@@ -49,10 +49,10 @@
 import type {PropType} from 'vue';
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {Chart} from '@antv/g2';
 
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {PointDashboardTrendBucket} from '@/config/types/dashboard';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 import {formatDateTime} from '@/utils/timeUtil';
 import {chartPalette, compactNumber, formatValue, hourLabel} from './util';
 
@@ -89,7 +89,7 @@ const emit = defineEmits<{
 
 const {t} = useI18n();
 const chartRef = ref<HTMLElement>();
-let chart: Chart | undefined;
+let disposeChart: (() => void) | undefined;
 
 const hasData = computed(() => props.data.length > 0);
 
@@ -120,81 +120,82 @@ const rows = computed(() =>
 );
 
 const destroyChart = () => {
-  chart?.destroy();
-  chart = undefined;
+  disposeChart?.();
+  disposeChart = undefined;
 };
 
 const draw = () => {
   const el = chartRef.value;
   if (!el) return;
   destroyChart();
-  chart = new Chart({container: el, autoFit: true});
   const {primary} = chartPalette();
   const data = rows.value;
 
-  chart
-    .rangeY()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', ['min', 'max'])
-    .style('fill', primary)
-    .style('fillOpacity', 0.12)
-    .scale('y', {nice: true})
-    .axis({
-      x: {title: false, labelAutoHide: true},
-      y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))},
-    })
-    .legend(false);
+  disposeChart = mountG2Chart(el, (chart) => {
+    chart
+      .rangeY()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', ['min', 'max'])
+      .style('fill', primary)
+      .style('fillOpacity', 0.12)
+      .scale('y', {nice: true})
+      .axis({
+        x: {title: false, labelAutoHide: true},
+        y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))},
+      })
+      .legend(false);
 
-  chart
-    .line()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', 'avg')
-    .encode('shape', 'smooth')
-    .style('stroke', primary)
-    .style('lineWidth', 2)
-    .axis(false)
-    .legend(false);
+    chart
+      .line()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', 'avg')
+      .encode('shape', 'smooth')
+      .style('stroke', primary)
+      .style('lineWidth', 2)
+      .axis(false)
+      .legend(false);
 
-  chart
-    .point()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', 'avg')
-    .style('fill', primary)
-    .style('r', 2.5)
-    .axis(false)
-    .legend(false);
+    chart
+      .point()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', 'avg')
+      .style('fill', primary)
+      .style('r', 2.5)
+      .axis(false)
+      .legend(false);
 
-  chart.interaction('tooltip', {
-    render: (
-      _event: unknown,
-      {items}: {items: Array<{value: unknown; data?: Record<string, unknown>}>}
-    ) => {
-      const d = items?.[0]?.data as Record<string, any> | undefined;
-      if (!d) return '';
-      const unit = props.unit ? ` ${props.unit}` : '';
-      const rowsHtml = [
-        [t('pointValue.dashboard.trend.min'), d.min],
-        [t('pointValue.dashboard.trend.max'), d.max],
-        [t('pointValue.dashboard.trend.avg'), d.avg],
-      ]
-        .filter(([, v]) => v != null && Number.isFinite(Number(v)))
-        .map(
-          ([name, v]) =>
-            `<div class="trend-band-tooltip__row"><span>${name}</span><b>${formatValue(Number(v))}${unit}</b></div>`
-        )
-        .join('');
-      return `<div class="trend-band-tooltip">
-        <div class="trend-band-tooltip__title">${formatDateTime(String(d.from ?? ''))}</div>
-        ${rowsHtml}
-        <div class="trend-band-tooltip__count">${Number(d.count) || 0} ${t('pointValue.dashboard.trend.samples')}</div>
-      </div>`;
-    },
+    chart.interaction('tooltip', {
+      render: (
+        _event: unknown,
+        {items}: {items: Array<{value: unknown; data?: Record<string, unknown>}>}
+      ) => {
+        const d = items?.[0]?.data as Record<string, any> | undefined;
+        if (!d) return '';
+        const unit = props.unit ? ` ${props.unit}` : '';
+        const rowsHtml = [
+          [t('pointValue.dashboard.trend.min'), d.min],
+          [t('pointValue.dashboard.trend.max'), d.max],
+          [t('pointValue.dashboard.trend.avg'), d.avg],
+        ]
+          .filter(([, v]) => v != null && Number.isFinite(Number(v)))
+          .map(
+            ([name, v]) =>
+              `<div class="trend-band-tooltip__row"><span>${name}</span><b>${formatValue(Number(v))}${unit}</b></div>`
+          )
+          .join('');
+        return `<div class="trend-band-tooltip">
+          <div class="trend-band-tooltip__title">${formatDateTime(String(d.from ?? ''))}</div>
+          ${rowsHtml}
+          <div class="trend-band-tooltip__count">${Number(d.count) || 0} ${t('pointValue.dashboard.trend.samples')}</div>
+        </div>`;
+      },
+    });
+
+    chart.render();
   });
-
-  chart.render();
 };
 
 // Redraw whenever the data, unit or window label mode changes. The canvas

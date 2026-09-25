@@ -39,6 +39,7 @@ import {Chart} from '@antv/g2';
 import {alertTrend} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 const props = defineProps<{ days?: number }>();
 const {t, locale} = useI18n();
@@ -47,12 +48,21 @@ const {loading, run, status} = useAsyncLoader();
 const rows = ref<{date: string; source: string; count: number}[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 const render = (data: { date: string; source: string; count: number }[]) => {
   const el = chartRef.value;
   if (!el) return;
-  chart?.destroy();
+  destroyChart();
   chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
   chart
     .line()
     .data(data)
@@ -96,19 +106,13 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (rows.value.length > 0) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(() => props.days, load);
 watch(locale, load);
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 
 defineExpose({refresh: load});
 </script>

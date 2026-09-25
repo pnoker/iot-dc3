@@ -40,6 +40,7 @@ import {alertTopSources} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 const props = defineProps<{ days?: number; limit?: number }>();
 const {locale} = useI18n();
@@ -48,13 +49,22 @@ const {loading, run, status} = useAsyncLoader();
 const rows = ref<{name: string; count: number}[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
 const {resolveBySource, nameBySource} = useEntityNames();
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 const render = (data: { name: string; count: number }[]) => {
   const el = chartRef.value;
   if (!el) return;
-  chart?.destroy();
+  destroyChart();
   chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
   chart
     .interval()
     .data(data)
@@ -88,19 +98,13 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (rows.value.length > 0) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(() => props.days, load);
 watch(locale, load);
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 
 defineExpose({refresh: load});
 </script>

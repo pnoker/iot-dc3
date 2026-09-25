@@ -38,7 +38,6 @@
 <script lang="ts" setup>
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {Chart} from '@antv/g2';
 
 import {statsActivity} from '@/api/dashboard';
 import {deviceActivity} from '@/api/dashboard/device';
@@ -46,6 +45,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 
 const {t} = useI18n();
 // A weekday/hour heatmap is most informative over a full week. The previous
@@ -55,7 +55,7 @@ const props = defineProps<{deviceId?: string}>();
 const rangeKey = ref<RangeKey>('7d');
 const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
-let chart: Chart | undefined;
+let disposeChart: (() => void) | undefined;
 const rows = ref<{dow: number; hour: number; count: number}[]>([]);
 const hasData = computed(() => rows.value.length > 0);
 
@@ -70,10 +70,15 @@ const dayLabels = computed(() => [
   t('home.activity.dow.sat'),
 ]);
 
+const destroyChart = () => {
+  disposeChart?.();
+  disposeChart = undefined;
+};
+
 const render = (rows: { dow: number; hour: number; count: number }[]) => {
-  if (!chartRef.value) return;
-  chart?.destroy();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+  const el = chartRef.value;
+  if (!el) return;
+  destroyChart();
 
   const labels = dayLabels.value;
   const data = rows.map((r) => ({
@@ -82,26 +87,28 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
     count: Number(r.count) || 0,
   }));
 
-  chart
-    .cell()
-    .data(data)
-    .encode('x', 'hour')
-    .encode('y', 'dow')
-    .encode('color', 'count')
-    .scale('color', {
-      type: 'sequential',
-      palette: 'blues',
-    })
-    .style({stroke: '#ffffff', lineWidth: 1, inset: 0.5})
-    .axis({
-      x: {title: false, labelAutoHide: false},
-      y: {title: false},
-    })
-    .tooltip({
-      title: (d: any) => `${d.dow} ${d.hour}:00`,
-      items: [{field: 'count', name: t('home.activity.count')}],
-    });
-  chart.render();
+  disposeChart = mountG2Chart(el, (chart) => {
+    chart
+      .cell()
+      .data(data)
+      .encode('x', 'hour')
+      .encode('y', 'dow')
+      .encode('color', 'count')
+      .scale('color', {
+        type: 'sequential',
+        palette: 'blues',
+      })
+      .style({stroke: '#ffffff', lineWidth: 1, inset: 0.5})
+      .axis({
+        x: {title: false, labelAutoHide: false},
+        y: {title: false},
+      })
+      .tooltip({
+        title: (d: any) => `${d.dow} ${d.hour}:00`,
+        items: [{field: 'count', name: t('home.activity.count')}],
+      });
+    chart.render();
+  });
 };
 
 const load = async () => {
@@ -124,25 +131,16 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (hasData.value) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(rangeKey, load);
 watch(() => props.deviceId, load);
 watch(error, (value) => {
-  if (value) {
-    chart?.destroy();
-    chart = undefined;
-  }
+  if (value) destroyChart();
 });
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 </script>
 
 <style lang="scss" scoped>

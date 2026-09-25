@@ -43,6 +43,7 @@ import {alertAging} from '@/api/dashboard';
 import type {AgingBacklog} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 const {t, locale} = useI18n();
 const {loading, run, status} = useAsyncLoader();
@@ -50,6 +51,14 @@ const {loading, run, status} = useAsyncLoader();
 const data = reactive<AgingBacklog>({under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 // Palette is green→yellow→orange→red — progressively more alarming as
 // unconfirmed alarms age. The 24h+ bucket is the SLA breach indicator.
@@ -58,8 +67,9 @@ const colours = ['#67c23a', '#e6a23c', '#f56c6c', '#c45656'];
 const render = () => {
   const el = chartRef.value;
   if (!el) return;
-  chart?.destroy();
+  destroyChart();
   chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
   const rows = [
     {bucket: t('settings.event.overview.agingBucketUnder1h'), count: data.under1h, idx: 0},
     {bucket: t('settings.event.overview.agingBucket1to6'), count: data.h1to6, idx: 1},
@@ -85,17 +95,14 @@ const load = () =>
       Object.assign(data, result ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
       void nextTick().then(() => {
         if (data.total > 0) render();
-        else {
-          chart?.destroy();
-          chart = undefined;
-        }
+        else destroyChart();
       });
     },
   });
 
 onMounted(load);
 watch(locale, load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(destroyChart);
 
 defineExpose({refresh: load});
 </script>

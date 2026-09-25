@@ -22,7 +22,8 @@
 <script lang="ts" setup>
 import type {PropType} from 'vue';
 import {onMounted, onUnmounted, ref, watch} from 'vue';
-import {Chart} from '@antv/g2';
+
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 
 /**
  * A small area+line chart used by stat cards and the point-value history
@@ -30,8 +31,8 @@ import {Chart} from '@antv/g2';
  * callers used to duplicate:
  *   - CSS-string gradient fill (G2 v5 rejects descriptor-object form,
  *     throws `colorStr.indexOf is not a function`)
- *   - rAF-wrapped chart construction so autoFit picks up a real width
- *     even when the parent grid is still laying out
+ *   - mountG2Chart so construction waits for a real box and later card/grid
+ *     resizes re-fit the chart instead of leaving a stale tiny canvas
  *   - flush:'post' + immediate watch so the first paint happens after
  *     Vue has patched the DOM
  */
@@ -70,7 +71,7 @@ const props = defineProps({
 });
 
 const containerRef = ref<HTMLElement>();
-let chart: Chart | undefined;
+let disposeChart: (() => void) | undefined;
 
 const resolveCssColor = (color: string) => {
   const match = color.match(/^var\((--[^),]+)(?:,[^)]+)?\)$/);
@@ -79,77 +80,74 @@ const resolveCssColor = (color: string) => {
   return getComputedStyle(document.documentElement).getPropertyValue(token).trim() || color;
 };
 
-const draw = (attempt = 0) => {
+const destroyChart = () => {
+  disposeChart?.();
+  disposeChart = undefined;
+};
+
+const draw = () => {
   const el = containerRef.value;
   if (!el || !props.data || props.data.length === 0) return;
-  requestAnimationFrame(() => {
-    const node = containerRef.value;
-    if (!node) return;
-    // autoFit reads the container's offsetWidth once at construction time.
-    // When the parent layout hasn't settled yet (e.g. a grid cell that
-    // hasn't finished sizing on the first paint), the chart silently
-    // renders with zero width. Retry a couple of frames before giving up.
-    if (node.offsetWidth === 0 && attempt < 5) {
-      draw(attempt + 1);
-      return;
-    }
-    const points = props.data.map((y, i) => ({x: i, y: Number.isFinite(y) ? y : 0}));
+  destroyChart();
+  const points = props.data.map((y, i) => ({x: i, y: Number.isFinite(y) ? y : 0}));
+  const color = resolveCssColor(props.color);
+  const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${color} 100%)`;
 
-    chart?.destroy();
-    chart = new Chart({
-      container: node,
-      autoFit: true,
+  // The sparkline pins its height (a stat-card strip slot) but keeps the
+  // width container-driven, so mountG2Chart's size observer still tracks
+  // card/grid resizes — the race that used to leave 0-width charts behind.
+  disposeChart = mountG2Chart(
+    el,
+    (chart) => {
+      const area = chart
+        .area()
+        .data(points)
+        .encode('x', 'x')
+        .encode('y', 'y')
+        .encode('shape', 'smooth')
+        .scale('y', {zero: true})
+        .style('fill', fillGradient)
+        .style('fillOpacity', 0.3)
+        .axis(false)
+        .legend(false);
+      if (props.animate) {
+        area.animate('enter', {type: 'fadeIn'});
+      }
+      if (props.tooltipUnit) {
+        chart.interaction('tooltip', {
+          render: (_e: unknown, {items}: { items: Array<{ value: unknown }> }) => {
+            const first = items[0];
+            return first ? `${first.value} ${props.tooltipUnit}` : '';
+          },
+        });
+      } else {
+        area.tooltip(false);
+      }
+
+      if (props.showLine) {
+        const line = chart
+          .line()
+          .data(points)
+          .encode('x', 'x')
+          .encode('y', 'y')
+          .encode('shape', 'smooth')
+          .style('stroke', color)
+          .style('lineWidth', 2)
+          .axis(false)
+          .legend(false);
+        if (!props.tooltipUnit) line.tooltip(false);
+      }
+
+      chart.render();
+    },
+    {
       height: props.height,
       paddingTop: 2,
       paddingBottom: 2,
       paddingLeft: 2,
       paddingRight: 2,
-    });
-
-    const color = resolveCssColor(props.color);
-    const fillGradient = `linear-gradient(90deg, rgba(255,255,255,0) 0%, ${color} 100%)`;
-
-    const area = chart
-      .area()
-      .data(points)
-      .encode('x', 'x')
-      .encode('y', 'y')
-      .encode('shape', 'smooth')
-      .scale('y', {zero: true})
-      .style('fill', fillGradient)
-      .style('fillOpacity', 0.3)
-      .axis(false)
-      .legend(false);
-    if (props.animate) {
-      area.animate('enter', {type: 'fadeIn'});
     }
-    if (props.tooltipUnit) {
-      chart.interaction('tooltip', {
-        render: (_e: unknown, {items}: { items: Array<{ value: unknown }> }) => {
-          const first = items[0];
-          return first ? `${first.value} ${props.tooltipUnit}` : '';
-        },
-      });
-    } else {
-      area.tooltip(false);
-    }
-
-    if (props.showLine) {
-      const line = chart
-        .line()
-        .data(points)
-        .encode('x', 'x')
-        .encode('y', 'y')
-        .encode('shape', 'smooth')
-        .style('stroke', color)
-        .style('lineWidth', 2)
-        .axis(false)
-        .legend(false);
-      if (!props.tooltipUnit) line.tooltip(false);
-    }
-
-    chart.render();
-  });
+  );
 };
 
 // Initial paint triggers from onMounted (not from watch immediate:true).
@@ -163,7 +161,7 @@ watch(
   {deep: true, flush: 'post'}
 );
 
-onUnmounted(() => chart?.destroy());
+onUnmounted(destroyChart);
 </script>
 
 <style lang="scss" scoped>

@@ -37,7 +37,6 @@
 
 <script lang="ts" setup>
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
-import {Chart} from '@antv/g2';
 
 import {statsTimeseries} from '@/api/dashboard';
 import {deviceTimeseries} from '@/api/dashboard/device';
@@ -45,46 +44,49 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 
 const props = defineProps<{deviceId?: string}>();
 
 const rangeKey = ref<RangeKey>('24h');
 const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
-let chart: Chart | undefined;
+let disposeChart: (() => void) | undefined;
 const points = ref<{bucket: string; count: number}[]>([]);
 const hasData = computed(() => points.value.length > 0);
 
-const ensureChart = () => {
-  if (!chartRef.value) return;
-  chart?.destroy();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+const destroyChart = () => {
+  disposeChart?.();
+  disposeChart = undefined;
 };
 
 const render = (points: { bucket: string; count: number }[]) => {
-  ensureChart();
-  if (!chart) return;
-  chart
-    .area()
-    .data(points)
-    .encode('x', 'bucket')
-    .encode('y', 'count')
-    .encode('shape', 'smooth')
-    .scale('y', {zero: true, nice: true})
-    .style('fill', 'linear-gradient(-90deg, rgba(64,158,255,0.02) 0%, rgba(64,158,255,0.45) 100%)')
-    .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
-    .animate('enter', {type: 'fadeIn', duration: 400});
-  chart
-    .line()
-    .data(points)
-    .encode('x', 'bucket')
-    .encode('y', 'count')
-    .encode('shape', 'smooth')
-    .style('stroke', '#409eff')
-    .style('lineWidth', 2)
-    .axis(false)
-    .legend(false);
-  chart.render();
+  const el = chartRef.value;
+  if (!el) return;
+  destroyChart();
+  disposeChart = mountG2Chart(el, (chart) => {
+    chart
+      .area()
+      .data(points)
+      .encode('x', 'bucket')
+      .encode('y', 'count')
+      .encode('shape', 'smooth')
+      .scale('y', {zero: true, nice: true})
+      .style('fill', 'linear-gradient(-90deg, rgba(64,158,255,0.02) 0%, rgba(64,158,255,0.45) 100%)')
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
+      .animate('enter', {type: 'fadeIn', duration: 400});
+    chart
+      .line()
+      .data(points)
+      .encode('x', 'bucket')
+      .encode('y', 'count')
+      .encode('shape', 'smooth')
+      .style('stroke', '#409eff')
+      .style('lineWidth', 2)
+      .axis(false)
+      .legend(false);
+    chart.render();
+  });
 };
 
 // Backend resolves rangeKey → from-timestamp itself (TimeRangeUtil);
@@ -120,25 +122,16 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (hasData.value) render(points.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(rangeKey, load);
 watch(() => props.deviceId, load);
 watch(error, (value) => {
-  if (value) {
-    chart?.destroy();
-    chart = undefined;
-  }
+  if (value) destroyChart();
 });
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 </script>
 
 <style lang="scss" scoped>

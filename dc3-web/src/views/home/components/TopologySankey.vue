@@ -115,6 +115,7 @@ import DashboardCard from "@/components/card/dashboard/DashboardCard.vue";
 import RangeSegmented from "@/components/segmented/RangeSegmented.vue";
 import ResponsiveRecordList from "@/components/list/ResponsiveRecordList.vue";
 import { useAsyncLoader } from "@/utils/asyncLoaderUtil";
+import { observeChartSize } from "@/utils/g2ChartUtil";
 
 const { t, locale } = useI18n();
 const router = useRouter();
@@ -143,6 +144,7 @@ const othersDialog = reactive<{
   children: [],
 });
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
 const { loading, status, run } = useAsyncLoader();
 
 const hiddenChildColumns = computed(() => [
@@ -249,6 +251,8 @@ const render = (payload: TopologyResponse) => {
 
   chart?.destroy();
   chart = new Chart({ container: el, autoFit: true });
+  disposeFit?.();
+  disposeFit = observeChartSize(el, chart);
 
   chart.options({
     type: "sankey",
@@ -357,6 +361,8 @@ const render = (payload: TopologyResponse) => {
 };
 
 const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
   if (!chart) return;
   try {
     chart.destroy();

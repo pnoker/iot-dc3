@@ -38,7 +38,6 @@
 <script lang="ts" setup>
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {Chart} from '@antv/g2';
 
 import {statsLatency} from '@/api/dashboard';
 import {deviceLatency} from '@/api/dashboard/device';
@@ -46,6 +45,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 
 const {t} = useI18n();
 const props = defineProps<{deviceId?: string}>();
@@ -53,7 +53,7 @@ const props = defineProps<{deviceId?: string}>();
 const rangeKey = ref<RangeKey>('24h');
 const {error, loading, run, status} = useAsyncLoader();
 const chartRef = ref<HTMLElement>();
-let chart: Chart | undefined;
+let disposeChart: (() => void) | undefined;
 const rows = ref<{bin: number; count: number}[]>([]);
 const hasData = computed(() => rows.value.length > 0);
 
@@ -67,27 +67,34 @@ const binLabels = () => [
   t('home.latency.bin.over30s'),
 ];
 
+const destroyChart = () => {
+  disposeChart?.();
+  disposeChart = undefined;
+};
+
 const render = (rows: { bin: number; count: number }[]) => {
-  if (!chartRef.value) return;
-  chart?.destroy();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+  const el = chartRef.value;
+  if (!el) return;
+  destroyChart();
   const labels = binLabels();
   const data = rows.map((r) => ({label: labels[r.bin] || `bin-${r.bin}`, bin: r.bin, count: Number(r.count) || 0}));
-  chart
-    .interval()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', 'count')
-    .encode('color', 'bin')
-    // Latency distributions are strongly right-skewed. A square-root scale
-    // preserves a zero baseline while keeping rare slow buckets visible.
-    .scale('y', {type: 'sqrt', zero: true, nice: true})
-    .scale('color', {
-      range: ['#67c23a', '#95d475', '#f0c14b', '#e6a23c', '#f56c6c', '#c45656'],
-    })
-    .legend(false)
-    .axis({x: {title: false, labelAutoRotate: false}, y: {title: false}});
-  chart.render();
+  disposeChart = mountG2Chart(el, (chart) => {
+    chart
+      .interval()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', 'count')
+      .encode('color', 'bin')
+      // Latency distributions are strongly right-skewed. A square-root scale
+      // preserves a zero baseline while keeping rare slow buckets visible.
+      .scale('y', {type: 'sqrt', zero: true, nice: true})
+      .scale('color', {
+        range: ['#67c23a', '#95d475', '#f0c14b', '#e6a23c', '#f56c6c', '#c45656'],
+      })
+      .legend(false)
+      .axis({x: {title: false, labelAutoRotate: false}, y: {title: false}});
+    chart.render();
+  });
 };
 
 const load = async () => {
@@ -106,25 +113,16 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (hasData.value) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(rangeKey, load);
 watch(() => props.deviceId, load);
 watch(error, (value) => {
-  if (value) {
-    chart?.destroy();
-    chart = undefined;
-  }
+  if (value) destroyChart();
 });
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 </script>
 
 <style lang="scss" scoped>

@@ -96,10 +96,10 @@
 <script lang="ts" setup>
 import type {PropType} from 'vue';
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
-import {Chart} from '@antv/g2';
 
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {PointDashboardGap, PointDashboardHourVolume, PointDashboardIntervalBin} from '@/config/types/dashboard';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 import {formatClock, formatMs} from '@/utils/timeUtil';
 import {chartPalette, compactNumber, hourLabel, intervalBinLabel} from './util';
 
@@ -141,8 +141,8 @@ const MAX_GAPS = 10;
 
 const intervalChartRef = ref<HTMLElement>();
 const hourlyChartRef = ref<HTMLElement>();
-let intervalChart: Chart | undefined;
-let hourlyChart: Chart | undefined;
+let disposeIntervalChart: (() => void) | undefined;
+let disposeHourlyChart: (() => void) | undefined;
 
 const visibleGaps = computed(() => props.gaps.slice(0, MAX_GAPS));
 
@@ -165,10 +165,10 @@ const hourlyRows = computed(() =>
 );
 
 const destroyCharts = () => {
-  intervalChart?.destroy();
-  intervalChart = undefined;
-  hourlyChart?.destroy();
-  hourlyChart = undefined;
+  disposeIntervalChart?.();
+  disposeIntervalChart = undefined;
+  disposeHourlyChart?.();
+  disposeHourlyChart = undefined;
 };
 
 // Interval histogram: one bar per fixed bin, the open-ended top bin
@@ -177,41 +177,43 @@ const destroyCharts = () => {
 const drawInterval = () => {
   const el = intervalChartRef.value;
   if (!el) return;
-  intervalChart?.destroy();
-  intervalChart = new Chart({container: el, autoFit: true});
+  disposeIntervalChart?.();
   const {primary, danger} = chartPalette();
   const data = intervalRows.value;
-  intervalChart
-    .interval()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', 'count')
-    .encode('color', 'open')
-    .scale('y', {type: 'sqrt', zero: true, nice: true})
-    .scale('color', {range: [primary, danger]})
-    .axis({x: {title: false, labelAutoHide: true}, y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))}})
-    .legend(false);
-  intervalChart.render();
+  disposeIntervalChart = mountG2Chart(el, (chart) => {
+    chart
+      .interval()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', 'count')
+      .encode('color', 'open')
+      .scale('y', {type: 'sqrt', zero: true, nice: true})
+      .scale('color', {range: [primary, danger]})
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))}})
+      .legend(false);
+    chart.render();
+  });
 };
 
 // Hourly volume: plain bars, one per hour of the window.
 const drawHourly = () => {
   const el = hourlyChartRef.value;
   if (!el) return;
-  hourlyChart?.destroy();
-  hourlyChart = new Chart({container: el, autoFit: true});
+  disposeHourlyChart?.();
   const {primary} = chartPalette();
   const data = hourlyRows.value;
-  hourlyChart
-    .interval()
-    .data(data)
-    .encode('x', 'label')
-    .encode('y', 'count')
-    .style('fill', primary)
-    .scale('y', {zero: true, nice: true})
-    .axis({x: {title: false, labelAutoHide: true}, y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))}})
-    .legend(false);
-  hourlyChart.render();
+  disposeHourlyChart = mountG2Chart(el, (chart) => {
+    chart
+      .interval()
+      .data(data)
+      .encode('x', 'label')
+      .encode('y', 'count')
+      .style('fill', primary)
+      .scale('y', {zero: true, nice: true})
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))}})
+      .legend(false);
+    chart.render();
+  });
 };
 
 watch(
@@ -220,13 +222,13 @@ watch(
     await nextTick();
     if (intervalChartRef.value && intervalRows.value.length) drawInterval();
     else {
-      intervalChart?.destroy();
-      intervalChart = undefined;
+      disposeIntervalChart?.();
+      disposeIntervalChart = undefined;
     }
     if (hourlyChartRef.value && hourlyRows.value.length) drawHourly();
     else {
-      hourlyChart?.destroy();
-      hourlyChart = undefined;
+      disposeHourlyChart?.();
+      disposeHourlyChart = undefined;
     }
   },
   {deep: true, flush: 'post'}

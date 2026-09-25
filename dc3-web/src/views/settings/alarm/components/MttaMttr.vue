@@ -46,6 +46,7 @@ import {alertMtta} from '@/api/dashboard';
 import type {MttaTrend} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 import {formatMs} from '@/utils/timeUtil';
 
 const {t} = useI18n();
@@ -61,6 +62,14 @@ const daysKey = ref<string>('30');
 const rows = ref<MttaTrend[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 const subtitleText = computed(() => {
   if (rows.value.length === 0) return '';
@@ -74,8 +83,9 @@ const subtitleText = computed(() => {
 const render = () => {
   const el = chartRef.value;
   if (!el) return;
-  chart?.destroy();
+  destroyChart();
   chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
 
   // Two-series line: p50 (green, operator-steady) and p95 (red, tail
   // latency). Y axis in seconds to keep numbers readable.
@@ -104,17 +114,14 @@ const load = () =>
       rows.value = result ?? [];
       void nextTick().then(() => {
         if (rows.value.length > 0) render();
-        else {
-          chart?.destroy();
-          chart = undefined;
-        }
+        else destroyChart();
       });
     },
   });
 
 watch(daysKey, load);
 onMounted(load);
-onUnmounted(() => chart?.destroy());
+onUnmounted(destroyChart);
 
 defineExpose({refresh: load});
 </script>

@@ -67,6 +67,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
 import RangeSegmented from '@/components/segmented/RangeSegmented.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 type TabKey = 'deviceStatus' | 'protocol' | 'profile' | 'topDevice' | 'topPoint' | 'topDriver';
 type Group = 'structural' | 'top';
@@ -129,16 +130,21 @@ const caption = computed(() => {
 });
 
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
 
 const disposeChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
   chart?.destroy();
   chart = undefined;
 };
 
 const createChart = () => {
-  if (!chartRef.value) return;
+  const el = chartRef.value;
+  if (!el) return;
   disposeChart();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+  chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
 };
 
 // Entity id → display name caches so top-N charts render labels, not ids.

@@ -43,6 +43,7 @@
 import {Chart} from '@antv/g2';
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
 import i18n from '@/config/i18n';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 import type {ChartSpec} from './assistantContent';
 import type {AgenticVisualizationSpec, AgenticVisualizationType} from '@/config/types';
 
@@ -56,6 +57,7 @@ const t = i18n.global.t.bind(i18n.global);
 
 const containerRef = ref<HTMLDivElement>();
 let chartInstance: Chart | undefined;
+let disposeFit: (() => void) | undefined;
 
 type NormalizedChart = Required<Pick<AgenticVisualizationSpec, 'type' | 'dataset' | 'encode'>> &
   Omit<AgenticVisualizationSpec, 'type' | 'dataset' | 'encode'>;
@@ -177,6 +179,7 @@ const renderChart = () => {
     paddingBottom: 32,
     paddingLeft: 48,
   });
+  disposeFit = observeChartSize(container, chartInstance);
 
   if (current.type === 'pie' || current.type === 'donut') {
     renderPieLikeChart(chartInstance, current);
@@ -264,6 +267,8 @@ const formatValue = (value: unknown) => {
 };
 
 const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
   chartInstance?.destroy();
   chartInstance = undefined;
 };

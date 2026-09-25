@@ -25,6 +25,7 @@ const chartInstanceMocks = vi.hoisted(() => ({
   interaction: vi.fn(),
   render: vi.fn(),
   destroy: vi.fn(),
+  forceFit: vi.fn(),
   ChartCtor: vi.fn(),
 }));
 
@@ -51,6 +52,7 @@ vi.mock('@antv/g2', () => {
     interaction = chartInstanceMocks.interaction;
     render = chartInstanceMocks.render;
     destroy = chartInstanceMocks.destroy;
+    forceFit = chartInstanceMocks.forceFit;
 
     constructor() {
       chartInstanceMocks.ChartCtor();

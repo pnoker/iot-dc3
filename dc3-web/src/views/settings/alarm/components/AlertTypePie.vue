@@ -41,6 +41,7 @@ import {alertTypeDistribution} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {AlertTypeRow} from '@/config/types/dashboard';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 const {t, locale} = useI18n();
 
@@ -48,6 +49,14 @@ const {loading, run, status} = useAsyncLoader();
 const rows = ref<AlertTypeRow[]>([]);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 // Human-readable label per event-ext.type tag produced by the backend.
 // Falls back to the raw type when the backend introduces a new tag we
@@ -59,9 +68,11 @@ const labelFor = (type: string) => {
 };
 
 const render = (data: AlertTypeRow[]) => {
-  if (!chartRef.value) return;
-  chart?.destroy();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+  const el = chartRef.value;
+  if (!el) return;
+  destroyChart();
+  chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
   const mapped = data.map((r) => ({type: labelFor(r.type), count: Number(r.count) || 0}));
   chart
     .interval()
@@ -88,18 +99,12 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (rows.value.length > 0) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(locale, load);
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 defineExpose({refresh: load});
 </script>
 

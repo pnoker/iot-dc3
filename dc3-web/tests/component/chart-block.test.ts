@@ -35,6 +35,7 @@ vi.mock('@antv/g2', () => {
     this.area = vi.fn(() => mark);
     this.coordinate = vi.fn().mockReturnThis();
     this.destroy = vi.fn();
+    this.forceFit = vi.fn();
     this.interval = vi.fn(() => mark);
     this.line = vi.fn(() => mark);
     this.point = vi.fn(() => mark);
@@ -78,9 +79,11 @@ describe('ChartBlock', () => {
   });
 
   it('rejects unsupported chart types through the safe whitelist', () => {
-    // @ts-expect-error — `type: 'custom'` is intentionally outside the
-    // AgenticVisualizationSpec union to verify the whitelist guard.
     const chart: AgenticVisualizationSpec = {
+      // @ts-expect-error — `type: 'custom'` is intentionally outside the
+      // AgenticVisualizationSpec union to verify the whitelist guard. The
+      // directive must sit on the offending property line: it only suppresses
+      // errors on the line directly below it, not across the object literal.
       type: 'custom',
       dataset: [{x: 1, y: 2}],
       encode: {x: 'x', y: 'y'},

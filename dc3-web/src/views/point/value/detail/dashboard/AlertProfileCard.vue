@@ -98,10 +98,10 @@
 import type {PropType} from 'vue';
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {Chart} from '@antv/g2';
 
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {AlertEventRow, PointAlertDaily, PointAlertProfile} from '@/config/types/dashboard';
+import {mountG2Chart} from '@/utils/g2ChartUtil';
 import {formatClock} from '@/utils/timeUtil';
 import {chartPalette} from './util';
 
@@ -140,8 +140,8 @@ const emit = defineEmits<{ (e: 'refresh'): void }>();
 const {t, locale} = useI18n();
 const ringChartRef = ref<HTMLElement>();
 const dailyChartRef = ref<HTMLElement>();
-let ringChart: Chart | undefined;
-let dailyChart: Chart | undefined;
+let disposeRingChart: (() => void) | undefined;
+let disposeDailyChart: (() => void) | undefined;
 
 // Human-readable label per event-ext.type tag produced by the backend,
 // reusing the alarm overview's type dictionary. Unknown tags fall back to
@@ -176,47 +176,49 @@ const dailyRows = computed(() => {
 });
 
 const destroyCharts = () => {
-  ringChart?.destroy();
-  ringChart = undefined;
-  dailyChart?.destroy();
-  dailyChart = undefined;
+  disposeRingChart?.();
+  disposeRingChart = undefined;
+  disposeDailyChart?.();
+  disposeDailyChart = undefined;
 };
 
 // Type distribution donut: stacked theta intervals with a right-side legend.
 const drawRing = () => {
   const el = ringChartRef.value;
   if (!el) return;
-  ringChart?.destroy();
-  ringChart = new Chart({container: el, autoFit: true});
-  ringChart
-    .interval()
-    .data(typeRows.value)
-    .transform({type: 'stackY'})
-    .coordinate({type: 'theta', innerRadius: 0.6})
-    .encode('y', 'count')
-    .encode('color', 'type')
-    .legend('color', {position: 'right'})
-    .tooltip({title: (d: {type: string}) => d.type, items: [{field: 'count'}]});
-  ringChart.render();
+  disposeRingChart?.();
+  disposeRingChart = mountG2Chart(el, (chart) => {
+    chart
+      .interval()
+      .data(typeRows.value)
+      .transform({type: 'stackY'})
+      .coordinate({type: 'theta', innerRadius: 0.6})
+      .encode('y', 'count')
+      .encode('color', 'type')
+      .legend('color', {position: 'right'})
+      .tooltip({title: (d: {type: string}) => d.type, items: [{field: 'count'}]});
+    chart.render();
+  });
 };
 
 // Daily alarm counts: a quiet mini bar strip, one bar per day.
 const drawDaily = () => {
   const el = dailyChartRef.value;
   if (!el) return;
-  dailyChart?.destroy();
-  dailyChart = new Chart({container: el, autoFit: true});
+  disposeDailyChart?.();
   const {primary} = chartPalette();
-  dailyChart
-    .interval()
-    .data(dailyRows.value)
-    .encode('x', 'label')
-    .encode('y', 'count')
-    .style('fill', primary)
-    .scale('y', {zero: true, nice: true})
-    .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
-    .legend(false);
-  dailyChart.render();
+  disposeDailyChart = mountG2Chart(el, (chart) => {
+    chart
+      .interval()
+      .data(dailyRows.value)
+      .encode('x', 'label')
+      .encode('y', 'count')
+      .style('fill', primary)
+      .scale('y', {zero: true, nice: true})
+      .axis({x: {title: false, labelAutoHide: true}, y: {title: false}})
+      .legend(false);
+    chart.render();
+  });
 };
 
 watch(
@@ -225,13 +227,13 @@ watch(
     await nextTick();
     if (ringChartRef.value && typeRows.value.length) drawRing();
     else {
-      ringChart?.destroy();
-      ringChart = undefined;
+      disposeRingChart?.();
+      disposeRingChart = undefined;
     }
     if (dailyChartRef.value && dailyRows.value.length) drawDaily();
     else {
-      dailyChart?.destroy();
-      dailyChart = undefined;
+      disposeDailyChart?.();
+      disposeDailyChart = undefined;
     }
   },
   {deep: true, flush: 'post'}

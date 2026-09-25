@@ -39,6 +39,7 @@ import {Chart} from '@antv/g2';
 import {alertActivity} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
+import {observeChartSize} from '@/utils/g2ChartUtil';
 
 const {t, locale} = useI18n();
 
@@ -47,6 +48,14 @@ const rows = ref<{dow: number; hour: number; count: number}[]>([]);
 const hasData = computed(() => rows.value.length > 0);
 const chartRef = ref<HTMLElement>();
 let chart: Chart | undefined;
+let disposeFit: (() => void) | undefined;
+
+const destroyChart = () => {
+  disposeFit?.();
+  disposeFit = undefined;
+  chart?.destroy();
+  chart = undefined;
+};
 
 // Sunday-first so the row order matches Postgres EXTRACT(DOW) (0..6 = Sun..Sat).
 const dayLabels = computed(() => [
@@ -60,9 +69,11 @@ const dayLabels = computed(() => [
 ]);
 
 const render = (rows: { dow: number; hour: number; count: number }[]) => {
-  if (!chartRef.value) return;
-  chart?.destroy();
-  chart = new Chart({container: chartRef.value, autoFit: true});
+  const el = chartRef.value;
+  if (!el) return;
+  destroyChart();
+  chart = new Chart({container: el, autoFit: true});
+  disposeFit = observeChartSize(el, chart);
   const labels = dayLabels.value;
   const data = rows.map((r) => ({
     dow: labels[r.dow] || `d-${r.dow}`,
@@ -102,18 +113,12 @@ const load = async () => {
   await nextTick();
   if (status.value !== 'success') return;
   if (hasData.value) render(rows.value);
-  else {
-    chart?.destroy();
-    chart = undefined;
-  }
+  else destroyChart();
 };
 
 onMounted(load);
 watch(locale, load);
-onUnmounted(() => {
-  chart?.destroy();
-  chart = undefined;
-});
+onUnmounted(destroyChart);
 defineExpose({refresh: load});
 </script>
 
