@@ -19,6 +19,7 @@ package io.github.pnoker.db.data;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
 import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.time.DatabaseInstant;
@@ -58,7 +59,7 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
         if (alarm.getId() == null) {
             alarm.setId(stableId(alarm));
         }
-        LocalDateTime now = utcNow();
+        LocalDateTime now = LocalDateTimeUtil.now();
         if (alarm.getCreateTime() == null) {
             alarm.setCreateTime(now);
         }
@@ -74,20 +75,20 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
                 .sql(sql)
                 .bind("id", alarm.getId())
                 .bind("alarm_target_type_flag", value(alarm.getAlarmTargetTypeFlag()))
-                .bind("entity_id", value(alarm.getEntityId()))
-                .bind("driver_id", value(alarm.getDriverId()))
-                .bind("device_id", value(alarm.getDeviceId()))
-                .bind("point_id", value(alarm.getPointId()))
-                .bind("rule_id", value(alarm.getRuleId()))
-                .bind("rule_state_id", value(alarm.getRuleStateId()))
+                .bind("entity_id", longValue(alarm.getEntityId()))
+                .bind("driver_id", longValue(alarm.getDriverId()))
+                .bind("device_id", longValue(alarm.getDeviceId()))
+                .bind("point_id", longValue(alarm.getPointId()))
+                .bind("rule_id", longValue(alarm.getRuleId()))
+                .bind("rule_state_id", longValue(alarm.getRuleStateId()))
                 .bind("alarm_type_flag", value(alarm.getAlarmTypeFlag()))
                 .bind("alarm_source_flag", value(alarm.getAlarmSourceFlag()))
                 .bind("alarm_level_flag", value(alarm.getAlarmLevelFlag()))
-                .bind("expired_time", value(alarm.getExpiredTime()))
+                .bind("expired_time", longValue(alarm.getExpiredTime()))
                 .bind("confirm_flag", value(alarm.getConfirmFlag()))
-                .bind("tenant_id", alarm.getTenantId())
-                .bind("create_time", alarm.getCreateTime())
-                .bind("operate_time", alarm.getOperateTime());
+                .bind("tenant_id", alarm.getTenantId());
+        spec = bindTime(spec, "create_time", alarm.getCreateTime());
+        spec = bindTime(spec, "operate_time", alarm.getOperateTime());
         spec = bindNullable(spec, "dedupe_key", alarm.getDedupeKey(), String.class);
         spec = spec.bind("alarm_ext", alarm.getAlarmExt() == null ? "{}" : JsonUtil.toJsonString(alarm.getAlarmExt()));
         return transactionalOperator
@@ -188,8 +189,31 @@ public class R2dbcEntityAlarmStore implements ReactiveEntityAlarmStore {
         return value == null ? 0 : value.intValue();
     }
 
-    private LocalDateTime utcNow() {
-        return LocalDateTime.now(ZoneOffset.UTC);
+    /**
+     * Bind a BIGINT identity column. Snowflake ids only survive the round trip
+     * through {@code longValue}: the {@code value} helper truncates to int and
+     * used to corrupt every entity_id/point_id/rule_id on insert.
+     * @param value the nullable numeric id
+     * @return the id as a long, or 0 when absent
+     */
+    private long longValue(Number value) {
+        return value == null ? 0L : value.longValue();
+    }
+
+    /**
+     * Bind a display-wall timestamp the way the point-value store does:
+     * {@code LocalDateTimeUtil.now()} walls anchored as UTC offsets, so the
+     * stored instant round-trips through {@link DatabaseInstant#toLocalDateTimeUtc}
+     * back to the same wall the API serves to the UI. Binding the wall raw (or
+     * mixing UTC walls in) shifted every alarm time by a timezone offset.
+     * @param spec the statement to bind into
+     * @param name the placeholder name
+     * @param value the wall time to bind, nullable
+     * @return the bound statement
+     */
+    private DatabaseClient.GenericExecuteSpec bindTime(
+            DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
+        return value == null ? spec : spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 
     private boolean validId(Long value) {

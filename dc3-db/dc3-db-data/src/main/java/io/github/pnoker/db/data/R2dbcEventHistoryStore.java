@@ -18,6 +18,7 @@ package io.github.pnoker.db.data;
 
 import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.repository.ReactiveEventHistoryStore;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.page.OffsetPage;
@@ -63,7 +64,7 @@ public class R2dbcEventHistoryStore implements ReactiveEventHistoryStore {
             return Mono.error(new IllegalArgumentException("tenantId and recordId are required"));
         }
         if (event.getId() == null) event.setId(UuidV7.nextLong());
-        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime now = LocalDateTimeUtil.now();
         if (event.getReceiveTime() == null) event.setReceiveTime(now);
         if (event.getCreateTime() == null) event.setCreateTime(now);
         if (event.getOperateTime() == null) event.setOperateTime(now);
@@ -82,15 +83,15 @@ public class R2dbcEventHistoryStore implements ReactiveEventHistoryStore {
                 .bind("event_type_flag", value(event.getEventTypeFlag()))
                 .bind("event_level_flag", value(event.getEventLevelFlag()))
                 .bind("message", event.getMessage())
-                .bind("occur_time", event.getOccurTime())
-                .bind("receive_time", event.getReceiveTime())
                 .bind("acknowledge_flag", value(event.getAcknowledgeFlag()))
-                .bind("schema_version", event.getSchemaVersion() == null ? (short) 1 : event.getSchemaVersion())
-                .bind("create_time", event.getCreateTime())
-                .bind("operate_time", event.getOperateTime());
+                .bind("schema_version", event.getSchemaVersion() == null ? (short) 1 : event.getSchemaVersion());
+        spec = bindTime(spec, "occur_time", event.getOccurTime());
+        spec = bindTime(spec, "receive_time", event.getReceiveTime());
+        spec = bindTime(spec, "create_time", event.getCreateTime());
+        spec = bindTime(spec, "operate_time", event.getOperateTime());
         spec = bindNullable(spec, "param_values", event.getParamValues(), String.class);
         spec = bindNullable(spec, "config_snapshot", event.getConfigSnapshot(), String.class);
-        spec = bindNullable(spec, "acknowledge_time", event.getAcknowledgeTime(), LocalDateTime.class);
+        spec = bindTime(spec, "acknowledge_time", event.getAcknowledgeTime());
         spec = bindNullable(spec, "acknowledge_user_id", event.getAcknowledgeUserId(), Long.class);
         return transactionalOperator
                 .transactional(spec.fetch().rowsUpdated())
@@ -217,6 +218,22 @@ public class R2dbcEventHistoryStore implements ReactiveEventHistoryStore {
 
     private LocalDateTime time(Object value) {
         return DatabaseInstant.toLocalDateTimeUtc(value);
+    }
+
+    /**
+     * Bind a display-wall timestamp the way the point-value store does:
+     * {@code LocalDateTimeUtil.now()} walls anchored as UTC offsets, so the
+     * stored instant round-trips back to the wall the API serves to the UI.
+     * @param spec the statement to bind into
+     * @param name the placeholder name
+     * @param value the wall time to bind, nullable
+     * @return the bound statement
+     */
+    private DatabaseClient.GenericExecuteSpec bindTime(
+            DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
+        return value == null
+                ? spec.bindNull(name, LocalDateTime.class)
+                : spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 
     private <T> DatabaseClient.GenericExecuteSpec bindNullable(

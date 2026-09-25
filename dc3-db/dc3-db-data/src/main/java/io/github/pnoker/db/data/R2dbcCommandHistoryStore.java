@@ -20,6 +20,7 @@ import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.repository.ReactiveCommandHistoryStore;
 import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.PointCommandStatusEnum;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.page.OffsetPage;
@@ -96,19 +97,19 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
                 .bind("command_code", history.getCommandCode())
                 .bind("status", status(history.getStatus()))
                 .bind("source", source(history.getSource()))
-                .bind("occur_time", history.getOccurTime())
-                .bind("schema_version", history.getSchemaVersion() == null ? (short) 1 : history.getSchemaVersion())
-                .bind("create_time", history.getCreateTime())
-                .bind("operate_time", history.getOperateTime());
+                .bind("schema_version", history.getSchemaVersion() == null ? (short) 1 : history.getSchemaVersion());
+        spec = bindTime(spec, "occur_time", history.getOccurTime());
+        spec = bindTime(spec, "create_time", history.getCreateTime());
+        spec = bindTime(spec, "operate_time", history.getOperateTime());
         spec = bindNullable(spec, "param_values", history.getParamValues(), String.class);
         spec = bindNullable(spec, "result_values", history.getResultValues(), String.class);
         spec = bindNullable(spec, "config_snapshot", history.getConfigSnapshot(), String.class);
         spec = bindNullable(spec, "error_code", history.getErrorCode(), String.class);
         spec = bindNullable(spec, "error_message", history.getErrorMessage(), String.class);
         spec = bindNullable(spec, "source_user_id", history.getSourceUserId(), Long.class);
-        spec = bindNullable(spec, "send_time", history.getSendTime(), LocalDateTime.class);
-        spec = bindNullable(spec, "finish_time", history.getFinishTime(), LocalDateTime.class);
-        spec = bindNullable(spec, "expire_time", history.getExpireTime(), LocalDateTime.class);
+        spec = bindTime(spec, "send_time", history.getSendTime());
+        spec = bindTime(spec, "finish_time", history.getFinishTime());
+        spec = bindTime(spec, "expire_time", history.getExpireTime());
         return transactionalOperator.transactional(spec.fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
@@ -118,14 +119,15 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
 
     @Override
     public Mono<Boolean> markSent(Long tenantId, String recordId, Instant sentAt) {
+        // bindStates=true: the state clause reads `status=:pending` while the
+        // assignment sets `status=:sent`, so both placeholders must be bound.
         return update(
                 tenantId,
                 recordId,
                 "status=:sent, send_time=:sent_time, operate_time=:operate_time",
-                spec -> spec.bind("sent", PointCommandStatusEnum.SENT.getIndex())
-                        .bind("sent_time", local(sentAt))
-                        .bind("operate_time", utcNow()),
-                "status=:pending");
+                spec -> bindTime(bindTime(spec, "sent_time", local(sentAt)), "operate_time", utcNow()),
+                "status=:pending",
+                true);
     }
 
     @Override
@@ -135,14 +137,16 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
                 tenantId,
                 recordId,
                 "status=:failed, error_code=:error_code, error_message=:error_message, finish_time=:finish_time, operate_time=:operate_time",
-                spec -> bindNullable(
-                                spec.bind("failed", PointCommandStatusEnum.FAILED.getIndex()),
-                                "error_code",
-                                errorCode,
-                                String.class)
-                        .bind("error_message", errorMessage == null ? "" : errorMessage)
-                        .bind("finish_time", local(finishedAt))
-                        .bind("operate_time", utcNow()),
+                spec -> {
+                    DatabaseClient.GenericExecuteSpec bound = bindNullable(
+                                    spec.bind("failed", PointCommandStatusEnum.FAILED.getIndex()),
+                                    "error_code",
+                                    errorCode,
+                                    String.class)
+                            .bind("error_message", errorMessage == null ? "" : errorMessage);
+                    bound = bindTime(bound, "finish_time", local(finishedAt));
+                    return bindTime(bound, "operate_time", utcNow());
+                },
                 "status IN (:pending,:sent)",
                 true);
     }
@@ -165,9 +169,9 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
                         + ", config_snapshot=" + dialect.jsonWriteExpression(":config_snapshot")
                         + ", error_code=:error_code, error_message=:error_message, finish_time=:finish_time, operate_time=:operate_time",
                 spec -> {
-                    DatabaseClient.GenericExecuteSpec bound = spec.bind("status", status.getIndex())
-                            .bind("finish_time", local(finishedAt))
-                            .bind("operate_time", utcNow());
+                    DatabaseClient.GenericExecuteSpec bound = spec.bind("status", status.getIndex());
+                    bound = bindTime(bound, "finish_time", local(finishedAt));
+                    bound = bindTime(bound, "operate_time", utcNow());
                     bound = bindNullable(bound, "result_values", resultValues, String.class);
                     bound = bindNullable(bound, "config_snapshot", configSnapshot, String.class);
                     bound = bindNullable(bound, "error_code", errorCode, String.class);
@@ -184,14 +188,16 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
                 tenantId,
                 recordId,
                 "status=:dead, error_code=:error_code, error_message=:error_message, finish_time=:finish_time, operate_time=:operate_time",
-                spec -> bindNullable(
-                                spec.bind("dead", PointCommandStatusEnum.DEAD.getIndex()),
-                                "error_code",
-                                errorCode,
-                                String.class)
-                        .bind("error_message", errorMessage == null ? "" : errorMessage)
-                        .bind("finish_time", local(finishedAt))
-                        .bind("operate_time", utcNow()),
+                spec -> {
+                    DatabaseClient.GenericExecuteSpec bound = bindNullable(
+                                    spec.bind("dead", PointCommandStatusEnum.DEAD.getIndex()),
+                                    "error_code",
+                                    errorCode,
+                                    String.class)
+                            .bind("error_message", errorMessage == null ? "" : errorMessage);
+                    bound = bindTime(bound, "finish_time", local(finishedAt));
+                    return bindTime(bound, "operate_time", utcNow());
+                },
                 "status IN (:pending,:sent)",
                 true);
     }
@@ -344,12 +350,36 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
         return value == null ? CommandHistorySourceEnum.HTTP.getIndex() : value.getIndex();
     }
 
+    /**
+     * Wall time of an instant in the platform display zone, matching
+     * {@link LocalDateTimeUtil#now()} so API timestamps read back exactly as
+     * the UI should show them.
+     * @param value the instant, or null for now
+     * @return the display wall time
+     */
     private LocalDateTime local(Instant value) {
-        return LocalDateTime.ofInstant(value == null ? Instant.now() : value, ZoneOffset.UTC);
+        return LocalDateTimeUtil.dateTime((value == null ? Instant.now() : value).toEpochMilli());
     }
 
     private LocalDateTime utcNow() {
-        return LocalDateTime.now(ZoneOffset.UTC);
+        return LocalDateTimeUtil.now();
+    }
+
+    /**
+     * Bind a display-wall timestamp the way the point-value store does:
+     * {@code LocalDateTimeUtil.now()} walls anchored as UTC offsets, so the
+     * stored instant round-trips through {@link DatabaseInstant#toLocalDateTimeUtc}
+     * back to the wall the API serves to the UI.
+     * @param spec the statement to bind into
+     * @param name the placeholder name
+     * @param value the wall time to bind, nullable
+     * @return the bound statement
+     */
+    private DatabaseClient.GenericExecuteSpec bindTime(
+            DatabaseClient.GenericExecuteSpec spec, String name, LocalDateTime value) {
+        return value == null
+                ? spec.bindNull(name, LocalDateTime.class)
+                : spec.bind(name, value.atOffset(ZoneOffset.UTC));
     }
 
     private LocalDateTime time(Object value) {

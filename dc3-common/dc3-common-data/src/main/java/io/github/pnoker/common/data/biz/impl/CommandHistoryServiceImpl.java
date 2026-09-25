@@ -45,11 +45,11 @@ import io.github.pnoker.common.mq.MqHeaders;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
 import io.github.pnoker.common.utils.JsonUtil;
+import io.github.pnoker.common.utils.LocalDateTimeUtil;
 import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.page.OffsetPage;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -242,7 +242,14 @@ public class CommandHistoryServiceImpl implements CommandHistoryService {
         }
     }
 
+    /**
+     * Wall time of an instant in the platform display zone, so command
+     * history timestamps round-trip to the UI unchanged (the UTC-wall form
+     * rendered every command time a timezone offset off).
+     * @param value the instant to convert
+     * @return the display wall time
+     */
     private LocalDateTime local(Instant value) {
-        return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
+        return LocalDateTimeUtil.dateTime(value.toEpochMilli());
     }
 }

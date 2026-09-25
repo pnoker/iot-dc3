@@ -23,7 +23,9 @@ import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.repository.RoleFilter;
+import io.github.pnoker.common.data.entity.model.CommandHistoryDO;
 import io.github.pnoker.common.data.entity.model.EntityAlarmDO;
+import io.github.pnoker.common.data.entity.model.EventHistoryDO;
 import io.github.pnoker.common.data.entity.model.NotifyHistoryDO;
 import io.github.pnoker.common.data.entity.model.PointValueDO;
 import io.github.pnoker.common.data.repository.NotifyHistoryInsertResult;
@@ -31,24 +33,28 @@ import io.github.pnoker.common.data.repository.ReactiveEntityAlarmStore;
 import io.github.pnoker.common.data.repository.ReactivePointValueIngestOutbox;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.entity.ext.DriverExt;
+import io.github.pnoker.common.enums.CommandHistorySourceEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.enums.EntityTypeEnum;
+import io.github.pnoker.common.enums.PointCommandStatusEnum;
 import io.github.pnoker.common.manager.entity.bo.DeviceBO;
 import io.github.pnoker.common.manager.entity.bo.DriverBO;
 import io.github.pnoker.common.manager.repository.DeviceFilter;
 import io.github.pnoker.common.utils.JsonUtil;
 import io.github.pnoker.db.agentic.R2dbcSessionStore;
 import io.github.pnoker.db.auth.R2dbcRoleStore;
+import io.github.pnoker.db.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
+import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.data.R2dbcCommandHistoryStore;
 import io.github.pnoker.db.data.R2dbcEntityAlarmStore;
 import io.github.pnoker.db.data.R2dbcEntityStateStore;
+import io.github.pnoker.db.data.R2dbcEventHistoryStore;
 import io.github.pnoker.db.data.R2dbcNotifyHistoryStore;
 import io.github.pnoker.db.data.R2dbcPointValueIngestOutbox;
 import io.github.pnoker.db.data.R2dbcPointValueLatestStore;
 import io.github.pnoker.db.manager.R2dbcDeviceStore;
 import io.github.pnoker.db.manager.R2dbcDriverStore;
-import io.github.pnoker.db.core.dialect.R2dbcDialect;
-import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
-import io.github.pnoker.db.core.page.PageRequest;
 import io.github.pnoker.db.runtime.transaction.SpringR2dbcPageTransaction;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
@@ -89,6 +95,10 @@ abstract class AbstractDbDialectContractTest {
     protected abstract String alarmTable();
 
     protected abstract String notifyHistoryTable();
+
+    protected abstract String commandHistoryTable();
+
+    protected abstract String eventHistoryTable();
 
     @AfterAll
     void closeFactories() {
@@ -135,6 +145,16 @@ abstract class AbstractDbDialectContractTest {
 
     private R2dbcNotifyHistoryStore notifyHistoryStore() {
         return new R2dbcNotifyHistoryStore(
+                client(), tx(), new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())), dialect());
+    }
+
+    private R2dbcCommandHistoryStore commandHistoryStore() {
+        return new R2dbcCommandHistoryStore(
+                client(), tx(), new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())), dialect());
+    }
+
+    private R2dbcEventHistoryStore eventHistoryStore() {
+        return new R2dbcEventHistoryStore(
                 client(), tx(), new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())), dialect());
     }
 
@@ -326,6 +346,44 @@ abstract class AbstractDbDialectContractTest {
     }
 
     @Test
+    void commandHistoryMarkSentBindsStateParams() {
+        // Regression: markSent's state clause reads `status=:pending` while the
+        // assignment sets `status=:sent` — both placeholders must be bound or
+        // every dispatch throws and is mislabelled BROKER_PUBLISH_FAILED even
+        // though the command was delivered and executed.
+        long tenant = id();
+        String recordId = "tck-cmd:" + tenant;
+        R2dbcCommandHistoryStore store = commandHistoryStore();
+        CommandHistoryDO history = new CommandHistoryDO();
+        history.setRecordId(recordId);
+        history.setTenantId(tenant);
+        history.setDeviceId(id());
+        history.setCommandId(id());
+        history.setCommandCode("REBOOT");
+        history.setParamValues("{}");
+        history.setStatus(PointCommandStatusEnum.PENDING);
+        history.setSource(CommandHistorySourceEnum.HTTP);
+        history.setOccurTime(LocalDateTime.now());
+        history.setExpireTime(LocalDateTime.now().plusSeconds(30));
+        history.setSchemaVersion((short) 1);
+        assertThat(store.insert(history).block()).isNotNull();
+
+        assertThat(store.markSent(tenant, recordId, Instant.now()).block()).isTrue();
+        assertThat(client().sql("SELECT status FROM " + commandHistoryTable()
+                                + " WHERE tenant_id=:tenant AND record_id=:record")
+                        .bind("tenant", tenant)
+                        .bind("record", recordId)
+                        .map((row, metadata) -> row.get("status", Number.class).intValue())
+                        .one()
+                        .block())
+                .isEqualTo((int) PointCommandStatusEnum.SENT.getIndex());
+
+        // The state guard must also close the transition: a second markSent
+        // finds no PENDING row and reports false instead of re-sending.
+        assertThat(store.markSent(tenant, recordId, Instant.now()).block()).isFalse();
+    }
+
+    @Test
     void alarmInsertIsIdempotentByTenantAndDedupeKey() {
         long tenant = id();
         EntityAlarmDO alarm = new EntityAlarmDO();
@@ -371,6 +429,144 @@ abstract class AbstractDbDialectContractTest {
                         .one()
                         .block())
                 .isEqualTo(1L);
+    }
+
+    @Test
+    void entityAlarmInsertPreservesSnowflakeIds() {
+        // Regression: the store's numeric binder used to truncate BIGINT
+        // identity columns to int32 (Number#intValue), so every entity_id /
+        // point_id / rule_id landed corrupted and the alarm dashboards, which
+        // query by the full 64-bit id, silently saw nothing.
+        long tenant = id();
+        long entityId = 8532968299819360872L;
+        long deviceId = 8319267248317138751L;
+        long pointId = 5323719808981599587L;
+        long ruleId = 220465438935478546L;
+        EntityAlarmDO alarm = new EntityAlarmDO();
+        alarm.setTenantId(tenant);
+        alarm.setEntityId(entityId);
+        alarm.setDriverId(3727604544552135439L);
+        alarm.setDeviceId(deviceId);
+        alarm.setPointId(pointId);
+        alarm.setRuleId(ruleId);
+        alarm.setAlarmTargetTypeFlag((byte) 0);
+        alarm.setAlarmTypeFlag((byte) 0);
+        alarm.setAlarmSourceFlag((byte) 0);
+        alarm.setAlarmLevelFlag((byte) 1);
+        alarm.setConfirmFlag((byte) 0);
+        alarm.setExpiredTime(0L);
+        alarm.setDedupeKey("tck-ids:" + tenant);
+        assertThat(alarmStore().insert(alarm).block()).isNotNull();
+
+        Map<String, Object> row = client().sql("SELECT entity_id, driver_id, device_id, point_id, rule_id FROM "
+                        + alarmTable() + " WHERE tenant_id=:tenant AND dedupe_key=:dedupe")
+                .bind("tenant", tenant)
+                .bind("dedupe", alarm.getDedupeKey())
+                .map((r, metadata) -> Map.of(
+                        "entity_id", r.get("entity_id"),
+                        "driver_id", r.get("driver_id"),
+                        "device_id", r.get("device_id"),
+                        "point_id", r.get("point_id"),
+                        "rule_id", r.get("rule_id")))
+                .one()
+                .block();
+        assertThat(row).isNotNull();
+        assertThat(((Number) row.get("entity_id")).longValue()).isEqualTo(entityId);
+        assertThat(((Number) row.get("driver_id")).longValue()).isEqualTo(3727604544552135439L);
+        assertThat(((Number) row.get("device_id")).longValue()).isEqualTo(deviceId);
+        assertThat(((Number) row.get("point_id")).longValue()).isEqualTo(pointId);
+        assertThat(((Number) row.get("rule_id")).longValue()).isEqualTo(ruleId);
+    }
+
+    @Test
+    void historyTimestampsRoundTripDisplayWalls() {
+        // Regression: the history stores used to write UTC walls (or bind
+        // walls without the UTC anchor), which rendered every alarm/event/
+        // command time a timezone offset off in the UI. The point-value
+        // store's convention is display walls bound as UTC offsets — these
+        // three stores must round-trip the wall unchanged.
+        LocalDateTime wall = LocalDateTime.of(2026, 9, 25, 16, 38, 0);
+        long tenant = id();
+
+        EntityAlarmDO alarm = new EntityAlarmDO();
+        alarm.setTenantId(tenant);
+        alarm.setEntityId(id());
+        alarm.setDriverId(id());
+        alarm.setDeviceId(id());
+        alarm.setPointId(id());
+        alarm.setRuleId(id());
+        alarm.setAlarmTargetTypeFlag((byte) 0);
+        alarm.setAlarmTypeFlag((byte) 0);
+        alarm.setAlarmSourceFlag((byte) 0);
+        alarm.setAlarmLevelFlag((byte) 1);
+        alarm.setConfirmFlag((byte) 0);
+        alarm.setExpiredTime(0L);
+        alarm.setDedupeKey("tck-wall:" + tenant);
+        alarm.setCreateTime(wall);
+        alarm.setOperateTime(wall);
+        assertThat(alarmStore().insert(alarm).block()).isNotNull();
+
+        CommandHistoryDO command = new CommandHistoryDO();
+        command.setRecordId("tck-wall:" + tenant);
+        command.setTenantId(tenant);
+        command.setDeviceId(id());
+        command.setCommandId(id());
+        command.setCommandCode("REBOOT");
+        command.setStatus(PointCommandStatusEnum.PENDING);
+        command.setSource(CommandHistorySourceEnum.HTTP);
+        command.setOccurTime(wall);
+        command.setExpireTime(wall.plusSeconds(30));
+        command.setCreateTime(wall);
+        command.setOperateTime(wall);
+        command.setSchemaVersion((short) 1);
+        assertThat(commandHistoryStore().insert(command).block()).isNotNull();
+
+        EventHistoryDO event = new EventHistoryDO();
+        event.setRecordId("tck-wall:" + tenant);
+        event.setTenantId(tenant);
+        event.setDeviceId(id());
+        event.setEventId(id());
+        event.setEventCode("HEARTBEAT");
+        event.setEventTypeFlag((byte) 0);
+        event.setEventLevelFlag((byte) 0);
+        event.setMessage("tck-wall");
+        event.setOccurTime(wall);
+        event.setReceiveTime(wall);
+        event.setCreateTime(wall);
+        event.setOperateTime(wall);
+        event.setSchemaVersion((short) 1);
+        assertThat(eventHistoryStore().insert(event).block()).isNotNull();
+
+        assertThat(readUtcWall(
+                        "SELECT create_time AT TIME ZONE 'UTC' AS wall FROM " + alarmTable()
+                                + " WHERE tenant_id=:tenant AND dedupe_key=:key",
+                        tenant,
+                        "key",
+                        alarm.getDedupeKey()))
+                .isEqualTo(wall);
+        assertThat(readUtcWall(
+                        "SELECT occur_time AT TIME ZONE 'UTC' AS wall FROM " + commandHistoryTable()
+                                + " WHERE tenant_id=:tenant AND record_id=:key",
+                        tenant,
+                        "key",
+                        command.getRecordId()))
+                .isEqualTo(wall);
+        assertThat(readUtcWall(
+                        "SELECT occur_time AT TIME ZONE 'UTC' AS wall FROM " + eventHistoryTable()
+                                + " WHERE tenant_id=:tenant AND record_id=:key",
+                        tenant,
+                        "key",
+                        event.getRecordId()))
+                .isEqualTo(wall);
+    }
+
+    private LocalDateTime readUtcWall(String sql, long tenant, String keyName, String key) {
+        return client().sql(sql)
+                .bind("tenant", tenant)
+                .bind(keyName, key)
+                .map((row, metadata) -> row.get("wall", LocalDateTime.class))
+                .one()
+                .block();
     }
 
     @Test

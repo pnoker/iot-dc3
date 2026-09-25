@@ -119,4 +119,14 @@ class PostgresDialectContractIT extends AbstractDbDialectContractTest {
     protected String notifyHistoryTable() {
         return "dc3_data.dc3_notify_history";
     }
+
+    @Override
+    protected String commandHistoryTable() {
+        return "dc3_data.dc3_command_history";
+    }
+
+    @Override
+    protected String eventHistoryTable() {
+        return "dc3_data.dc3_event_history";
+    }
 }
