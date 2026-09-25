@@ -169,7 +169,12 @@
         <!-- Test execution toggles (consumed by surefire/failsafe) -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>false</skip.integration.tests>
-        <mockito.version>5.20.0</mockito.version>
+        <!-- Must equal the mockito version the dependency graph resolves: the
+             surefire/failsafe mockito agent is opened from a version-pinned jar
+             path below, so a BOM-side mockito bump that leaves this property
+             behind breaks every fork with "Error opening zip file or JAR
+             manifest missing". The dependencyManagement pin keeps them together. -->
+        <mockito.version>5.23.0</mockito.version>
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
@@ -224,6 +229,23 @@
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-core-jakarta</artifactId>
                 <version>${swagger-core.version}</version>
+            </dependency>
+            <!-- Pin mockito to ${mockito.version} so the resolved jars and the
+                 mockito agent path in mockito.javaagent.argLine always agree.
+                 Declared before the BOM imports for the same reason as
+                 swagger-core: the spring-boot BOM would otherwise manage
+                 mockito-core to its own version while the agent path keeps
+                 pointing at ${mockito.version}, and every forked test JVM dies
+                 with "agent library failed Agent_OnLoad". -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-junit-jupiter</artifactId>
+                <version>${mockito.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>

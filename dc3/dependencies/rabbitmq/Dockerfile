@@ -35,5 +35,20 @@ COPY ./keys /data/rabbitmq/dc3/keys
 
 RUN chmod +x /usr/local/bin/dc3-rabbitmq-entrypoint.sh
 
+# server.key is a gitignored secret (*.key) and never ships in the build
+# context, so a fresh clone cannot satisfy ssl_options.keyfile. Mint a
+# throwaway self-signed pair at build time when the key is absent — the TLS
+# listener runs verify_none and the platform talks plain AMQP by default.
+# The key is encrypted with the same password rabbitmq.conf declares.
+RUN if [ ! -f /data/rabbitmq/dc3/keys/server.key ]; then \
+        openssl req -x509 -newkey rsa:2048 \
+            -passout pass:dc3-server \
+            -keyout /data/rabbitmq/dc3/keys/server.key \
+            -out /data/rabbitmq/dc3/keys/server.crt \
+            -days 3650 -subj "/CN=dc3-rabbitmq" && \
+        chown rabbitmq:rabbitmq /data/rabbitmq/dc3/keys/server.key && \
+        chmod 640 /data/rabbitmq/dc3/keys/server.key ; \
+    fi
+
 ENTRYPOINT ["dc3-rabbitmq-entrypoint.sh"]
 CMD ["rabbitmq-server"]

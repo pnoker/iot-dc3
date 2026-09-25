@@ -34,10 +34,20 @@ COPY dc3-web/ ./
 
 # pnpm 12 dropped bin/pnpm.cjs while the corepack shim bundled with Node 22
 # still expects it, so corepack prepare fails at first pnpm invocation; install
-# pnpm directly so the bin entry resolves.
-RUN npm install -g pnpm@12.3.4
-RUN apk add --no-cache git
-RUN pnpm install --frozen-lockfile --ignore-scripts
+# pnpm directly so the bin entry resolves. Install the exact version
+# package.json pins as packageManager — an older wrapper re-downloads the
+# pinned native launcher at first run, and a truncated download segfaults the
+# install. Registry falls back to the CN mirror like the Aliyun Maven settings.
+RUN npm install -g pnpm@12.5.1 \
+    || npm install -g pnpm@12.5.1 --registry=https://registry.npmmirror.com
+# The Alpine CDN is intermittently unreachable from CN networks (TLS reset);
+# retry through the TUNA mirror — same rationale as the Aliyun Maven mirrors
+# in .mvn/settings.xml. git is required by pnpm's git-hosted dependencies.
+RUN apk add --no-cache git \
+    || (sed -i 's#https://dl-cdn.alpinelinux.org#https://mirrors.tuna.tsinghua.edu.cn#g' /etc/apk/repositories \
+        && apk add --no-cache git)
+RUN pnpm install --frozen-lockfile --ignore-scripts \
+    || pnpm install --frozen-lockfile --ignore-scripts --registry=https://registry.npmmirror.com
 RUN pnpm build
 
 # runtime
