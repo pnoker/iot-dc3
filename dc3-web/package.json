@@ -63,7 +63,7 @@
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.20.0",
     "dayjs": "^1.11.23",
-    "dompurify": "^3.4.15",
+    "dompurify": "^3.4.16",
     "element-plus": "^2.14.6",
     "marked": "^18.0.14",
     "nprogress": "^0.2.0",
