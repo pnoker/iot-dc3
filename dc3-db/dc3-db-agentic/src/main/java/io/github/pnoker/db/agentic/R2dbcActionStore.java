@@ -24,6 +24,7 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.page.OffsetPage;
 import io.github.pnoker.db.core.page.PageRequest;
+import io.github.pnoker.db.core.time.DatabaseInstant;
 import io.github.pnoker.db.core.transaction.PageTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -236,16 +237,16 @@ public class R2dbcActionStore implements ReactiveActionStore {
         action.setPayload(payload == null ? Map.of() : deserialize(payload));
         Number status = row.get("status", Number.class);
         action.setStatus(AgenticActionStatusEnum.ofIndex(status == null ? null : status.byteValue()));
-        action.setExpireTime(toLocalDateTime(row.get("expire_time")));
+        action.setExpireTime(DatabaseInstant.toLocalDateTimeUtc(row.get("expire_time")));
         action.setTenantId(row.get("tenant_id", Long.class));
         action.setUserId(row.get("user_id", Long.class));
         action.setRemark(row.get("remark", String.class));
         action.setCreatorId(row.get("creator_id", Long.class));
         action.setCreatorName(row.get("creator_name", String.class));
-        action.setCreateTime(toLocalDateTime(row.get("create_time")));
+        action.setCreateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("create_time")));
         action.setOperatorId(row.get("operator_id", Long.class));
         action.setOperatorName(row.get("operator_name", String.class));
-        action.setOperateTime(toLocalDateTime(row.get("operate_time")));
+        action.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         return action;
     }
 
@@ -297,11 +298,5 @@ public class R2dbcActionStore implements ReactiveActionStore {
 
     private LocalDateTime utc(Instant value, Instant fallback) {
         return LocalDateTime.ofInstant(value == null ? fallback : value, ZoneOffset.UTC);
-    }
-
-    private LocalDateTime toLocalDateTime(Object value) {
-        if (value instanceof LocalDateTime localDateTime) return localDateTime;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
     }
 }

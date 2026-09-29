@@ -19,6 +19,7 @@ package io.github.pnoker.db.agentic;
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.db.core.time.DatabaseInstant;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -139,17 +140,11 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
         attachment.setRemark(row.get("remark", String.class));
         attachment.setCreatorId(row.get("creator_id", Long.class));
         attachment.setCreatorName(row.get("creator_name", String.class));
-        attachment.setCreateTime(toLocalDateTime(row.get("create_time")));
+        attachment.setCreateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("create_time")));
         attachment.setOperatorId(row.get("operator_id", Long.class));
         attachment.setOperatorName(row.get("operator_name", String.class));
-        attachment.setOperateTime(toLocalDateTime(row.get("operate_time")));
+        attachment.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         return attachment;
-    }
-
-    private LocalDateTime toLocalDateTime(Object value) {
-        if (value instanceof LocalDateTime localDateTime) return localDateTime;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
     }
 
     private LocalDateTime utcNow() {

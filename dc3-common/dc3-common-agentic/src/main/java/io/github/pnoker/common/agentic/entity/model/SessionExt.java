@@ -60,4 +60,17 @@ public class SessionExt implements Serializable {
 
     @Schema(description = "Maximum number of tokens the model may generate in a single response.", example = "2048")
     private Integer maxTokens;
+
+    @Schema(
+            description = "Visual category metadata for rich clients (e.g. rail icon: monitor, warning, trend, ...).",
+            example = "monitor")
+    private String icon;
+
+    @Schema(description = "Free-form session category label for rich clients.", example = "health")
+    private String category;
+
+    @Schema(
+            description = "Archived sessions leave the main conversation list and rest in the folded archive section.",
+            example = "false")
+    private Boolean archived;
 }

@@ -16,11 +16,14 @@
  */
 package io.github.pnoker.db.core.time;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Objects;
 
 /** UTC microsecond instant normalization shared by persistence layers. */
@@ -43,7 +46,11 @@ public final class DatabaseInstant {
         if (raw instanceof LocalDateTime value) return value;
         if (raw instanceof OffsetDateTime value)
             return value.withOffsetSameInstant(ZoneOffset.UTC).toLocalDateTime();
+        if (raw instanceof ZonedDateTime value)
+            return value.withZoneSameInstant(ZoneOffset.UTC).toLocalDateTime();
         if (raw instanceof Instant value) return LocalDateTime.ofInstant(value, ZoneOffset.UTC);
+        if (raw instanceof Timestamp value) return LocalDateTime.ofInstant(value.toInstant(), ZoneOffset.UTC);
+        if (raw instanceof Date value) return LocalDateTime.ofInstant(value.toInstant(), ZoneOffset.UTC);
         throw new IllegalStateException(
                 "unsupported timestamp type: " + raw.getClass().getName());
     }

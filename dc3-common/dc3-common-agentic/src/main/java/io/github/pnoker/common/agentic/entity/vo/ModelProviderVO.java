@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
@@ -70,5 +71,7 @@ public class ModelProviderVO extends BaseVO {
             description =
                     "API key used to authenticate requests to the provider's endpoint. Write-only: never included in API responses.",
             accessMode = Schema.AccessMode.WRITE_ONLY)
+    @ToString.Exclude
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String apiKey;
 }

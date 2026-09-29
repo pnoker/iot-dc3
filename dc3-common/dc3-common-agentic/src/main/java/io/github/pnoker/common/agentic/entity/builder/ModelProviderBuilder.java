@@ -33,7 +33,6 @@ import org.mapstruct.MappingTarget;
 public interface ModelProviderBuilder {
 
     /** Convert the value object into its business-object form. */
-    @Mapping(target = "apiKey", ignore = true)
     ModelProviderBO buildBOByVO(ModelProviderVO entityVO);
 
     /** Convert the value objects into their business-object forms. */
@@ -45,7 +44,8 @@ public interface ModelProviderBuilder {
         if (Objects.nonNull(entityRequest)) entityBO.setProviderType(entityRequest.getProviderType());
     }
 
-    /** Convert the business object into its value-object form. */
+    /** Convert the business object into its value-object form; the API key never crosses to responses. */
+    @Mapping(target = "apiKey", ignore = true)
     ModelProviderVO buildVOByBO(ModelProviderBO entityBO);
 
     /** Convert the business objects into their value-object forms. */

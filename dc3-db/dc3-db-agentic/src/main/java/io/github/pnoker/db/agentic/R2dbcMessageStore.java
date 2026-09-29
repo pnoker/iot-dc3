@@ -22,6 +22,7 @@ import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
+import io.github.pnoker.db.core.time.DatabaseInstant;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -232,16 +233,10 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
         message.setRemark(row.get("remark", String.class));
         message.setCreatorId(row.get("creator_id", Long.class));
         message.setCreatorName(row.get("creator_name", String.class));
-        message.setCreateTime(toLocalDateTime(row.get("create_time")));
+        message.setCreateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("create_time")));
         message.setOperatorId(row.get("operator_id", Long.class));
         message.setOperatorName(row.get("operator_name", String.class));
-        message.setOperateTime(toLocalDateTime(row.get("operate_time")));
+        message.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         return message;
-    }
-
-    private LocalDateTime toLocalDateTime(Object value) {
-        if (value instanceof LocalDateTime localDateTime) return localDateTime;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
     }
 }

@@ -24,6 +24,7 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.page.OffsetPage;
 import io.github.pnoker.db.core.page.SortSpec;
+import io.github.pnoker.db.core.time.DatabaseInstant;
 import io.github.pnoker.db.core.transaction.PageTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -292,10 +293,10 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
         session.setRemark(row.get("remark", String.class));
         session.setCreatorId(row.get("creator_id", Long.class));
         session.setCreatorName(row.get("creator_name", String.class));
-        session.setCreateTime(toLocalDateTime(row.get("create_time")));
+        session.setCreateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("create_time")));
         session.setOperatorId(row.get("operator_id", Long.class));
         session.setOperatorName(row.get("operator_name", String.class));
-        session.setOperateTime(toLocalDateTime(row.get("operate_time")));
+        session.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         return session;
     }
 
@@ -325,6 +326,12 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
         if (incoming.getReasoningEnabled() != null) merged.setReasoningEnabled(incoming.getReasoningEnabled());
         if (incoming.getTemperature() != null) merged.setTemperature(incoming.getTemperature());
         if (incoming.getMaxTokens() != null) merged.setMaxTokens(incoming.getMaxTokens());
+        if (incoming.getIcon() != null && !incoming.getIcon().isBlank())
+            merged.setIcon(incoming.getIcon().trim());
+        if (incoming.getCategory() != null && !incoming.getCategory().isBlank()) {
+            merged.setCategory(incoming.getCategory().trim());
+        }
+        if (incoming.getArchived() != null) merged.setArchived(incoming.getArchived());
         if (merged.getTemperature() != null && (merged.getTemperature() < 0 || merged.getTemperature() > 2)) {
             throw new IllegalArgumentException("temperature must be between 0.0 and 2.0");
         }
@@ -332,12 +339,6 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
             throw new IllegalArgumentException("maxTokens must be greater than 0");
         }
         return merged;
-    }
-
-    private LocalDateTime toLocalDateTime(Object value) {
-        if (value instanceof LocalDateTime localDateTime) return localDateTime;
-        if (value instanceof Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
     }
 
     private LocalDateTime utcNow() {

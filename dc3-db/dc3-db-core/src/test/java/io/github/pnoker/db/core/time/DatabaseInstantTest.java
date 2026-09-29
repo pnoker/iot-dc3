@@ -20,10 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import org.junit.jupiter.api.Test;
 
 class DatabaseInstantTest {
@@ -52,6 +55,24 @@ class DatabaseInstantTest {
         assertEquals(
                 LocalDateTime.of(2026, 9, 19, 12, 0),
                 DatabaseInstant.toLocalDateTimeUtc(Instant.parse("2026-09-19T12:00:00Z")));
+    }
+
+    @Test
+    void decodesZonedDateTimeToUtc() {
+        ZonedDateTime value = ZonedDateTime.of(2026, 9, 19, 14, 0, 0, 0, ZoneOffset.ofHours(2));
+        assertEquals(LocalDateTime.of(2026, 9, 19, 12, 0), DatabaseInstant.toLocalDateTimeUtc(value));
+    }
+
+    @Test
+    void decodesSqlTimestampToUtc() {
+        Timestamp value = Timestamp.from(Instant.parse("2026-09-19T12:00:00Z"));
+        assertEquals(LocalDateTime.of(2026, 9, 19, 12, 0), DatabaseInstant.toLocalDateTimeUtc(value));
+    }
+
+    @Test
+    void decodesUtilDateToUtc() {
+        Date value = Date.from(Instant.parse("2026-09-19T12:00:00Z"));
+        assertEquals(LocalDateTime.of(2026, 9, 19, 12, 0), DatabaseInstant.toLocalDateTimeUtc(value));
     }
 
     @Test
