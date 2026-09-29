@@ -296,7 +296,7 @@ const filteredSessions = computed(() => props.sessions.filter((session) => !isAr
 const filteredArchived = computed(() => props.sessions.filter((session) => isArchived(session) && matchesSearch(session)));
 
 const focusSearch = () => {
-  if (collapsed.value) emit('toggle-collapse');
+  if (props.collapsed) emit('toggle-collapse');
   void nextTick(() => searchInputRef.value?.focus?.());
 };
 
