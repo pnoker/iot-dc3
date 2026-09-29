@@ -155,6 +155,8 @@
   // Layout metrics mirror tokens.scss (read at runtime when a component
   // needs a metric in JS or calc()).
   --dc3-header-height: 60px;
+  // Space reserved for the docked assistant panel (0 when closed).
+  --dc3-agentic-dock-width: 0px;
   --dc3-aside-width: 220px;
   --dc3-aside-collapsed-width: 64px;
 
@@ -165,6 +167,8 @@
   --dc3-list-label-width: 78px;
   --dc3-skeleton-line-height: 12px;
   --dc3-skeleton-title-height: 16px;
+  // Shared collapsed-height for code/json snippet blocks (agentic details, MCP server).
+  --dc3-snippet-max-height: 180px;
 
   color-scheme: light;
 }

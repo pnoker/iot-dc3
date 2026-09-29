@@ -40,7 +40,7 @@ import type {
   AgenticVisualizationSpec,
 } from '@/config/types';
 import {failMessage, warnMessage} from '@/utils/notificationUtil';
-import {getStorage, setStorage} from '@/utils/storageUtil';
+import {getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
 import {defineStore} from 'pinia';
 import {computed, ref} from 'vue';
 import i18n from '@/config/i18n';
@@ -59,6 +59,10 @@ const DEFAULT_MODEL: AgenticModel = {
 /** Pinia store for the agentic chat panel: sessions, messages, attachments, models, and streaming state. */
 export const useAgenticStore = defineStore('agentic', () => {
   const visible = ref(false);
+  // Workbench (full-screen) mode. Lives here rather than in the component so
+  // its lifecycle is the panel's: it survives route changes while the panel
+  // is open and is cleared whenever the panel closes (see close/reset).
+  const workbenchExpanded = ref(false);
   const bootstrapped = ref(false);
   const loading = ref(false);
   const sessionsLoading = ref(false);
@@ -168,6 +172,15 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const close = () => {
     visible.value = false;
+    workbenchExpanded.value = false;
+  };
+
+  const setWorkbenchExpanded = (value: boolean) => {
+    workbenchExpanded.value = value;
+  };
+
+  const toggleWorkbench = () => {
+    workbenchExpanded.value = !workbenchExpanded.value;
   };
 
   const toggle = async () => {
@@ -424,6 +437,44 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
   };
 
+  // Archive/unarchive a conversation (sessionExt.archived). Archiving the
+  // active conversation hands focus to the next live one, or a fresh session.
+  const setSessionArchived = async (conversationId: string, archived: boolean) => {
+    if (
+      !conversationId ||
+      streamingConversationId.value === conversationId ||
+      sessionActionLoading.value[conversationId]
+    ) return false;
+    const currentLifecycle = lifecycleToken;
+    const session = sessions.value.find((item) => item.conversationId === conversationId);
+    const previousExt = session?.sessionExt;
+    updateSessionLocally(conversationId, {sessionExt: {...(previousExt || {}), archived}});
+    if (archived && activeConversationId.value === conversationId) {
+      const next = sessions.value.find(
+        (item) => item.conversationId !== conversationId && !sessionExtOf(item)?.archived
+      );
+      if (next) void selectSession(next.conversationId);
+      else newSession();
+    }
+    setSessionActionLoading(conversationId, true);
+    try {
+      await updateAgenticSession(conversationId, {sessionExt: {...(previousExt || {}), archived}});
+      return true;
+    } catch (error) {
+      if (currentLifecycle === lifecycleToken) {
+        // Write the previous mark back explicitly — merging an absent ext
+        // would leave the optimistic archived flag in place.
+        updateSessionLocally(conversationId, {
+          sessionExt: {...(previousExt || {}), archived: previousExt?.archived},
+        });
+        warnMessage(i18n.global.t('agentic.failedSessionUpdate'), 'Agentic', error);
+      }
+      return false;
+    } finally {
+      if (currentLifecycle === lifecycleToken) setSessionActionLoading(conversationId, false);
+    }
+  };
+
   const sendMessage = async (content: string): Promise<boolean> => {
     const text = content.trim();
     if (!text || streaming.value) {
@@ -441,16 +492,23 @@ export const useAgenticStore = defineStore('agentic', () => {
     selectedModel.value = model;
     applyModelCapabilities();
     updateSessionLocally(conversationId, {sessionExt: buildCurrentSessionExt(model)});
+    const now = new Date().toISOString();
+    const sentAttachmentIds = currentAttachments.value.map((attachment) => String(attachment.id));
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
       content: text,
+      createTime: now,
+      // Backend AgenticMessageContent keeps attachment ids so history can
+      // show what travelled with the prompt.
+      contentExt: sentAttachmentIds.length ? {text, attachments: sentAttachmentIds} : undefined,
     };
     const assistantMessage: AgenticMessage = {
       id: createMessageId('assistant'),
       role: 'assistant',
       content: '',
       streaming: true,
+      createTime: now,
     };
 
     setConversationMessages(conversationId, [...currentMessages.value, userMessage, assistantMessage]);
@@ -567,6 +625,7 @@ export const useAgenticStore = defineStore('agentic', () => {
           contentExt: message.contentExt,
           messageIndex: message.messageIndex,
           status: message.status,
+          createTime: message.createTime,
           reasoning: message.reasoning || message.contentExt?.reasoningContent,
         }));
         messagesByConversation.value[conversationId] = mergeEphemeralAssistantState(previousMessages, loadedMessages);
@@ -922,6 +981,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   return {
     visible,
+    workbenchExpanded,
     bootstrapped,
     loading,
     sessionsLoading,
@@ -964,6 +1024,8 @@ export const useAgenticStore = defineStore('agentic', () => {
     open,
     close,
     toggle,
+    setWorkbenchExpanded,
+    toggleWorkbench,
     bootstrap,
     loadSessions,
     retrySessions,
@@ -971,6 +1033,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     selectSession,
     deleteSession,
     renameSession,
+    setSessionArchived,
     setSelectedModel,
     persistCurrentSessionPrefs,
     sendMessage,
@@ -986,6 +1049,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       lifecycleToken += 1;
       currentAbortController.value?.abort();
       visible.value = false;
+      workbenchExpanded.value = false;
       bootstrapped.value = false;
       loading.value = false;
       sessionsLoading.value = false;
@@ -1022,7 +1086,7 @@ export const useAgenticStore = defineStore('agentic', () => {
       sessionModelRequestTokens.clear();
       sessionPreferenceRequestTokens.clear();
       try {
-        localStorage.removeItem(MESSAGE_STORAGE_KEY);
+        removeStorage(MESSAGE_STORAGE_KEY);
       } catch {
         // storage unavailable
       }
@@ -1150,6 +1214,7 @@ const normalizeSessionExt = (sessionExt?: RawAgenticSessionExt): AgenticSessionE
     maxTokens: sessionExt.maxTokens ?? sessionExt.max_tokens,
     icon: sessionExt.icon,
     category: sessionExt.category,
+    archived: normalizeBoolean((sessionExt as Record<string, unknown>).archived),
   };
 };
 

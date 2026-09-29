@@ -61,6 +61,10 @@ function findViolations(): string[] {
     const content = stripComments(readFileSync(path, "utf8"));
     for (const match of content.matchAll(RADIUS_DECL)) {
       const value = match[1].trim();
+      // Shape literals: percentage-based elliptical corners (wave surfaces,
+      // organic blobs) are geometry, not design radii — same spirit as the
+      // 50%/100% circles above.
+      if (/^[0-9.%/\s]+$/.test(value)) continue;
       const segments = value.split(/\s+/);
       if (segments.every((segment) => TOKEN_ATOM.some((atom) => atom.test(segment)))) continue;
       const line = content.slice(0, match.index).split("\n").length;

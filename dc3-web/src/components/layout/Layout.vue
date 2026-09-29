@@ -78,6 +78,33 @@
                 @click="handleCommand('settings')"
               />
             </el-tooltip>
+            <!-- Agent assistant entry: shares the utility-button grammar with
+                 settings but wears the brand tint and a breathing halo so the
+                 AI presence reads as "alive". Kept as .agentic-launcher for
+                 the e2e contract. -->
+            <el-tooltip
+              :content="agenticStore.visible ? t('agentic.headerClose') : t('agentic.tooltip')"
+              placement="bottom"
+            >
+              <el-button
+                :aria-label="t('agentic.tooltip')"
+                :class="['agentic-launcher', 'header_assistant_button', {'is-active': agenticStore.visible}]"
+                circle
+                text
+                @click="agenticStore.toggle()"
+              >
+                <!-- Four-point sparkle: the AI glyph, floating above a
+                     siri-gradient "water ball" whose level bobs like liquid. -->
+                <svg aria-hidden="true" class="assistant-sparkle" viewBox="0 0 24 24">
+                  <path
+                    d="M12 1.5c1 8.4 2.1 11.6 10.5 12.5-8.4.9-9.5 4.1-10.5 12.5-1-8.4-2.1-11.6-10.5-12.5C9.9 13.1 11 9.9 12 1.5Z"
+                  />
+                  <path
+                    d="M19.5 2c.3 2.3.85 3.3 3.1 3.65-2.25.35-2.8 1.35-3.1 3.65-.3-2.3-.85-3.3-3.1-3.65 2.25-.35 2.8-1.35 3.1-3.65Z"
+                  />
+                </svg>
+              </el-button>
+            </el-tooltip>
           </div>
           <span class="header_actions_divider" aria-hidden="true" />
           <div class="header_user">
@@ -185,11 +212,13 @@
         </div>
       </div>
       <agentic-assistant />
-      <!-- Backtop keeps clear of the assistant FAB and screen edges on
-           thumb terminals (A3). -->
+      <!-- Backtop owns the bottom-right corner now that the assistant entry
+           moved into the header; it hides while the assistant panel is open,
+           which would otherwise cover it. -->
       <el-backtop
-        :bottom="isMobile ? 88 : 40"
-        :right="isMobile ? 16 : 40"
+        v-if="!agenticStore.visible"
+        :bottom="16"
+        :right="isMobile ? 12 : 16"
         target=".body-main .el-scrollbar__wrap"
       />
     </div>
@@ -686,6 +715,105 @@ const handleCommand = async (command: string) => {
       transform: rotate(18deg);
     }
 
+    // Agent assistant entry: a "water ball" — the disc is a glass of liquid
+    // with a siri-like flowing multi-colour gradient, and the water level
+    // bobs like a half-sphere of water being gently tipped. The sparkle
+    // glyph floats above the liquid surface.
+    .header_assistant_button {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      overflow: hidden;
+      border: 1px solid var(--dc3-border-base);
+      background: var(--dc3-bg-interactive);
+      transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
+
+      .assistant-sparkle {
+        position: relative;
+        z-index: 2;
+        width: 19px;
+        height: 19px;
+        fill: var(--el-color-white);
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28));
+      }
+
+      // The liquid body: oversized so translateY reads as a moving water
+      // level, with a wave-shaped surface (border-radius) that tilts.
+      &::before {
+        content: '';
+        position: absolute;
+        right: -30%;
+        bottom: -70%;
+        left: -30%;
+        z-index: 1;
+        height: 150%;
+        border-radius: 42% 46% 0 0 / 26% 30% 0 0;
+        background: linear-gradient(
+          120deg,
+          #00c6ff 0%,
+          #6f5cff 28%,
+          #c44dff 52%,
+          #ff5c8a 76%,
+          #ffb347 100%
+        );
+        background-size: 260% 260%;
+        transform-origin: 50% 100%;
+        animation:
+          assistant-water-bob 3.4s ease-in-out infinite alternate,
+          assistant-gradient-flow 8s linear infinite;
+      }
+
+      &:hover,
+      &:focus-visible {
+        transform: translateY(-1px);
+
+        &::before {
+          animation-duration: 2.2s, 5s;
+        }
+      }
+
+      // Panel open: the water sits higher — the "filled" state.
+      &.is-active::before {
+        bottom: -52%;
+      }
+    }
+
+    @keyframes assistant-water-bob {
+      0% {
+        transform: translateY(10%) rotate(-5deg);
+      }
+
+      50% {
+        transform: translateY(2%) rotate(3deg);
+      }
+
+      100% {
+        transform: translateY(-6%) rotate(6deg);
+      }
+    }
+
+    @keyframes assistant-gradient-flow {
+      from {
+        background-position: 0% 50%;
+      }
+
+      to {
+        background-position: 260% 50%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .header_assistant_button,
+      .header_assistant_button::before {
+        transition: none;
+        animation: none;
+      }
+
+      .header_assistant_button::before {
+        transform: translateY(4%);
+      }
+    }
+
     // Account tile follows the platform's tone-tile grammar (the same
     // accent-tinted glyph block family as ThingsCardHeader / StatCard):
     // brand-tinted disc, hairline accent ring, glyph in the accent colour.
@@ -797,6 +925,11 @@ const handleCommand = async (command: string) => {
       flex: 1 1 auto;
       min-width: 0;
       height: 100%;
+      // Slide over when the assistant panel docks: the panel is
+      // position:fixed, so the page reserves its width through this var
+      // (published by AgenticAssistant from panelStyle, including drag-resize).
+      margin-right: var(--dc3-agentic-dock-width, 0px);
+      transition: margin-right var(--dc3-duration-slow) var(--dc3-ease-standard);
 
       > .el-scrollbar {
         flex: 1;

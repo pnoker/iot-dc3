@@ -151,3 +151,63 @@ export const toPlainText = (content: string | undefined | null): string => {
   });
   return parts.join('\n\n').trim();
 };
+
+/**
+ * Strips markdown markup so a quoted passage previews as plain text.
+ *
+ * @param content raw message content (markdown)
+ * @returns the plain-text excerpt
+ */
+export const quoteExcerpt = (content: string) => {
+  return toPlainText(content)
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s*(?:[-*+] |\d+\.\s+)/gm, '')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
+    .replace(/[*_`~]+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
+/**
+ * Split pieces of a user message body: an optional quoted block
+ * (`> **label**` header followed by `>` lines) and the free text after it.
+ */
+export interface UserMessageParts {
+  body: string;
+  label?: string;
+  quote?: string;
+}
+
+/**
+ * Parses a user message into its quote and body parts.
+ *
+ * @param content raw user message content
+ * @returns the parsed parts
+ */
+export const userMessageParts = (content?: string | null): UserMessageParts => {
+  // Legacy rows can carry a null/empty content — never let the render path
+  // throw over one bad message (a render crash hides the whole panel).
+  if (!content) {
+    return {body: ''};
+  }
+  const lines = content.split('\n');
+  const labelMatch = lines[0]?.match(/^> \*\*(.+)\*\*$/);
+  if (!labelMatch) {
+    return {body: content};
+  }
+
+  const quoteLines: string[] = [];
+  let index = 1;
+  while (index < lines.length) {
+    const line = lines[index];
+    if (!line?.startsWith('>')) break;
+    quoteLines.push(line.replace(/^> ?/, ''));
+    index += 1;
+  }
+
+  return {
+    label: labelMatch[1],
+    quote: quoteExcerpt(quoteLines.join('\n')),
+    body: lines.slice(index).join('\n').trim(),
+  };
+};

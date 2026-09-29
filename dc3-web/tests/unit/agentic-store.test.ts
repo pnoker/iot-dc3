@@ -372,4 +372,46 @@ describe('agentic store', () => {
     await expect(store.rejectAction('action-reject')).rejects.toThrow('reject failed');
     expect(store.actionLoading['action-reject']).toBeUndefined();
   });
+
+  it('archives a session through sessionExt and moves focus to a live one', async () => {
+    apiMocks.updateAgenticSession.mockImplementation((conversationId: string, data: Record<string, unknown>) =>
+      Promise.resolve({conversationId, ...data})
+    );
+    const store = useAgenticStore();
+    store.sessions = [
+      {conversationId: 'c1', title: 'First'},
+      {conversationId: 'c2', title: 'Second'},
+    ];
+    store.activeConversationId = 'c1';
+    apiMocks.listAgenticMessages.mockResolvedValue(undefined);
+
+    expect(await store.setSessionArchived('c1', true)).toBe(true);
+    expect(store.sessions[0].sessionExt?.archived).toBe(true);
+    // Focus leaves the archived conversation for the next live one.
+    expect(store.activeConversationId).toBe('c2');
+
+    // A failed update rolls the archive mark back.
+    apiMocks.updateAgenticSession.mockRejectedValueOnce(new Error('update failed'));
+    // c2 is active now: archiving it finds no live session left and starts a new one.
+    expect(await store.setSessionArchived('c2', true)).toBe(false);
+    expect(store.sessions.some((s) => s.conversationId === 'c1' || s.conversationId === 'c2')).toBe(true);
+    expect(store.sessions[0]?.conversationId).not.toBe('c1');
+    // Look the session up by id — archiving the active conversation creates
+    // a fresh one at the head of the list, so index-based assertions shift.
+    expect(store.sessions.find((s) => s.conversationId === 'c2')?.sessionExt?.archived).toBeUndefined();
+  });
+
+  it('clears the workbench flag when the panel closes or the store resets', () => {
+    const store = useAgenticStore();
+
+    store.toggleWorkbench();
+    expect(store.workbenchExpanded).toBe(true);
+    store.close();
+    expect(store.visible).toBe(false);
+    expect(store.workbenchExpanded).toBe(false);
+
+    store.setWorkbenchExpanded(true);
+    store.reset();
+    expect(store.workbenchExpanded).toBe(false);
+  });
 });

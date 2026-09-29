@@ -594,6 +594,43 @@ function buildShots(ids) {
     },
   });
 
+  // Workbench (full-screen) mode — three columns: sessions rail + chat +
+  // context panel. The expand button is labelled in the active locale.
+  const openWorkbench = async (page) => {
+    const panel = page.locator('.agentic-panel:visible').first();
+    await panel.waitFor({state: 'visible', timeout: 10000});
+    const toggles = panel.locator('.agentic-header__primary-actions button');
+    const count = await toggles.count();
+    for (let i = 0; i < count; i++) {
+      const label = (await toggles.nth(i).getAttribute('aria-label')) || '';
+      if (/全屏|full.?screen/i.test(label)) {
+        await toggles.nth(i).click();
+        await page.locator('.agentic-panel--expanded').waitFor({state: 'visible', timeout: 10000});
+        return;
+      }
+    }
+    throw new Error('Cannot find workbench expand button');
+  };
+  add('ai-assistant-workbench', 'AI assistant workbench', '/home', {
+    wait: 1600,
+    prepare: async (page) => {
+      const launcher = page.locator('.agentic-launcher:visible').first();
+      if (!(await launcher.count())) throw new Error('Cannot find AI assistant launcher');
+      await launcher.click();
+      await openWorkbench(page);
+    },
+  });
+  add('ai-assistant-workbench-rail-collapsed', 'AI assistant workbench rail collapsed', '/home', {
+    wait: 1600,
+    prepare: async (page) => {
+      const launcher = page.locator('.agentic-launcher:visible').first();
+      if (!(await launcher.count())) throw new Error('Cannot find AI assistant launcher');
+      await launcher.click();
+      await openWorkbench(page);
+      await page.locator('.agentic-sessions__collapse').click();
+    },
+  });
+
   return shots.map((shot, index) => ({
     ...shot,
     file: `${String(index + 1).padStart(3, '0')}-${shot.slug}.png`,

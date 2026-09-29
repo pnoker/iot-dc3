@@ -20,6 +20,24 @@
 @use '@/styles/theme.scss';
 @use '@/styles/tokens.scss' as *;
 
+// Backtop owns the bottom-right corner (the assistant entry moved into the
+// header) and matches the --dc3-touch-target size like every other control.
+// Doubled class beats the Element Plus component style that loads later.
+.el-backtop.el-backtop {
+  box-sizing: border-box;
+  width: var(--dc3-touch-target);
+  height: var(--dc3-touch-target);
+}
+
+@media (max-width: $breakpoint-xs-max) {
+  // Inline right/bottom props cannot express the safe-area inset.
+  .el-backtop.el-backtop {
+    right: 12px !important;
+    bottom: calc(var(--dc3-space-4) + env(safe-area-inset-bottom)) !important;
+  }
+}
+
+
 // Imported once by main.ts. These rules cannot live in element-variables.scss because
 // Vite injects additionalData into every scoped style block and appends scope hashes,
 // which do not match body or teleported dropdown, popover, and dialog containers.

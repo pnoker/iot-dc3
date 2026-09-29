@@ -106,6 +106,7 @@ function mountAssistant() {
         Plus: PassthroughStub,
         Promotion: PassthroughStub,
         Setting: PassthroughStub,
+        Tickets: PassthroughStub,
         VideoPause: PassthroughStub,
         Warning: PassthroughStub,
         RenderedAssistantMessage: {
@@ -186,14 +187,14 @@ describe('AgenticAssistant', () => {
     const actions = wrapper.findAll('.agentic-message__action');
     await actions[1].trigger('click');
 
-    expect(wrapper.find('.agentic-quote-preview').exists()).toBe(true);
-    expect(wrapper.find('.agentic-quote-preview').text()).toContain('AI response');
-    expect(wrapper.find('.agentic-quote-preview').text()).toContain('需要引用的 AI 分析结果');
-    expect(wrapper.find('.agentic-quote-preview').text()).not.toContain('> ');
-    expect(wrapper.find('.agentic-quote-preview').text()).not.toContain('###');
+    expect(wrapper.find('.chat-quote--surface').exists()).toBe(true);
+    expect(wrapper.find('.chat-quote--surface').text()).toContain('AI response');
+    expect(wrapper.find('.chat-quote--surface').text()).toContain('需要引用的 AI 分析结果');
+    expect(wrapper.find('.chat-quote--surface').text()).not.toContain('> ');
+    expect(wrapper.find('.chat-quote--surface').text()).not.toContain('###');
 
-    await wrapper.find('.agentic-quote-preview__close').trigger('click');
-    expect(wrapper.find('.agentic-quote-preview').exists()).toBe(false);
+    await wrapper.find('.chat-quote__close').trigger('click');
+    expect(wrapper.find('.chat-quote--surface').exists()).toBe(false);
   });
 
   it('renders quoted user content as a styled card instead of raw markdown markers', () => {
@@ -208,7 +209,7 @@ describe('AgenticAssistant', () => {
 
     const wrapper = mountAssistant();
 
-    expect(wrapper.find('.agentic-user-quote').text()).toContain('FAN-03 温度趋势存在异常');
+    expect(wrapper.find('.chat-quote--on-primary').text()).toContain('FAN-03 温度趋势存在异常');
     expect(wrapper.find('.agentic-text').text()).toBe('请继续分析原因。');
     expect(wrapper.find('.agentic-message__content').text()).not.toContain('> **');
   });

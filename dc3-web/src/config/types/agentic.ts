@@ -103,6 +103,8 @@ export interface AgenticSessionExt {
   /** Optional visual category metadata used by rich clients and mock demos. */
   icon?: 'monitor' | 'warning' | 'trend' | 'connection' | 'odometer' | 'tools' | 'operation' | 'lightning';
   category?: string;
+  /** Archived conversations leave the main rail list and rest in the folded section. */
+  archived?: boolean;
 }
 
 /**

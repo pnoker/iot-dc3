@@ -40,6 +40,16 @@ const SETTINGS_COLLAPSED_KEY = 'dc3.app.settingsCollapsed';
 // choice, mirroring theme/density persistence (the session-local ref used
 // before reset on every refresh).
 const SETTINGS_RAIL_EXPANDED_KEY = 'dc3.app.settingsRailExpanded';
+// Agent workbench layout preferences: sessions-rail collapse and the
+// context panel toggle. The panel pref is tri-state — undefined means
+// "follow the breakpoint default" (open on desktop, closed below).
+const AGENTIC_RAIL_COLLAPSED_KEY = 'dc3.app.agenticRailCollapsed';
+const AGENTIC_CONTEXT_PANEL_OPEN_KEY = 'dc3.app.agenticContextPanelOpen';
+
+const readOptionalBool = (key: string): boolean | undefined => {
+  const stored = getStorage(key);
+  return stored === true ? true : stored === false ? false : undefined;
+};
 
 const THEME_MODES: ThemeMode[] = ['light', 'dark', 'auto'];
 
@@ -59,6 +69,8 @@ export const useAppStore = defineStore('app', () => {
   const density = ref<Density>(readDensity());
   const settingsCollapsed = ref(getStorage(SETTINGS_COLLAPSED_KEY) === true);
   const settingsRailExpanded = ref(getStorage(SETTINGS_RAIL_EXPANDED_KEY) === true);
+  const agenticRailCollapsed = ref(getStorage(AGENTIC_RAIL_COLLAPSED_KEY) === true);
+  const agenticContextPanelOpen = ref(readOptionalBool(AGENTIC_CONTEXT_PANEL_OPEN_KEY));
   const systemDark = ref(false);
 
   let systemMedia: MediaQueryList | undefined;
@@ -109,6 +121,16 @@ export const useAppStore = defineStore('app', () => {
     setStorage(SETTINGS_RAIL_EXPANDED_KEY, settingsRailExpanded.value);
   };
 
+  const toggleAgenticRailCollapsed = () => {
+    agenticRailCollapsed.value = !agenticRailCollapsed.value;
+    setStorage(AGENTIC_RAIL_COLLAPSED_KEY, agenticRailCollapsed.value);
+  };
+
+  const setAgenticContextPanelOpen = (value: boolean) => {
+    agenticContextPanelOpen.value = value;
+    setStorage(AGENTIC_CONTEXT_PANEL_OPEN_KEY, value);
+  };
+
   watch([resolvedTheme, density], () => {
     applyTheme();
   });
@@ -119,6 +141,8 @@ export const useAppStore = defineStore('app', () => {
     density,
     settingsCollapsed,
     settingsRailExpanded,
+    agenticRailCollapsed,
+    agenticContextPanelOpen,
     systemDark,
     // Getters
     resolvedTheme,
@@ -130,5 +154,7 @@ export const useAppStore = defineStore('app', () => {
     setDensity,
     toggleSettingsCollapsed,
     toggleSettingsRailExpanded,
+    toggleAgenticRailCollapsed,
+    setAgenticContextPanelOpen,
   };
 });

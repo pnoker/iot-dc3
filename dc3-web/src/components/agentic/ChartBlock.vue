@@ -173,7 +173,9 @@ const renderChart = () => {
   chartInstance = new Chart({
     container,
     autoFit: true,
-    height: 260,
+    // Follow the CSS-clamped canvas height (see .agentic-chart__canvas);
+    // observeChartSize keeps the chart in sync afterwards.
+    height: container.clientHeight || 260,
     paddingTop: 16,
     paddingRight: 12,
     paddingBottom: 32,
@@ -292,14 +294,14 @@ onBeforeUnmount(destroyChart);
 .agentic-chart {
   margin: 8px 0;
   padding: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dc3-border-base);
   border-radius: var(--dc3-radius-md);
-  background: #fbfdff;
+  background: var(--dc3-bg-elevated-strong);
 }
 
 .agentic-chart__title {
   margin-bottom: 6px;
-  color: #334155;
+  color: var(--dc3-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
@@ -307,14 +309,14 @@ onBeforeUnmount(destroyChart);
 .agentic-chart__description,
 .agentic-chart__empty {
   margin: 0 0 8px;
-  color: #64748b;
+  color: var(--dc3-text-muted);
   font-size: 12px;
   line-height: 1.5;
 }
 
 .agentic-chart__canvas {
   width: 100%;
-  height: 260px;
+  height: var(--agentic-chart-height, clamp(200px, 28vh, 320px));
 }
 
 .agentic-chart__stats {
@@ -329,9 +331,9 @@ onBeforeUnmount(destroyChart);
   gap: 2px;
   min-width: 0;
   padding: 8px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--dc3-border-base);
   border-radius: var(--dc3-radius-md);
-  background: #f8fafc;
+  background: var(--dc3-bg-muted);
 
   span,
   strong {
@@ -341,12 +343,12 @@ onBeforeUnmount(destroyChart);
   }
 
   span {
-    color: #64748b;
+    color: var(--dc3-text-muted);
     font-size: 11px;
   }
 
   strong {
-    color: #1f2937;
+    color: var(--dc3-text-primary);
     font-size: 14px;
   }
 }
@@ -365,10 +367,10 @@ onBeforeUnmount(destroyChart);
     gap: 4px;
     max-width: 100%;
     padding: 3px 6px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-sm);
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--dc3-bg-muted);
+    color: var(--dc3-text-muted);
     font-size: 11px;
     line-height: 1.4;
   }
@@ -382,7 +384,7 @@ onBeforeUnmount(destroyChart);
   }
 
   strong {
-    color: #334155;
+    color: var(--dc3-text-primary);
     font-weight: 600;
   }
 }
