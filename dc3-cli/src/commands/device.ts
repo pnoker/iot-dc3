@@ -61,15 +61,15 @@ export function registerDeviceCommand(program: Command): void {
     .option('--driver-id <id>', 'Filter by driver ID')
     .option('--profile-id <id>', 'Filter by profile ID')
     .option('--group-id <id>', 'Filter by group ID')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       // Manager list endpoints use POST with body query
       const body: Record<string, unknown> = {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       };
       if (opts.driverId) body.driverId = opts.driverId;
       if (opts.profileId) body.profileId = opts.profileId;
@@ -89,10 +89,11 @@ export function registerDeviceCommand(program: Command): void {
       printAndExit(result, format);
     });
 
-  // dc3 device create
+  // dc3 device add (create kept as a one-release compat alias)
   device
-    .command('create')
-    .description('Create a new device')
+    .command('add')
+    .alias('create')
+    .description('Add a new device')
     .requiredOption('--name <name>', 'Device name')
     .requiredOption('--driver-id <id>', 'Driver ID')
     .requiredOption('--profile-id <id>', 'Profile ID')
@@ -154,7 +155,7 @@ export function registerDeviceCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/manager/device/get_count_by_driver_id?driver_id=${opts.driverId}`,
+        `/api/v3/manager/device/get_count_by_driver_id?driver_id=${encodeURIComponent(opts.driverId)}`,
       );
       printAndExit(result, format);
     });
@@ -180,17 +181,22 @@ export function registerDeviceCommand(program: Command): void {
     .requiredOption('--profile-id <id>', 'Profile ID used by imported devices')
     .option('--idempotency-key <key>', 'Stable key for safe retries (defaults to a UUIDv4)')
     .option('--no-wait', 'Return the accepted operation without polling')
-    .option('--poll-interval <ms>', 'Polling interval in milliseconds', '500')
+    .option(
+      '--poll-interval <ms>',
+      'Polling interval in milliseconds',
+      parseNonNegativeInteger,
+      500,
+    )
     .option('--format <format>', 'Output format')
     .action(async (file: string, opts) => {
       const format = detectFormat(opts.format);
       if (!file.toLowerCase().endsWith('.xlsx')) {
-        printAndExit({ ok: false, message: 'Import file must use the .xlsx extension' }, 'json', 1);
+        printAndExit({ ok: false, message: 'Import file must use the .xlsx extension' }, format, 1);
         return;
       }
       const content = await readFile(file);
       if (content.length === 0) {
-        printAndExit({ ok: false, message: 'Import file must not be empty' }, 'json', 1);
+        printAndExit({ ok: false, message: 'Import file must not be empty' }, format, 1);
         return;
       }
       const form = new FormData();
@@ -222,7 +228,7 @@ export function registerDeviceCommand(program: Command): void {
         printAndExit(accepted, format);
         return;
       }
-      const operation = await waitForOperation(accepted, Math.max(100, Number(opts.pollInterval)));
+      const operation = await waitForOperation(accepted, Math.max(100, opts.pollInterval));
       printAndExit(operation, format, operation.status === 'SUCCEEDED' ? 0 : 1);
     });
 }

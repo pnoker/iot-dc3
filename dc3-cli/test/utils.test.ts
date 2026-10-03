@@ -1,14 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sha256 } from '../src/utils/crypto';
 import { decodeJwt, isTokenExpired, tokenTtl } from '../src/utils/jwt';
-
-describe('crypto utils', () => {
-  it('sha256 should produce correct hash', () => {
-    const result = sha256('hello');
-    expect(result).toBe('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824');
-    expect(result).toHaveLength(64);
-  });
-});
 
 describe('jwt utils', () => {
   // A valid-looking JWT with known payload

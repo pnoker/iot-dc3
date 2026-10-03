@@ -17,6 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { parseNonNegativeInteger } from '../utils/manager.js';
 
 /**
  * Register the `label` command tree on the CLI program.
@@ -28,14 +29,14 @@ export function registerLabelCommand(program: Command): void {
   label
     .command('list')
     .description('List labels')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/manager/label/list', {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });
@@ -46,7 +47,9 @@ export function registerLabelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/manager/label/get_by_id?id=${id}`);
+      const result = await dc3Client.get(
+        `/api/v3/manager/label/get_by_id?id=${encodeURIComponent(id)}`,
+      );
       printAndExit(result, format);
     });
 }

@@ -35,14 +35,14 @@ export function registerDriverCommand(program: Command): void {
   driver
     .command('list')
     .description('List drivers')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post(`${DRIVER_BASE}/list`, {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });
@@ -58,8 +58,9 @@ export function registerDriverCommand(program: Command): void {
     });
 
   driver
-    .command('create')
-    .description('Create a driver')
+    .command('add')
+    .alias('create')
+    .description('Add a driver')
     .requiredOption('--name <name>', 'Driver name')
     .requiredOption('--service-name <name>', 'Driver service name')
     .requiredOption('--service-host <host>', 'Driver service IPv4 address')

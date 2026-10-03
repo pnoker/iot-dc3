@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { Command } from 'commander';
+import { handleFatalError } from './core/errors.js';
+import { applyGlobalOptions } from './core/context.js';
 import { registerConfigCommand } from './commands/config.js';
 import { registerAuthCommand } from './commands/auth.js';
 import { registerDeviceCommand } from './commands/device.js';
@@ -39,10 +41,15 @@ program
   .name('dc3')
   .description('IoT DC3 Platform CLI — AI-ready command-line interface')
   .version('0.1.0')
-  .option('--profile <name>', 'Use a specific profile')
-  .option('--format <format>', 'Output format: json, table, yaml')
-  .option('--verbose', 'Verbose output (show request/response details)')
-  .option('--ci', 'CI mode: no colors, json output, strict exit codes');
+  .option('--profile <name>', 'Use a specific profile for this invocation (before the subcommand)')
+  .option('--format <format>', 'Global output format: json, table, yaml (before the subcommand)');
+
+// Apply the global options once per invocation, before any command action runs:
+// --profile installs a validated per-invocation profile override, --format seeds
+// the format-resolution context (the command's own --format still wins).
+program.hook('preAction', async () => {
+  await applyGlobalOptions(program.opts() as { profile?: string; format?: string });
+});
 
 // Register all commands
 registerConfigCommand(program);
@@ -64,8 +71,5 @@ registerAnalyticsCommand(program);
 registerSessionCommand(program);
 registerActionCommand(program);
 
-// Parse and handle errors
-program.parseAsync(process.argv).catch((err: Error) => {
-  process.stderr.write(`Error: ${err.message}\n`);
-  process.exit(1);
-});
+// Parse and map fatal errors to the contract exit codes (auth 3, network 2, business 1)
+program.parseAsync(process.argv).catch(handleFatalError);

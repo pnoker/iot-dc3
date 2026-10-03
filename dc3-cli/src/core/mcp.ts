@@ -16,7 +16,8 @@
  */
 import { configManager } from './config-manager.js';
 import { tokenManager } from './token-manager.js';
-import { AuthError } from './client.js';
+import { AuthError } from './errors.js';
+import { fetchOrNetworkError, normalizeGateway } from './http.js';
 
 /**
  * Thin MCP JSON-RPC client over the gateway's POST /mcp endpoint.
@@ -30,8 +31,8 @@ import { AuthError } from './client.js';
 export class McpClient {
   private async rpc<T = unknown>(method: string, params?: unknown): Promise<T> {
     const profile = await configManager.getActiveProfile();
-    const gateway = profile.gateway.replace(/\/+$/, '');
-    const profileName = (await configManager.load()).current_profile;
+    const gateway = normalizeGateway(profile.gateway);
+    const profileName = await configManager.getActiveProfileName();
     const state = await tokenManager.getState(profileName);
     if (!state || state.authType !== 'oauth') {
       throw new AuthError('MCP endpoint requires an OAuth ticket. Run: dc3 auth login --oauth');
@@ -41,7 +42,7 @@ export class McpClient {
       Accept: 'application/json, text/event-stream',
       ...tokenManager.buildHeaders(state), // Authorization: Bearer …
     };
-    const res = await fetch(`${gateway}/mcp`, {
+    const res = await fetchOrNetworkError(`${gateway}/mcp`, {
       method: 'POST',
       headers,
       body: JSON.stringify({

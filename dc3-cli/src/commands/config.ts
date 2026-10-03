@@ -14,9 +14,30 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 import { configManager } from '../core/config-manager.js';
-import { detectFormat, printAndExit } from '../utils/format.js';
+import { detectFormat, printAndExit, type OutputFormat } from '../utils/format.js';
+import { parseNonNegativeInteger } from '../utils/manager.js';
+
+/**
+ * Parse a numeric `config set` value, rejecting invalid input before anything is persisted.
+ * @param key - full config key as typed by the user, used in the error message
+ * @param value - raw CLI value to parse
+ * @param format - output format for the error report
+ * @returns the parsed non-negative integer
+ */
+function parseSettingInteger(key: string, value: string, format: OutputFormat): number {
+  try {
+    return parseNonNegativeInteger(value);
+  } catch (error) {
+    const reason = error instanceof InvalidArgumentError ? error.message : String(error);
+    printAndExit(
+      { ok: false, message: `Invalid value for ${key}: "${value}" (${reason})` },
+      format,
+      1,
+    );
+  }
+}
 
 /**
  * Register the `config` command tree on the CLI program.
@@ -34,7 +55,7 @@ export function registerConfigCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (key: string, value: string, options) => {
       const format = detectFormat(options.format);
-      const profileName = (await configManager.load()).current_profile;
+      const profileName = await configManager.getActiveProfileName();
 
       switch (key) {
         case 'gateway':
@@ -83,9 +104,15 @@ export function registerConfigCommand(program: Command): void {
             } else if (settingKey === 'color') {
               await configManager.setSetting('color', value === 'true');
             } else if (settingKey === 'renewal_threshold_hours') {
-              await configManager.setSetting('renewal_threshold_hours', parseInt(value, 10));
+              await configManager.setSetting(
+                'renewal_threshold_hours',
+                parseSettingInteger(key, value, format),
+              );
             } else if (settingKey === 'retry_count') {
-              await configManager.setSetting('retry_count', parseInt(value, 10));
+              await configManager.setSetting(
+                'retry_count',
+                parseSettingInteger(key, value, format),
+              );
             } else {
               printAndExit({ ok: false, message: `Unknown setting: ${settingKey}` }, format, 1);
             }
@@ -106,7 +133,7 @@ export function registerConfigCommand(program: Command): void {
       const format = detectFormat(options.format);
       const allProfiles = await configManager.getAllProfiles();
       const configData = await configManager.load();
-      const profileName = configData.current_profile;
+      const profileName = await configManager.getActiveProfileName();
       const profile = allProfiles[profileName];
       const settings = configData.settings;
 
@@ -135,31 +162,30 @@ export function registerConfigCommand(program: Command): void {
 
       switch (key) {
         case 'gateway':
-          console.log(profile.gateway);
+          printAndExit(profile.gateway, format);
           break;
         case 'tenant':
         case 'auth.tenant':
-          console.log(profile.tenant);
+          printAndExit(profile.tenant, format);
           break;
         case 'username':
         case 'auth.username':
-          console.log(profile.username);
+          printAndExit(profile.username, format);
           break;
         case 'credential_store':
         case 'auth.store':
-          console.log(profile.credential_store);
+          printAndExit(profile.credential_store, format);
           break;
         default: {
           // Try settings
           const ks = key! as keyof typeof settings;
           if (ks in settings) {
-            console.log(String(settings[ks]));
+            printAndExit(settings[ks], format);
           } else {
             printAndExit({ ok: false, message: `Unknown config key: ${key}` }, format, 1);
           }
         }
       }
-      process.exit(0);
     });
 
   // dc3 config list
@@ -198,31 +224,36 @@ export function registerConfigCommand(program: Command): void {
   profileCmd
     .command('use <name>')
     .description('Switch to a profile')
-    .action(async (name: string) => {
+    .option('--format <format>', 'Output format')
+    .action(async (name: string, options) => {
+      const format = detectFormat(options.format);
       await configManager.switchProfile(name);
-      console.log(`Switched to profile "${name}"`);
+      printAndExit({ ok: true, message: `Switched to profile "${name}"` }, format);
     });
 
   profileCmd
     .command('delete <name>')
     .description('Delete a profile')
-    .action(async (name: string) => {
+    .option('--format <format>', 'Output format')
+    .action(async (name: string, options) => {
+      const format = detectFormat(options.format);
       await configManager.deleteProfile(name);
-      console.log(`Deleted profile "${name}"`);
+      printAndExit({ ok: true, message: `Deleted profile "${name}"` }, format);
     });
 
   // dc3 config reset
   config
     .command('reset')
     .description('Reset all configuration')
-    .action(async () => {
+    .option('--format <format>', 'Output format')
+    .action(async (options) => {
+      const format = detectFormat(options.format);
       const { confirm } = await import('../utils/prompt.js');
       const ok = await confirm('This will delete all profiles and config. Continue?');
       if (!ok) {
-        console.log('Cancelled');
-        process.exit(0);
+        printAndExit({ ok: true, message: 'Cancelled' }, format);
       }
       await configManager.reset();
-      console.log('Configuration reset');
+      printAndExit({ ok: true, message: 'Configuration reset' }, format);
     });
 }

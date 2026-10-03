@@ -5,6 +5,7 @@ const fetchCalls: Array<{ url: string; init: RequestInit }> = [];
 vi.mock('../src/core/config-manager.js', () => ({
   configManager: {
     getActiveProfile: vi.fn(async () => ({ gateway: 'http://gw.test/', tenant: 't', username: 'u', credential_store: 'env' })),
+    getActiveProfileName: vi.fn(async () => 'default'),
     load: vi.fn(async () => ({ current_profile: 'default' })),
     getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12, output_format: 'json', color: false, retry_count: 1 })),
   },

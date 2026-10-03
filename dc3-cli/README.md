@@ -25,6 +25,9 @@ dc3 dashboard stats
 
 ## Commands
 
+Create-verb commands are named `add` to mirror the backend CRUD conventions; `create`
+remains available as a deprecated compat alias for one release.
+
 ### Configuration (`dc3 config`)
 
 ```bash
@@ -58,7 +61,7 @@ dc3 auth token --header                # Display full auth headers as JSON
 ```bash
 dc3 device list [--driver-id] [--profile-id] [--offset] [--limit]
 dc3 device get <id>
-dc3 device create --name "..." --driver-id "..." --profile-id "..."
+dc3 device add --name "..." --driver-id "..." --profile-id "..."   # alias: create
 dc3 device update <id> --version <n> [--name "..."] [--driver-id "..."] [--profile-id "..."]
 dc3 device delete <id> --version <n>
 dc3 device count --driver-id "..."
@@ -73,7 +76,7 @@ dc3 device import <file.xlsx> --driver-id "..." --profile-id "..." [--idempotenc
 ```bash
 dc3 driver list [--offset] [--limit]
 dc3 driver get <id>
-dc3 driver create --name "..." --service-name "..." --service-host "..." [--type DRIVER_CLIENT]
+dc3 driver add --name "..." --service-name "..." --service-host "..." [--type DRIVER_CLIENT]
 dc3 driver update <id> --version <n> [--name "..."] [--service-name "..."] [--service-host "..."]
 dc3 driver delete <id> --version <n>
 dc3 driver status <id>
@@ -87,7 +90,7 @@ dc3 point get <id>
 dc3 point read <id>                                      # Read latest value
 dc3 point history <id> --device-id <did> [--count 100]   # Read history
 dc3 point write <id> --device-id <did> --value 25.5      # Write value
-dc3 point create --name "..." --profile-id "..." [--type FLOAT] [--rw READ_ONLY]
+dc3 point add --name "..." --profile-id "..." [--type FLOAT] [--rw READ_ONLY]
 dc3 point update <id> --version <n> [--name "..."] [--profile-id "..."] [--type FLOAT]
 dc3 point delete <id> --version <n>
 ```
@@ -97,7 +100,7 @@ dc3 point delete <id> --version <n>
 ```bash
 dc3 profile list [--device-id] [--type] [--offset] [--limit]
 dc3 profile get <id>
-dc3 profile create --name "..." [--type "..."]
+dc3 profile add --name "..." [--type "..."]
 dc3 profile update <id> --version <n> [--name "..."] [--type USER]
 dc3 profile delete <id> --version <n>
 ```
@@ -107,7 +110,7 @@ dc3 profile delete <id> --version <n>
 ```bash
 dc3 group list [--offset] [--limit]
 dc3 group get <id>
-dc3 group create --name "..."
+dc3 group add --name "..."
 
 dc3 label list [--offset] [--limit]
 dc3 label get <id>
@@ -118,7 +121,7 @@ dc3 label get <id>
 ```bash
 dc3 event list [--device-id] [--profile-id] [--offset] [--limit]
 dc3 event get <id>
-dc3 event create --name "..." --profile-id "..." [--type INFO] [--level LOW]
+dc3 event add --name "..." --profile-id "..." [--type INFO] [--level LOW]
 dc3 event update <id> --version <n> [--name "..."] [--profile-id "..."]
 dc3 event delete <id> --version <n>
 dc3 event history [--offset] [--limit]
@@ -129,7 +132,7 @@ dc3 event history [--offset] [--limit]
 ```bash
 dc3 command list [--device-id] [--profile-id] [--offset] [--limit]
 dc3 command get <id>
-dc3 command create --name "..." --profile-id "..." [--type CUSTOM] [--call-type SYNC] [--timeout 30]
+dc3 command add --name "..." --profile-id "..." [--type CUSTOM] [--call-type SYNC] [--timeout 30]
 dc3 command update <id> --version <n> [--name "..."] [--profile-id "..."]
 dc3 command delete <id> --version <n>
 dc3 command call --device-id "..." --command-id "..." [--params '{"k":"v"}']
@@ -229,12 +232,21 @@ dc3 chat --conversation-id <id>       # Continue conversation
 
 ## Global Options
 
-| Option                       | Description                                           |
-| ---------------------------- | ----------------------------------------------------- |
-| `--profile <name>`           | Use a specific config profile                         |
-| `--format json\|table\|yaml` | Output format (default: table for TTY, json for pipe) |
-| `--verbose`                  | Show request/response details                         |
-| `--ci`                       | CI mode: no colors, json output, strict exit codes    |
+Passed before the subcommand, e.g. `dc3 --profile prod --format json device list`.
+
+| Option                       | Description                                                              |
+| ---------------------------- | ------------------------------------------------------------------------ |
+| `--profile <name>`           | Use a specific profile for this invocation (exit 1 if it does not exist) |
+| `--format json\|table\|yaml` | Global output format                                                     |
+
+### Output format resolution
+
+Every command accepts its own `--format` option. The effective format is resolved as:
+
+1. the command's `--format` option,
+2. the global `--format` option,
+3. the persisted `settings.output_format` (set once via `dc3 config set settings.output_format <fmt>`; unset by default),
+4. the TTY default: `table` on an interactive terminal, `json` when piped.
 
 ## Multi-Profile
 
@@ -294,12 +306,12 @@ The AI agent will discover all platform API tools automatically.
 
 ## Exit Codes
 
-| Code | Meaning                                      |
-| ---- | -------------------------------------------- |
-| 0    | Success                                      |
-| 1    | Business error (invalid input, auth failure) |
-| 2    | Network error (gateway unreachable)          |
-| 3    | Authentication error (needs login)           |
+| Code | Meaning                                 |
+| ---- | --------------------------------------- |
+| 0    | Success                                 |
+| 1    | Business error (invalid input)          |
+| 2    | Network error (gateway unreachable)     |
+| 3    | Authentication error (needs login)      |
 
 ## License
 

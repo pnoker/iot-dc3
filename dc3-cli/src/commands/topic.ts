@@ -17,6 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { parseNonNegativeInteger } from '../utils/manager.js';
 
 /**
  * Register the `topic` command tree on the CLI program.
@@ -28,14 +29,14 @@ export function registerTopicCommand(program: Command): void {
   topic
     .command('list')
     .description('List MQTT topics')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/manager/topic/list', {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });

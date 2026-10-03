@@ -19,6 +19,7 @@ vi.mock("../src/core/config-manager.js", () => ({
       tenant: "t",
       username: "u",
     })),
+    getActiveProfileName: vi.fn(async () => "default"),
     load: vi.fn(async () => ({ current_profile: "default" })),
     getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12 })),
   },

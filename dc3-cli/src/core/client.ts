@@ -17,7 +17,11 @@
 import { configManager } from './config-manager.js';
 import { tokenManager } from './token-manager.js';
 import { resolvePassword } from './credential-store.js';
+import { fetchOrNetworkError, normalizeGateway } from './http.js';
+import { ApiError, AuthError } from './errors.js';
 import { decodeJwt } from '../utils/jwt.js';
+
+export { AuthError, NetworkError, ApiError } from './errors.js';
 
 /**
  * DC3 API client — HTTP wrapper that:
@@ -31,7 +35,7 @@ export class Dc3Client {
   async getGateway(): Promise<string> {
     if (!this.gateway) {
       const profile = await configManager.getActiveProfile();
-      this.gateway = profile.gateway.replace(/\/+$/, ''); // strip trailing slash
+      this.gateway = normalizeGateway(profile.gateway);
     }
     return this.gateway;
   }
@@ -54,7 +58,7 @@ export class Dc3Client {
   ): Promise<T> {
     const gateway = await this.getGateway();
     const profile = await configManager.getActiveProfile();
-    const profileName = (await configManager.load()).current_profile;
+    const profileName = await configManager.getActiveProfileName();
     const settings = await configManager.getSettings();
     const thresholdSec = settings.renewal_threshold_hours * 3600;
 
@@ -80,7 +84,7 @@ export class Dc3Client {
         : JSON.stringify(body);
 
     const url = `${gateway}${path}`;
-    const res = await fetch(url, {
+    const res = await fetchOrNetworkError(url, {
       method,
       headers,
       body: requestBody,
@@ -96,7 +100,7 @@ export class Dc3Client {
         if (isFormData) {
           delete newHeaders['Content-Type'];
         }
-        const retryRes = await fetch(url, {
+        const retryRes = await fetchOrNetworkError(url, {
           method,
           headers: newHeaders,
           body: requestBody,
@@ -168,7 +172,7 @@ export class Dc3Client {
       const gateway = await this.getGateway();
 
       // Step 1: Get salt
-      const saltRes = await fetch(`${gateway}/api/v3/auth/token/salt`, {
+      const saltRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/salt`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: username, tenant }),
@@ -177,7 +181,7 @@ export class Dc3Client {
       const salt = parseScalarResource(await saltRes.text(), 'Salt');
 
       // Step 2: Generate token
-      const tokenRes = await fetch(`${gateway}/api/v3/auth/token/generate`, {
+      const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -235,7 +239,7 @@ export class Dc3Client {
     if (scope && scope.trim()) {
       form.set('scope', scope.trim());
     }
-    const res = await fetch(`${gateway}/oauth2/token`, {
+    const res = await fetchOrNetworkError(`${gateway}/oauth2/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -243,11 +247,21 @@ export class Dc3Client {
       },
       body: form.toString(),
     });
+    if (!res.ok) {
+      // The token endpoint may answer non-JSON error bodies — read as text first.
+      const body = await res.text();
+      let detail: string = body;
+      try {
+        const json = JSON.parse(body) as Record<string, unknown>;
+        detail = String(json.error_description ?? json.error ?? body);
+      } catch {
+        // Non-JSON error body; keep the raw text.
+      }
+      throw new AuthError(`OAuth token request failed (${res.status}): ${detail}`);
+    }
     const payload = (await res.json()) as Record<string, unknown>;
-    if (!res.ok || typeof payload.access_token !== 'string') {
-      throw new AuthError(
-        `OAuth token request failed (${res.status}): ${String(payload.error_description ?? payload.error ?? 'unknown')}`,
-      );
+    if (typeof payload.access_token !== 'string') {
+      throw new AuthError('OAuth token endpoint returned no access_token');
     }
     const token = String(payload.access_token);
     const jwtPayload = decodeJwt(token);
@@ -286,7 +300,7 @@ export class Dc3Client {
     const gateway = await this.getGateway();
 
     // Step 1: salt
-    const saltRes = await fetch(`${gateway}/api/v3/auth/token/salt`, {
+    const saltRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/salt`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: username, tenant }),
@@ -295,7 +309,7 @@ export class Dc3Client {
     const salt = parseScalarResource(await saltRes.text(), 'Salt');
 
     // Step 2: generate
-    const tokenRes = await fetch(`${gateway}/api/v3/auth/token/generate`, {
+    const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -324,25 +338,23 @@ export class Dc3Client {
   }
 
   /**
-   * Logout: call cancel endpoint + clear local state.
+   * Logout: call cancel endpoint + clear local state. Transport and auth
+   * failures propagate (NetworkError → exit 2, AuthError → exit 3) instead of
+   * being swallowed; the "not logged in" case never reaches the network.
    * @param profileName - profile name used for the lookup
    */
   async logout(profileName: string): Promise<void> {
     const state = await tokenManager.getState(profileName);
     if (state) {
-      try {
-        await this.request(
-          'POST',
-          '/api/v3/auth/token/cancel',
-          {
-            name: state.username,
-            tenant: state.tenant,
-          },
-          false,
-        ); // Don't retry on 401 for logout
-      } catch {
-        // Cancel may fail if token already expired — that's fine
-      }
+      await this.request(
+        'POST',
+        '/api/v3/auth/token/cancel',
+        {
+          name: state.username,
+          tenant: state.tenant,
+        },
+        false,
+      ); // Don't retry on 401 for logout
     }
     await tokenManager.clearState(profileName);
   }
@@ -375,29 +387,6 @@ export class Dc3Client {
       default:
         return new ApiError(`HTTP ${res.status}: ${msg}`, res.status);
     }
-  }
-}
-
-/**
- * Error thrown when the gateway rejects authentication (HTTP 401).
- */
-export class AuthError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
-
-/**
- * Error thrown for non-2xx gateway responses, carrying status and problem details.
- */
-export class ApiError extends Error {
-  public readonly statusCode: number;
-
-  constructor(message: string, statusCode: number) {
-    super(message);
-    this.name = 'ApiError';
-    this.statusCode = statusCode;
   }
 }
 

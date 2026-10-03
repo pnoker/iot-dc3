@@ -16,7 +16,7 @@
  */
 import { Command } from 'commander';
 import { mcpClient } from '../core/mcp.js';
-import { AuthError } from '../core/client.js';
+import { AuthError, NetworkError } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 /**
@@ -49,9 +49,12 @@ export function registerToolCommand(program: Command): void {
         printAndExit(rows, format, 0);
       } catch (err) {
         if (err instanceof AuthError) {
-          printAndExit({ ok: false, message: err.message }, 'json', 3);
+          printAndExit({ ok: false, message: err.message }, format, 3);
         }
-        printAndExit({ ok: false, message: (err as Error).message }, 'json', 1);
+        if (err instanceof NetworkError) {
+          printAndExit({ ok: false, message: err.message }, format, 2);
+        }
+        printAndExit({ ok: false, message: (err as Error).message }, format, 1);
       }
     });
 
@@ -68,16 +71,19 @@ export function registerToolCommand(program: Command): void {
         try {
           args = JSON.parse(opts.args);
         } catch {
-          printAndExit({ ok: false, message: '--args is not valid JSON' }, 'json', 1);
+          printAndExit({ ok: false, message: '--args is not valid JSON' }, format, 1);
           return;
         }
         const result = await mcpClient.callTool(name, args);
         printAndExit(result, format, 0);
       } catch (err) {
         if (err instanceof AuthError) {
-          printAndExit({ ok: false, message: err.message }, 'json', 3);
+          printAndExit({ ok: false, message: err.message }, format, 3);
         }
-        printAndExit({ ok: false, message: (err as Error).message }, 'json', 1);
+        if (err instanceof NetworkError) {
+          printAndExit({ ok: false, message: err.message }, format, 2);
+        }
+        printAndExit({ ok: false, message: (err as Error).message }, format, 1);
       }
     });
 }

@@ -41,14 +41,14 @@ export function registerCommandCommand(program: Command): void {
     .description('List configured commands')
     .option('--device-id <id>', 'Filter by device ID')
     .option('--profile-id <id>', 'Filter by profile ID')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post(`${COMMAND_BASE}/list`, {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
         ...(opts.deviceId ? { deviceId: opts.deviceId } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
       });
@@ -65,9 +65,11 @@ export function registerCommandCommand(program: Command): void {
       printAndExit(result, format);
     });
 
+  // dc3 command add (create kept as a one-release compat alias)
   cmd
-    .command('create')
-    .description('Create a command configuration')
+    .command('add')
+    .alias('create')
+    .description('Add a command configuration')
     .requiredOption('--name <name>', 'Command name')
     .requiredOption('--profile-id <id>', 'Profile ID')
     .option('--type <type>', 'Command type', 'CUSTOM')
@@ -160,14 +162,14 @@ export function registerCommandCommand(program: Command): void {
   cmd
     .command('history-list')
     .description('List command execution history')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/data/command_history/list', {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });

@@ -5,6 +5,7 @@ const { getState } = vi.hoisted(() => ({ getState: vi.fn() }));
 vi.mock('../src/core/config-manager.js', () => ({
   configManager: {
     getActiveProfile: vi.fn(async () => ({ gateway: 'http://gw.example.com/' })),
+    getActiveProfileName: vi.fn(async () => 'default'),
     load: vi.fn(async () => ({ current_profile: 'default' })),
   },
 }));

@@ -17,6 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { parseNonNegativeInteger } from '../utils/manager.js';
 
 /**
  * Register the `alert` command tree on the CLI program.
@@ -41,14 +42,14 @@ export function registerAlertCommand(program: Command): void {
     .command('list')
     .description('List alerts')
     .option('--source <source>', 'Alert source: driver, device, point')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const body: Record<string, unknown> = {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       };
       if (opts.source) body.source = opts.source;
       const result = await dc3Client.post('/api/v3/data/dashboard/alert/page', body);
@@ -77,7 +78,7 @@ export function registerAlertCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post(
-        `/api/v3/data/dashboard/alert/confirm?source=${opts.source}&id=${opts.id}`,
+        `/api/v3/data/dashboard/alert/confirm?source=${encodeURIComponent(opts.source)}&id=${encodeURIComponent(opts.id)}`,
       );
       printAndExit(result, format);
     });
@@ -92,7 +93,7 @@ export function registerAlertCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post(
-        `/api/v3/data/dashboard/alert/unconfirm?source=${opts.source}&id=${opts.id}`,
+        `/api/v3/data/dashboard/alert/unconfirm?source=${encodeURIComponent(opts.source)}&id=${encodeURIComponent(opts.id)}`,
       );
       printAndExit(result, format);
     });
@@ -247,7 +248,7 @@ export function registerAlertCommand(program: Command): void {
       try {
         body = JSON.parse(opts.args);
       } catch {
-        printAndExit({ ok: false, message: '--args is not valid JSON' }, 'json', 1);
+        printAndExit({ ok: false, message: '--args is not valid JSON' }, format, 1);
         return;
       }
       const result = await dc3Client.post('/api/v3/data/dashboard/alert/bulk_confirm', body);

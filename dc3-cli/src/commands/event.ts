@@ -38,14 +38,14 @@ export function registerEventCommand(program: Command): void {
     .description('List configured events')
     .option('--device-id <id>', 'Filter by device ID')
     .option('--profile-id <id>', 'Filter by profile ID')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post(`${EVENT_BASE}/list`, {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
         ...(opts.deviceId ? { deviceId: opts.deviceId } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
       });
@@ -66,21 +66,23 @@ export function registerEventCommand(program: Command): void {
   event
     .command('history')
     .description('List event history records')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/data/event_history/list', {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });
 
+  // dc3 event add (create kept as a one-release compat alias)
   event
-    .command('create')
-    .description('Create a new event configuration')
+    .command('add')
+    .alias('create')
+    .description('Add a new event configuration')
     .requiredOption('--name <name>', 'Event name')
     .requiredOption('--profile-id <id>', 'Profile ID')
     .option('--type <type>', 'Event type', 'INFO')

@@ -50,54 +50,44 @@ export function registerAuthCommand(program: Command): void {
     .option('--format <format>', 'Output format: json, table, yaml')
     .action(async (options) => {
       const format = detectFormat(options.format);
-      try {
-        if (options.oauth) {
-          await loginOAuthAction(options, format);
-          return;
-        }
-        const profileName = (await configManager.load()).current_profile;
-        const tenant = options.tenant || (await prompt('Tenant: '));
-        const username = options.username || (await prompt('Username: '));
-        const password = options.password || (await passwordPrompt('Password: '));
+      if (options.oauth) {
+        await loginOAuthAction(options, format);
+        return;
+      }
+      const profileName = await configManager.getActiveProfileName();
+      const tenant = options.tenant || (await prompt('Tenant: '));
+      const username = options.username || (await prompt('Username: '));
+      const password = options.password || (await passwordPrompt('Password: '));
 
-        const token = await dc3Client.login(tenant.trim(), username.trim(), password, profileName);
+      const token = await dc3Client.login(tenant.trim(), username.trim(), password, profileName);
 
-        // Save profile config
-        await configManager.setProfile(profileName, {
+      // Save profile config
+      await configManager.setProfile(profileName, {
+        tenant: tenant.trim(),
+        username: username.trim(),
+        credential_store: options.noSave ? 'prompt' : options.store,
+      });
+
+      // Save password (unless --no-save)
+      if (!options.noSave) {
+        await savePasswordToStore(`${username.trim()}@${tenant.trim()}`, password);
+      }
+
+      // Get expiry info for display
+      const state = await tokenManager.getState(profileName);
+      const expiresAt = state ? new Date(state.expiresAt * 1000).toLocaleString() : 'unknown';
+
+      printAndExit(
+        {
+          ok: true,
           tenant: tenant.trim(),
           username: username.trim(),
-          credential_store: options.noSave ? 'prompt' : options.store,
-        });
-
-        // Save password (unless --no-save)
-        if (!options.noSave) {
-          await savePasswordToStore(`${username.trim()}@${tenant.trim()}`, password);
-        }
-
-        // Get expiry info for display
-        const state = await tokenManager.getState(profileName);
-        const expiresAt = state ? new Date(state.expiresAt * 1000).toLocaleString() : 'unknown';
-
-        // Clear password from memory
-        (password as unknown as string).split('').fill('\0');
-
-        printAndExit(
-          {
-            ok: true,
-            tenant: tenant.trim(),
-            username: username.trim(),
-            token_prefix: token.substring(0, 20) + '...',
-            expires_at: expiresAt,
-            message: `Login successful. Token expires at ${expiresAt}`,
-          },
-          format,
-        );
-      } catch (err) {
-        if (err instanceof AuthError) {
-          printAndExit({ ok: false, message: err.message }, 'json', 1);
-        }
-        throw err;
-      }
+          token_prefix: token.substring(0, 20) + '...',
+          expires_at: expiresAt,
+          message: `Login successful. Token expires at ${expiresAt}`,
+        },
+        format,
+      );
     });
 
   /**
@@ -113,11 +103,11 @@ export function registerAuthCommand(program: Command): void {
     options: { clientId?: string; clientSecret?: string; scope?: string },
     format: ReturnType<typeof detectFormat>,
   ): Promise<void> {
-    const profileName = (await configManager.load()).current_profile;
+    const profileName = await configManager.getActiveProfileName();
     const clientId = options.clientId || (await prompt('Client id: '));
     const clientSecret = options.clientSecret || (await passwordPrompt('Client secret: '));
     if (!clientId?.trim() || !clientSecret) {
-      printAndExit({ ok: false, message: 'client id and secret are required' }, 'json', 1);
+      printAndExit({ ok: false, message: 'client id and secret are required' }, format, 1);
     }
     const result = await dc3Client.loginOAuth(
       clientId.trim(),
@@ -145,7 +135,7 @@ export function registerAuthCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (options) => {
       const format = detectFormat(options.format);
-      const profileName = (await configManager.load()).current_profile;
+      const profileName = await configManager.getActiveProfileName();
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
@@ -169,7 +159,6 @@ export function registerAuthCommand(program: Command): void {
 
       if (options.all) {
         const states = await tokenManager.getAllStates();
-        const config = await configManager.load();
         const result: Record<string, unknown> = {};
         for (const [name, state] of Object.entries(states)) {
           const isExpired = state.expiresAt * 1000 < Date.now();
@@ -185,14 +174,14 @@ export function registerAuthCommand(program: Command): void {
         }
         printAndExit(
           {
-            current_profile: config.current_profile,
+            current_profile: await configManager.getActiveProfileName(),
             profiles: result,
           },
           format,
         );
       }
 
-      const profileName = (await configManager.load()).current_profile;
+      const profileName = await configManager.getActiveProfileName();
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
@@ -226,20 +215,20 @@ export function registerAuthCommand(program: Command): void {
     .command('token')
     .description('Display current token (for scripting)')
     .option('--header', 'Output full X-Auth-* headers as JSON')
+    .option('--format <format>', 'Output format: json, table, yaml')
     .action(async (options) => {
-      const profileName = (await configManager.load()).current_profile;
+      const format = detectFormat(options.format);
+      const profileName = await configManager.getActiveProfileName();
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
-        printAndExit({ error: 'Not logged in. Run: dc3 auth login' }, 'json', 1);
+        // Auth failure: propagate to the top-level handler (stderr + exit 3)
+        throw new AuthError('Not logged in. Run: dc3 auth login');
       }
 
       if (options.header) {
-        const headers = tokenManager.buildHeaders(state!);
-        process.stdout.write(JSON.stringify(headers, null, 2) + '\n');
-      } else {
-        process.stdout.write(state!.token + '\n');
+        printAndExit(tokenManager.buildHeaders(state), format);
       }
-      process.exit(0);
+      printAndExit(state.token, format);
     });
 }

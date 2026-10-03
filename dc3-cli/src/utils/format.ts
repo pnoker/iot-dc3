@@ -69,6 +69,8 @@ function formatTable(data: unknown): string {
   return String(data);
 }
 
+import { getGlobalFormatOverride, getSettingsFormatOverride } from '../core/context.js';
+
 /**
  * Supported output render formats (json, table, yaml).
  */
@@ -106,13 +108,23 @@ export function formatOutput(data: unknown, format: OutputFormat = 'json'): stri
 }
 
 /**
- * Detect the best output format: table for interactive TTY, json otherwise.
- * @param explicit - format requested via --format, if any
+ * Detect the best output format. Priority: the command's own `--format` option,
+ * then the global `--format` option, then the persisted `settings.output_format`,
+ * and finally the TTY-aware default (table for interactive TTY, json for pipes).
+ * @param explicit - format requested via the command's --format, if any
  * @returns the format to render with
  */
 export function detectFormat(explicit?: string): OutputFormat {
   if (explicit === 'json' || explicit === 'table' || explicit === 'yaml') {
     return explicit;
+  }
+  const globalOverride = getGlobalFormatOverride();
+  if (globalOverride) {
+    return globalOverride;
+  }
+  const settingsOverride = getSettingsFormatOverride();
+  if (settingsOverride) {
+    return settingsOverride;
   }
   return process.stdout.isTTY ? 'table' : 'json';
 }

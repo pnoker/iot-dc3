@@ -44,7 +44,8 @@ export function registerAnalyticsCommand(program: Command): void {
   analytics
     .command('list')
     .description('List available analytics operations')
-    .action(() => printAndExit({ operations: OPS }, 'json'));
+    .option('--format <format>', 'Output format')
+    .action((opts) => printAndExit({ operations: OPS }, detectFormat(opts.format)));
 
   analytics
     .command('run <op>')
@@ -56,7 +57,7 @@ export function registerAnalyticsCommand(program: Command): void {
       if (!(OPS as readonly string[]).includes(op)) {
         printAndExit(
           { ok: false, message: `Unknown operation: ${op}. Run: dc3 analytics list` },
-          'json',
+          format,
           1,
         );
         return;
@@ -65,7 +66,7 @@ export function registerAnalyticsCommand(program: Command): void {
       try {
         body = JSON.parse(opts.args);
       } catch {
-        printAndExit({ ok: false, message: '--args is not valid JSON' }, 'json', 1);
+        printAndExit({ ok: false, message: '--args is not valid JSON' }, format, 1);
         return;
       }
       const result = await dc3Client.post(`/api/v3/data/analytics/${op}`, body);

@@ -38,14 +38,14 @@ export function registerPointCommand(program: Command): void {
     .description('List points')
     .option('--device-id <id>', 'Filter by device ID')
     .option('--profile-id <id>', 'Filter by profile ID')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const body: Record<string, unknown> = {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       };
       if (opts.deviceId) body.deviceId = opts.deviceId;
       if (opts.profileId) body.profileId = opts.profileId;
@@ -96,9 +96,13 @@ export function registerPointCommand(program: Command): void {
           1,
         );
       }
-      const result = await dc3Client.get(
-        `/api/v3/data/point_value/history?device_id=${opts.deviceId}&point_id=${id}&limit=${opts.limit}${opts.cursor ? `&cursor=${encodeURIComponent(opts.cursor)}` : ''}`,
-      );
+      const params = new URLSearchParams({
+        device_id: opts.deviceId,
+        point_id: id,
+        limit: String(opts.limit),
+      });
+      if (opts.cursor) params.set('cursor', opts.cursor);
+      const result = await dc3Client.get(`/api/v3/data/point_value/history?${params}`);
       printAndExit(result, format);
     });
 
@@ -130,10 +134,11 @@ export function registerPointCommand(program: Command): void {
       printAndExit(result, format);
     });
 
-  // dc3 point create
+  // dc3 point add (create kept as a one-release compat alias)
   point
-    .command('create')
-    .description('Create a new point')
+    .command('add')
+    .alias('create')
+    .description('Add a new point')
     .requiredOption('--name <name>', 'Point name')
     .requiredOption('--profile-id <id>', 'Profile ID')
     .option('--type <type>', 'Point type', 'FLOAT')

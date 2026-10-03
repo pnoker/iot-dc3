@@ -15,8 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { Command } from 'commander';
-import { dc3Client, AuthError } from '../core/client.js';
+import { dc3Client, AuthError, NetworkError } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { parseNonNegativeInteger } from '../utils/manager.js';
 
 /**
  * Session & action plane of the agentic center: conversation lifecycle plus the
@@ -31,14 +32,14 @@ export function registerSessionCommand(program: Command): void {
   session
     .command('list')
     .description('List conversations for the current principal')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger, 0)
+    .option('--limit <n>', 'Maximum items to return', parseNonNegativeInteger, 20)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.post('/api/v3/agentic/session/list', {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset,
+        limit: opts.limit,
       });
       printAndExit(result, format);
     });
@@ -124,7 +125,10 @@ export function registerActionCommand(program: Command): void {
           printAndExit(result, format);
         } catch (err) {
           if (err instanceof AuthError) {
-            printAndExit({ ok: false, message: err.message }, 'json', 3);
+            printAndExit({ ok: false, message: err.message }, format, 3);
+          }
+          if (err instanceof NetworkError) {
+            printAndExit({ ok: false, message: err.message }, format, 2);
           }
           throw err;
         }
@@ -149,7 +153,10 @@ export function registerActionCommand(program: Command): void {
         printAndExit(result, format);
       } catch (err) {
         if (err instanceof AuthError) {
-          printAndExit({ ok: false, message: err.message }, 'json', 3);
+          printAndExit({ ok: false, message: err.message }, format, 3);
+        }
+        if (err instanceof NetworkError) {
+          printAndExit({ ok: false, message: err.message }, format, 2);
         }
         throw err;
       }

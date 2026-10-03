@@ -35,22 +35,43 @@ export function registerProfileCommand(program: Command): void {
   profile
     .command('list')
     .description('List profiles')
-    .option('--device-id <id>', 'Filter by device ID')
+    .option('--device-id <id>', 'Filter by device ID (unpaged endpoint)')
     .option('--type <type>', 'Filter by type')
-    .option('--offset <n>', 'Zero-based result offset', '0')
-    .option('--limit <n>', 'Maximum items to return', '20')
+    .option(
+      '--offset <n>',
+      'Zero-based result offset (cannot be combined with --device-id)',
+      parseNonNegativeInteger,
+    )
+    .option(
+      '--limit <n>',
+      'Maximum items to return (cannot be combined with --device-id)',
+      parseNonNegativeInteger,
+    )
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       if (opts.deviceId) {
+        // The device filter is a separate GET endpoint without paging: refuse the
+        // combination instead of silently ignoring explicit paging flags.
+        if (opts.offset !== undefined || opts.limit !== undefined) {
+          printAndExit(
+            {
+              ok: false,
+              message:
+                '--offset/--limit cannot be combined with --device-id: the device filter endpoint is not paged',
+            },
+            format,
+            1,
+          );
+        }
         const result = await dc3Client.get(
-          `/api/v3/manager/profile/list_by_device_id?device_id=${opts.deviceId}`,
+          `/api/v3/manager/profile/list_by_device_id?device_id=${encodeURIComponent(opts.deviceId)}`,
         );
         printAndExit(result, format);
       }
       const body: Record<string, unknown> = {
-        offset: Number(opts.offset),
-        limit: Number(opts.limit),
+        offset: opts.offset ?? 0,
+        limit: opts.limit ?? 20,
       };
       if (opts.type) body.profileTypeFlag = opts.type;
       const result = await dc3Client.post(`${PROFILE_BASE}/list`, body);
@@ -68,8 +89,9 @@ export function registerProfileCommand(program: Command): void {
     });
 
   profile
-    .command('create')
-    .description('Create a new profile')
+    .command('add')
+    .alias('create')
+    .description('Add a new profile')
     .requiredOption('--name <name>', 'Profile name')
     .option('--type <type>', 'Profile type')
     .option('--format <format>', 'Output format')

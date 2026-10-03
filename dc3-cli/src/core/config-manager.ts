@@ -33,7 +33,9 @@ export const ProfileConfigSchema = z.object({
  * App-level settings.
  */
 export const AppSettingsSchema = z.object({
-  output_format: z.enum(['json', 'table', 'yaml']).default('table'),
+  // Absent by default so the TTY-aware default (table on TTY, json on pipe) applies;
+  // persisted only when the user explicitly chooses one.
+  output_format: z.enum(['json', 'table', 'yaml']).optional(),
   color: z.boolean().default(true),
   renewal_threshold_hours: z.number().min(0).max(12).default(1),
   retry_count: z.number().min(0).max(3).default(1),
@@ -82,12 +84,42 @@ async function ensureDir(): Promise<void> {
   }
 }
 
-async function readConfig(): Promise<Config> {
+/**
+ * Best-effort copy of a corrupt config file to `<path>.bak`, overwriting any previous backup.
+ * @param raw - exact bytes previously read from the corrupt file
+ * @returns true when the backup was written
+ */
+async function backupCorruptFile(raw: string): Promise<boolean> {
   try {
-    const raw = await readFile(CONFIG_PATH, 'utf8');
-    return ConfigSchema.parse(JSON.parse(raw));
+    await ensureDir();
+    await writeFile(`${CONFIG_PATH}.bak`, raw, { mode: 0o644 });
+    return true;
   } catch {
-    return defaultConfig();
+    // Backup is best-effort: a failure must never block CLI startup.
+    return false;
+  }
+}
+
+/** Read result: parsed config plus whether the on-disk file was corrupt. */
+type ReadConfigResult = { config: Config; corrupt: boolean };
+
+async function readConfig(): Promise<ReadConfigResult> {
+  let raw: string;
+  try {
+    raw = await readFile(CONFIG_PATH, 'utf8');
+  } catch {
+    // Missing or unreadable file (first run): defaults, no noise, nothing to preserve.
+    return { config: defaultConfig(), corrupt: false };
+  }
+  try {
+    return { config: ConfigSchema.parse(JSON.parse(raw)), corrupt: false };
+  } catch {
+    const backedUp = await backupCorruptFile(raw);
+    console.error(
+      `Warning: ${CONFIG_PATH} is corrupt; using defaults for this session (file left in place` +
+        `${backedUp ? `, copy saved to ${CONFIG_PATH}.bak` : ''}).`,
+    );
+    return { config: defaultConfig(), corrupt: true };
   }
 }
 
@@ -112,17 +144,70 @@ async function writeConfig(config: Config): Promise<void> {
  */
 export class ConfigManager {
   private config: Config | null = null;
+  /** True while the in-memory config came from defaults because the file on disk was corrupt. */
+  private lastLoadCorrupt = false;
+  /** Per-invocation profile override installed by the global `--profile` option. */
+  private profileOverride: string | null = null;
 
   async load(): Promise<Config> {
     if (!this.config) {
-      this.config = await readConfig();
+      const result = await readConfig();
+      this.config = result.config;
+      this.lastLoadCorrupt = result.corrupt;
     }
     return this.config;
   }
 
+  /**
+   * Persist the in-memory config, warning first when it was built from defaults because the
+   * last load failed: settings and profiles from the corrupt file are not carried over into
+   * what gets written (they stay preserved in the `.bak` copy).
+   * @param config - config to persist
+   */
+  private async persist(config: Config): Promise<void> {
+    if (this.lastLoadCorrupt) {
+      console.error(
+        `Warning: writing ${CONFIG_PATH} from in-memory defaults; other settings and profiles` +
+          ` from the corrupt file are not carried over (preserved in ${CONFIG_PATH}.bak).`,
+      );
+    }
+    await writeConfig(config);
+    this.lastLoadCorrupt = false;
+  }
+
   async save(): Promise<void> {
     if (!this.config) throw new Error('Config not loaded');
-    await writeConfig(this.config);
+    await this.persist(this.config);
+  }
+
+  /**
+   * Install a per-invocation profile override (global `--profile` option). The
+   * name is validated to exist; a missing profile throws, which the top-level
+   * handler maps to exit code 1. Every profile-dependent read (gateway, tenant,
+   * token resolution) flows through {@link getActiveProfileName} afterwards.
+   * @param name - profile name to use for this invocation only
+   */
+  async setProfileOverride(name: string): Promise<void> {
+    const config = await this.load();
+    if (!config.profiles[name]) {
+      throw new Error(
+        `Profile "${name}" not found. Available: ${Object.keys(config.profiles).join(', ') || '(none)'}`,
+      );
+    }
+    this.profileOverride = name;
+  }
+
+  /**
+   * Get the active profile name: the per-invocation `--profile` override when
+   * installed, otherwise the persisted `current_profile`.
+   * @returns the profile name all profile-dependent reads must resolve through
+   */
+  async getActiveProfileName(): Promise<string> {
+    if (this.profileOverride) {
+      return this.profileOverride;
+    }
+    const config = await this.load();
+    return config.current_profile;
   }
 
   /**
@@ -130,8 +215,8 @@ export class ConfigManager {
    * @returns the active profile merged with defaults
    */
   async getActiveProfile(): Promise<ProfileConfig> {
+    const profileName = await this.getActiveProfileName();
     const config = await this.load();
-    const profileName = config.current_profile;
     const profile = config.profiles[profileName];
     if (!profile) {
       throw new Error(`Profile "${profileName}" not found. Run: dc3 config init`);
@@ -171,7 +256,7 @@ export class ConfigManager {
       ...existing,
       ...partial,
     });
-    await writeConfig(config);
+    await this.persist(config);
     this.config = config;
   }
 
@@ -187,7 +272,7 @@ export class ConfigManager {
       );
     }
     config.current_profile = name;
-    await writeConfig(config);
+    await this.persist(config);
     this.config = config;
   }
 
@@ -204,7 +289,7 @@ export class ConfigManager {
       throw new Error(`Cannot delete active profile "${name}". Switch first.`);
     }
     delete config.profiles[name];
-    await writeConfig(config);
+    await this.persist(config);
     this.config = config;
   }
 
@@ -216,7 +301,7 @@ export class ConfigManager {
   async setSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]): Promise<void> {
     const config = await this.load();
     config.settings[key] = value;
-    await writeConfig(config);
+    await this.persist(config);
     this.config = config;
   }
 
