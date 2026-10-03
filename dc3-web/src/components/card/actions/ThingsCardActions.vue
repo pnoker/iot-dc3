@@ -84,7 +84,7 @@ defineProps({
   busy: {type: Boolean, default: false},
 });
 
-defineEmits(['disable', 'enable', 'delete', 'edit', 'detail']);
+defineEmits<{ disable: []; enable: []; delete: []; edit: []; detail: [] }>();
 
 const {t} = useI18n();
 </script>

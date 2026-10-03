@@ -67,7 +67,7 @@
 import {computed, onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
-import {streamLatest} from '@/api/dashboard';
+import {listStreamLatest} from '@/api/dashboard';
 import {deviceStream} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -111,7 +111,7 @@ const refresh = async () => {
   // initiated after the current request settles via the shared card button.
   if (loading.value) return;
   await run(
-    () => (props.deviceId ? deviceStream(props.deviceId, props.size) : streamLatest(props.size)),
+    () => (props.deviceId ? deviceStream(props.deviceId, props.size) : listStreamLatest(props.size)),
     {
     apply: (res) => {
       rows.value = Array.isArray(res) ? res : [];

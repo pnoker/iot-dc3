@@ -39,7 +39,7 @@
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
-import {statsActivity} from '@/api/dashboard';
+import {listStatsActivity} from '@/api/dashboard';
 import {deviceActivity} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
@@ -116,7 +116,7 @@ const load = async () => {
     () =>
       props.deviceId
         ? deviceActivity(props.deviceId, {rangeKey: rangeKey.value})
-        : statsActivity({rangeKey: rangeKey.value}),
+        : listStatsActivity({rangeKey: rangeKey.value}),
     {
     apply: (res) => {
       const payload = Array.isArray(res) ? res : [];

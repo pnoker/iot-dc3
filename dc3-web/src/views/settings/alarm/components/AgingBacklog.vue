@@ -39,7 +39,7 @@ import {nextTick, onMounted, onUnmounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertAging} from '@/api/dashboard';
+import {getAlertAging} from '@/api/dashboard';
 import type {AgingBacklog} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -90,7 +90,7 @@ const render = () => {
 };
 
 const load = () =>
-  run(() => alertAging() as Promise<AgingBacklog>, {
+  run(() => getAlertAging() as Promise<AgingBacklog>, {
     apply: (result) => {
       Object.assign(data, result ?? {under1h: 0, h1to6: 0, h6to24: 0, over24h: 0, total: 0});
       void nextTick().then(() => {

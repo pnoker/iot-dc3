@@ -15,7 +15,7 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!-- Point dashboard (位号看板): read-only data board of one point, aligned
+<!-- Point dashboard: read-only data board of one point, aligned
      with the device detail page's design language — identity banner (tone
      tile + name + device link + rw chip + footer), StatCard strip, trend
      band with the shared window selector, collection health trio, value

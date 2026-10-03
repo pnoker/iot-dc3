@@ -36,7 +36,7 @@ import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertTopSources} from '@/api/dashboard';
+import {listAlertTopSources} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -87,7 +87,7 @@ const load = async () => {
   const limit = props.limit ?? 10;
   await run(
     async () => {
-      const result: any = await alertTopSources(days, limit);
+      const result: any = await listAlertTopSources(days, limit);
       const sourceRows: any[] = Array.isArray(result) ? result : [];
       await resolveBySource(sourceRows);
       return sourceRows.map((row) => ({name: nameBySource(row.source, row.sourceId), count: Number(row.count) || 0}));

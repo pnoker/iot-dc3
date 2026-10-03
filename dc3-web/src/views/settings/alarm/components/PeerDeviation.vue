@@ -60,7 +60,7 @@ import {computed, onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
-import {alertPeerDeviation} from '@/api/dashboard';
+import {listAlertPeerDeviation} from '@/api/dashboard';
 import type {PeerDeviation} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
@@ -105,7 +105,7 @@ const rowKey = (row: PeerDeviation) => `${row.profileId}:${row.deviceId}`;
 const load = () =>
   run(
     async () => {
-      const result: PeerDeviation[] = await alertPeerDeviation(Number(daysKey.value));
+      const result: PeerDeviation[] = await listAlertPeerDeviation(Number(daysKey.value));
       const nextRows = result ?? [];
       await Promise.all([
         resolveDevices(nextRows.map((row) => row.deviceId)),

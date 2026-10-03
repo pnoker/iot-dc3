@@ -232,7 +232,7 @@ void loadMetadata();
 .mcp-overview__snippet-code {
   margin: 0;
   padding: var(--dc3-space-2) var(--dc3-space-3);
-  max-height: 180px;
+  max-height: var(--dc3-snippet-max-height);
   overflow: auto;
   background: var(--el-fill-color-light);
   border-radius: var(--dc3-radius-sm);

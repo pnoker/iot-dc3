@@ -57,7 +57,7 @@
 import {onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
-import {alertPage} from '@/api/dashboard';
+import {listAlertPage} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import type {AlertEventRow, AlertSource} from '@/config/types/dashboard';
@@ -71,7 +71,7 @@ const {resolveBySource, nameBySource} = useEntityNames();
 const load = async () => {
   await run(
     async () => {
-      const result: any = await alertPage({confirmFlag: 0, offset: 0, limit: 5});
+      const result: any = await listAlertPage({confirmFlag: 0, offset: 0, limit: 5});
       const data: AlertEventRow[] = Array.isArray(result) ? result : result?.items ?? [];
       await resolveBySource(data);
       return data;

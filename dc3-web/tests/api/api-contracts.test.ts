@@ -259,7 +259,7 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   disableServiceAccount: ['id-1'],
   // Page-query callers whose names don't match the heuristic prefixes.
   getAgenticSessions: [pageQuery],
-  alertPage: [pageQuery],
+  listAlertPage: [pageQuery],
   // Array-id callers without `ByIds` suffix.
   getPointUnit: [['id-1', 'id-2']],
   deleteDriver: ['id-1', 3],

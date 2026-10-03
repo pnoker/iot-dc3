@@ -43,7 +43,7 @@
       >
         <el-tab-pane :label="$t('device.detail.dashboard')" name="dashboard">
           <div class="device-dashboard">
-            <!-- Device 名片: tone-tile hero (name + attachment + status chip)
+            <!-- Device card: tone-tile hero (name + attachment + status chip)
                  with the machine code and live meta demoted to a quiet footer. -->
             <div class="device-dashboard__banner">
               <div class="device-dashboard__hero">
@@ -593,7 +593,7 @@ onBeforeUnmount(() => {
 // Device dashboard tab — mirrors the Home page's el-row/gutter rhythm so
 // the reused chart/feed cards sit on the same 8px (12px mobile) grid.
 .device-dashboard {
-  // Device 名片: the device-card header anatomy (tone tile + name + attach)
+  // Device card: the device-card header anatomy (tone tile + name + attach)
   // scaled up, with the status as a soft chip and the machine code + live
   // meta demoted to a quiet footer.
   &__banner {

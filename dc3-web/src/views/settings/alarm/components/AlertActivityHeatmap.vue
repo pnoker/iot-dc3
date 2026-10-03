@@ -36,7 +36,7 @@ import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertActivity} from '@/api/dashboard';
+import {listAlertActivity} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {observeChartSize} from '@/utils/g2ChartUtil';
@@ -100,7 +100,7 @@ const render = (rows: { dow: number; hour: number; count: number }[]) => {
 };
 
 const load = async () => {
-  await run(() => alertActivity(7), {
+  await run(() => listAlertActivity(7), {
     apply: (res) => {
       rows.value = (Array.isArray(res) ? res : []).map((row) => ({
         dow: Number(row.dow),

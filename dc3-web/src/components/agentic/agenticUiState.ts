@@ -21,8 +21,10 @@
 // survives refresh as-is); localStorage mirrors it so in-app navigations
 // that drop the query can still restore on reload.
 
+/** Visibility mode of the assistant panel: hidden, docked beside the chat, or full-screen workbench. */
 export type AgenticUiMode = 'closed' | 'open' | 'workbench';
 
+/** Persisted assistant UI state: panel mode plus the selected conversation, if any. */
 export interface AgenticUiState {
   mode: AgenticUiMode;
   conversationId?: string;

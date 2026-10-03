@@ -127,11 +127,19 @@ const PAGES: SmokePage[] = [
 
 describe('Settings pages smoke mount', () => {
   for (const page of PAGES) {
-    it(`mounts ${page.name} without error`, async () => {
-      const component = (await page.loader()).default;
-      const wrapper = await mountListPage({component, props: page.props, stubs: localComponentStubs});
-      await flushPromises();
-      expect(wrapper.exists()).toBe(true);
-    });
+    // Heavy list pages (AlarmOverview, User) mount in ~17s even alone and can
+    // exceed the 30s global cap under full-suite worker contention. The mount
+    // path resolves or throws — it never polls — so a 60s budget absorbs load
+    // spikes without masking real hangs.
+    it(
+      `mounts ${page.name} without error`,
+      async () => {
+        const component = (await page.loader()).default;
+        const wrapper = await mountListPage({component, props: page.props, stubs: localComponentStubs});
+        await flushPromises();
+        expect(wrapper.exists()).toBe(true);
+      },
+      60_000
+    );
   }
 });

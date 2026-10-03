@@ -19,12 +19,10 @@ import type {AxiosInstance} from 'axios';
 import axios, {type AxiosError, type AxiosResponse, type InternalAxiosRequestConfig} from 'axios';
 
 import {AXIOS_CONFIG, PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
-import {AUTH_HEADERS} from '@/config/constant/common';
 import i18n from '@/config/i18n';
-import {failMessage, warnMessage} from '@/utils/notificationUtil';
-import {getStorage, removeStorage} from '@/utils/storageUtil';
-import {isNull} from '@/utils/validationUtil';
 import router from '@/config/router';
+import {buildAuthHeaders, resetAuthSession} from '@/utils/authSession';
+import {failMessage, warnMessage} from '@/utils/notificationUtil';
 
 /**
  * Custom Axios instance with default configuration
@@ -58,9 +56,7 @@ const notifyProblem = (status: number, problem: ProblemPayload) => {
   }
   if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
     warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
-    removeStorage(AUTH_HEADERS.TENANT);
-    removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
+    resetAuthSession();
     router.push({name: 'login'}).catch(() => {});
   } else if (status >= 500) {
     failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
@@ -81,14 +77,8 @@ request.interceptors.request.use(
       return config;
     }
 
-    const tenant = getStorage(AUTH_HEADERS.TENANT);
-    if (!isNull(tenant)) {
-      headers[AUTH_HEADERS.TENANT] = tenant;
-    }
-
-    const login = getStorage(AUTH_HEADERS.LOGIN);
-    if (!isNull(login)) {
-      headers[AUTH_HEADERS.LOGIN] = login;
+    for (const [name, value] of Object.entries(buildAuthHeaders())) {
+      headers[name] = value;
     }
 
     // Token travels in an httpOnly cookie (withCredentials) — never inject it

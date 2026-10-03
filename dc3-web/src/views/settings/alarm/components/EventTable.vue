@@ -159,7 +159,7 @@ import {computed, onBeforeUnmount, onMounted, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRoute} from 'vue-router';
 
-import {alertBulkConfirm, alertConfirm, alertPage, alertUnconfirm} from '@/api/dashboard';
+import {alertBulkConfirm, alertConfirm, listAlertPage, alertUnconfirm} from '@/api/dashboard';
 import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {listPointByIds} from '@/api/point';
@@ -286,7 +286,7 @@ const load = async () => {
   loading.value = true;
   status.value = 'loading';
   try {
-    const res: any = await alertPage({
+    const res: any = await listAlertPage({
       source: props.source,
       alarmTypeFlag: formData.alarmTypeFlag === '' ? null : Number(formData.alarmTypeFlag),
       confirmFlag: formData.confirmFlag === '' ? null : Number(formData.confirmFlag),

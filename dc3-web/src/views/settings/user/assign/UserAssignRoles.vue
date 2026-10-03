@@ -76,18 +76,19 @@
               </template>
             </el-input>
           </div>
-          <responsive-record-list
-            :columns="roleColumns"
-            :loading="state.loading"
-            :rows="filteredAvailable"
-            :selected-rows="state.leftSelection"
-            :selection-disabled="() => state.loading || state.submitting"
-            embedded
-            selectable
-            row-key="id"
-            class="assign-pane__list"
-            @selection-change="setLeftSelection"
-          />
+          <el-scrollbar class="assign-pane__list">
+            <responsive-record-list
+              :columns="roleColumns"
+              :loading="state.loading"
+              :rows="filteredAvailable"
+              :selected-rows="state.leftSelection"
+              :selection-disabled="() => state.loading || state.submitting"
+              embedded
+              selectable
+              row-key="id"
+              @selection-change="setLeftSelection"
+            />
+          </el-scrollbar>
         </section>
 
         <div class="assign-actions" :aria-label="t('settings.user.assignRolesTitle')">
@@ -129,18 +130,19 @@
               </template>
             </el-input>
           </div>
-          <responsive-record-list
-            :columns="roleColumns"
-            :loading="state.loading"
-            :rows="filteredAssigned"
-            :selected-rows="state.rightSelection"
-            :selection-disabled="() => state.loading || state.submitting"
-            embedded
-            selectable
-            row-key="id"
-            class="assign-pane__list"
-            @selection-change="setRightSelection"
-          />
+          <el-scrollbar class="assign-pane__list">
+            <responsive-record-list
+              :columns="roleColumns"
+              :loading="state.loading"
+              :rows="filteredAssigned"
+              :selected-rows="state.rightSelection"
+              :selection-disabled="() => state.loading || state.submitting"
+              embedded
+              selectable
+              row-key="id"
+              @selection-change="setRightSelection"
+            />
+          </el-scrollbar>
         </section>
       </div>
     </div>
@@ -455,7 +457,6 @@ onBeforeUnmount(() => {
 
 .assign-pane__list {
   max-height: min(360px, 42vh);
-  overflow: auto;
 }
 
 .assign-actions {

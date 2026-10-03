@@ -61,7 +61,7 @@ import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 import {Warning} from '@element-plus/icons-vue';
 
-import {alertFlapping} from '@/api/dashboard';
+import {listAlertFlapping} from '@/api/dashboard';
 import type {FlappingSource} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -93,7 +93,7 @@ const rows = ref<FlappingSource[]>([]);
 const load = () =>
   run(
     async () => {
-      const result: FlappingSource[] = await alertFlapping(Number(windowKey.value), minCount.value, 30);
+      const result: FlappingSource[] = await listAlertFlapping(Number(windowKey.value), minCount.value, 30);
       const nextRows = result ?? [];
       await resolveBySource(nextRows);
       return nextRows;

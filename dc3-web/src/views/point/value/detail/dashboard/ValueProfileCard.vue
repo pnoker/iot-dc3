@@ -15,7 +15,7 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!-- Value profile of the point (值域画像): numeric value histogram beside
+<!-- Value profile of the point: numeric value histogram beside
      the 24h typical-day curve. Two equal cards side by side; stacked on
      narrow screens. -->
 

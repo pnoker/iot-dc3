@@ -744,29 +744,6 @@ exports[`API wrapper contracts > alarm > updateRule maps to its transport contra
 }
 `;
 
-exports[`API wrapper contracts > alert > alertActivity maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/activity",
-    {
-      "params": {
-        "days": 7,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertAging maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/aging",
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > alert > alertBulkConfirm maps to its transport contract 1`] = `
 {
   "args": [
@@ -782,21 +759,6 @@ exports[`API wrapper contracts > alert > alertBulkConfirm maps to its transport 
     },
   ],
   "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertChangeImpact maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/change_impact",
-    {
-      "params": {
-        "days": 30,
-        "limit": 30,
-      },
-    },
-  ],
-  "transport": "httpGet",
 }
 `;
 
@@ -816,141 +778,6 @@ exports[`API wrapper contracts > alert > alertConfirm maps to its transport cont
 }
 `;
 
-exports[`API wrapper contracts > alert > alertCorrelation maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/correlation",
-    {
-      "params": {
-        "hours": 24,
-        "limit": 15,
-        "window_sec": 30,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertFlapping maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/flapping",
-    {
-      "params": {
-        "hours": 6,
-        "limit": 20,
-        "min_count": 5,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertMtta maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/mtta",
-    {
-      "params": {
-        "days": 30,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertPage maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/page",
-    {
-      "keyword": "demo",
-      "page": {
-        "current": 2,
-        "size": 20,
-      },
-    },
-  ],
-  "transport": "httpPost",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertPeerDeviation maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/peer_deviation",
-    {
-      "params": {
-        "days": 7,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertStormSources maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/storm_sources",
-    {
-      "params": {
-        "hours": 1,
-        "limit": 10,
-        "min_count": 10,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertTopSources maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/top_sources",
-    {
-      "params": {
-        "days": 30,
-        "limit": 10,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertTrend maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/trend",
-    {
-      "params": {
-        "days": 30,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > alert > alertTypeDistribution maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/alert/type_distribution",
-    {
-      "params": {
-        "days": 30,
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
 exports[`API wrapper contracts > alert > alertUnconfirm maps to its transport contract 1`] = `
 {
   "args": [
@@ -964,6 +791,15 @@ exports[`API wrapper contracts > alert > alertUnconfirm maps to its transport co
     },
   ],
   "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alert > getAlertAging maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/aging",
+  ],
+  "transport": "httpGet",
 }
 `;
 
@@ -985,23 +821,247 @@ exports[`API wrapper contracts > alert > getPointAlertProfile maps to its transp
 
 exports[`API wrapper contracts > alert > has every export covered by the contract matrix 1`] = `
 [
-  "alertActivity",
-  "alertAging",
   "alertBulkConfirm",
-  "alertChangeImpact",
   "alertConfirm",
-  "alertCorrelation",
-  "alertFlapping",
-  "alertMtta",
-  "alertPage",
-  "alertPeerDeviation",
-  "alertStormSources",
-  "alertTopSources",
-  "alertTrend",
-  "alertTypeDistribution",
   "alertUnconfirm",
+  "getAlertAging",
   "getPointAlertProfile",
+  "listAlertActivity",
+  "listAlertChangeImpact",
+  "listAlertCorrelation",
+  "listAlertFlapping",
+  "listAlertMtta",
+  "listAlertPage",
+  "listAlertPeerDeviation",
+  "listAlertStormSources",
+  "listAlertTopSources",
+  "listAlertTrend",
+  "listAlertTypeDistribution",
 ]
+`;
+
+exports[`API wrapper contracts > alert > listAlertActivity maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/activity",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertChangeImpact maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/change_impact",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+        "limit": 30,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertCorrelation maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/correlation",
+    {
+      "params": {
+        "hours": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+        "limit": 15,
+        "window_sec": 30,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertFlapping maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/flapping",
+    {
+      "params": {
+        "hours": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+        "limit": 20,
+        "min_count": 5,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertMtta maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/mtta",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertPage maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/page",
+    {
+      "keyword": "demo",
+      "page": {
+        "current": 2,
+        "size": 20,
+      },
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertPeerDeviation maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/peer_deviation",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertStormSources maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/storm_sources",
+    {
+      "params": {
+        "hours": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+        "limit": 10,
+        "min_count": 10,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertTopSources maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/top_sources",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+        "limit": 10,
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertTrend maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/trend",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > alert > listAlertTypeDistribution maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/alert/type_distribution",
+    {
+      "params": {
+        "days": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
 `;
 
 exports[`API wrapper contracts > api > addApi maps to its transport contract 1`] = `
@@ -4022,13 +4082,13 @@ exports[`API wrapper contracts > serviceAccount > updateServiceAccount maps to i
 }
 `;
 
-exports[`API wrapper contracts > stats > dailyGrowth maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > getDailyGrowth maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/manager/dashboard/growth",
     {
       "params": {
-        "days": 7,
+        "days": "id-1",
       },
     },
   ],
@@ -4036,13 +4096,13 @@ exports[`API wrapper contracts > stats > dailyGrowth maps to its transport contr
 }
 `;
 
-exports[`API wrapper contracts > stats > deviceStats maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > getDeviceStats maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/manager/dashboard/device/stats",
     {
       "params": {
-        "top_n": 10,
+        "top_n": "id-1",
       },
     },
   ],
@@ -4050,7 +4110,7 @@ exports[`API wrapper contracts > stats > deviceStats maps to its transport contr
 }
 `;
 
-exports[`API wrapper contracts > stats > driverStats maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > getDriverStats maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/manager/dashboard/driver/stats",
@@ -4059,61 +4119,7 @@ exports[`API wrapper contracts > stats > driverStats maps to its transport contr
 }
 `;
 
-exports[`API wrapper contracts > stats > has every export covered by the contract matrix 1`] = `
-[
-  "dailyGrowth",
-  "deviceStats",
-  "driverStats",
-  "statsActivity",
-  "statsLatency",
-  "statsTimeseries",
-  "statsToday",
-  "statsTop",
-  "streamLatest",
-]
-`;
-
-exports[`API wrapper contracts > stats > statsActivity maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/stats/activity",
-    {
-      "params": {
-        "range_key": "7d",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > stats > statsLatency maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/stats/latency",
-    {
-      "params": {
-        "range_key": "24h",
-      },
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > stats > statsTimeseries maps to its transport contract 1`] = `
-{
-  "args": [
-    "api/v3/data/dashboard/stats/timeseries",
-    {
-      "params": {},
-    },
-  ],
-  "transport": "httpGet",
-}
-`;
-
-exports[`API wrapper contracts > stats > statsToday maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > getStatsToday maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/data/dashboard/stats/today",
@@ -4122,25 +4128,105 @@ exports[`API wrapper contracts > stats > statsToday maps to its transport contra
 }
 `;
 
-exports[`API wrapper contracts > stats > statsTop maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > has every export covered by the contract matrix 1`] = `
+[
+  "getDailyGrowth",
+  "getDeviceStats",
+  "getDriverStats",
+  "getStatsToday",
+  "listStatsActivity",
+  "listStatsLatency",
+  "listStatsTimeseries",
+  "listStatsTop",
+  "listStreamLatest",
+]
+`;
+
+exports[`API wrapper contracts > stats > listStatsActivity maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/top",
+    "api/v3/data/dashboard/stats/activity",
     {
-      "params": {},
+      "params": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
+        },
+      },
     },
   ],
   "transport": "httpGet",
 }
 `;
 
-exports[`API wrapper contracts > stats > streamLatest maps to its transport contract 1`] = `
+exports[`API wrapper contracts > stats > listStatsLatency maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/stats/latency",
+    {
+      "params": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > stats > listStatsTimeseries maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/stats/timeseries",
+    {
+      "params": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > stats > listStatsTop maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/data/dashboard/top",
+    {
+      "params": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
+        },
+      },
+    },
+  ],
+  "transport": "httpGet",
+}
+`;
+
+exports[`API wrapper contracts > stats > listStreamLatest maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/data/dashboard/stream",
     {
       "params": {
-        "limit": 20,
+        "limit": {
+          "keyword": "demo",
+          "page": {
+            "current": 2,
+            "size": 20,
+          },
+        },
       },
     },
   ],
@@ -4190,13 +4276,13 @@ exports[`API wrapper contracts > system > has every export covered by the contra
   "alertLatest",
   "alertStats",
   "coverageGap",
-  "protocolHealth",
+  "listProtocolHealth",
   "silentSources",
   "systemHealth",
 ]
 `;
 
-exports[`API wrapper contracts > system > protocolHealth maps to its transport contract 1`] = `
+exports[`API wrapper contracts > system > listProtocolHealth maps to its transport contract 1`] = `
 {
   "args": [
     "api/v3/data/dashboard/protocol/health",

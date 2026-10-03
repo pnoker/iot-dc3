@@ -129,7 +129,7 @@ import {listDevice} from '@/api/device';
 import {listPoint} from '@/api/point';
 import {listProfile} from '@/api/profile';
 import {listDriver} from '@/api/driver';
-import {alertStats, dailyGrowth, statsTimeseries, statsToday} from '@/api/dashboard';
+import {alertStats, getDailyGrowth, listStatsTimeseries, getStatsToday} from '@/api/dashboard';
 import type {
   AlertStatsSummary,
   DailyGrowthSummary,
@@ -281,7 +281,7 @@ const loadTotals = async () => {
 };
 
 const loadToday = async () => {
-  const res = await statsToday();
+  const res = await getStatsToday();
   if (!alive) return;
   const data: StatsTodaySummary = res;
   state.todayCount = toNumber(data.today);
@@ -290,7 +290,7 @@ const loadToday = async () => {
 };
 
 const loadSparkline = async () => {
-  const res = await statsTimeseries({granularity: 'hour', rangeKey: '24h'});
+  const res = await listStatsTimeseries({granularity: 'hour', rangeKey: '24h'});
   if (!alive) return;
   const buckets: StatsTimeBucket[] = res;
   state.todaySparkline = buckets.map((bucket) => toNumber(bucket.count));
@@ -314,7 +314,7 @@ const loadAlerts = async () => {
 };
 
 const loadGrowth = async () => {
-  const res = await dailyGrowth(7);
+  const res = await getDailyGrowth(7);
   if (!alive) return;
   const data: DailyGrowthSummary = res;
   state.driverSparkline = toNumberArray(data.driverDailyCounts ?? []);

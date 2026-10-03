@@ -41,7 +41,7 @@ import type {
  * @param body - request body payload
  * @returns the page result response
  */
-export const alertPage = (body: AlertPageQuery = {}) =>
+export const listAlertPage = (body: AlertPageQuery = {}) =>
   httpPost<PageResult<AlertEventRow>>(
     `${API_DATA_BASE}/dashboard/alert/page`,
     body,
@@ -89,7 +89,7 @@ export const alertBulkConfirm = (
  * @param days - days entries
  * @returns the alert trend row response
  */
-export const alertTrend = (days = 30) =>
+export const listAlertTrend = (days = 30) =>
   httpGet<AlertTrendRow[]>(`${API_DATA_BASE}/dashboard/alert/trend`, {
     params: { days },
   });
@@ -97,7 +97,7 @@ export const alertTrend = (days = 30) =>
 /**
  * Fetch the alarm profile of a single point: alarm-type distribution and
  * daily counts inside a rolling day range. The recent-alert list is served
- * separately by {@link alertPage} with source=point.
+ * separately by {@link listAlertPage} with source=point.
  * @param pointId - point id whose alarm profile is being queried
  * @param days - rolling day range, defaults to 30
  * @param rangeKey - preset time range key overriding days
@@ -116,7 +116,7 @@ export const getPointAlertProfile = (pointId: string, days = 30, rangeKey?: stri
  * @param limit - maximum number of entries to return or generate
  * @returns the alert top source row response
  */
-export const alertTopSources = (days = 30, limit = 10) =>
+export const listAlertTopSources = (days = 30, limit = 10) =>
   httpGet<AlertTopSourceRow[]>(
     `${API_DATA_BASE}/dashboard/alert/top_sources`,
     { params: { days, limit } },
@@ -127,7 +127,7 @@ export const alertTopSources = (days = 30, limit = 10) =>
  * @param days - days entries
  * @returns the alert activity row response
  */
-export const alertActivity = (days = 7) =>
+export const listAlertActivity = (days = 7) =>
   httpGet<AlertActivityRow[]>(`${API_DATA_BASE}/dashboard/alert/activity`, {
     params: { days },
   });
@@ -137,7 +137,7 @@ export const alertActivity = (days = 7) =>
  * @param days - days entries
  * @returns the alert type row response
  */
-export const alertTypeDistribution = (days = 30) =>
+export const listAlertTypeDistribution = (days = 30) =>
   httpGet<AlertTypeRow[]>(
     `${API_DATA_BASE}/dashboard/alert/type_distribution`,
     { params: { days } },
@@ -150,7 +150,7 @@ export const alertTypeDistribution = (days = 30) =>
  * @param limit - maximum number of entries to return or generate
  * @returns the alert storm row response
  */
-export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
+export const listAlertStormSources = (hours = 1, minCount = 10, limit = 10) =>
   httpGet<AlertStormRow[]>(
     `${API_DATA_BASE}/dashboard/alert/storm_sources`,
     {
@@ -169,7 +169,7 @@ export const alertStormSources = (hours = 1, minCount = 10, limit = 10) =>
  * @param limit - maximum number of entries to return or generate
  * @returns the flapping source response
  */
-export const alertFlapping = (hours = 6, minCount = 5, limit = 20) =>
+export const listAlertFlapping = (hours = 6, minCount = 5, limit = 20) =>
   httpGet<FlappingSource[]>(`${API_DATA_BASE}/dashboard/alert/flapping`, {
     params: {
       hours,
@@ -185,7 +185,7 @@ export const alertFlapping = (hours = 6, minCount = 5, limit = 20) =>
  * @param limit - maximum number of entries to return or generate
  * @returns the correlation pair response
  */
-export const alertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
+export const listAlertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
   httpGet<CorrelationPair[]>(
     `${API_DATA_BASE}/dashboard/alert/correlation`,
     {
@@ -202,7 +202,7 @@ export const alertCorrelation = (hours = 24, windowSec = 30, limit = 15) =>
  * @param days - days entries
  * @returns the peer deviation response
  */
-export const alertPeerDeviation = (days = 7) =>
+export const listAlertPeerDeviation = (days = 7) =>
   httpGet<PeerDeviation[]>(
     `${API_DATA_BASE}/dashboard/alert/peer_deviation`,
     { params: { days } },
@@ -212,7 +212,7 @@ export const alertPeerDeviation = (days = 7) =>
  * Fetch the alert aging backlog.
  * @returns the aging backlog response
  */
-export const alertAging = () =>
+export const getAlertAging = () =>
   httpGet<AgingBacklog>(`${API_DATA_BASE}/dashboard/alert/aging`);
 
 /**
@@ -220,7 +220,7 @@ export const alertAging = () =>
  * @param days - days entries
  * @returns the mtta trend response
  */
-export const alertMtta = (days = 30) =>
+export const listAlertMtta = (days = 30) =>
   httpGet<MttaTrend[]>(`${API_DATA_BASE}/dashboard/alert/mtta`, {
     params: { days },
   });
@@ -231,7 +231,7 @@ export const alertMtta = (days = 30) =>
  * @param limit - maximum number of entries to return or generate
  * @returns the change impact response
  */
-export const alertChangeImpact = (days = 30, limit = 30) =>
+export const listAlertChangeImpact = (days = 30, limit = 30) =>
   httpGet<ChangeImpact[]>(`${API_DATA_BASE}/dashboard/alert/change_impact`, {
     params: { days, limit },
   });

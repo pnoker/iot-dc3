@@ -58,7 +58,7 @@ import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 import {Warning} from '@element-plus/icons-vue';
 
-import {alertStormSources} from '@/api/dashboard';
+import {listAlertStormSources} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {jumpToSourceEvents} from '@/utils/jumpUtil';
@@ -100,7 +100,7 @@ const load = async () => {
   const {hours, minCount} = window.value;
   await run(
     async () => {
-      const result = await alertStormSources(hours, minCount, props.limit);
+      const result = await listAlertStormSources(hours, minCount, props.limit);
       const nextRows = Array.isArray(result) ? result : [];
       await resolveBySource(nextRows);
       return nextRows;

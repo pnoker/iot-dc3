@@ -57,7 +57,7 @@ import {onMounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {useRouter} from 'vue-router';
 
-import {alertChangeImpact} from '@/api/dashboard';
+import {listAlertChangeImpact} from '@/api/dashboard';
 import type {ChangeImpact} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -83,7 +83,7 @@ const rows = ref<ChangeImpact[]>([]);
 const load = () =>
   run(
     async () => {
-      const result: ChangeImpact[] = await alertChangeImpact(Number(daysKey.value), 30);
+      const result: ChangeImpact[] = await listAlertChangeImpact(Number(daysKey.value), 30);
       const nextRows = result ?? [];
       await Promise.all([
         resolveDrivers(nextRows.filter((row) => row.kind === 'driver').map((row) => row.entityId)),

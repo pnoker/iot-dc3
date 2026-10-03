@@ -63,7 +63,7 @@
 import {computed, onMounted, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 
-import {protocolHealth} from '@/api/dashboard';
+import {listProtocolHealth} from '@/api/dashboard';
 import type {ProtocolHealth} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import ResponsiveRecordList from '@/components/list/ResponsiveRecordList.vue';
@@ -100,7 +100,7 @@ const columns = computed(() => [
 ]);
 
 const load = () =>
-  run(() => protocolHealth() as Promise<ProtocolHealth[]>, {
+  run(() => listProtocolHealth() as Promise<ProtocolHealth[]>, {
     apply: (result) => (rows.value = result ?? []),
   });
 

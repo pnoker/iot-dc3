@@ -193,7 +193,7 @@ import {useRoute, useRouter} from 'vue-router';
 import {Bell, CircleCheck, Management, Promotion, Warning, WarningFilled} from '@element-plus/icons-vue';
 
 import {AUTO_REFRESH_INTERVAL} from '@/config/constant/ui';
-import {alertPage, alertStats, alertTrend} from '@/api/dashboard';
+import {listAlertPage, alertStats, listAlertTrend} from '@/api/dashboard';
 import blankCard from '@/components/card/blank/BlankCard.vue';
 import StatCard from '@/components/card/stat/StatCard.vue';
 import {useBreakpoint} from '@/composables/useBreakpoint';
@@ -281,13 +281,13 @@ const state = reactive({
   // 7-day daily buckets split by source. Feeds each non-today card's own
   // sparkline + trend, so driver-total and device-total don't end up
   // with identical chart shapes. Mirrors how Home uses driverSparkline /
-  // deviceSparkline from dailyGrowth.
+  // deviceSparkline from getDailyGrowth.
   driverDaily: [] as number[],
   deviceDaily: [] as number[],
 });
 
 const fetchCount = async (source: 'point' | 'device' | 'driver', confirmFlag: number | null) => {
-  const res: any = await alertPage({source, confirmFlag, offset: 0, limit: 1});
+  const res: any = await listAlertPage({source, confirmFlag, offset: 0, limit: 1});
   return Number(res?.total ?? 0);
 };
 
@@ -303,7 +303,7 @@ const load = async () => {
       fetchCount('driver', null),
       fetchCount('driver', 0),
       alertStats(),
-      alertTrend(7),
+      listAlertTrend(7),
     ]);
     if (sequence !== loadSequence) return;
     state.deviceTotal = dt;

@@ -13,16 +13,16 @@ minimumReleaseAgeExclude:
   - '@vue/language-core@3.3.0 || 3.3.2'
   - vue-i18n@11.4.4 || 11.4.10
   - vue-tsc@3.3.0 || 3.3.2
-  - '@typescript-eslint/eslint-plugin@8.62.0'
-  - '@typescript-eslint/parser@8.62.0'
-  - '@typescript-eslint/project-service@8.62.0'
-  - '@typescript-eslint/scope-manager@8.62.0'
-  - '@typescript-eslint/tsconfig-utils@8.62.0'
-  - '@typescript-eslint/type-utils@8.62.0'
-  - '@typescript-eslint/types@8.62.0'
-  - '@typescript-eslint/typescript-estree@8.62.0'
-  - '@typescript-eslint/utils@8.62.0'
-  - '@typescript-eslint/visitor-keys@8.62.0'
+  - '@typescript-eslint/eslint-plugin@8.62.0 || 8.71.0'
+  - '@typescript-eslint/parser@8.62.0 || 8.71.0'
+  - '@typescript-eslint/project-service@8.62.0 || 8.71.0'
+  - '@typescript-eslint/scope-manager@8.62.0 || 8.71.0'
+  - '@typescript-eslint/tsconfig-utils@8.62.0 || 8.71.0'
+  - '@typescript-eslint/type-utils@8.62.0 || 8.71.0'
+  - '@typescript-eslint/types@8.62.0 || 8.71.0'
+  - '@typescript-eslint/typescript-estree@8.62.0 || 8.71.0'
+  - '@typescript-eslint/utils@8.62.0 || 8.71.0'
+  - '@typescript-eslint/visitor-keys@8.62.0 || 8.71.0'
   - axios@1.18.1 || 1.20.0
   - globals@17.7.0
   - happy-dom@20.11.0
@@ -30,3 +30,4 @@ minimumReleaseAgeExclude:
   - jsdom@30.1.1
   - marked@18.0.14
   - sass@1.105.0
+  - eslint-plugin-jsdoc@65.0.0

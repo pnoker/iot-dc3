@@ -37,7 +37,7 @@ import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertTypeDistribution} from '@/api/dashboard';
+import {listAlertTypeDistribution} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {AlertTypeRow} from '@/config/types/dashboard';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -87,7 +87,7 @@ const render = (data: AlertTypeRow[]) => {
 };
 
 const load = async () => {
-  await run(() => alertTypeDistribution(30), {
+  await run(() => listAlertTypeDistribution(30), {
     apply: (res) => {
       rows.value = (Array.isArray(res) ? res : []).map((row) => ({
         type: String(row.type || '-'),

@@ -38,7 +38,7 @@
 <script lang="ts" setup>
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 
-import {statsTimeseries} from '@/api/dashboard';
+import {listStatsTimeseries} from '@/api/dashboard';
 import {deviceTimeseries} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
@@ -107,7 +107,7 @@ const load = async () => {
             granularity: granularityFor(requestRange),
             rangeKey: requestRange,
           })
-        : statsTimeseries({
+        : listStatsTimeseries({
             granularity: granularityFor(requestRange),
             rangeKey: requestRange,
           }),

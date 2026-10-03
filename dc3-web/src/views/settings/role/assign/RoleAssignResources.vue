@@ -86,23 +86,25 @@
         </el-tabs>
 
         <div class="assign-pane__tree">
-          <template v-for="type in availableTypes" :key="type">
-            <el-tree
-              v-show="activeType === type"
-              :ref="(el) => registerTree(type, el)"
-              :data="treesByType[type] || []"
-              :filter-node-method="filterNode"
-              :props="treeProps"
-            node-key="id"
-            show-checkbox
-            @check-change="onCheckChange"
-            />
-            <el-empty
-              v-show="activeType === type && (treesByType[type] || []).length === 0"
-              :description="t('settings.role.empty')"
-              :image-size="60"
-            />
-          </template>
+          <el-scrollbar>
+            <template v-for="type in availableTypes" :key="type">
+              <el-tree
+                v-show="activeType === type"
+                :ref="(el) => registerTree(type, el)"
+                :data="treesByType[type] || []"
+                :filter-node-method="filterNode"
+                :props="treeProps"
+                node-key="id"
+                show-checkbox
+                @check-change="onCheckChange"
+              />
+              <el-empty
+                v-show="activeType === type && (treesByType[type] || []).length === 0"
+                :description="t('settings.role.empty')"
+                :image-size="60"
+              />
+            </template>
+          </el-scrollbar>
         </div>
       </div>
     </div>
@@ -555,7 +557,6 @@ onBeforeUnmount(() => {
 
 .assign-pane__tree {
   height: min(440px, 52vh);
-  overflow: auto;
   border: 1px solid var(--el-border-color-extra-light);
   border-radius: var(--dc3-radius-md);
   padding: 4px 6px;

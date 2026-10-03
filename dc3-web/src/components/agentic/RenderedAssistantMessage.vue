@@ -41,8 +41,13 @@ const charts = computed(() => props.charts || []);
 // Assistant content is model output rendered via v-html, so it must be sanitized with
 // DOMPurify (script blocks, on* handlers, javascript:, data:/vbscript: schemes, mutation
 // XSS). The previous hand-rolled regex sanitizer missed several of these (CodeQL
-// js/bad-tag-filter, incomplete-*, url-scheme-check).
+// js/bad-tag-filter, incomplete-*, url-scheme-check). Form controls are forbidden
+// alongside the active-content vectors: model output must not be able to spoof
+// login or input chrome inside the conversation.
 const renderMarkdown = (text: string) => {
-  return DOMPurify.sanitize(String(marked.parse(text)), {USE_PROFILES: {html: true}});
+  return DOMPurify.sanitize(String(marked.parse(text)), {
+    USE_PROFILES: {html: true},
+    FORBID_TAGS: ['form', 'input', 'button', 'select', 'textarea', 'option'],
+  });
 };
 </script>

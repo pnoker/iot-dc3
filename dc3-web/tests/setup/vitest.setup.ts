@@ -57,32 +57,38 @@ beforeEach(() => {
   };
 });
 
-Object.defineProperty(window, 'ResizeObserver', {
-  configurable: true,
-  writable: true,
-  value: ResizeObserverMock,
-});
+// DOM polyfills only apply in browser-like environments; the live agentic
+// evaluation suite runs under Node (real network I/O) and must not need them.
+const HAS_DOM = typeof window !== 'undefined';
 
-Object.defineProperty(window, 'matchMedia', {
-  configurable: true,
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+if (HAS_DOM) {
+  Object.defineProperty(window, 'ResizeObserver', {
+    configurable: true,
+    writable: true,
+    value: ResizeObserverMock,
+  });
 
-Object.defineProperty(window, 'scrollTo', {
-  configurable: true,
-  writable: true,
-  value: vi.fn(),
-});
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+
+  Object.defineProperty(window, 'scrollTo', {
+    configurable: true,
+    writable: true,
+    value: vi.fn(),
+  });
+}
 
 Object.defineProperty(URL, 'createObjectURL', {
   configurable: true,
@@ -127,7 +133,7 @@ ensureStorage('localStorage');
 ensureStorage('sessionStorage');
 
 afterEach(() => {
-  document.body.innerHTML = '';
+  if (HAS_DOM) document.body.innerHTML = '';
   localStorage.clear();
   sessionStorage.clear();
   console.warn = originalWarn;

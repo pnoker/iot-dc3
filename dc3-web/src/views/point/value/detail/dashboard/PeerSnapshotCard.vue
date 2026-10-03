@@ -15,7 +15,7 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!-- Peer snapshot (邻位快照): the other points of the same device with their
+<!-- Peer snapshot: the other points of the same device with their
      latest values, as a clickable card grid that routes to each point's own
      detail page. -->
 

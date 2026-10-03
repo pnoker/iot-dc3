@@ -42,7 +42,7 @@ import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertMtta} from '@/api/dashboard';
+import {listAlertMtta} from '@/api/dashboard';
 import type {MttaTrend} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -109,7 +109,7 @@ const render = () => {
 };
 
 const load = () =>
-  run(() => alertMtta(Number(daysKey.value)) as Promise<MttaTrend[]>, {
+  run(() => listAlertMtta(Number(daysKey.value)) as Promise<MttaTrend[]>, {
     apply: (result) => {
       rows.value = result ?? [];
       void nextTick().then(() => {

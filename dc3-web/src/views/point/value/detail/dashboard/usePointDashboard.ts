@@ -16,7 +16,7 @@
  */
 
 /**
- * Data-loading composable for the point dashboard (位号看板). One round trip
+ * Data-loading composable for the point dashboard. One round trip
  * per concern, each with its own loader so a failing section (e.g. alerts)
  * degrades alone instead of blanking the whole board:
  *   - dashboard  — GET /point_value/dashboard (window-scoped, range-hours driven)
@@ -27,7 +27,7 @@
 
 import {ref} from 'vue';
 
-import {alertPage, getPointAlertProfile} from '@/api/dashboard/alert';
+import {listAlertPage, getPointAlertProfile} from '@/api/dashboard/alert';
 import {getPointValueLatest, getPointValueDashboard, listPointByDeviceId} from '@/api/point';
 import type {AlertEventRow, PointAlertProfile, PointValueDashboard} from '@/config/types/dashboard';
 import type {PointRecord} from '@/config/types/manager';
@@ -125,7 +125,7 @@ export const usePointDashboard = () => {
   const loadRecentAlerts = (pointId: string) =>
     recentAlerts.run(
       () =>
-        alertPage({
+        listAlertPage({
           source: 'point',
           sourceId: pointId,
           rangeKey: '30d',

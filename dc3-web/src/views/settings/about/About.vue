@@ -29,10 +29,14 @@
         <el-descriptions-item :label="t('settings.about.version')">v{{ version }}</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.license')">AGPL-3.0</el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.docs')">
-          <external-link href="https://docs.dc3.site">docs.dc3.site</external-link>
+          <el-link href="https://docs.dc3.site" rel="noopener noreferrer" target="_blank" type="primary">
+            docs.dc3.site
+          </el-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.repo')">
-          <external-link href="https://github.com/pnoker/iot-dc3">github.com/pnoker/iot-dc3</external-link>
+          <el-link href="https://github.com/pnoker/iot-dc3" rel="noopener noreferrer" target="_blank" type="primary">
+            github.com/pnoker/iot-dc3
+          </el-link>
         </el-descriptions-item>
         <el-descriptions-item :label="t('settings.about.copyright')">
           © 2016-present the IoT DC3 original author or authors
@@ -81,9 +85,15 @@
         <span class="about__title">{{ t('settings.about.licenseTitle') }}</span>
       </template>
       <p class="about__intro">{{ t('settings.about.licenseDetail') }}</p>
-      <external-link class="about__license-link" href="https://www.gnu.org/licenses/agpl-3.0.html">
+      <el-link
+        class="about__license-link"
+        href="https://www.gnu.org/licenses/agpl-3.0.html"
+        rel="noopener noreferrer"
+        target="_blank"
+        type="primary"
+      >
         AGPL-3.0 Full Text
-      </external-link>
+      </el-link>
     </el-card>
   </div>
 </template>

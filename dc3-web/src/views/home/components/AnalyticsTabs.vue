@@ -58,7 +58,7 @@ import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {deviceStats, driverStats, statsTop} from '@/api/dashboard';
+import {getDeviceStats, getDriverStats, listStatsTop} from '@/api/dashboard';
 import {listDeviceByIds} from '@/api/device';
 import {listDriverByIds} from '@/api/driver';
 import {listPointByIds} from '@/api/point';
@@ -245,7 +245,7 @@ const loadStructural = async (tab: Extract<TabKey, 'deviceStatus' | 'protocol' |
   // Fetch both summaries once for parity with the existing endpoint contract,
   // but derive the result from the tab captured at request start. This keeps a
   // late response from being interpreted using a newer tab selection.
-  const [driverResult, deviceResult] = (await Promise.all([driverStats(), deviceStats(10)])) as [StructuralPayload, any];
+  const [driverResult, deviceResult] = (await Promise.all([getDriverStats(), getDeviceStats(10)])) as [StructuralPayload, any];
   const driverPayload = driverResult?.driver ?? (driverResult as any)?.data ?? driverResult ?? {};
   const devicePayload = deviceResult?.device ?? (deviceResult as any)?.data ?? deviceResult ?? {};
 
@@ -280,7 +280,7 @@ const loadTop = async (
     topDriver: 'driver',
   };
   const dim = dimMap[tab];
-  const result = await statsTop({dimension: dim, rangeKey: range, limit: 10});
+  const result = await listStatsTop({dimension: dim, rangeKey: range, limit: 10});
   const rows = (Array.isArray(result) ? result : []) as Array<{entityId: string | number; count: number}>;
   await resolveNames(dim, rows.map((row) => String(row.entityId)));
   return rows.map((row) => ({

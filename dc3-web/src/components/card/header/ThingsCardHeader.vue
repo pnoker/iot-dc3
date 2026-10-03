@@ -57,7 +57,7 @@ const props = defineProps({
   copyLabel: {type: String, required: true},
 });
 
-defineEmits(['copy-id']);
+defineEmits<{ 'copy-id': [] }>();
 
 const isImageUrl = computed(() => props.icon.includes('/'));
 </script>

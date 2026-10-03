@@ -44,7 +44,7 @@ import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Graph} from '@antv/g6';
 
-import {alertCorrelation} from '@/api/dashboard';
+import {listAlertCorrelation} from '@/api/dashboard';
 import type {CorrelationPair} from '@/config/types/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
@@ -74,7 +74,7 @@ let graph: Graph | undefined;
 const load = () =>
   run(
     async () => {
-      const result: CorrelationPair[] = await alertCorrelation(hours.value, windowSec, 15);
+      const result: CorrelationPair[] = await listAlertCorrelation(hours.value, windowSec, 15);
       const nextPairs = result ?? [];
       await resolveBySource(
         nextPairs.flatMap((pair) => [

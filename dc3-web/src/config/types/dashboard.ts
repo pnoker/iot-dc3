@@ -348,7 +348,7 @@ export interface AlertTopSourceRow {
   count: number;
 }
 
-/** Bucket shape shared by statsTop / latency / enable-breakdown endpoints. */
+/** Bucket shape shared by listStatsTop / latency / enable-breakdown endpoints. */
 export interface StatsCountBucket {
   entityId?: number;
   key?: string;
@@ -492,7 +492,7 @@ export interface DeviceStatusDetail {
   expireTime: string | null;
 }
 
-// ---- Point-scoped dashboard (位号看板) ---------------------------------
+// ---- Point-scoped dashboard ---------------------------------
 // Payload shapes of the point data dashboard, mirroring the backend
 // PointValueDashboardVO / PointAlertProfileVO contracts.
 

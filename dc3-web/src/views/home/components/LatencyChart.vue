@@ -39,7 +39,7 @@
 import {computed, nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 
-import {statsLatency} from '@/api/dashboard';
+import {listStatsLatency} from '@/api/dashboard';
 import {deviceLatency} from '@/api/dashboard/device';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import type {RangeKey} from '@/config/types/dashboard';
@@ -102,7 +102,7 @@ const load = async () => {
     () =>
       props.deviceId
         ? deviceLatency(props.deviceId, {rangeKey: rangeKey.value})
-        : statsLatency({rangeKey: rangeKey.value}),
+        : listStatsLatency({rangeKey: rangeKey.value}),
     {
     apply: (res) => {
       const payload = Array.isArray(res) ? res : [];

@@ -15,7 +15,7 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<!-- Alarm profile of the point (告警画像): type-distribution donut, the five
+<!-- Alarm profile of the point: type-distribution donut, the five
      most recent point-scoped alerts and a daily-count mini bar strip. All
      three sections share the "zero alarms" positive empty copy. -->
 

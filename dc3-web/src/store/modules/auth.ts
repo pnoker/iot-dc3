@@ -26,7 +26,8 @@ import {cancelToken, changePassword, generateSalt, generateToken} from '@/api/to
 import {AUTH_HEADERS} from '@/config/constant/common';
 import {PASSWORD_CHANGE_CODES} from '@/config/constant/axios';
 import type {Login} from '@/config/types';
-import {getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
+import {resetAuthSession} from '@/utils/authSession';
+import {getStorage, setStorage} from '@/utils/storageUtil';
 import {failMessage} from '@/utils/notificationUtil';
 import {isNull} from '@/utils/validationUtil';
 
@@ -63,9 +64,7 @@ export const useAuthStore = defineStore('auth', () => {
   };
 
   const removeToken = () => {
-    removeStorage(AUTH_HEADERS.TENANT);
-    removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
+    resetAuthSession();
   };
 
   const login = async (form: LoginForm) => {

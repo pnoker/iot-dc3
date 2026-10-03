@@ -36,7 +36,7 @@ import {nextTick, onMounted, onUnmounted, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {Chart} from '@antv/g2';
 
-import {alertTrend} from '@/api/dashboard';
+import {listAlertTrend} from '@/api/dashboard';
 import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {observeChartSize} from '@/utils/g2ChartUtil';
@@ -79,7 +79,7 @@ const render = (data: { date: string; source: string; count: number }[]) => {
 
 const load = async () => {
   const days = props.days ?? 30;
-  await run(() => alertTrend(days), {
+  await run(() => listAlertTrend(days), {
     apply: (res) => {
       const flat: {date: string; source: string; count: number}[] = [];
       type TrendPayload = {

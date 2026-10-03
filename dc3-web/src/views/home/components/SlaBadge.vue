@@ -45,7 +45,7 @@ import {computed, onMounted, reactive, ref} from 'vue';
 import {useRouter} from 'vue-router';
 import {Warning} from '@element-plus/icons-vue';
 
-import {alertAging, silentSources} from '@/api/dashboard';
+import {getAlertAging, silentSources} from '@/api/dashboard';
 import type {AgingBacklog, SilentSource} from '@/config/types/dashboard';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
@@ -62,7 +62,7 @@ const load = () =>
   run(
     async () => {
       const [agingBacklog, silentSourceRows]: [AgingBacklog, SilentSource[]] = await Promise.all([
-        alertAging(),
+        getAlertAging(),
         silentSources(7, 15, 200),
       ]);
       return {agingBacklog, silentCount: (silentSourceRows ?? []).length};

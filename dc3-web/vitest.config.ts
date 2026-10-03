@@ -23,7 +23,7 @@ export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
+      '@': resolve(import.meta.dirname, './src'),
       vue$: 'vue/dist/vue.runtime.esm-bundler.js',
     },
   },

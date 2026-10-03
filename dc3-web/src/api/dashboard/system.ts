@@ -50,7 +50,7 @@ export const systemHealth = () => httpGet<SystemHealth>(`${API_DATA_BASE}/dashbo
  * Fetch the protocol health.
  * @returns the protocol health response
  */
-export const protocolHealth = () => httpGet<ProtocolHealth[]>(`${API_DATA_BASE}/dashboard/protocol/health`);
+export const listProtocolHealth = () => httpGet<ProtocolHealth[]>(`${API_DATA_BASE}/dashboard/protocol/health`);
 
 /**
  * Fetch the silent sources.

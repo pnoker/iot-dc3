@@ -17,7 +17,6 @@
 
 import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AGENTIC_BASE} from '@/config/constant/api';
-import {AUTH_HEADERS} from '@/config/constant/common';
 import type {
   AgenticAction,
   AgenticAttachment,
@@ -34,8 +33,7 @@ import type {
   PageQuery,
   PageResult,
 } from '@/config/types';
-import {getStorage, removeStorage} from '@/utils/storageUtil';
-import {isNull} from '@/utils/validationUtil';
+import {buildAuthHeaders, resetAuthSession} from '@/utils/authSession';
 
 interface OpenAIChunk {
   object?: string;
@@ -294,35 +292,19 @@ export const completeAgenticChatCompletion = async (
   return (await response.json()) as AgenticChatCompletionResponse;
 };
 
-const buildFetchHeaders = (): HeadersInit => {
-  const headers: Record<string, string> = {
-    Accept: 'text/event-stream',
-    'Content-Type': 'application/json',
-  };
-
-  const tenant = getStorage(AUTH_HEADERS.TENANT);
-  if (!isNull(tenant)) {
-    headers[AUTH_HEADERS.TENANT] = String(tenant);
-  }
-
-  const login = getStorage(AUTH_HEADERS.LOGIN);
-  if (!isNull(login)) {
-    headers[AUTH_HEADERS.LOGIN] = String(login);
-  }
-
+const buildFetchHeaders = (): HeadersInit => ({
+  Accept: 'text/event-stream',
+  'Content-Type': 'application/json',
   // Token travels in an httpOnly cookie via fetch credentials — not injected here.
-
-  return headers;
-};
+  ...buildAuthHeaders(),
+});
 
 const handleStreamHttpError = async (response: Response): Promise<never> => {
   if (response.status === 401) {
     // Drop only the auth keys — never nuke the whole storage. The token cookie
     // is cleared server-side on 401; here we just remove the frontend flag,
     // mirroring the axios interceptor's 401 handling.
-    removeStorage(AUTH_HEADERS.TENANT);
-    removeStorage(AUTH_HEADERS.LOGIN);
-    removeStorage(AUTH_HEADERS.AUTHENTICATED, true);
+    resetAuthSession();
     window.location.hash = '#/login';
   }
 
