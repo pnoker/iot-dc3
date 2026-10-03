@@ -133,12 +133,19 @@ function proxyRequest(req, res) {
       headers,
     },
     (proxyRes) => {
-      res.writeHead(proxyRes.statusCode || 502, proxyRes.headers);
-      pipeline(proxyRes, res, (error) => {
-        if (error && !res.destroyed) {
-          res.destroy(error);
-        }
-      });
+      // Reloads and navigations cancel in-flight requests (SSE streams
+      // included). Piping into the client's destroyed stream must degrade to
+      // a dropped connection — never to an uncaught exception that kills the
+      // whole server mid-suite.
+      const noop = () => undefined;
+      res.on('error', noop);
+      proxyRes.on('error', noop);
+      try {
+        res.writeHead(proxyRes.statusCode || 502, proxyRes.headers);
+        pipeline(proxyRes, res, noop);
+      } catch {
+        proxyRes.destroy();
+      }
     }
   );
 
