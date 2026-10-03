@@ -32,6 +32,11 @@
     <description>R2DBC relational contract suite for the canonical PostgreSQL runtime
     </description>
 
+    <properties>
+        <!-- No installable artifact: skip install so full-reactor install completes -->
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.github.pnoker</groupId>

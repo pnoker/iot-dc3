@@ -271,15 +271,6 @@ public class R2dbcCommandHistoryStore implements ReactiveCommandHistoryStore {
                 binder.apply(spec).fetch().rowsUpdated().map(rows -> rows == 1));
     }
 
-    private Mono<Boolean> update(
-            Long tenantId,
-            String recordId,
-            String assignments,
-            java.util.function.Function<DatabaseClient.GenericExecuteSpec, DatabaseClient.GenericExecuteSpec> binder,
-            String state) {
-        return update(tenantId, recordId, assignments, binder, state, false);
-    }
-
     private DatabaseClient.GenericExecuteSpec bindFilters(
             DatabaseClient.GenericExecuteSpec spec,
             Long tenantId,

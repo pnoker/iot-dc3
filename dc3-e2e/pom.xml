@@ -37,6 +37,8 @@
     </description>
 
     <properties>
+    <!-- No installable artifact: skip install so full-reactor install completes -->
+    <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <!-- E2E is only invoked by an explicit profile or workflow. -->
         <skip.unit.tests>true</skip.unit.tests>

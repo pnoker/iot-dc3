@@ -28,6 +28,7 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.page.OffsetPage;
 import io.github.pnoker.db.core.page.SortSpec;
+import io.github.pnoker.db.core.time.DatabaseInstant;
 import io.github.pnoker.db.core.transaction.PageTransaction;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -335,10 +336,10 @@ public class R2dbcDriverStore implements ReactiveDriverStore {
         value.setVersion(row.get("version", Integer.class));
         value.setCreatorId(row.get("creator_id", Long.class));
         value.setCreatorName(row.get("creator_name", String.class));
-        value.setCreateTime(toLocalDateTime(row.get("create_time")));
+        value.setCreateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("create_time")));
         value.setOperatorId(row.get("operator_id", Long.class));
         value.setOperatorName(row.get("operator_name", String.class));
-        value.setOperateTime(toLocalDateTime(row.get("operate_time")));
+        value.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         Number type = row.get("driver_type_flag", Number.class);
         value.setDriverTypeFlag(DriverTypeEnum.ofIndex(type == null ? null : type.byteValue()));
         Number enabled = row.get("enable_flag", Number.class);
@@ -384,12 +385,5 @@ public class R2dbcDriverStore implements ReactiveDriverStore {
 
     private boolean present(String value) {
         return value != null && !value.isBlank();
-    }
-
-    private LocalDateTime toLocalDateTime(Object value) {
-        if (value instanceof LocalDateTime localDateTime) return localDateTime;
-        if (value instanceof java.time.OffsetDateTime offsetDateTime) return offsetDateTime.toLocalDateTime();
-        if (value instanceof java.time.Instant instant) return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        return null;
     }
 }
