@@ -172,10 +172,14 @@ services:
       - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_SINGLE_GRPC_PORT:-9100}:9100"
     environment:
       <<: *app-runtime-env
+      # The single center embeds the agentic center; its attachments live under
+      # the service workdir and persist on the agentic_data volume below.
+      AGENTIC_ATTACHMENT_STORAGE_PATH: ${AGENTIC_ATTACHMENT_STORAGE_PATH:-dc3/data/agentic/attachments}
     container_name: dc3-center-single
     hostname: dc3-center-single
     volumes:
       - logs:/dc3-center/dc3-center-single/dc3/logs
+      - agentic_data:/dc3-center/dc3-center-single/dc3/data
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8100/single/actuator/health/readiness >/dev/null || exit 1" ]
       interval: 15s
@@ -283,9 +287,9 @@ services:
         aliases:
           - dc3-driver-mqtt
 
-  dc3-driver-bacnet-ip:
+  bacnet-ip:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-bacnet-ip
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-bacnet-ip:${DC3_IMAGE_TAG:-2026.9}
@@ -306,9 +310,9 @@ services:
         aliases:
           - dc3-driver-bacnet-ip
 
-  dc3-driver-ble:
+  ble:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-ble
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ble:${DC3_IMAGE_TAG:-2026.9}
@@ -329,9 +333,9 @@ services:
         aliases:
           - dc3-driver-ble
 
-  dc3-driver-can:
+  can:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-can
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.9}
@@ -352,9 +356,9 @@ services:
         aliases:
           - dc3-driver-can
 
-  dc3-driver-coap:
+  coap:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-coap
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.9}
@@ -375,9 +379,9 @@ services:
         aliases:
           - dc3-driver-coap
 
-  dc3-driver-dlms:
+  dlms:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-dlms
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.9}
@@ -398,9 +402,9 @@ services:
         aliases:
           - dc3-driver-dlms
 
-  dc3-driver-ethernet-ip:
+  ethernet-ip:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-ethernet-ip
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.9}
@@ -421,9 +425,9 @@ services:
         aliases:
           - dc3-driver-ethernet-ip
 
-  dc3-driver-fins:
+  fins:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-fins
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.9}
@@ -444,9 +448,9 @@ services:
         aliases:
           - dc3-driver-fins
 
-  dc3-driver-http:
+  http:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-http
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.9}
@@ -467,9 +471,9 @@ services:
         aliases:
           - dc3-driver-http
 
-  dc3-driver-iec104:
+  iec104:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-iec104
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.9}
@@ -490,9 +494,9 @@ services:
         aliases:
           - dc3-driver-iec104
 
-  dc3-driver-lwm2m:
+  lwm2m:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-lwm2m
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lwm2m:${DC3_IMAGE_TAG:-2026.9}
@@ -513,9 +517,9 @@ services:
         aliases:
           - dc3-driver-lwm2m
 
-  dc3-driver-melsec:
+  melsec:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-melsec
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-melsec:${DC3_IMAGE_TAG:-2026.9}
@@ -536,9 +540,9 @@ services:
         aliases:
           - dc3-driver-melsec
 
-  dc3-driver-mysql:
+  mysql:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-mysql
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.9}
@@ -559,9 +563,9 @@ services:
         aliases:
           - dc3-driver-mysql
 
-  dc3-driver-oracle:
+  oracle:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-oracle
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.9}
@@ -582,9 +586,9 @@ services:
         aliases:
           - dc3-driver-oracle
 
-  dc3-driver-postgresql:
+  postgresql:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-postgresql
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.9}
@@ -605,9 +609,9 @@ services:
         aliases:
           - dc3-driver-postgresql
 
-  dc3-driver-serial:
+  serial:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-serial
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.9}
@@ -627,9 +631,10 @@ services:
       dc3net:
         aliases:
           - dc3-driver-serial
-  dc3-driver-dlt645:
+
+  dlt645:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-dlt645
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.9}
@@ -650,9 +655,9 @@ services:
         aliases:
           - dc3-driver-dlt645
 
-  dc3-driver-dnp3:
+  dnp3:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-dnp3
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dnp3:${DC3_IMAGE_TAG:-2026.9}
@@ -673,9 +678,9 @@ services:
         aliases:
           - dc3-driver-dnp3
 
-  dc3-driver-iec61850:
+  iec61850:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-iec61850
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec61850:${DC3_IMAGE_TAG:-2026.9}
@@ -696,9 +701,9 @@ services:
         aliases:
           - dc3-driver-iec61850
 
-  dc3-driver-kafka:
+  kafka:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-kafka
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.9}
@@ -719,9 +724,9 @@ services:
         aliases:
           - dc3-driver-kafka
 
-  dc3-driver-knx:
+  knx:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-knx
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-knx:${DC3_IMAGE_TAG:-2026.9}
@@ -742,9 +747,9 @@ services:
         aliases:
           - dc3-driver-knx
 
-  dc3-driver-lorawan:
+  lorawan:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-lorawan
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-lorawan:${DC3_IMAGE_TAG:-2026.9}
@@ -765,9 +770,9 @@ services:
         aliases:
           - dc3-driver-lorawan
 
-  dc3-driver-mbus:
+  mbus:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-mbus
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.9}
@@ -788,9 +793,9 @@ services:
         aliases:
           - dc3-driver-mbus
 
-  dc3-driver-redis:
+  redis:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-redis
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.9}
@@ -810,9 +815,10 @@ services:
       dc3net:
         aliases:
           - dc3-driver-redis
-  dc3-driver-sl651:
+
+  sl651:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-sl651
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.9}
@@ -833,9 +839,9 @@ services:
         aliases:
           - dc3-driver-sl651
 
-  dc3-driver-snmp:
+  snmp:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-snmp
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.9}
@@ -856,9 +862,9 @@ services:
         aliases:
           - dc3-driver-snmp
 
-  dc3-driver-sqlserver:
+  sqlserver:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-sqlserver
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.9}
@@ -879,9 +885,9 @@ services:
         aliases:
           - dc3-driver-sqlserver
 
-  dc3-driver-tcp-udp:
+  tcp-udp:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-tcp-udp
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.9}
@@ -902,9 +908,9 @@ services:
         aliases:
           - dc3-driver-tcp-udp
 
-  dc3-driver-zigbee:
+  zigbee:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile
       target: dc3-driver-zigbee
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.9}
@@ -1020,6 +1026,7 @@ services:
 volumes:
   logs:
   driver_data:
+  agentic_data:
   nginx:
 networks:
   dc3net:

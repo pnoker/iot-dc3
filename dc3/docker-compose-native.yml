@@ -248,6 +248,7 @@ services:
     hostname: dc3-center-agentic
     volumes:
       - logs:/dc3-center/dc3-center-agentic/dc3/logs
+      - agentic_data:/dc3-center/dc3-center-agentic/dc3/data
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8600/agentic/actuator/health/readiness >/dev/null || exit 1" ]
       interval: 15s
@@ -262,6 +263,7 @@ services:
 
 volumes:
   logs:
+  agentic_data:
 networks:
   dc3net:
     driver: bridge

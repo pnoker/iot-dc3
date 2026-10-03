@@ -25,7 +25,7 @@ x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
   # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
   DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
-  # Relational dialect selection (docs/design/storage-abstraction.md §3); postgres is the default
+  # Relational dialect selection (docs/db-dialects.md); postgres is the default
   # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
   DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
   DC3_MQ_PULSAR_URL: "${DC3_MQ_PULSAR_URL:-pulsar://pulsar:6650}"
@@ -232,6 +232,7 @@ services:
     hostname: dc3-center-agentic
     volumes:
       - logs:/dc3-center/dc3-center-agentic/dc3/logs
+      - agentic_data:/dc3-center/dc3-center-agentic/dc3/data
     healthcheck:
       test: [ "CMD-SHELL", "curl -fsS http://127.0.0.1:8600/agentic/actuator/health/readiness >/dev/null || exit 1" ]
       interval: 15s
@@ -938,6 +939,7 @@ volumes:
   logs:
   driver_data:
   nginx:
+  agentic_data:
 
 networks:
   dc3net:

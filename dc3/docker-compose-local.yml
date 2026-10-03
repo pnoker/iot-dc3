@@ -1,0 +1,31 @@
+#
+# Copyright 2016-present the IoT DC3 original author or authors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+# Local-only override (untracked): publish the gateway on the host for the
+# dc3-web dev server, whose /api proxy targets http://localhost:8000
+# (dc3-web/src/config/env/.env.dev). The app stack deliberately keeps the
+# gateway off the host; append this file only for local development:
+#
+#   docker compose --env-file .env \
+#     -f dc3/docker-compose-db.yml \
+#     -f dc3/docker-compose.yml \
+#     -f dc3/docker-compose-local.yml up -d
+#
+services:
+  gateway:
+    ports:
+      - "${DC3_BIND_HOST:-127.0.0.1}:${DC3_GATEWAY_PORT:-8000}:8000"

@@ -1,7 +1,7 @@
 # IoT DC3 Helm Chart
 
 Helm chart for deploying the IoT DC3 platform: HTTP gateway, the four centers (auth / manager / data / agentic), the Vue
-web console, the 28 published protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
+web console, the 36 protocol drivers, and the PostgreSQL + RabbitMQ stateful dependencies.
 
 > Kubernetes manifests (kustomize) live in `../../k8s`; the compose stacks live in
 > `dc3/docker-compose*.yml`. See `dc3/doc/DEPLOYMENT.md` for the full deployment guide.
@@ -66,8 +66,8 @@ same SQLite outbox file, so drivers stay at 1 replica.
 
 ## Driver coverage
 
-The chart ships the upstream 28-driver set. Eight drivers have no published images yet (`dlt645 dnp3 iec61850 kafka
-knx lorawan mbus redis`) and default to `enabled: false` in `values.yaml`; enable them once their images ship.
+The chart ships all 36 protocol drivers; disable any you do not need with `drivers.<name>.enabled=false` in
+`values.yaml`.
 
 Hardware-bound drivers (`serial`, `ble`, `can`, `opc-da`) require host device access that the chart does not configure;
 run them on edge nodes with hostPath / device plugins instead of the default cluster deployment.

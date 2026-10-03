@@ -33,6 +33,10 @@ x-logging: &default-logging
 #   docker stack deploy -c dc3/docker-compose-swarm.yml dc3
 #
 # Notes:
+#   * Like DC3_SECURITY_KEY, the credentials POSTGRES_PASSWORD, RABBITMQ_PASSWORD
+#     and MQTT_PASSWORD have no defaults: provide them via the environment /
+#     .env (picked up because the deploy runs from the repository root) or the
+#     stack refuses to start.
 #   * Dependency images (dc3-postgres / dc3-rabbitmq) are NOT published by the
 #     release CI, so build them locally first (or push to your own registry and
 #     set DC3_IMAGE_REGISTRY accordingly).
@@ -59,13 +63,13 @@ x-app-runtime-env: &app-runtime-env
   POSTGRES_HOST: dc3-postgres
   POSTGRES_PORT: "5432"
   POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-*********}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set to a deployment-specific value}
   POSTGRES_DB: ${POSTGRES_DB:-dc3}
   RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
   RABBITMQ_HOST: dc3-rabbitmq
   RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
   RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
-  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-*********}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD must be set to a deployment-specific value}
   RABBITMQ_SSL_ENABLED: "${RABBITMQ_SSL_ENABLED:-false}"
   RABBITMQ_SSL_ALGORITHM: "${RABBITMQ_SSL_ALGORITHM:-TLS}"
   RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE: "${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:-false}"
@@ -73,7 +77,7 @@ x-app-runtime-env: &app-runtime-env
   MQTT_BROKER_HOST: dc3-rabbitmq
   MQTT_BROKER_PORT: "1883"
   MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
-  MQTT_PASSWORD: ${MQTT_PASSWORD:-*********}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:?MQTT_PASSWORD must be set to a deployment-specific value}
   DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS: "${DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS:-300000}"
   DC3_DRIVER_LEASE_RENEW_CRON: "${DC3_DRIVER_LEASE_RENEW_CRON:-0/10 * * * * ?}"
   DC3_DRIVER_LEASE_SECONDS: "${DC3_DRIVER_LEASE_SECONDS:-30}"
@@ -101,7 +105,7 @@ services:
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-dc3}
       - POSTGRES_USER=${POSTGRES_USERNAME:-dc3}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-*********}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set to a deployment-specific value}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME:-dc3} -d ${POSTGRES_DB:-dc3}" ]
       interval: 10s
@@ -143,7 +147,7 @@ services:
     environment:
       - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VIRTUAL_HOST:-dc3}
       - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME:-dc3}
-      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-*********}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD must be set to a deployment-specific value}
       - RABBITMQ_MQTT_EXCHANGE=${RABBITMQ_MQTT_EXCHANGE:-dc3.e.mqtt}
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
@@ -230,6 +234,9 @@ services:
     image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-gateway:${DC3_IMAGE_TAG:-2026.9}
     environment:
       <<: *app-runtime-env
+      # RS256 ticket verification on API routes (token-unification-mcp-first-cli.md)
+      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
+      DC3_GATEWAY_OAUTH_JWKS_URL: ${DC3_GATEWAY_OAUTH_JWKS_URL:-http://dc3-center-auth:8300/auth/oauth2/jwks}
     volumes:
       - logs:/dc3-gateway/dc3/logs
     healthcheck:

@@ -30,6 +30,7 @@ export DC3_SCHEMA_FINGERPRINT=5146811645192cebabe055c434a2f278c92174d600581f993e
 export DC3_SCHEMA_CONTRACT=r2dbc-flag-day-v1
 
 # Message broker selection (docs/mq-brokers.md); rabbitmq is the default
+export DC3_MQ_KAFKA_BOOTSTRAP=localhost:9092
 export DC3_MQ_TYPE=rabbitmq
 
 

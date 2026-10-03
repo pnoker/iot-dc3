@@ -309,44 +309,28 @@ drivers:
     enabled: true
     replicas: 1
   dlt645:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   dnp3:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   iec61850:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   kafka:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   knx:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   lorawan:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   mbus:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   redis:
-    # No image published by the release CI (docker-ci.yml covers the
-    # upstream 28-driver set only) - enable once the image is published.
-    enabled: false
+    enabled: true
     replicas: 1
   zigbee:
     enabled: true

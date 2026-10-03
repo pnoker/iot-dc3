@@ -40,6 +40,10 @@ x-logging: &default-logging
 #   docker compose -f dc3/docker-compose-scale.yml up -d \
 #       --scale gateway=2 --scale data=2
 #
+# Like DC3_SECURITY_KEY, the credentials POSTGRES_PASSWORD, RABBITMQ_PASSWORD
+# and MQTT_PASSWORD have no defaults: provide them via the environment / .env
+# or compose refuses to start the stack.
+#
 # Scaling semantics (see dc3/doc/DEPLOYMENT.md for details):
 #   * web        - keep replicas at 1 (publishes host ports 8080/8443); put your
 #                  own LB in front if you need more capacity.
@@ -67,13 +71,13 @@ x-app-runtime-env: &app-runtime-env
   POSTGRES_HOST: dc3-postgres
   POSTGRES_PORT: "5432"
   POSTGRES_USERNAME: ${POSTGRES_USERNAME:-dc3}
-  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-*********}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set to a deployment-specific value}
   POSTGRES_DB: ${POSTGRES_DB:-dc3}
   RABBITMQ_VIRTUAL_HOST: ${RABBITMQ_VIRTUAL_HOST:-dc3}
   RABBITMQ_HOST: dc3-rabbitmq
   RABBITMQ_PORT: "${RABBITMQ_CONTAINER_PORT:-5672}"
   RABBITMQ_USERNAME: ${RABBITMQ_USERNAME:-dc3}
-  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-*********}
+  RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?RABBITMQ_PASSWORD must be set to a deployment-specific value}
   RABBITMQ_SSL_ENABLED: "${RABBITMQ_SSL_ENABLED:-false}"
   RABBITMQ_SSL_ALGORITHM: "${RABBITMQ_SSL_ALGORITHM:-TLS}"
   RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE: "${RABBITMQ_SSL_VALIDATE_SERVER_CERTIFICATE:-false}"
@@ -81,7 +85,7 @@ x-app-runtime-env: &app-runtime-env
   MQTT_BROKER_HOST: dc3-rabbitmq
   MQTT_BROKER_PORT: "1883"
   MQTT_USERNAME: ${MQTT_USERNAME:-dc3}
-  MQTT_PASSWORD: ${MQTT_PASSWORD:-*********}
+  MQTT_PASSWORD: ${MQTT_PASSWORD:?MQTT_PASSWORD must be set to a deployment-specific value}
   DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS: "${DC3_DRIVER_LEASE_QUEUE_EXPIRES_MILLIS:-300000}"
   DC3_DRIVER_LEASE_RENEW_CRON: "${DC3_DRIVER_LEASE_RENEW_CRON:-0/10 * * * * ?}"
   DC3_DRIVER_LEASE_SECONDS: "${DC3_DRIVER_LEASE_SECONDS:-30}"
@@ -152,6 +156,9 @@ services:
         condition: service_healthy
     environment:
       <<: *app-runtime-env
+      # RS256 ticket verification on API routes (token-unification-mcp-first-cli.md)
+      DC3_GATEWAY_OAUTH_ENABLED: ${DC3_GATEWAY_OAUTH_ENABLED:-false}
+      DC3_GATEWAY_OAUTH_JWKS_URL: ${DC3_GATEWAY_OAUTH_JWKS_URL:-http://dc3-center-auth:8300/auth/oauth2/jwks}
     volumes:
       - logs:/dc3-gateway/dc3/logs
     healthcheck:
