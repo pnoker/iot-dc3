@@ -41,6 +41,10 @@ jobs:
       - name: Run end-to-end suite
         env:
           DC3_E2E: "true"
+          # CI resolves dependencies from the public Maven repos; the Aliyun
+          # mirror in .mvn/settings.xml is a local-dev optimization. Empty
+          # MVN_SETTINGS makes the Makefile drop its -s flag.
+          MVN_SETTINGS: ""
         run: |
           set -euo pipefail
           make test-e2e

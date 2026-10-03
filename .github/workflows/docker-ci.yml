@@ -137,15 +137,23 @@ jobs:
             dc3-driver-can
             dc3-driver-coap
             dc3-driver-dlms
+            dc3-driver-dlt645
+            dc3-driver-dnp3
             dc3-driver-ethernet-ip
             dc3-driver-fins
             dc3-driver-http
             dc3-driver-iec104
+            dc3-driver-iec61850
+            dc3-driver-kafka
+            dc3-driver-knx
+            dc3-driver-lorawan
             dc3-driver-lwm2m
+            dc3-driver-mbus
             dc3-driver-melsec
             dc3-driver-mysql
             dc3-driver-oracle
             dc3-driver-postgresql
+            dc3-driver-redis
             dc3-driver-serial
             dc3-driver-sl651
             dc3-driver-snmp

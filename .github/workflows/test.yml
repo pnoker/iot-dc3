@@ -36,17 +36,29 @@ jobs:
           cache: maven
           cache-dependency-path: "**/pom.xml"
 
+      - name: Resolve mockito version from pom
+        # The agent jar path below must track the version the build resolves
+        # (pom.xml mockito.version), so extract it instead of hardcoding.
+        run: |
+          set -euo pipefail
+          MOCKITO_VERSION=$(mvn -q help:evaluate -Dexpression=mockito.version -DforceStdout)
+          if [[ -z "$MOCKITO_VERSION" ]]; then
+            echo "mockito.version not found in pom.xml" >&2
+            exit 1
+          fi
+          echo "MOCKITO_VERSION=$MOCKITO_VERSION" >> "$GITHUB_ENV"
+
       - name: Verify mockito agent jar integrity
         run: |
           set -euo pipefail
-          d="$HOME/.m2/repository/org/mockito/mockito-core/5.20.0"
-          f="$d/mockito-core-5.20.0.jar"
-          want=a32f446f38acf636363c5693db6498047731b9e0
+          d="$HOME/.m2/repository/org/mockito/mockito-core/${MOCKITO_VERSION}"
+          f="$d/mockito-core-${MOCKITO_VERSION}.jar"
+          want=a5cf3cf244300e4cd05f779827cf50d373a8460e  # published sha1 of the mockito-core jar for the version resolved above
           ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
           if ! ok; then
             echo "mockito jar missing or corrupt; refetching from Central"
             mkdir -p "$d"
-            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar
+            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/${MOCKITO_VERSION}/mockito-core-${MOCKITO_VERSION}.jar
           fi
           ok || { echo "mockito jar still corrupt after refetch"; exit 1; }
           echo "mockito agent jar verified"
@@ -99,17 +111,29 @@ jobs:
           docker version
           docker info
 
+      - name: Resolve mockito version from pom
+        # The agent jar path below must track the version the build resolves
+        # (pom.xml mockito.version), so extract it instead of hardcoding.
+        run: |
+          set -euo pipefail
+          MOCKITO_VERSION=$(mvn -q help:evaluate -Dexpression=mockito.version -DforceStdout)
+          if [[ -z "$MOCKITO_VERSION" ]]; then
+            echo "mockito.version not found in pom.xml" >&2
+            exit 1
+          fi
+          echo "MOCKITO_VERSION=$MOCKITO_VERSION" >> "$GITHUB_ENV"
+
       - name: Verify mockito agent jar integrity
         run: |
           set -euo pipefail
-          d="$HOME/.m2/repository/org/mockito/mockito-core/5.20.0"
-          f="$d/mockito-core-5.20.0.jar"
-          want=a32f446f38acf636363c5693db6498047731b9e0
+          d="$HOME/.m2/repository/org/mockito/mockito-core/${MOCKITO_VERSION}"
+          f="$d/mockito-core-${MOCKITO_VERSION}.jar"
+          want=a5cf3cf244300e4cd05f779827cf50d373a8460e  # published sha1 of the mockito-core jar for the version resolved above
           ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
           if ! ok; then
             echo "mockito jar missing or corrupt; refetching from Central"
             mkdir -p "$d"
-            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/5.20.0/mockito-core-5.20.0.jar
+            curl -fsSL -o "$f" https://repo.maven.apache.org/maven2/org/mockito/mockito-core/${MOCKITO_VERSION}/mockito-core-${MOCKITO_VERSION}.jar
           fi
           ok || { echo "mockito jar still corrupt after refetch"; exit 1; }
           echo "mockito agent jar verified"
