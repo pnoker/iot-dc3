@@ -214,10 +214,16 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
         if (Objects.isNull(device) || Objects.isNull(device.getId())) {
             return DeviceHealthState.offline();
         }
+        // Reject incomplete configuration before any pool bring-up: a health probe
+        // must never pay the Hikari connection timeout for a config typo.
+        ValidationReport report = validate(driverConfig);
+        if (Objects.isNull(report) || !report.isPassed()) {
+            return DeviceHealthState.offline();
+        }
         try {
             HikariDataSource ds = getConnector(device.getId(), driverConfig);
             try (Connection conn = ds.getConnection()) {
-                return conn.isValid(5) ? DeviceHealthState.online() : DeviceHealthState.offline();
+                return conn.isValid(2) ? DeviceHealthState.online() : DeviceHealthState.offline();
             }
         } catch (Exception e) {
             log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
@@ -239,7 +245,8 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                HikariDataSource removed = connectMap.remove(metadataEvent.getId());
+                HikariDataSource removed =
+                        Objects.isNull(metadataEvent.getId()) ? null : connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     closeQuietly(metadataEvent.getId(), removed);
                     log.info(
@@ -399,6 +406,10 @@ public abstract class AbstractJdbcDriverCustomService implements DriverCustomSer
             config.setMinimumIdle(1);
             config.setMaxLifetime(1800000);
             config.setKeepaliveTime(300000);
+            // Bounded bring-up: shared schedulers call into drivers and must never
+            // block on the Hikari default 30s connection timeout.
+            config.setConnectionTimeout(4000);
+            config.setValidationTimeout(2000);
             config.setPoolName("dc3-" + driverCode + "-" + deviceId);
 
             try {
