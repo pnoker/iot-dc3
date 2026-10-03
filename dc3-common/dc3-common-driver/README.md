@@ -84,7 +84,6 @@ the authoritative definitions.
 |-----------------------------------------|----------------------------:|----------------------------------------------------------------------|
 | `dc3.driver.lease.seconds`              |                        `30` | Manager-issued runtime lease; valid range is 10–120 seconds          |
 | `dc3.driver.lease.renew-cron`           |            `0/10 * * * * ?` | Lease renewal schedule; keep comfortably below the lease             |
-| `dc3.driver.lease.queue-expires-millis` |                    `300000` | Removes unused per-node command queues after pod churn               |
 | `dc3.driver.buffer.db-path`             | `dc3/data/driver/buffer.db` | Mandatory SQLite outbox path on runtime-exclusive persistent storage |
 | `dc3.driver.buffer.batch-size`          |                       `200` | Maximum outbox rows attempted per republish tick                     |
 | `dc3.driver.buffer.max-backoff-seconds` |                       `600` | Maximum per-message republish backoff                                |

@@ -28,19 +28,28 @@
 
     <name>${project.artifactId}</name>
     <artifactId>dc3-mq-tck</artifactId>
-    <version>2026.9.22</version>
     <packaging>jar</packaging>
 
     <description>IoT DC3 broker-neutral contract suite: an adapter that passes these tests is compliant</description>
+
+    <properties>
+        <!-- No installable artifact: skip install so full-reactor install completes -->
+        <maven.install.skip>true</maven.install.skip>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.github.pnoker</groupId>
             <artifactId>dc3-mq-core</artifactId>
         </dependency>
+        <!-- The exported contract suite is a JUnit 5 test base class, so its main
+             sources compile against the Jupiter API. Provided scope keeps it off
+             consumers' compile classpath: adapters declare their own JUnit test
+             dependencies to run the suite. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
@@ -94,11 +103,6 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>testcontainers-kafka</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

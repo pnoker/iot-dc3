@@ -23,6 +23,12 @@ Shared connection defaults live in `application-rabbitmq.yml`; runtime addresses
 `spring.rabbitmq.*` properties. The optional `dc3.rabbit.tag` system property prefixes exchange, queue, and routing
 names for isolated environments.
 
+Adapter tuning is bound by `RabbitMqAdapterProperties`:
+
+| Property                             | Default  | Meaning                                                       |
+|--------------------------------------|---------:|---------------------------------------------------------------|
+| `dc3.mq.rabbit.queue-expires-millis` | `300000`  | Removes unused per-node command queues after pod churn        |
+
 ## Dependencies
 
 `dc3-mq-core`, `spring-boot-starter-amqp`, `dc3-common-constant`, `dc3-common-public`.

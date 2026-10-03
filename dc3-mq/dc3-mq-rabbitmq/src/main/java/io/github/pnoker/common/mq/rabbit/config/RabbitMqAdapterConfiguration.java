@@ -26,11 +26,11 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.amqp.autoconfigure.RabbitTemplateCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -52,6 +52,7 @@ import org.springframework.context.annotation.Bean;
 @Slf4j
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "dc3.mq", name = "type", havingValue = "rabbitmq", matchIfMissing = true)
+@EnableConfigurationProperties(RabbitMqAdapterProperties.class)
 public class RabbitMqAdapterConfiguration {
 
     /**
@@ -118,8 +119,12 @@ public class RabbitMqAdapterConfiguration {
             RabbitAdmin rabbitAdmin,
             ConnectionFactory connectionFactory,
             BatchConsumerProperties batchProperties,
-            @Value("${dc3.driver.lease.queue-expires-millis:300000}") int driverQueueExpiresMillis) {
+            RabbitMqAdapterProperties adapterProperties) {
         return new RabbitMqAdapter(
-                rabbitTemplate, rabbitAdmin, connectionFactory, batchProperties, driverQueueExpiresMillis);
+                rabbitTemplate,
+                rabbitAdmin,
+                connectionFactory,
+                batchProperties,
+                adapterProperties.getQueueExpiresMillis());
     }
 }

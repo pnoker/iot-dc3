@@ -1,0 +1,45 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package io.github.pnoker.common.mq.rabbit.config;
+
+import jakarta.validation.constraints.Min;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+
+/**
+ * RabbitMQ adapter tuning. Owns the per-instance command queue expiry that
+ * previously lived under the misleading {@code dc3.driver.lease} prefix: the knob
+ * configures broker-side queue TTL inside this adapter, not a driver lease, and
+ * the driver-side property it duplicated was never read.
+ *
+ * @author pnoker
+ * @since 2026.9.22
+ */
+@Getter
+@Setter
+@Validated
+@ConfigurationProperties(prefix = "dc3.mq.rabbit")
+public class RabbitMqAdapterProperties {
+
+    /**
+     * Delete per-instance command queues after a departed node remains unused.
+     */
+    @Min(value = 60000, message = "Queue expires millis must be at least 60000")
+    private int queueExpiresMillis = 300000;
+}

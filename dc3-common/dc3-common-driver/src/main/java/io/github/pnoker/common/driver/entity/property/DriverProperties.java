@@ -357,11 +357,5 @@ public class DriverProperties {
 
         @NotBlank(message = "Lease renewal cron can't be empty")
         private String renewCron = "0/10 * * * * ?";
-
-        /**
-         * Delete per-instance command queues after a departed node remains unused.
-         */
-        @Min(60000)
-        private int queueExpiresMillis = 300000;
     }
 }
