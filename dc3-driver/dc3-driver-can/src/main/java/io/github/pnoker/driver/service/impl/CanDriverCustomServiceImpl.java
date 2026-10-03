@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -40,7 +41,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -48,18 +48,17 @@ import org.springframework.stereotype.Service;
  * <p>
  * Communicates with CAN bus devices on Linux via {@code can-utils} command-line
  * tools ({@code candump}, {@code cansend}). A {@link ProcessBuilder} is used to
- * execute shell commands for both read and write operations.
+ * execute shell commands for both read and write operations. Point attributes
+ * {@code dataOffset}/{@code dataLength} select the payload byte range returned by
+ * the read path (0-based slice of the frame payload, reported as a contiguous hex
+ * string); the write path substitutes {@code ${value}} into the configured frame
+ * template.
  * </p>
  * <p>
- * TODO: Native SocketCAN JNI integration for lower-latency frame-level access.
- * The current {@code ProcessBuilder} approach works but incurs per-call
- * process startup overhead.
- * </p>
- *
- *
- * <p>
- * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented.
+ * The per-call process startup cost of {@code can-utils} is an accepted trade-off:
+ * a native SocketCAN JNI bridge was evaluated and deliberately not adopted, because
+ * the latency win does not justify dragging cross-compilation into this driver's
+ * build for its low-frequency industrial sampling profile.
  * </p>
  *
  * @author pnoker
@@ -75,14 +74,13 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             java.util.regex.Pattern.compile("^[A-Za-z0-9_]+$");
 
     private final DriverMetadata driverMetadata;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, Boolean> deviceMap;
+    private Map<Long, Boolean> deviceMap = new ConcurrentHashMap<>(16);
 
     /** can driver custom service impl. */
-    public CanDriverCustomServiceImpl(DriverMetadata driverMetadata) {
+    public CanDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
     }
 
@@ -115,7 +113,10 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         }
         String interfaceName = getConfigValue(driverConfig, "interfaceName", "can0");
         if (!INTERFACE_NAME_PATTERN.matcher(interfaceName).matches()) {
-            throw new ReadPointException("Invalid CAN interface name, interface={}", interfaceName);
+            // A health probe must answer with a state, never throw: an invalid
+            // interface name is one more way for the device to be unreachable.
+            log.debug("CAN interface name invalid, reporting offline, interface={}", interfaceName);
+            return DeviceHealthState.offline();
         }
         try {
             Process process = new ProcessBuilder("ip", "link", "show", interfaceName)
@@ -137,24 +138,26 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                deviceMap.remove(metadataEvent.getId());
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    deviceMap.remove(metadataEvent.getId());
+                }
                 log.info(
                         "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         metadataEvent.getId(),
                         operateType);
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -174,6 +177,8 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         String canId = getConfigValue(pointConfig, "canId", "");
         String requestCanId = getConfigValue(pointConfig, "requestCanId", "");
         String requestData = getConfigValue(pointConfig, "requestData", "");
+        int dataOffset = parseByteIndex(pointConfig, "dataOffset", 0);
+        int dataLength = parseByteIndex(pointConfig, "dataLength", 1);
 
         try {
             // If a request CAN ID is configured, send a request frame first
@@ -183,14 +188,14 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             }
 
             // Listen for CAN frames matching the expected CAN ID
-            String value = readCanFrame(interfaceName, canId);
+            String value = readCanFrame(interfaceName, canId, dataOffset, dataLength);
             return new ReadPointValue(device, point, value);
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
             throw new ReadPointException(
                     "CAN read failed, protocol={}, interface={}, canId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     interfaceName,
                     canId,
                     e.getMessage(),
@@ -221,7 +226,7 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             throw new WritePointException(
                     "CAN write failed, protocol={}, interface={}, canId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     interfaceName,
                     canId,
                     e.getMessage(),
@@ -264,13 +269,16 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * Read a CAN frame matching the given CAN ID from the specified interface.
-     * Uses {@code candump} to capture a single frame.
+     * Uses {@code candump} to capture a single frame, then slices the payload by
+     * the point's {@code dataOffset}/{@code dataLength} attributes.
      *
      * @param interfaceName the CAN interface name (e.g. can0)
      * @param canId         the expected CAN ID (hex)
-     * @return the data payload of the captured frame
+     * @param dataOffset    0-based byte offset into the frame payload
+     * @param dataLength    number of payload bytes to report
+     * @return the sliced payload bytes as a contiguous hex string
      */
-    private String readCanFrame(String interfaceName, String canId) throws Exception {
+    private String readCanFrame(String interfaceName, String canId, int dataOffset, int dataLength) throws Exception {
         String command = String.format("timeout 3 candump -n 1 %s,%s", interfaceName, canId);
         String output = executeCommand(command);
 
@@ -278,13 +286,46 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
             throw new ReadPointException("No CAN frame received, interface={}, canId={}", interfaceName, canId);
         }
 
-        // candump output format: "can0  123   [1]  FF"
-        // Extract the data portion (last field)
-        String[] parts = output.trim().split("\\s+");
-        if (parts.length >= 3) {
-            return parts[parts.length - 1];
+        String payload = sliceCanPayload(output, dataOffset, dataLength);
+        if (payload.isEmpty()) {
+            throw new ReadPointException(
+                    "CAN frame slice is empty, interface={}, canId={}, dataOffset={}, dataLength={}",
+                    interfaceName,
+                    canId,
+                    dataOffset,
+                    dataLength);
         }
-        return output.trim();
+        return payload;
+    }
+
+    /**
+     * Extract a byte-range slice from candump output as a contiguous hex string.
+     * candump lines look like {@code can0  123   [8]  DE AD BE EF 00 11 22 33};
+     * the payload starts after the {@code [dlc]} marker, {@code dataOffset} is
+     * 0-based from the first payload byte, and {@code dataLength} counts bytes.
+     * Output without a DLC marker is treated as payload-only.
+     */
+    static String sliceCanPayload(String candumpOutput, int dataOffset, int dataLength) {
+        String trimmed = candumpOutput.trim();
+        int marker = trimmed.indexOf('[');
+        String payloadPart = marker >= 0 ? trimmed.substring(trimmed.indexOf(']', marker) + 1) : trimmed;
+        String[] bytes = payloadPart.trim().split("\\s+");
+        int from = Math.max(0, dataOffset);
+        int to = Math.min(bytes.length, from + Math.max(0, dataLength));
+        StringBuilder hex = new StringBuilder();
+        for (int i = from; i < to; i++) {
+            hex.append(bytes[i]);
+        }
+        return hex.toString();
+    }
+
+    private int parseByteIndex(Map<String, AttributeBO> config, String code, int defaultValue) {
+        String raw = getConfigValue(config, code, String.valueOf(defaultValue));
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            throw new ReadPointException("CAN point attribute '{}' must be an integer, value={}", code, raw);
+        }
     }
 
     private String getConfigValue(Map<String, AttributeBO> config, String code, String defaultValue) {

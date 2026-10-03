@@ -80,6 +80,12 @@ dc3:
         default-value: $.payload
         remark: JSON path used to resolve event payload
 
+    mqtt:
+      broker-host: ${MQTT_BROKER_HOST:localhost}
+      broker-port: ${MQTT_BROKER_PORT:1883}
+      username: ${MQTT_USERNAME:}
+      password: ${MQTT_PASSWORD:}
+
     buffer:
       db-path: dc3/data/driver/mqtt/buffer.db
 

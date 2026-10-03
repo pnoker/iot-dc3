@@ -51,7 +51,7 @@ dc3:
         attribute-code: dongleType
         attribute-type-flag: STRING
         default-value: TELEGESIS
-        remark: Coordinator dongle type (TELEGESIS, EMBER, CONBEE)
+        remark: Coordinator dongle type (TELEGESIS supported in this build; EMBER/CONBEE planned)
       - attribute-name: PAN ID
         attribute-code: panId
         attribute-type-flag: INT

@@ -6,9 +6,15 @@
 embedded Eclipse Leshan LwM2M server, accept device registrations, and read/write LwM2M resources by Object / Object
 Instance / Resource ID.
 
-> ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented. The
-> class documentation of `Lwm2mDriverCustomServiceImpl` explicitly states it is a "work-in-progress skeleton". Treat it
-> as a starting template, not a production-ready driver.
+## Status
+
+| Area                 | Status  | Notes                                                                        |
+|----------------------|---------|------------------------------------------------------------------------------|
+| Connection management | preview | Embedded Eclipse Leshan server; CoAP/CoAPS bind configuration driven        |
+| Point read           | preview | Active read of LwM2M resources by Object / Instance / Resource ID           |
+| Point write          | preview | Active write of LwM2M resources                                             |
+| Device health        | stable  | Registration lookup against the embedded Leshan server                      |
+| Observe notifications | missing | Auto-forwarding of Observe notifications awaits endpoint-to-point mapping infrastructure |
 
 ## Module Information
 

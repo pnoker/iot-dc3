@@ -30,6 +30,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -97,7 +98,7 @@ class MqttDriverCustomServiceImplTest {
     void setUp() {
         // Publish-only driver: no inbound adapter configured.
         service = new MqttDriverCustomServiceImpl(
-                driverMetadata, driverSenderService, mqttSendService, adapterProvider(null));
+                driverMetadata, driverSenderService, mqttSendService, adapterProvider(null), driverProperties());
     }
 
     private MqttDriverCustomServiceImpl serviceWithAdapter() {
@@ -105,7 +106,14 @@ class MqttDriverCustomServiceImplTest {
                 driverMetadata,
                 driverSenderService,
                 mqttSendService,
-                adapterProvider(mock(MqttPahoMessageDrivenChannelAdapter.class)));
+                adapterProvider(mock(MqttPahoMessageDrivenChannelAdapter.class)),
+                driverProperties());
+    }
+
+    private static DriverProperties driverProperties() {
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("MqttDriver");
+        return driverProperties;
     }
 
     @Test

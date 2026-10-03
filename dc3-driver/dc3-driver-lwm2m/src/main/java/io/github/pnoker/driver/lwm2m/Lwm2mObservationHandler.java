@@ -65,11 +65,12 @@ public class Lwm2mObservationHandler {
                 resourceId,
                 value);
 
-        // TODO: Implement device/point lookup from driver metadata using endpoint and resource path.
-        //  The current driver metadata model uses deviceId-based lookups, not endpoint-based.
-        //  A future enhancement should maintain an endpoint -> deviceId mapping and
-        //  objectId/objectInstanceId/resourceId -> pointId mapping to enable automatic
-        //  point value forwarding from observed resources.
+        // TODO(lwm2m-observe-forwarding): Forward observed resource values to the
+        //  platform. Two pieces are missing: this handler is not yet registered with
+        //  the Leshan server, and the driver metadata model is deviceId-based, so an
+        //  endpoint -> deviceId and objectId/objectInstanceId/resourceId -> pointId
+        //  mapping must be introduced first. Tracked by the lwm2m-observe-forwarding
+        //  issue; see the driver README status table.
         log.debug(
                 "LwM2M observation value received but auto-forwarding not yet implemented: endpoint={}, path=/{}/{}/{}",
                 endpoint,

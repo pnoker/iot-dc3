@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import java.util.HashMap;
@@ -47,7 +48,9 @@ class CanDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new CanDriverCustomServiceImpl(driverMetadata);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("CanDriver");
+        service = new CanDriverCustomServiceImpl(driverMetadata, driverProperties);
     }
 
     @Test
@@ -80,5 +83,32 @@ class CanDriverCustomServiceImplTest {
         ValidationReport report = service.validatePoint(new HashMap<>(), point);
         assertThat(report.isPassed()).isFalse();
         assertThat(report.getIssues()).isNotEmpty();
+    }
+
+    @Test
+    void sliceCanPayloadExtractsRequestedByteRange() {
+        String candumpLine = "  can0  123   [8]  DE AD BE EF 00 11 22 33  ";
+
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload(candumpLine, 1, 2))
+                .isEqualTo("ADBE");
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload(candumpLine, 0, 8))
+                .isEqualTo("DEADBEEF00112233");
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload(candumpLine, 6, 10))
+                .isEqualTo("2233");
+    }
+
+    @Test
+    void sliceCanPayloadTreatsMarkerlessOutputAsPayloadOnly() {
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload("DE AD", 0, 1)).isEqualTo("DE");
+    }
+
+    @Test
+    void sliceCanPayloadReturnsEmptyWhenRangeStartsBeyondPayload() {
+        String candumpLine = "can0  123   [1]  FF";
+
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload(candumpLine, 4, 2))
+                .isEmpty();
+        assertThat(CanDriverCustomServiceImpl.sliceCanPayload(candumpLine, 0, 0))
+                .isEmpty();
     }
 }

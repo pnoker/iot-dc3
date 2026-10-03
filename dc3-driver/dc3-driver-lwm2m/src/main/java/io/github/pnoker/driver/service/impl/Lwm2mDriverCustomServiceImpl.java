@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -46,12 +46,6 @@ import org.springframework.stereotype.Service;
  * <p>
  * Implements the DriverCustomService interface for the LwM2M protocol.
  * Supports active read/write operations via the embedded Leshan server.
- * </p>
- *
- *
- * <p>
- * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented — see TODO markers in method bodies.
  * </p>
  *
  * @author pnoker
@@ -66,9 +60,7 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
     private final DeviceMetadata deviceMetadata;
     private final DriverSenderService driverSenderService;
     private final Lwm2mServerManager lwm2mServerManager;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -85,7 +77,7 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         // Lwm2mServerManager auto-starts via @PostConstruct
-        log.info("LwM2M driver initialized, protocol={}", driverCode);
+        log.info("LwM2M driver initialized, protocol={}", driverProperties.getCode());
     }
 
     @Override
@@ -120,17 +112,17 @@ public class Lwm2mDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
-            if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
+            if (MetadataOperateTypeEnum.DELETE.equals(operateType) && Objects.nonNull(metadataEvent.getId())) {
                 cleanupDevice(metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());

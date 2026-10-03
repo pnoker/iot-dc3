@@ -16,16 +16,17 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.driver.mqtt.MqttProperties;
 import io.github.pnoker.driver.service.MqttSendService;
 import jakarta.annotation.PreDestroy;
 import java.nio.charset.StandardCharsets;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,56 +40,31 @@ import org.springframework.stereotype.Service;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MqttSendServiceImpl implements MqttSendService {
 
-    private final String brokerHost;
-
-    private final int brokerPort;
-
-    private final String username;
-
-    private final String password;
-
-    private final String defaultTopic;
-
-    private final int defaultQos;
+    private final MqttProperties mqttProperties;
 
     private volatile MqttClient client;
 
-    /** mqtt send service impl. */
-    public MqttSendServiceImpl(
-            @Value("${MQTT_BROKER_HOST:localhost}") String brokerHost,
-            @Value("${MQTT_BROKER_PORT:1883}") int brokerPort,
-            @Value("${MQTT_USERNAME:}") String username,
-            @Value("${MQTT_PASSWORD:}") String password,
-            @Value("${dc3.driver.mqtt.default-topic:dc3/d/v/dc3-driver-mqtt_default}") String defaultTopic,
-            @Value("${dc3.driver.mqtt.default-qos:2}") int defaultQos) {
-        this.brokerHost = brokerHost;
-        this.brokerPort = brokerPort;
-        this.username = username;
-        this.password = password;
-        this.defaultTopic = defaultTopic;
-        this.defaultQos = defaultQos;
-    }
-
     @Override
     public void sendToMqtt(String data) {
-        publish(defaultTopic, defaultQos, data);
+        publish(mqttProperties.getDefaultTopic(), mqttProperties.getDefaultQos(), data);
     }
 
     @Override
     public void sendToMqtt(Integer qos, String data) {
-        publish(defaultTopic, qos == null ? defaultQos : qos, data);
+        publish(mqttProperties.getDefaultTopic(), qos == null ? mqttProperties.getDefaultQos() : qos, data);
     }
 
     @Override
     public void sendToMqtt(String topic, String data) {
-        publish(topic, defaultQos, data);
+        publish(topic, mqttProperties.getDefaultQos(), data);
     }
 
     @Override
     public void sendToMqtt(String topic, Integer qos, String data) {
-        publish(topic, qos == null ? defaultQos : qos, data);
+        publish(topic, qos == null ? mqttProperties.getDefaultQos() : qos, data);
     }
 
     private synchronized void publish(String topic, int qos, String data) {
@@ -98,7 +74,12 @@ public class MqttSendServiceImpl implements MqttSendService {
             message.setQos(qos);
             current.publish(topic, message);
         } catch (MqttException error) {
-            log.error("MQTT publish failed, topic={}, broker={}:{}", topic, brokerHost, brokerPort, error);
+            log.error(
+                    "MQTT publish failed, topic={}, broker={}:{}",
+                    topic,
+                    mqttProperties.getBrokerHost(),
+                    mqttProperties.getBrokerPort(),
+                    error);
         }
     }
 
@@ -109,12 +90,15 @@ public class MqttSendServiceImpl implements MqttSendService {
                 current.close();
             }
             current = new MqttClient(
-                    "tcp://" + brokerHost + ":" + brokerPort, MqttClient.generateClientId(), new MemoryPersistence());
+                    "tcp://" + mqttProperties.getBrokerHost() + ":" + mqttProperties.getBrokerPort(),
+                    MqttClient.generateClientId(),
+                    new MemoryPersistence());
             MqttConnectOptions options = new MqttConnectOptions();
             options.setAutomaticReconnect(true);
+            String username = mqttProperties.getUsername();
             if (username != null && !username.isBlank()) {
                 options.setUserName(username);
-                options.setPassword(password.toCharArray());
+                options.setPassword(mqttProperties.getPassword().toCharArray());
             }
             current.connect(options);
             client = current;

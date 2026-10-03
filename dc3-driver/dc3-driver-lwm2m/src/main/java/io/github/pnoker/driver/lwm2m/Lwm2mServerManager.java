@@ -19,6 +19,7 @@ package io.github.pnoker.driver.lwm2m;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
+import io.github.pnoker.common.exception.ServiceException;
 import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.Map;
@@ -114,8 +115,7 @@ public class Lwm2mServerManager implements DisposableBean {
                     lwm2mProperties.getServerPort(),
                     lwm2mProperties.getSecurePort());
         } catch (Exception e) {
-            log.error("Failed to start LwM2M server", e);
-            throw new RuntimeException("LwM2M server startup failed", e);
+            throw new ServiceException("LwM2M server startup failed, message={}", e.getMessage(), e);
         }
     }
 

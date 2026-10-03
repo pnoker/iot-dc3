@@ -5,9 +5,15 @@
 `dc3-driver-mqtt` is the MQTT protocol driver of the IoT DC3 platform. It is intended to subscribe to configured MQTT
 topics, parse incoming payloads as device point values, and forward commands to devices via MQTT publish.
 
-> ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented
-> (`health()` always reports online and `read()` is a reference stub; see the TODO markers in
-> `MqttDriverCustomServiceImpl`). Treat it as a starting template, not a production-ready driver.
+## Status
+
+| Area                  | Status  | Notes                                                                        |
+|-----------------------|---------|------------------------------------------------------------------------------|
+| Connection management | preview | Spring Integration Paho adapter; broker events drive driver health           |
+| Point read            | preview | Passive pub/sub ingestion via the shared MQTT receive handler; no active poll |
+| Point write           | preview | Publish to the point command topic with configured or default QoS            |
+| Command execution     | preview | Payload template rendering with device context                               |
+| Device health         | preview | Broker connection state from subscribed/connection-failed adapter events     |
 
 ## Module Information
 

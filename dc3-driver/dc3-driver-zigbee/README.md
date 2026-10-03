@@ -6,12 +6,16 @@
 serial coordinator dongle (using the ZSmartSystems Zigbee library), read point values from Zigbee devices via ZCL
 attributes addressed by node IEEE address / endpoint / cluster / attribute, and write values to ZCL attributes.
 
-> ⚠️ **Work in progress.** This driver is currently a skeleton — protocol-level I/O is not yet fully implemented.
-> The implementation (`ZigbeeDriverCustomServiceImpl`) carries an explicit "work-in-progress skeleton" warning and
-> multiple `TODO` markers: `initial()` hardcodes the serial port (`/dev/ttyUSB0`) and baud rate (`115200`) instead of
-> reading them from the driver configuration; the device-level `health()` returns `online` unconditionally; and the
-> write path (`writeAttribute`) only logs and never actually writes the ZCL attribute. Treat it as a starting
-> template, not a production-ready driver.
+## Status
+
+| Area                  | Status  | Notes                                                                        |
+|-----------------------|---------|------------------------------------------------------------------------------|
+| Connection management | preview | Config-driven lazy serial connection; serial hardware-in-the-loop pending    |
+| Point read            | preview | ZCL attribute read by IEEE address / endpoint / cluster / attribute          |
+| Point write           | preview | ZCL attribute write; not yet exercised against real hardware                 |
+| Device health         | preview | Node lookup against the coordinator's device table                           |
+| Observe support       | missing | ZCL attribute reporting/observe is not implemented                           |
+| Dongle support        | missing | TELEGESIS only; EMBER and CONBEE adapters are not implemented                |
 
 ## Module Information
 
@@ -53,8 +57,7 @@ buffering. Keep this README aligned when those user-facing settings change.
 ## Prerequisites
 
 A Zigbee coordinator dongle connected to a serial port on the host running the driver. The dependencies bundle the
-Telegesis dongle adapter; note that `initial()` currently hardcodes the serial port and baud rate rather than reading
-the driver attributes above (see the work-in-progress warning).
+Telegesis dongle adapter; the connection is established lazily from the driver attributes above on first use.
 
 ## Running Locally
 

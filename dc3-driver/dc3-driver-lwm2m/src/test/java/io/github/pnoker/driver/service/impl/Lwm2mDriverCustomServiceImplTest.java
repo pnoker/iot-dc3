@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -56,8 +57,10 @@ class Lwm2mDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("Lwm2mDriver");
         service = new Lwm2mDriverCustomServiceImpl(
-                driverMetadata, deviceMetadata, driverSenderService, lwm2mServerManager);
+                driverMetadata, deviceMetadata, driverSenderService, lwm2mServerManager, driverProperties);
     }
 
     @Test

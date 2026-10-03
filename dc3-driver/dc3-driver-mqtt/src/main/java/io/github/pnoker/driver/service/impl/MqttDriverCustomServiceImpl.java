@@ -24,12 +24,14 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.service.MqttSendService;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -40,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.integration.mqtt.event.MqttConnectionFailedEvent;
 import org.springframework.integration.mqtt.event.MqttIntegrationEvent;
@@ -51,16 +52,12 @@ import org.springframework.stereotype.Service;
 /**
  * Custom driver service implementation for the MQTT driver.
  * <p>
- * This service provides MQTT-specific device communication capabilities. Since MQTT is a
- * publish-subscribe protocol, data is passively received through subscriptions rather
- * than actively polled. The read method returns null as data is received asynchronously
- * through the MQTT receive handler.
- * </p>
- *
- *
- * <p>
- * <b>WARNING:</b> This driver is a work-in-progress skeleton. Protocol-level
- * I/O is not yet fully implemented.
+ * MQTT is publish-subscribe, so point data is ingested passively: {@link #read} returns null and
+ * inbound payloads flow through the shared MQTT receive handler. Writes publish to the point's
+ * command topic via {@link MqttSendService} with a configured or default QoS, and
+ * {@link #execute} renders command payload templates with device context. Driver health follows
+ * the inbound adapter's broker events and degrades to ONLINE with a diagnostic note for
+ * publish-only deployments.
  * </p>
  *
  * @author pnoker
@@ -86,8 +83,7 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
      */
     private final ObjectProvider<MqttPahoMessageDrivenChannelAdapter> inboundAdapterProvider;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     /**
      * Latest known broker connection state, driven by {@link MqttSubscribedEvent} (up)
@@ -165,13 +161,13 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
             brokerConnected = Boolean.TRUE;
             log.info(
                     "MQTT broker connected and subscribed, protocol={}, source={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     Objects.toString(event.getSource(), "?"));
         } else if (event instanceof MqttConnectionFailedEvent) {
             brokerConnected = Boolean.FALSE;
             log.error(
                     "MQTT broker connection failed, protocol={}, source={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     Objects.toString(event.getSource(), "?"));
         }
     }
@@ -202,18 +198,16 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
-            // to do something for device event
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
-            // to do something for point event
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -286,11 +280,17 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
          * the message with the default QoS. Finally, return `true` to indicate a
          * successful write operation.
          */
-        String commandTopic = pointConfig.get("commandTopic").getValue(String.class);
+        AttributeBO commandTopicAttribute = pointConfig.get("commandTopic");
+        if (Objects.isNull(commandTopicAttribute)
+                || Objects.isNull(commandTopicAttribute.getValue())
+                || commandTopicAttribute.getValue().isEmpty()) {
+            throw new WritePointException("Required attribute '{}' is missing", "commandTopic");
+        }
+        String commandTopic = commandTopicAttribute.getValue(String.class);
         String value = values.getValue();
         log.debug(
                 "Driver point write requested, protocol={}, deviceId={}, pointId={}, topic={}, valueLength={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId(),
                 point.getId(),
                 commandTopic,

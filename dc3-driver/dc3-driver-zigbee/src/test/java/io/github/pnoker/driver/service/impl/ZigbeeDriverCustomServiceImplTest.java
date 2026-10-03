@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.zsmartsystems.zigbee.CommandResult;
@@ -30,18 +31,21 @@ import com.zsmartsystems.zigbee.ZigBeeNode;
 import com.zsmartsystems.zigbee.ZigBeeStatus;
 import com.zsmartsystems.zigbee.zcl.ZclAttribute;
 import com.zsmartsystems.zigbee.zcl.ZclCluster;
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
+import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
-import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.WritePointException;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,12 +55,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class ZigbeeDriverCustomServiceImplTest {
 
     @Mock
     private DriverMetadata driverMetadata;
+
+    @Mock
+    private DeviceMetadata deviceMetadata;
 
     @Mock
     private DriverSenderService driverSenderService;
@@ -120,7 +128,10 @@ class ZigbeeDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new ZigbeeDriverCustomServiceImpl(driverMetadata, driverSenderService, networkManagerFactory);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("ZigbeeDriver");
+        service = new ZigbeeDriverCustomServiceImpl(
+                driverMetadata, deviceMetadata, driverSenderService, networkManagerFactory, driverProperties);
     }
 
     @Test
@@ -129,17 +140,47 @@ class ZigbeeDriverCustomServiceImplTest {
     }
 
     @Test
-    void initialCreatesAndStartsNetworkManager() {
-        when(networkManagerFactory.create("/dev/ttyUSB0", 115200)).thenReturn(networkManager);
-        when(networkManager.initialize()).thenReturn(ZigBeeStatus.SUCCESS);
-        when(networkManager.startup(true)).thenReturn(ZigBeeStatus.SUCCESS);
-
+    void initialDefersNetworkCreationToFirstUse() {
         service.initial();
 
-        assertThat(service.health().getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
-        verify(networkManager).addNetworkStateListener(any());
+        assertThat(service.health().getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
+        verifyNoInteractions(networkManagerFactory);
+    }
+
+    @Test
+    void readCreatesNetworkFromDriverConfigurationOnFirstUse() {
+        stubNetworkStartup();
+        stubAttributePath();
+        when(attribute.readValue(5000L)).thenReturn(23.75);
+
+        ReadPointValue value = service.read(driverConfig(), pointConfig(), device(), point());
+
+        assertThat(value.getValue()).isEqualTo("23.75");
+        verify(networkManagerFactory).create("TELEGESIS", "/dev/ttyUSB0", 115200);
         verify(networkManager).initialize();
         verify(networkManager).startup(true);
+        verify(attribute).readValue(5000L);
+    }
+
+    @Test
+    void readRejectsMissingSerialPortBeforeTouchingTheNetwork() {
+        Map<String, AttributeBO> incomplete = driverConfig();
+        incomplete.remove("serialPort");
+
+        assertThatThrownBy(() -> service.read(incomplete, pointConfig(), device(), point()))
+                .isInstanceOf(ConnectorException.class)
+                .hasMessageContaining("serialPort");
+        verifyNoInteractions(networkManagerFactory);
+    }
+
+    @Test
+    void readRejectsDongleTypesWithoutAnAdapter() {
+        when(networkManagerFactory.create("EMBER", "/dev/ttyUSB0", 115200))
+                .thenThrow(new ConnectorException("Driver Zigbee dongle type 'EMBER' has no adapter"));
+
+        assertThatThrownBy(() -> service.read(driverConfig("EMBER"), pointConfig(), device(), point()))
+                .isInstanceOf(ConnectorException.class)
+                .hasMessageContaining("EMBER");
     }
 
     @Test
@@ -160,30 +201,39 @@ class ZigbeeDriverCustomServiceImplTest {
     }
 
     @Test
-    void readUsesLiveAttributeValueFromResolvedProtocolPath() {
-        initializeNetwork();
-        stubAttributePath();
-        when(attribute.readValue(5000L)).thenReturn(23.75);
+    void deviceHealthIsOnlineWhenAnyPointResolvesToAKnownNode() {
+        ReflectionTestUtils.setField(service, "networkManager", networkManager);
+        Map<Long, Map<String, AttributeBO>> points = new HashMap<>();
+        points.put(9L, pointConfig());
+        when(deviceMetadata.getPointConfig(7L)).thenReturn(points);
+        when(networkManager.getNode(any(IeeeAddress.class))).thenReturn(node);
 
-        ReadPointValue value = service.read(driverConfig(), pointConfig(), device(), point());
+        DeviceHealthState health = service.health(driverConfig(), device());
 
-        assertThat(value.getValue()).isEqualTo("23.75");
-        verify(attribute).readValue(5000L);
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
     }
 
     @Test
-    void readFailsWhenNodeDoesNotExist() {
-        initializeNetwork();
-        when(networkManager.getNode(any(IeeeAddress.class))).thenReturn(null);
+    void deviceHealthIsOfflineWhenNoPointCarriesANodeAddress() {
+        ReflectionTestUtils.setField(service, "networkManager", networkManager);
+        when(deviceMetadata.getPointConfig(7L)).thenReturn(new HashMap<>());
 
-        assertThatThrownBy(() -> service.read(driverConfig(), pointConfig(), device(), point()))
-                .isInstanceOf(ReadPointException.class)
-                .hasMessageContaining("node not found");
+        DeviceHealthState health = service.health(driverConfig(), device());
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
+    }
+
+    @Test
+    void deviceHealthIsOfflineBeforeTheNetworkStarts() {
+        DeviceHealthState health = service.health(driverConfig(), device());
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
+        verifyNoInteractions(networkManagerFactory, deviceMetadata);
     }
 
     @Test
     void writeWaitsForSuccessfulProtocolAcknowledgement() {
-        initializeNetwork();
+        stubNetworkStartup();
         stubAttributePath();
         when(attribute.writeValue("42")).thenReturn(CompletableFuture.completedFuture(commandResult));
         when(commandResult.isSuccess()).thenReturn(true);
@@ -201,7 +251,7 @@ class ZigbeeDriverCustomServiceImplTest {
 
     @Test
     void writeRejectsNegativeProtocolAcknowledgement() {
-        initializeNetwork();
+        stubNetworkStartup();
         stubAttributePath();
         when(attribute.writeValue("42")).thenReturn(CompletableFuture.completedFuture(commandResult));
         when(commandResult.isSuccess()).thenReturn(false);
@@ -219,9 +269,16 @@ class ZigbeeDriverCustomServiceImplTest {
                 .hasMessageContaining("write rejected");
     }
 
-    private void initializeNetwork() {
-        when(networkManagerFactory.create("/dev/ttyUSB0", 115200)).thenReturn(networkManager);
-        service.initial();
+    private Map<String, AttributeBO> driverConfig(String dongleType) {
+        Map<String, AttributeBO> config = driverConfig();
+        config.put("dongleType", attribute(dongleType, AttributeTypeEnum.STRING));
+        return config;
+    }
+
+    private void stubNetworkStartup() {
+        when(networkManagerFactory.create("TELEGESIS", "/dev/ttyUSB0", 115200)).thenReturn(networkManager);
+        when(networkManager.initialize()).thenReturn(ZigBeeStatus.SUCCESS);
+        when(networkManager.startup(true)).thenReturn(ZigBeeStatus.SUCCESS);
     }
 
     private void stubAttributePath() {

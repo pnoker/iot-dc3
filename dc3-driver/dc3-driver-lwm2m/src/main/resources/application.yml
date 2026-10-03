@@ -94,11 +94,11 @@ dc3:
         remark: 'Enable LwM2M Observe: true, false'
     command-attribute: [ ]
 
-  lwm2m:
-    server-host: '0.0.0.0'
-    server-port: 5683
-    secure-port: 5684
-    security-mode: NOSEC
+    lwm2m:
+      server-host: '0.0.0.0'
+      server-port: 5683
+      secure-port: 5684
+      security-mode: NOSEC
 
     buffer:
       db-path: dc3/data/driver/lwm2m/buffer.db

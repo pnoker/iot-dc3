@@ -5,11 +5,14 @@
 `dc3-driver-can` is the CAN bus driver of the IoT DC3 platform. It is intended to read and write CAN frames on a
 SocketCAN interface, parsing frame payloads into device point values and sending command frames to the bus.
 
-> ⚠️ **Work in progress.** This driver is a skeleton — its class documentation explicitly states "Protocol-level
-> I/O is not yet fully implemented" and there are TODO markers in the method bodies (e.g. native SocketCAN JNI
-> integration is not done). The current `read()`/`write()` path shells out to Linux `can-utils`
-> (`candump`/`cansend`) and `health()` checks the interface via `ip link show`. Treat it as a starting template,
-> not a production-ready driver.
+## Status
+
+| Area             | Status  | Notes                                                                        |
+|------------------|---------|------------------------------------------------------------------------------|
+| Point read       | preview | `candump` capture with payload slicing by offset/length; Linux only          |
+| Point write      | preview | `cansend` with `${value}` templating; Linux only                             |
+| Device health    | stable  | Interface state checked via `ip link show`                                   |
+| Native SocketCAN | missing | Deliberate design decision: can-utils subprocess chosen over JNI bindings    |
 
 ## Module Information
 

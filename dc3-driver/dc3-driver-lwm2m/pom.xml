@@ -51,12 +51,6 @@
         </dependency>
 
         <!-- Test -->
-        <dependency>
-            <groupId>io.github.pnoker</groupId>
-            <artifactId>dc3-common-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
 </project>

@@ -16,8 +16,10 @@
  */
 package io.github.pnoker.driver;
 
+import io.github.pnoker.driver.mqtt.MqttProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * Main application class for the MQTT driver.
@@ -31,6 +33,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @since 2016.10.1
  */
 @SpringBootApplication
+@EnableConfigurationProperties(MqttProperties.class)
 public class MqttDriverApplication {
 
     /**
