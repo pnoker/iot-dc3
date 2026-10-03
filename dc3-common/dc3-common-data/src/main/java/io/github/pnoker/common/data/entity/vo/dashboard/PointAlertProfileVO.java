@@ -27,7 +27,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Alarm profile of a single point (告警画像): the alarm-type distribution and
+ * Alarm profile of a single point: the alarm-type distribution and
  * the daily alarm counts inside the queried window. The recent-alert list is
  * served separately by the existing alert page endpoint with {@code source=point}.
  *

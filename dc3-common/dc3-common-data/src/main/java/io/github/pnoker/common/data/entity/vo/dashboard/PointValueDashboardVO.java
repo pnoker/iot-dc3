@@ -28,7 +28,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * Data-dashboard payload for a single point (位号看板). Everything the point
+ * Data-dashboard payload for a single point. Everything the point
  * detail dashboard renders in one round trip: the value trend band, hourly
  * sample volume, value distribution, sampling-interval health, collection gaps,
  * the typical 24h curve and the window-level stats. Built from TSDB bucket
@@ -60,7 +60,9 @@ public class PointValueDashboardVO implements Serializable {
     @Schema(description = "Sampling-interval histogram over fixed bins, bins ascending")
     private List<IntervalBin> intervalHistogram = new ArrayList<>();
 
-    @Schema(description = "Collection gaps (consecutive samples farther apart than 5x the median interval), newest first")
+    @Schema(
+            description =
+                    "Collection gaps (consecutive samples farther apart than 5x the median interval), newest first")
     private List<Gap> gaps = new ArrayList<>();
 
     @Schema(description = "Typical day curve: per hour-of-day average over the last 7 days")
@@ -220,7 +222,9 @@ public class PointValueDashboardVO implements Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 
-        @Schema(description = "Raw samples walked (bounded by the raw-cap; truncated reports whether the cap cut the walk short)")
+        @Schema(
+                description =
+                        "Raw samples walked (bounded by the raw-cap; truncated reports whether the cap cut the walk short)")
         private long sampleCount;
 
         @Schema(description = "Minimum numeric value in the walk")

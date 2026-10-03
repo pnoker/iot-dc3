@@ -20,7 +20,7 @@ import io.github.pnoker.common.data.entity.vo.dashboard.PointValueDashboardVO;
 import reactor.core.publisher.Mono;
 
 /**
- * Data-dashboard analytics for a single point (位号看板). Serves everything the
+ * Data-dashboard analytics for a single point. Serves everything the
  * point detail dashboard renders in one round trip: trend band, hourly volume,
  * value distribution, sampling-interval health, collection gaps and the typical
  * day curve.
