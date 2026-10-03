@@ -33,6 +33,7 @@ import com.serotonin.modbus4j.locator.BaseLocator;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -148,7 +149,9 @@ class ModbusRtuDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModbusRtuDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("ModbusRtuDriver");
+        service = new ModbusRtuDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
         previousFactory = swapStaticFactory(modbusFactory);
         service.initial();
     }

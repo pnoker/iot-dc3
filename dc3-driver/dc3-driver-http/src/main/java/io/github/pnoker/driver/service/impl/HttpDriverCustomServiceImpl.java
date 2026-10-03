@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -40,7 +41,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -78,11 +78,9 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, WebClient> clientMap;
+    private Map<Long, WebClient> clientMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -121,26 +119,28 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                WebClient removed = clientMap.remove(metadataEvent.getId());
-                if (Objects.nonNull(removed)) {
-                    log.info(
-                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
-                            metadataEvent.getId(),
-                            operateType);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    WebClient removed = clientMap.remove(metadataEvent.getId());
+                    if (Objects.nonNull(removed)) {
+                        log.info(
+                                "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                                driverProperties.getCode(),
+                                metadataEvent.getId(),
+                                operateType);
+                    }
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -167,7 +167,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
                     .block();
 
             if (Objects.isNull(responseBody)) {
-                throw new ReadPointException("Empty HTTP response, protocol={}", driverCode);
+                throw new ReadPointException("Empty HTTP response, protocol={}", driverProperties.getCode());
             }
 
             String value = extractValue(responseBody, responsePath);
@@ -176,7 +176,8 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            throw new ReadPointException("HTTP read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "HTTP read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -205,7 +206,8 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             return true;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            throw new WritePointException("HTTP write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "HTTP write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -222,7 +224,10 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
             int timeout = getConfigIntValue(driverConfig, ATTR_TIMEOUT, DEFAULT_TIMEOUT_MS);
 
             log.debug(
-                    "Driver connection creating, protocol={}, deviceId={}, baseUrl={}", driverCode, deviceId, baseUrl);
+                    "Driver connection creating, protocol={}, deviceId={}, baseUrl={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    baseUrl);
 
             HttpClient httpClient = HttpClient.create().responseTimeout(Duration.ofMillis(timeout));
 
@@ -235,7 +240,7 @@ public class HttpDriverCustomServiceImpl implements DriverCustomService {
 
             log.info(
                     "Driver connection established, protocol={}, deviceId={}, baseUrl={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     baseUrl);
             return client;

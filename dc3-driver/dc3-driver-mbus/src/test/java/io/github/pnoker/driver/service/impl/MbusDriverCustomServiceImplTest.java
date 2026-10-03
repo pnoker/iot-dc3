@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import java.util.HashMap;
@@ -42,7 +43,9 @@ class MbusDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new MbusDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("MbusDriver");
+        service = new MbusDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
     }
 
     @Test

@@ -29,6 +29,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -152,7 +153,10 @@ class OpcUaDriverCustomServiceImplTest {
     @BeforeEach
     void setUp() throws Exception {
         Mockito.when(keyLoaderFactory.load()).thenReturn(keyLoader);
-        service = new OpcUaDriverCustomServiceImpl(driverMetadata, driverSenderService, keyLoaderFactory);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("OpcUaDriver");
+        service = new OpcUaDriverCustomServiceImpl(
+                driverMetadata, driverSenderService, keyLoaderFactory, driverProperties);
         service.initial();
     }
 

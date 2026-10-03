@@ -32,6 +32,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -136,11 +137,10 @@ class PlcS7DriverCustomServiceImplTest {
     }
 
     @BeforeEach
-    void setUp() throws Exception {
-        service = new PlcS7DriverCustomServiceImpl(driverMetadata, driverSenderService);
-        Field codeField = PlcS7DriverCustomServiceImpl.class.getDeclaredField("driverCode");
-        codeField.setAccessible(true);
-        codeField.set(service, "PlcS7Driver");
+    void setUp() {
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("PlcS7Driver");
+        service = new PlcS7DriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
         service.initial();
     }
 

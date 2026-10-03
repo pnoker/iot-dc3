@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -46,7 +47,6 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -75,9 +75,7 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
     private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
     private final Map<String, String> dataByDevEui = new ConcurrentHashMap<>();
     private final Map<String, Map<String, String>> objectByDevEui = new ConcurrentHashMap<>();
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private MqttClient mqttClient;
     private volatile boolean connected;
@@ -118,7 +116,7 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
     @Override
     public void connectionLost(Throwable cause) {
         connected = false;
-        log.warn("MQTT connection lost, protocol={}", driverCode, cause);
+        log.warn("MQTT connection lost, protocol={}", driverProperties.getCode(), cause);
     }
 
     @Override
@@ -128,7 +126,10 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
             JsonNode root = objectMapper.readTree(payload);
             String devEui = root.path("deviceInfo").path("devEui").asText();
             if (devEui.isEmpty()) {
-                log.debug("LoRaWAN uplink without devEui ignored, protocol={}, topic={}", driverCode, topic);
+                log.debug(
+                        "LoRaWAN uplink without devEui ignored, protocol={}, topic={}",
+                        driverProperties.getCode(),
+                        topic);
                 return;
             }
             String data = root.path("data").asText(null);
@@ -143,9 +144,9 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
                 }
                 objectByDevEui.put(devEui, fields);
             }
-            log.debug("LoRaWAN uplink cached, protocol={}, devEui={}", driverCode, devEui);
+            log.debug("LoRaWAN uplink cached, protocol={}, devEui={}", driverProperties.getCode(), devEui);
         } catch (Exception e) {
-            log.warn("Failed to parse LoRaWAN uplink, protocol={}, topic={}", driverCode, topic, e);
+            log.warn("Failed to parse LoRaWAN uplink, protocol={}, topic={}", driverProperties.getCode(), topic, e);
         }
     }
 
@@ -171,7 +172,10 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         }
         if (Objects.isNull(value)) {
             throw new ReadPointException(
-                    "No LoRaWAN uplink cached, protocol={}, devEui={}, field={}", driverCode, devEui, field);
+                    "No LoRaWAN uplink cached, protocol={}, devEui={}, field={}",
+                    driverProperties.getCode(),
+                    devEui,
+                    field);
         }
         return new ReadPointValue(device, point, value);
     }
@@ -196,7 +200,7 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
             throw e;
         } catch (Exception e) {
             throw new WritePointException(
-                    "LoRaWAN write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "LoRaWAN write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -221,7 +225,11 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         String topic = getConfigValue(driverConfig, "topic", DEFAULT_TOPIC);
         mqttClient.subscribe(topic, 1);
         connected = true;
-        log.info("MQTT connected and subscribed, protocol={}, broker={}, topic={}", driverCode, brokerUri, topic);
+        log.info(
+                "MQTT connected and subscribed, protocol={}, broker={}, topic={}",
+                driverProperties.getCode(),
+                brokerUri,
+                topic);
         return mqttClient;
     }
 

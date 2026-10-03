@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -36,7 +37,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -61,9 +61,7 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     private final DriverSenderService driverSenderService;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final Map<String, String> latestByKey = new ConcurrentHashMap<>();
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -104,7 +102,11 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
     public void onMessage(ConsumerRecord<String, String> record) {
         String cacheKey = Objects.isNull(record.key()) || record.key().isEmpty() ? record.topic() : record.key();
         latestByKey.put(cacheKey, record.value());
-        log.debug("Kafka message consumed, protocol={}, topic={}, key={}", driverCode, record.topic(), record.key());
+        log.debug(
+                "Kafka message consumed, protocol={}, topic={}, key={}",
+                driverProperties.getCode(),
+                record.topic(),
+                record.key());
     }
 
     @Override
@@ -116,7 +118,8 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
         String cacheKey = resolveCacheKey(driverConfig, pointConfig);
         String value = latestByKey.get(cacheKey);
         if (Objects.isNull(value)) {
-            throw new ReadPointException("No Kafka message consumed yet, protocol={}, key={}", driverCode, cacheKey);
+            throw new ReadPointException(
+                    "No Kafka message consumed yet, protocol={}, key={}", driverProperties.getCode(), cacheKey);
         }
         return new ReadPointValue(device, point, value);
     }
@@ -140,7 +143,8 @@ public class KafkaDriverCustomServiceImpl implements DriverCustomService {
             }
             return true;
         } catch (Exception e) {
-            throw new WritePointException("Kafka write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "Kafka write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 

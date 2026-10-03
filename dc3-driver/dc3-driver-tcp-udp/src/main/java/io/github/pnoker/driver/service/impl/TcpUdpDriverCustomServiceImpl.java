@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -52,7 +53,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -74,22 +74,22 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
     private static final long FAILURE_BACKOFF_MS = 60_000;
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
     /**
      * Device TCP connection cache keyed by device ID.
      */
-    private Map<Long, Socket> tcpConnectMap;
+    private Map<Long, Socket> tcpConnectMap = new ConcurrentHashMap<>(16);
     /**
      * Failure tracking for connection backoff.
      */
-    private Map<Long, ConsecutiveFailure> failureMap;
+    private Map<Long, ConsecutiveFailure> failureMap = new ConcurrentHashMap<>(16);
 
     /**
      * Explicit constructor for dependency injection.
      */
-    public TcpUdpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public TcpUdpDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -147,7 +147,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
                 return DeviceHealthState.online();
             }
         } catch (Exception e) {
-            log.warn("TCP/UDP health check failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn("TCP/UDP health check failed, protocol={}, deviceId={}", driverProperties.getCode(), deviceId, e);
             return DeviceHealthState.offline();
         }
     }
@@ -159,23 +159,25 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                Socket removed = tcpConnectMap.remove(metadataEvent.getId());
-                if (removed != null) {
-                    closeQuietly(removed);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    Socket removed = tcpConnectMap.remove(metadataEvent.getId());
+                    if (removed != null) {
+                        closeQuietly(removed);
+                    }
+                    failureMap.remove(metadataEvent.getId());
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverProperties.getCode(),
+                            metadataEvent.getId(),
+                            operateType);
                 }
-                failureMap.remove(metadataEvent.getId());
-                log.info(
-                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode,
-                        metadataEvent.getId(),
-                        operateType);
             }
         }
     }
@@ -202,7 +204,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             invalidateConnector(device.getId());
             throw new ReadPointException(
                     "TCP/UDP read failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e.getMessage(),
@@ -241,7 +243,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             invalidateConnector(device.getId());
             throw new WritePointException(
                     "TCP/UDP write failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e.getMessage(),
@@ -304,7 +306,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             throw new ConnectorException(
                     "Driver connection in backoff after {} consecutive failures, protocol={}, deviceId={}",
                     failure.count,
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId);
         }
 
@@ -333,7 +335,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             failureMap.remove(deviceId);
             log.info(
                     "TCP connection established, protocol={}, deviceId={}, host={}, port={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     host,
                     port);
@@ -342,7 +344,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             failureMap.compute(deviceId, (k, v) -> v == null ? new ConsecutiveFailure() : v.increment());
             throw new ConnectorException(
                     "TCP connection failed, protocol={}, deviceId={}, host={}, port={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     host,
                     port,
@@ -437,7 +439,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         try {
             socket.close();
         } catch (IOException e) {
-            log.warn("TCP socket close failed, protocol={}", driverCode, e);
+            log.warn("TCP socket close failed, protocol={}", driverProperties.getCode(), e);
         }
     }
 

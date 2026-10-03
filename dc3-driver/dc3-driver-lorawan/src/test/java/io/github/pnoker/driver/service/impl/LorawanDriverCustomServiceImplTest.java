@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import java.util.HashMap;
@@ -42,7 +43,9 @@ class LorawanDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new LorawanDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("LorawanDriver");
+        service = new LorawanDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
     }
 
     @Test

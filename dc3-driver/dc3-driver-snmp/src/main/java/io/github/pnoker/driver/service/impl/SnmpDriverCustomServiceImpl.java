@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -51,7 +52,6 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -71,14 +71,14 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, Snmp> clientMap;
+    private Map<Long, Snmp> clientMap = new ConcurrentHashMap<>(16);
 
     /** snmp driver custom service impl. */
-    public SnmpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public SnmpDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -140,31 +140,33 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                Snmp removed = clientMap.remove(metadataEvent.getId());
-                if (Objects.nonNull(removed)) {
-                    try {
-                        removed.close();
-                    } catch (IOException e) {
-                        log.warn("SNMP client close failed, deviceId={}", metadataEvent.getId(), e);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    Snmp removed = clientMap.remove(metadataEvent.getId());
+                    if (Objects.nonNull(removed)) {
+                        try {
+                            removed.close();
+                        } catch (IOException e) {
+                            log.warn("SNMP client close failed, deviceId={}", metadataEvent.getId(), e);
+                        }
+                        log.info(
+                                "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                                driverProperties.getCode(),
+                                metadataEvent.getId(),
+                                operateType);
                     }
-                    log.info(
-                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
-                            metadataEvent.getId(),
-                            operateType);
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -180,6 +182,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         Snmp snmp = getConnector(device.getId());
         String oid = getConfigValue(pointConfig, "oid", "");
         try {
+            requireDriverConfig(driverConfig, "host", "port", "version", "community");
             CommunityTarget target = buildTarget(driverConfig);
 
             PDU pdu = new PDU();
@@ -188,7 +191,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
             ResponseEvent response = snmp.send(pdu, target);
             if (Objects.isNull(response) || Objects.isNull(response.getResponse())) {
-                throw new ReadPointException("SNMP response is null, protocol={}, oid={}", driverCode, oid);
+                throw new ReadPointException(
+                        "SNMP response is null, protocol={}, oid={}", driverProperties.getCode(), oid);
             }
 
             VariableBinding vb = response.getResponse().get(0);
@@ -199,7 +203,11 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             clientMap.remove(device.getId());
             throw new ReadPointException(
-                    "SNMP read failed, protocol={}, oid={}, message={}", driverCode, oid, e.getMessage(), e);
+                    "SNMP read failed, protocol={}, oid={}, message={}",
+                    driverProperties.getCode(),
+                    oid,
+                    e.getMessage(),
+                    e);
         }
     }
 
@@ -214,6 +222,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         String oid = getConfigValue(pointConfig, "oid", "");
         String snmpType = getConfigValue(pointConfig, "snmpType", "OCTET_STRING");
         try {
+            requireDriverConfig(driverConfig, "host", "port", "version", "community");
             CommunityTarget target = buildTarget(driverConfig);
 
             PDU pdu = new PDU();
@@ -223,7 +232,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
 
             ResponseEvent response = snmp.send(pdu, target);
             if (Objects.isNull(response) || Objects.isNull(response.getResponse())) {
-                throw new WritePointException("SNMP set response is null, protocol={}, oid={}", driverCode, oid);
+                throw new WritePointException(
+                        "SNMP set response is null, protocol={}, oid={}", driverProperties.getCode(), oid);
             }
             return true;
         } catch (WritePointException e) {
@@ -231,7 +241,11 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             clientMap.remove(device.getId());
             throw new WritePointException(
-                    "SNMP write failed, protocol={}, oid={}, message={}", driverCode, oid, e.getMessage(), e);
+                    "SNMP write failed, protocol={}, oid={}, message={}",
+                    driverProperties.getCode(),
+                    oid,
+                    e.getMessage(),
+                    e);
         }
     }
 
@@ -247,13 +261,38 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 TransportMapping<org.snmp4j.smi.UdpAddress> transport = new DefaultUdpTransportMapping();
                 Snmp snmp = new Snmp(transport);
                 transport.listen();
-                log.info("Driver SNMP connection established, protocol={}, deviceId={}", driverCode, deviceId);
+                log.info(
+                        "Driver SNMP connection established, protocol={}, deviceId={}",
+                        driverProperties.getCode(),
+                        deviceId);
                 return snmp;
             } catch (Exception e) {
-                log.error("Driver SNMP connection failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+                log.error(
+                        "Driver SNMP connection failed, protocol={}, deviceId={}",
+                        driverProperties.getCode(),
+                        deviceId,
+                        e);
                 return null;
             }
         });
+    }
+
+    /**
+     * Resolve the driver attributes required by {@link #validate} before any network I/O,
+     * failing fast when one is absent so reads and writes never block on a default target
+     * that cannot answer.
+     *
+     * @param config driver configuration
+     * @param codes  required attribute codes
+     * @throws ReadPointException when a required attribute is missing
+     */
+    private static void requireDriverConfig(Map<String, AttributeBO> config, String... codes) {
+        for (String code : codes) {
+            AttributeBO attr = config.get(code);
+            if (Objects.isNull(attr) || Objects.isNull(attr.getValue())) {
+                throw new ReadPointException("Required attribute '{}' is missing", code);
+            }
+        }
     }
 
     /**

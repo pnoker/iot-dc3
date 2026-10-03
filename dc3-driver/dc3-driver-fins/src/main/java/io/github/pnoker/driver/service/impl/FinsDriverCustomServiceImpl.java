@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -45,7 +46,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -84,15 +84,15 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, Socket> clientMap;
+    private Map<Long, Socket> clientMap = new ConcurrentHashMap<>(16);
 
     /** Create the driver custom service. */
     /** fins driver custom service impl. */
-    public FinsDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public FinsDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -128,7 +128,16 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         if (Objects.nonNull(socket) && socket.isConnected() && !socket.isClosed()) {
             return DeviceHealthState.online();
         }
-        socket = getConnector(device.getId(), driverConfig);
+        try {
+            socket = getConnector(device.getId(), driverConfig);
+        } catch (Exception e) {
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
+            return DeviceHealthState.offline();
+        }
         return Objects.nonNull(socket) ? DeviceHealthState.online() : DeviceHealthState.offline();
     }
 
@@ -139,27 +148,29 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                Socket removed = clientMap.remove(metadataEvent.getId());
-                if (Objects.nonNull(removed)) {
-                    closeSocket(removed);
-                    log.info(
-                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
-                            metadataEvent.getId(),
-                            operateType);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    Socket removed = clientMap.remove(metadataEvent.getId());
+                    if (Objects.nonNull(removed)) {
+                        closeSocket(removed);
+                        log.info(
+                                "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                                driverProperties.getCode(),
+                                metadataEvent.getId(),
+                                operateType);
+                    }
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -191,7 +202,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             closeSocket(socket);
             throw new ReadPointException(
                     "FINS read failed, protocol={}, memoryArea={}, address={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     memoryArea,
                     address,
                     e.getMessage(),
@@ -223,7 +234,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             closeSocket(socket);
             throw new WritePointException(
                     "FINS write failed, protocol={}, memoryArea={}, address={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     memoryArea,
                     address,
                     e.getMessage(),
@@ -249,7 +260,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 socket.setSoTimeout(timeout);
                 log.info(
                         "Driver FINS connection established, protocol={}, deviceId={}, host={}:{}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port);
@@ -257,7 +268,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             } catch (IOException e) {
                 log.error(
                         "Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port,

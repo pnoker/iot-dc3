@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -44,7 +45,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -65,9 +65,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private Map<Long, Dlt645SerialPortConnection> connectMap = new ConcurrentHashMap<>(16);
 
@@ -98,11 +96,23 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         if (Objects.isNull(device) || Objects.isNull(device.getId())) {
             return DeviceHealthState.offline();
         }
+        // Reject incomplete configuration before any serial attempt: probing a junk or
+        // missing port name can block the shared scheduler far beyond the health budget,
+        // so mirror validate()'s required-attribute contract and answer offline without
+        // touching hardware.
+        if (Objects.isNull(getConfigValue(driverConfig, "port", null))
+                || Objects.isNull(getConfigValue(driverConfig, "meterAddress", null))) {
+            return DeviceHealthState.offline();
+        }
         try {
             Dlt645SerialPortConnection conn = getConnector(device.getId(), driverConfig);
             return conn.isOpen() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
             return DeviceHealthState.offline();
         }
     }
@@ -114,18 +124,19 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                Dlt645SerialPortConnection removed = connectMap.remove(metadataEvent.getId());
+                Dlt645SerialPortConnection removed =
+                        Objects.isNull(metadataEvent.getId()) ? null : connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.close();
                     log.info(
                             "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
+                            driverProperties.getCode(),
                             metadataEvent.getId(),
                             operateType);
                 }
@@ -133,7 +144,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -154,13 +165,13 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
             byte[] request = Dlt645Frame.buildReadRequest(address, di);
             byte[] response = conn.sendAndReceive(request);
             if (Objects.isNull(response) || response.length == 0) {
-                throw new ReadPointException("Empty DL/T 645 response, protocol={}", driverCode);
+                throw new ReadPointException("Empty DL/T 645 response, protocol={}", driverProperties.getCode());
             }
             byte control = Dlt645Frame.control(response);
             if (control != Dlt645Frame.CONTROL_READ_RESPONSE && control != Dlt645Frame.CONTROL_READ_RESPONSE_MORE) {
                 throw new ReadPointException(
                         "Unexpected DL/T 645 response control code, protocol={}, control={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         String.format("0x%02X", control));
             }
             byte[] data = Dlt645Frame.parse(response);
@@ -172,7 +183,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
             throw new ReadPointException(
-                    "DL/T 645 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "DL/T 645 read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -201,7 +212,7 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
             throw new WritePointException(
-                    "DL/T 645 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "DL/T 645 write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -216,14 +227,18 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
 
             log.debug(
                     "Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     port,
                     baudRate);
             Dlt645SerialPortConnection conn =
                     new Dlt645SerialPortConnection(port, baudRate, dataBits, stopBits, parity, timeout);
             conn.open();
-            log.info("Driver connection established, protocol={}, deviceId={}, port={}", driverCode, deviceId, port);
+            log.info(
+                    "Driver connection established, protocol={}, deviceId={}, port={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    port);
             return conn;
         });
     }
@@ -325,7 +340,11 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
                 conn.close();
             }
         } catch (Exception e) {
-            log.warn("Driver connection destroy failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn(
+                    "Driver connection destroy failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    e);
         }
     }
 

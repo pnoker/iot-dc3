@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.exception.ReadPointException;
@@ -59,7 +60,9 @@ class Iec104DriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new Iec104DriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("Iec104Driver");
+        service = new Iec104DriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
     }
 
     @Test

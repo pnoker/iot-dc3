@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -41,7 +42,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -61,9 +61,7 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     // Eagerly initialized: metadata events may arrive before initial() runs.
     private Map<Long, SerialPortConnection> connectMap = new ConcurrentHashMap<>(16);
@@ -99,7 +97,11 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
             SerialPortConnection conn = getConnector(device.getId(), driverConfig);
             return conn.isOpen() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
             return DeviceHealthState.offline();
         }
     }
@@ -111,19 +113,20 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                SerialPortConnection removed = connectMap.remove(metadataEvent.getId());
+                SerialPortConnection removed =
+                        Objects.isNull(metadataEvent.getId()) ? null : connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.close();
                     log.info(
                             "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
+                            driverProperties.getCode(),
                             metadataEvent.getId(),
                             operateType);
                 }
@@ -131,7 +134,7 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -152,7 +155,7 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
 
             byte[] rawResponse = conn.sendAndReceive(commandBytes, receiveLength);
             if (Objects.isNull(rawResponse) || rawResponse.length == 0) {
-                throw new ReadPointException("Empty serial response, protocol={}", driverCode);
+                throw new ReadPointException("Empty serial response, protocol={}", driverProperties.getCode());
             }
 
             String value = parseResponse(rawResponse, pointConfig);
@@ -162,7 +165,8 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
-            throw new ReadPointException("Serial read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "Serial read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -183,7 +187,7 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
             throw new WritePointException(
-                    "Serial write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "Serial write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -206,14 +210,18 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
 
             log.debug(
                     "Driver connection creating, protocol={}, deviceId={}, port={}, baudRate={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     port,
                     baudRate);
 
             SerialPortConnection conn = new SerialPortConnection(port, baudRate, dataBits, stopBits, parity, timeout);
             conn.open();
-            log.info("Driver connection established, protocol={}, deviceId={}, port={}", driverCode, deviceId, port);
+            log.info(
+                    "Driver connection established, protocol={}, deviceId={}, port={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    port);
             return conn;
         });
     }
@@ -305,7 +313,11 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
                 conn.close();
             }
         } catch (Exception e) {
-            log.warn("Driver connection destroy failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn(
+                    "Driver connection destroy failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    e);
         }
     }
 

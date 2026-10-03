@@ -41,6 +41,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -155,7 +156,9 @@ class ModbusTcpDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModbusTcpDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("ModbusTcpDriver");
+        service = new ModbusTcpDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
         previousFactory = swapStaticFactory(modbusFactory);
         service.initial();
     }

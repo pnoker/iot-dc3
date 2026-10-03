@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import java.util.HashMap;
@@ -43,7 +44,9 @@ class Dlt645DriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new Dlt645DriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("Dlt645Driver");
+        service = new Dlt645DriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
     }
 
     @Test

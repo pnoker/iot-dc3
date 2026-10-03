@@ -5,9 +5,15 @@
 `dc3-driver-opc-da` is the OPC DA (Data Access) protocol driver of the IoT DC3 platform. It connects to OPC DA servers
 using DCOM/J-Interop to read real-time process data from OPC-compliant industrial devices and SCADA systems.
 
-> **Work in progress.** Protocol-level I/O is not fully implemented in `OpcDaDriverCustomServiceImpl`. Treat this
-> module as an integration skeleton, not a production-ready OPC DA driver, until its read/write TODOs are completed and
-> verified against a real server.
+## Status
+
+| Area                  | Status  | Notes                                                                        |
+|-----------------------|---------|------------------------------------------------------------------------------|
+| Connection management | preview | Per-device cached DCOM connection (vendored OpenSCADA/J-Interop stack)       |
+| Point read            | preview | OPC group/item read with typed VT_* variant conversion                       |
+| Point write           | preview | Typed writes for numeric, boolean, and string values via JIVariant           |
+| Device health         | preview | SDK lease-based health job; DCOM reachability depends on Windows host config |
+| Known gaps            | —       | No live OPC DA server validation yet; requires Windows DCOM configuration    |
 
 ## Module Information
 

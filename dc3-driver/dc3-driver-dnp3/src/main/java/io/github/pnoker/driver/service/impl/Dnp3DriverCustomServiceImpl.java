@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -34,6 +35,7 @@ import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import io.stepfunc.dnp3.*;
 import io.stepfunc.dnp3.Runtime;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.joou.UByte;
 import org.joou.ULong;
 import org.joou.UShort;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -73,12 +74,17 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
     private static final String POINT_TYPE_BINARY_OUTPUT = "BINARY_OUTPUT";
     private static final String POINT_TYPE_ANALOG_OUTPUT = "ANALOG_OUTPUT";
     private static final long POLL_TIMEOUT_MILLIS = 5_000L;
+    /**
+     * Upper bound for the TCP connect against an outstation. Without it the OS default
+     * connect timeout (tens of seconds to minutes for unreachable hosts) applies inside
+     * the connection loop, and a shared scheduler calling into the driver cannot absorb
+     * that latency.
+     */
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private Map<Long, Dnp3Connection> connectionMap = new ConcurrentHashMap<>(16);
 
@@ -125,12 +131,13 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
                         || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
-            Dnp3Connection removed = connectionMap.remove(metadataEvent.getId());
+            Dnp3Connection removed =
+                    Objects.isNull(metadataEvent.getId()) ? null : connectionMap.remove(metadataEvent.getId());
             if (Objects.nonNull(removed)) {
                 removed.close();
                 log.info(
                         "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         metadataEvent.getId(),
                         operateType);
             }
@@ -153,18 +160,22 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
                     .channel()
                     .readWithHandler(connection.associationId(), Request.classRequest(true, true, true, true), handler)
                     .exceptionally(ex -> {
-                        log.warn("DNP3 poll failed, protocol={}, deviceId={}", driverCode, device.getId(), ex);
+                        log.warn(
+                                "DNP3 poll failed, protocol={}, deviceId={}",
+                                driverProperties.getCode(),
+                                device.getId(),
+                                ex);
                         return null;
                     });
             if (!latch.await(POLL_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)) {
                 throw new ReadPointException(
-                        "DNP3 poll timed out, protocol={}, deviceId={}", driverCode, device.getId());
+                        "DNP3 poll timed out, protocol={}, deviceId={}", driverProperties.getCode(), device.getId());
             }
             String value = connection.cache().getOrDefault(pointType, Map.of()).get(pointIndex);
             if (Objects.isNull(value)) {
                 throw new ReadPointException(
                         "DNP3 point not found, protocol={}, pointType={}, pointIndex={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         pointType,
                         pointIndex);
             }
@@ -172,7 +183,8 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("DNP3 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "DNP3 read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -198,7 +210,9 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
                 commandSet.addG41V1U16(UShort.valueOf(pointIndex), Integer.parseInt(rawValue));
             } else {
                 throw new WritePointException(
-                        "DNP3 write unsupported point type, protocol={}, pointType={}", driverCode, pointType);
+                        "DNP3 write unsupported point type, protocol={}, pointType={}",
+                        driverProperties.getCode(),
+                        pointType);
             }
             connection
                     .channel()
@@ -209,7 +223,8 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         } catch (WritePointException e) {
             throw e;
         } catch (Exception e) {
-            throw new WritePointException("DNP3 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "DNP3 write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -227,15 +242,23 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
             MasterChannelConfig channelConfig = new MasterChannelConfig(UShort.valueOf(masterAddress));
             EndpointList endpoints = new EndpointList(host + ":" + port);
             ConnectStrategy connectStrategy = new ConnectStrategy();
+            ConnectOptions connectOptions = new ConnectOptions();
+            connectOptions.setTimeout(CONNECT_TIMEOUT);
             AtomicReference<ClientState> state = new AtomicReference<>(ClientState.DISABLED);
-            MasterChannel channel = MasterChannel.createTcpChannel(
-                    runtime, LinkErrorMode.CLOSE, channelConfig, endpoints, connectStrategy, new ClientStateListener() {
+            MasterChannel channel = MasterChannel.createTcpChannel2(
+                    runtime,
+                    LinkErrorMode.CLOSE,
+                    channelConfig,
+                    endpoints,
+                    connectStrategy,
+                    connectOptions,
+                    new ClientStateListener() {
                         @Override
                         public void onChange(ClientState clientState) {
                             state.set(clientState);
                             log.debug(
                                     "DNP3 client state changed, protocol={}, deviceId={}, state={}",
-                                    driverCode,
+                                    driverProperties.getCode(),
                                     deviceId,
                                     clientState);
                         }
@@ -251,7 +274,7 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
                     new NoopAssociationInformation());
             log.info(
                     "Driver connection established, protocol={}, deviceId={}, host={}:{}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     host,
                     port);

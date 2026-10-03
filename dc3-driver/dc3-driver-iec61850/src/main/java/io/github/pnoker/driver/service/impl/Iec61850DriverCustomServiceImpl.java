@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -41,7 +42,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.openmuc.openiec61850.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -61,11 +61,9 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, Iec61850Association> associationMap;
+    private Map<Long, Iec61850Association> associationMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -98,7 +96,11 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
             Iec61850Association association = getAssociation(device.getId(), driverConfig);
             return association.client().isOpen() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
             return DeviceHealthState.offline();
         }
     }
@@ -110,14 +112,16 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
                         || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
-            Iec61850Association removed = associationMap.remove(metadataEvent.getId());
-            if (Objects.nonNull(removed)) {
-                removed.client().close();
-                log.info(
-                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode,
-                        metadataEvent.getId(),
-                        operateType);
+            if (Objects.nonNull(metadataEvent.getId())) {
+                Iec61850Association removed = associationMap.remove(metadataEvent.getId());
+                if (Objects.nonNull(removed)) {
+                    removed.client().close();
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverProperties.getCode(),
+                            metadataEvent.getId(),
+                            operateType);
+                }
             }
         }
     }
@@ -142,7 +146,7 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             invalidateAssociation(device.getId(), association);
             throw new ReadPointException(
-                    "IEC 61850 read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "IEC 61850 read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -158,7 +162,8 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
             ModelNode node = resolveNode(association, pointConfig);
             association.client().getDataValues((FcModelNode) node);
             if (node.getBasicDataAttributes().isEmpty()) {
-                throw new WritePointException("IEC 61850 node has no writable data attribute, protocol={}", driverCode);
+                throw new WritePointException(
+                        "IEC 61850 node has no writable data attribute, protocol={}", driverProperties.getCode());
             }
             BasicDataAttribute bda = node.getBasicDataAttributes().get(0);
             String rawValue = writePointValue.getValue(String.class);
@@ -171,7 +176,7 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
         } catch (Exception e) {
             invalidateAssociation(device.getId(), association);
             throw new WritePointException(
-                    "IEC 61850 write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "IEC 61850 write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -219,7 +224,7 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
                 ServerModel serverModel = client.retrieveModel();
                 log.info(
                         "Driver connection established, protocol={}, deviceId={}, host={}:{}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port);
@@ -237,7 +242,11 @@ public class Iec61850DriverCustomServiceImpl implements DriverCustomService {
                 association.client().close();
             }
         } catch (Exception e) {
-            log.warn("Driver connection destroy failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn(
+                    "Driver connection destroy failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    e);
         }
     }
 

@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -43,7 +44,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.sputnikdev.bluetooth.URL;
 import org.sputnikdev.bluetooth.manager.BluetoothManager;
@@ -67,16 +67,18 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final BleManagerFactory managerFactory;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private BluetoothManager bluetoothManager;
-    private Map<Long, DeviceGovernor> deviceGovernorMap;
+    private Map<Long, DeviceGovernor> deviceGovernorMap = new ConcurrentHashMap<>(16);
 
     /** ble driver custom service impl. */
     public BleDriverCustomServiceImpl(
-            DriverMetadata driverMetadata, DriverSenderService driverSenderService, BleManagerFactory managerFactory) {
+            DriverMetadata driverMetadata,
+            DriverSenderService driverSenderService,
+            BleManagerFactory managerFactory,
+            DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
         this.managerFactory = managerFactory;
@@ -116,7 +118,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         deviceGovernorMap = new ConcurrentHashMap<>(16);
         bluetoothManager = managerFactory.create();
-        log.info("BLE driver initialized, protocol={}", driverCode);
+        log.info("BLE driver initialized, protocol={}", driverProperties.getCode());
     }
 
     @Override
@@ -154,27 +156,29 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                DeviceGovernor removed = deviceGovernorMap.remove(metadataEvent.getId());
-                if (Objects.nonNull(removed)) {
-                    removed.setConnectionControl(false);
-                    log.info(
-                            "Driver device control released, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
-                            metadataEvent.getId(),
-                            operateType);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    DeviceGovernor removed = deviceGovernorMap.remove(metadataEvent.getId());
+                    if (Objects.nonNull(removed)) {
+                        removed.setConnectionControl(false);
+                        log.info(
+                                "Driver device control released, protocol={}, deviceId={}, operateType={}",
+                                driverProperties.getCode(),
+                                metadataEvent.getId(),
+                                operateType);
+                    }
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -206,7 +210,8 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("BLE read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "BLE read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -227,7 +232,8 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
             byte[] data = writePointValue.getValue(String.class).getBytes(StandardCharsets.UTF_8);
             return gov.write(data);
         } catch (Exception e) {
-            throw new WritePointException("BLE write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "BLE write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -240,7 +246,7 @@ public class BleDriverCustomServiceImpl implements DriverCustomService {
             URL deviceUrl = new URL(adapterName, deviceAddress);
             DeviceGovernor governor = bluetoothManager.getDeviceGovernor(deviceUrl, true);
             governor.setConnectionControl(true);
-            log.info("BLE device governor created, protocol={}, deviceId={}", driverCode, deviceId);
+            log.info("BLE device governor created, protocol={}, deviceId={}", driverProperties.getCode(), deviceId);
             return governor;
         });
 

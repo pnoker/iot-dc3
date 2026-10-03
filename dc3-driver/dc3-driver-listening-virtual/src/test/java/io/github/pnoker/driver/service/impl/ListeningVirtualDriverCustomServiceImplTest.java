@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -90,8 +91,15 @@ class ListeningVirtualDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("ListeningVirtualDriver");
         service = new ListeningVirtualDriverCustomServiceImpl(
-                driverMetadata, driverSenderService, nettyTcpServer, nettyUdpServer, threadPoolExecutor);
+                driverMetadata,
+                driverSenderService,
+                nettyTcpServer,
+                nettyUdpServer,
+                threadPoolExecutor,
+                driverProperties);
         injectField("tcpPort", 6700);
         injectField("udpPort", 6800);
     }

@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -41,7 +42,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import tuwien.auto.calimero.GroupAddress;
 import tuwien.auto.calimero.IndividualAddress;
@@ -69,11 +69,9 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, KnxLink> linkMap;
+    private Map<Long, KnxLink> linkMap = new ConcurrentHashMap<>(16);
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -106,7 +104,11 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
             KnxLink link = getLink(device.getId(), driverConfig);
             return link.isOpen() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("Driver health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
             return DeviceHealthState.offline();
         }
     }
@@ -118,14 +120,16 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)
                 && (MetadataOperateTypeEnum.DELETE.equals(operateType)
                         || MetadataOperateTypeEnum.UPDATE.equals(operateType))) {
-            KnxLink removed = linkMap.remove(metadataEvent.getId());
-            if (Objects.nonNull(removed)) {
-                removed.close();
-                log.info(
-                        "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                        driverCode,
-                        metadataEvent.getId(),
-                        operateType);
+            if (Objects.nonNull(metadataEvent.getId())) {
+                KnxLink removed = linkMap.remove(metadataEvent.getId());
+                if (Objects.nonNull(removed)) {
+                    removed.close();
+                    log.info(
+                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                            driverProperties.getCode(),
+                            metadataEvent.getId(),
+                            operateType);
+                }
             }
         }
     }
@@ -154,7 +158,8 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             invalidateLink(device.getId(), link);
-            throw new ReadPointException("KNX read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "KNX read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -182,13 +187,16 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
             return true;
         } catch (Exception e) {
             invalidateLink(device.getId(), link);
-            throw new WritePointException("KNX write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "KNX write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
     private KnxLink getLink(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return linkMap.computeIfAbsent(deviceId, id -> {
-            String remoteHost = getConfigValue(driverConfig, "remoteHost", "192.168.0.100");
+            // remoteHost is required by validate(); enforcing it here fails fast instead of
+            // blocking on a tunneling connect against an unspecified gateway.
+            String remoteHost = getRequiredConfig(driverConfig, "remoteHost");
             int remotePort = getConfigIntValue(driverConfig, "remotePort", 3671);
             String localHost = getConfigValue(driverConfig, "localHost", "");
             boolean useNat = getConfigBoolValue(driverConfig, "useNat", false);
@@ -204,7 +212,7 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
                 ProcessCommunicator communicator = new ProcessCommunicatorImpl(link);
                 log.info(
                         "Driver connection established, protocol={}, deviceId={}, remote={}:{}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         remoteHost,
                         remotePort);
@@ -230,7 +238,11 @@ public class KnxDriverCustomServiceImpl implements DriverCustomService {
                 link.close();
             }
         } catch (Exception e) {
-            log.warn("Driver connection destroy failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn(
+                    "Driver connection destroy failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    e);
         }
     }
 

@@ -29,6 +29,7 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.EventRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -60,6 +61,9 @@ class VirtualDriverCustomServiceImplTest {
 
     @Mock
     private DriverSenderService driverSenderService;
+
+    @Mock
+    private DriverProperties driverProperties;
 
     @InjectMocks
     private VirtualDriverCustomServiceImpl service;

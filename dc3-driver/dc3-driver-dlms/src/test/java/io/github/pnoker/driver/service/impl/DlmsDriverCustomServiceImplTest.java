@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
@@ -74,7 +75,9 @@ class DlmsDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new DlmsDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("DlmsDriver");
+        service = new DlmsDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
         service.initial();
     }
 

@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -39,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,9 +60,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
     private final DriverSenderService driverSenderService;
     private final CoapClientManager coapClientManager;
     private final Map<Long, String> deviceUriMap = new ConcurrentHashMap<>();
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -78,7 +76,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
-        log.info("CoAP driver initialized, protocol={}", driverCode);
+        log.info("CoAP driver initialized, protocol={}", driverProperties.getCode());
     }
 
     @Override
@@ -93,18 +91,20 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                releaseDeviceClient(metadataEvent.getId());
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    releaseDeviceClient(metadataEvent.getId());
+                }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -129,7 +129,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         if (response == null || !response.isSuccess()) {
             log.error(
                     "CoAP read failed, protocol={}, uri={}, path={}, statusCode={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     uri,
                     readPath,
                     response != null ? response.getStatusCode() : "timeout");
@@ -165,7 +165,7 @@ public class CoapDriverCustomServiceImpl implements DriverCustomService {
         if (response == null || !response.isSuccess()) {
             log.error(
                     "CoAP write failed, protocol={}, uri={}, path={}, statusCode={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     uri,
                     writePath,
                     response != null ? response.getStatusCode() : "timeout");

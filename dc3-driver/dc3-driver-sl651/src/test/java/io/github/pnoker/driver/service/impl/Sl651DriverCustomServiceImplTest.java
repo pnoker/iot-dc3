@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.PointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
@@ -56,7 +57,10 @@ class Sl651DriverCustomServiceImplTest {
     @BeforeEach
     void setUp() {
         driverMetadata = new DriverMetadata();
-        service = new Sl651DriverCustomServiceImpl(driverMetadata, driverSenderService, deviceMetadata, pointMetadata);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("Sl651Driver");
+        service = new Sl651DriverCustomServiceImpl(
+                driverMetadata, driverSenderService, deviceMetadata, pointMetadata, driverProperties);
     }
 
     @Test

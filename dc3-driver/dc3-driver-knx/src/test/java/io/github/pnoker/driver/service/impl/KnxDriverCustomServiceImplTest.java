@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import java.util.HashMap;
@@ -42,7 +43,9 @@ class KnxDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new KnxDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("KnxDriver");
+        service = new KnxDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
         service.initial();
     }
 

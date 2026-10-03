@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.CommandRuntimeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -36,7 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -62,9 +62,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     /**
      * Explicit constructor for dependency injection.
@@ -72,7 +70,9 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
      * @param driverMetadata      driver metadata service
      * @param driverSenderService driver sender service
      */
-    public Iec104DriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public Iec104DriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -120,7 +120,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         // SDK records a read failure and applies backoff instead of echoing a fabricated/cached value.
         throw new ReadPointException(
                 "IEC 104 read not implemented: protocol I/O is pending, protocol={}, deviceId={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId());
     }
 
@@ -135,7 +135,7 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
         // of caching the value locally and reporting a fabricated write success.
         throw new WritePointException(
                 "IEC 104 write not implemented: protocol I/O is pending, protocol={}, deviceId={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId());
     }
 

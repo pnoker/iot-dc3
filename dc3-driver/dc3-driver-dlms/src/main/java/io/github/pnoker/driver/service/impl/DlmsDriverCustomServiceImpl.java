@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -64,14 +64,14 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
+    private final DriverProperties driverProperties;
 
-    @Value("${dc3.driver.code}")
-    private String driverCode;
-
-    private Map<Long, GXDLMSClient> clientMap;
+    private Map<Long, GXDLMSClient> clientMap = new ConcurrentHashMap<>(16);
 
     /** dlms driver custom service impl. */
-    public DlmsDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public DlmsDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -113,26 +113,28 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                GXDLMSClient removed = clientMap.remove(metadataEvent.getId());
-                if (Objects.nonNull(removed)) {
-                    log.info(
-                            "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
-                            metadataEvent.getId(),
-                            operateType);
+                if (Objects.nonNull(metadataEvent.getId())) {
+                    GXDLMSClient removed = clientMap.remove(metadataEvent.getId());
+                    if (Objects.nonNull(removed)) {
+                        log.info(
+                                "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
+                                driverProperties.getCode(),
+                                metadataEvent.getId(),
+                                operateType);
+                    }
                 }
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -150,7 +152,7 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
         // fabricated value.
         throw new ReadPointException(
                 "DLMS read not implemented: transport I/O is pending, protocol={}, deviceId={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId());
     }
 
@@ -165,7 +167,7 @@ public class DlmsDriverCustomServiceImpl implements DriverCustomService {
         // fast instead of reporting a fabricated write success.
         throw new WritePointException(
                 "DLMS write not implemented: transport I/O is pending, protocol={}, deviceId={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId());
     }
 

@@ -22,6 +22,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -34,7 +35,6 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -57,9 +57,7 @@ public class RedisDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final StringRedisTemplate stringRedisTemplate;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private static void checkRequired(
             Map<String, AttributeBO> config, String code, List<ValidationReport.AttributeIssue> issues) {
@@ -107,13 +105,15 @@ public class RedisDriverCustomServiceImpl implements DriverCustomService {
                 value = stringRedisTemplate.opsForValue().get(key);
             }
             if (Objects.isNull(value)) {
-                throw new ReadPointException("Redis key has no value, protocol={}, key={}", driverCode, key);
+                throw new ReadPointException(
+                        "Redis key has no value, protocol={}, key={}", driverProperties.getCode(), key);
             }
             return new ReadPointValue(device, point, value);
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("Redis read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "Redis read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -136,7 +136,8 @@ public class RedisDriverCustomServiceImpl implements DriverCustomService {
             }
             return true;
         } catch (Exception e) {
-            throw new WritePointException("Redis write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new WritePointException(
+                    "Redis write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 

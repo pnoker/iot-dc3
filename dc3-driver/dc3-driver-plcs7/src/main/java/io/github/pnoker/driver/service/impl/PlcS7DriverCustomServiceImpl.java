@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -31,6 +32,7 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.exception.WritePointException;
@@ -44,7 +46,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,9 +61,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private Map<Long, MyS7PLC> connectMap = new ConcurrentHashMap<>(16);
 
@@ -94,20 +93,21 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                MyS7PLC removed = connectMap.remove(metadataEvent.getId());
+                MyS7PLC removed =
+                        Objects.isNull(metadataEvent.getId()) ? null : connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     closeConnection(metadataEvent.getId(), removed);
                 }
                 log.info(
                         "Driver connection invalidated, protocol={}, deviceId={}, operateType={}, removed={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         metadataEvent.getId(),
                         operateType,
                         Objects.nonNull(removed));
@@ -115,7 +115,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -130,7 +130,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             PointBO point) {
         log.debug(
                 "Driver point read requested, protocol={}, deviceId={}, pointId={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId(),
                 point.getId());
         MyS7PLC myS7PLC = getS7PLC(device.getId(), driverConfig);
@@ -145,13 +145,13 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             invalidateConnection(device.getId(), myS7PLC);
             log.error(
                     "Driver point read failed, protocol={}, deviceId={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e);
             throw new ReadPointException(
                     "Driver point read failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e.getMessage(),
@@ -174,7 +174,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             WritePointValue writePointValue) {
         log.debug(
                 "Driver point write requested, protocol={}, deviceId={}, pointId={}, valueLength={}",
-                driverCode,
+                driverProperties.getCode(),
                 device.getId(),
                 point.getId(),
                 Objects.toString(writePointValue.getValue(), "").length());
@@ -190,13 +190,13 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             invalidateConnection(device.getId(), myS7PLC);
             log.error(
                     "Driver point write failed, protocol={}, deviceId={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e);
             throw new WritePointException(
                     "Driver point write failed, protocol={}, deviceId={}, pointId={}, message={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     device.getId(),
                     point.getId(),
                     e.getMessage(),
@@ -216,8 +216,8 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
      */
     private MyS7PLC getS7PLC(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return connectMap.computeIfAbsent(deviceId, id -> {
-            String host = driverConfig.get("host").getValue(String.class);
-            int port = driverConfig.get("port").getValue(Integer.class);
+            String host = getRequiredConfig(driverConfig, "host");
+            int port = getRequiredIntConfig(driverConfig, "port");
             String plcType = driverConfig.containsKey("plcType")
                     ? driverConfig.get("plcType").getValue(String.class)
                     : "S1200";
@@ -232,7 +232,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
 
             log.debug(
                     "Driver connection creating, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     host,
                     port,
@@ -242,7 +242,7 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
                 s7PLC.setEnableReconnect(true);
                 log.info(
                         "Driver connection established, protocol={}, deviceId={}, host={}, port={}, plcType={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port,
@@ -251,14 +251,14 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
             } catch (Exception e) {
                 log.error(
                         "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port,
                         e);
                 throw new ServiceException(
                         "Driver connection failed, protocol={}, deviceId={}, host={}, port={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         host,
                         port,
@@ -384,10 +384,53 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
         try {
             myS7PLC.getPlc().close();
         } catch (Exception e) {
-            log.warn("Driver connection close failed, protocol={}, deviceId={}", driverCode, deviceId, e);
+            log.warn(
+                    "Driver connection close failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    deviceId,
+                    e);
         } finally {
             myS7PLC.lock.unlock();
         }
+    }
+
+    /**
+     * Get a required string configuration value, throwing an exception if missing.
+     * <p>
+     * The connection code runs inside a shared scheduler, so a missing attribute must
+     * surface as the driver exception family instead of a {@link NullPointerException}
+     * when the attribute is absent from the configuration map.
+     * </p>
+     *
+     * @param config attribute configuration map
+     * @param code   attribute code
+     * @return configuration value
+     * @throws ConnectorException if the attribute is missing or empty
+     */
+    private String getRequiredConfig(Map<String, AttributeBO> config, String code) {
+        AttributeBO attr = config.get(code);
+        if (Objects.isNull(attr)
+                || Objects.isNull(attr.getValue())
+                || attr.getValue().isEmpty()) {
+            throw new ConnectorException("Required attribute '{}' is missing", code);
+        }
+        return attr.getValue(String.class);
+    }
+
+    /**
+     * Get a required integer configuration value, throwing an exception if missing.
+     *
+     * @param config attribute configuration map
+     * @param code   attribute code
+     * @return configuration value
+     * @throws ConnectorException if the attribute is missing or empty
+     */
+    private int getRequiredIntConfig(Map<String, AttributeBO> config, String code) {
+        AttributeBO attr = config.get(code);
+        if (Objects.isNull(attr) || Objects.isNull(attr.getValue())) {
+            throw new ConnectorException("Required attribute '{}' is missing", code);
+        }
+        return attr.getValue(Integer.class);
     }
 
     @Override

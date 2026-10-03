@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
@@ -85,7 +86,10 @@ class OpcDaDriverCustomServiceImplTest {
     @BeforeEach
     void setUp() {
         scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        service = new OpcDaDriverCustomServiceImpl(driverMetadata, driverSenderService, scheduledThreadPoolExecutor);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("OpcDaDriver");
+        service = new OpcDaDriverCustomServiceImpl(
+                driverMetadata, driverSenderService, scheduledThreadPoolExecutor, driverProperties);
         service.initial();
     }
 

@@ -23,6 +23,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DeviceMetadata;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.metadata.PointMetadata;
@@ -71,9 +72,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
     private final DriverSenderService driverSenderService;
     private final DeviceMetadata deviceMetadata;
     private final PointMetadata pointMetadata;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     @Value("${dc3.driver.sl651.port:5001}")
     private int serverPort;
@@ -97,7 +96,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
-        log.info("Driver initializing, protocol={}", driverCode);
+        log.info("Driver initializing, protocol={}", driverProperties.getCode());
         startServer();
     }
 
@@ -112,7 +111,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -121,20 +120,20 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
                 stopServer();
                 log.info(
                         "Driver server stopped due to device delete, protocol={}, deviceId={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         metadataEvent.getId());
             }
             if (MetadataOperateTypeEnum.ADD.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 restartServer();
                 log.info(
                         "Driver server restarted due to device change, protocol={}, deviceId={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         metadataEvent.getId());
             }
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -189,11 +188,18 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             serverClass.getMethod("setMessageListener", listenerClass).invoke(server, listener);
             serverClass.getMethod("start", int.class).invoke(server, serverPort);
             sl651Server = server;
-            log.info("Driver SL651 server started, protocol={}, port={}", driverCode, serverPort);
+            log.info("Driver SL651 server started, protocol={}, port={}", driverProperties.getCode(), serverPort);
         } catch (ClassNotFoundException e) {
-            log.warn("Driver SL651 server unavailable, protocol={}, reason=sl651ApiMissing", driverCode, e);
+            log.warn(
+                    "Driver SL651 server unavailable, protocol={}, reason=sl651ApiMissing",
+                    driverProperties.getCode(),
+                    e);
         } catch (Exception e) {
-            log.error("Driver SL651 server start failed, protocol={}, port={}", driverCode, serverPort, e);
+            log.error(
+                    "Driver SL651 server start failed, protocol={}, port={}",
+                    driverProperties.getCode(),
+                    serverPort,
+                    e);
         }
     }
 
@@ -207,10 +213,10 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             boolean alive = Boolean.TRUE.equals(isAlive.invoke(server));
             if (alive) {
                 server.getClass().getMethod("stop").invoke(server);
-                log.info("Driver SL651 server stopped, protocol={}", driverCode);
+                log.info("Driver SL651 server stopped, protocol={}", driverProperties.getCode());
             }
         } catch (Exception e) {
-            log.error("Driver SL651 server stop failed, protocol={}", driverCode, e);
+            log.error("Driver SL651 server stop failed, protocol={}", driverProperties.getCode(), e);
         } finally {
             sl651Server = null;
         }
@@ -251,7 +257,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             driverSenderService.pointValueSender(pointValues);
             log.debug(
                     "Driver SL651 point values forwarded, protocol={}, stationAddr={}, count={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     stationAddr,
                     pointValues.size());
         }
@@ -272,7 +278,10 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         try {
             return pointConfig.get("index").getValue(Integer.class);
         } catch (Exception e) {
-            log.warn("Driver SL651 point config skipped, protocol={}, reason=invalidIndex", driverCode, e);
+            log.warn(
+                    "Driver SL651 point config skipped, protocol={}, reason=invalidIndex",
+                    driverProperties.getCode(),
+                    e);
             return null;
         }
     }
@@ -283,7 +292,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         List<String> elements = extractBodyElements(bodyResponses);
         log.debug(
                 "Driver SL651 message received, protocol={}, stationAddr={}, funcCode={}, bodyCount={}",
-                driverCode,
+                driverProperties.getCode(),
                 stationAddr,
                 funcCode,
                 elements.size());
@@ -298,7 +307,11 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object value = target.getClass().getMethod(methodName).invoke(target);
             return value instanceof byte[] bytes ? bytes : new byte[0];
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            log.warn("Driver SL651 response field unavailable, protocol={}, method={}", driverCode, methodName, e);
+            log.warn(
+                    "Driver SL651 response field unavailable, protocol={}, method={}",
+                    driverProperties.getCode(),
+                    methodName,
+                    e);
             return new byte[0];
         }
     }
@@ -315,7 +328,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             if (!bodyElements.isEmpty()) {
                 log.debug(
                         "Driver SL651 body decoded, protocol={}, bodyIndex={}, elementCount={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         i,
                         bodyElements.size());
                 elements.addAll(bodyElements);
@@ -333,7 +346,7 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
             Object value = body.getClass().getMethod("getBodyElements").invoke(body);
             return value instanceof List<?> ? (List<String>) value : List.of();
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            log.warn("Driver SL651 body elements unavailable, protocol={}", driverCode, e);
+            log.warn("Driver SL651 body elements unavailable, protocol={}", driverProperties.getCode(), e);
             return List.of();
         }
     }

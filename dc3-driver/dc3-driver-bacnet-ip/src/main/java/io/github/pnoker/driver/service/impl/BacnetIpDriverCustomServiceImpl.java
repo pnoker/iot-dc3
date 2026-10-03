@@ -37,6 +37,7 @@ import io.github.pnoker.common.driver.entity.bean.WritePointValue;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.DeviceBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
@@ -52,7 +53,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -72,14 +72,14 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
-
-    @Value("${dc3.driver.code}")
-    private String driverCode;
+    private final DriverProperties driverProperties;
 
     private Map<Long, LocalDevice> connectMap = new ConcurrentHashMap<>(16);
 
     /** bacnet ip driver custom service impl. */
-    public BacnetIpDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverSenderService driverSenderService) {
+    public BacnetIpDriverCustomServiceImpl(
+            DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
+        this.driverProperties = driverProperties;
         this.driverMetadata = driverMetadata;
         this.driverSenderService = driverSenderService;
     }
@@ -118,7 +118,11 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             }
             return localDevice.isInitialized() ? DeviceHealthState.online() : DeviceHealthState.offline();
         } catch (Exception e) {
-            log.warn("BACnet health check failed, protocol={}, deviceId={}", driverCode, device.getId(), e);
+            log.warn(
+                    "BACnet health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
             return DeviceHealthState.offline();
         }
     }
@@ -130,19 +134,20 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, deviceId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                LocalDevice removed = connectMap.remove(metadataEvent.getId());
+                LocalDevice removed =
+                        Objects.isNull(metadataEvent.getId()) ? null : connectMap.remove(metadataEvent.getId());
                 if (Objects.nonNull(removed)) {
                     removed.terminate();
                     log.info(
                             "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
-                            driverCode,
+                            driverProperties.getCode(),
                             metadataEvent.getId(),
                             operateType);
                 }
@@ -150,7 +155,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         } else if (MetadataTypeEnum.POINT.equals(metadataType)) {
             log.info(
                     "Driver metadata event received, protocol={}, metadataType={}, operateType={}, pointId={}",
-                    driverCode,
+                    driverProperties.getCode(),
                     metadataType,
                     operateType,
                     metadataEvent.getId());
@@ -181,7 +186,8 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
         } catch (ReadPointException e) {
             throw e;
         } catch (Exception e) {
-            throw new ReadPointException("BACnet read failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+            throw new ReadPointException(
+                    "BACnet read failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -211,7 +217,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             return true;
         } catch (Exception e) {
             throw new WritePointException(
-                    "BACnet write failed, protocol={}, message={}", driverCode, e.getMessage(), e);
+                    "BACnet write failed, protocol={}, message={}", driverProperties.getCode(), e.getMessage(), e);
         }
     }
 
@@ -256,7 +262,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
 
             log.debug(
                     "BACnet connection creating, protocol={}, deviceId={}, localDeviceId={}, bind={}:{}",
-                    driverCode,
+                    driverProperties.getCode(),
                     deviceId,
                     localDeviceId,
                     bindAddress,
@@ -275,7 +281,7 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
                 localDevice.initialize();
                 log.info(
                         "BACnet connection established, protocol={}, deviceId={}, localDeviceId={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         localDeviceId);
             } catch (Exception e) {
@@ -284,13 +290,13 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
                 } catch (Exception e1) {
                     log.warn(
                             "BACnet connection destroy failed after init error, protocol={}, deviceId={}",
-                            driverCode,
+                            driverProperties.getCode(),
                             deviceId,
                             e1);
                 }
                 throw new ConnectorException(
                         "BACnet connection failed, protocol={}, deviceId={}, message={}",
-                        driverCode,
+                        driverProperties.getCode(),
                         deviceId,
                         e.getMessage(),
                         e);

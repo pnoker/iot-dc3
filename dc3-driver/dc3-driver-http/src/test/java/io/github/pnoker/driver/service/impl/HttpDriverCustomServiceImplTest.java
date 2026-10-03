@@ -22,6 +22,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bo.AttributeBO;
 import io.github.pnoker.common.driver.entity.bo.PointBO;
+import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
@@ -52,7 +53,9 @@ class HttpDriverCustomServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        service = new HttpDriverCustomServiceImpl(driverMetadata, driverSenderService);
+        DriverProperties driverProperties = new DriverProperties();
+        driverProperties.setCode("HttpDriver");
+        service = new HttpDriverCustomServiceImpl(driverMetadata, driverSenderService, driverProperties);
     }
 
     @Test
