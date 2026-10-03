@@ -107,6 +107,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <!-- Driver SDK surface used by the shared driver adversarial contract -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-driver</artifactId>
+        </dependency>
+
         <!-- Testcontainers core + database/messaging modules -->
         <dependency>
             <groupId>org.testcontainers</groupId>
