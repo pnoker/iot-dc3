@@ -53,16 +53,16 @@ See the [environment guide](https://docs.dc3.site/en/quickstart/environment) for
 
 ## Branches and Pull Requests
 
-IoT DC3 follows a simplified Git Flow:
+IoT DC3 is trunk-based:
 
-- `develop` — integration branch. Cut `feature/<scope>` branches from `develop` and open pull requests back against
-  `develop`. Full CI (lint / test / build / e2e) runs here.
-- `main` — production trunk. Verified work is promoted from `develop` to `main` via pull request. A release is published
-  only after the version and generated changelog are committed and the matching `v<project.version>` tag is explicitly
-  created.
-- `hotfix/<scope>` — cut from `main` for production fixes; open the PR back against `main` (then tag), and back-merge to
-  `develop`.
-- `release` — archived (read-only). It is kept for history only; do not open pull requests against it.
+- `main` — the single integration and production trunk. Cut feature branches from `main` and open pull requests
+  back against `main`; automated dependency updates also target `main`. Full CI (lint / test / build / e2e) runs
+  on every pull request.
+- `hotfix/<scope>` — cut from `main` for production fixes and open the pull request back against `main`.
+- Releases are cut and tagged from `main`; see the [Release Notes](#release-notes) section for the release
+  workflow.
+- The legacy `develop` and `release` branches are archived: `develop` is only periodically force-aligned from
+  `main`, and `release` is kept for history only. Do not open pull requests against either.
 
 Use descriptive branch names such as `feature/<name>/<topic>` or `fix/<name>/<topic>`. Keep pull requests focused —
 avoid mixing refactors, formatting churn, and behavior changes unless they are necessary for the same fix. Reference
