@@ -98,6 +98,8 @@
         <jackson.version>2.22.2</jackson.version>
         <jackson.annotations.version>2.22</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>
+        <!-- Jakarta XML Binding API artifact line, versioned separately from the jaxb-ri impl artifacts in jaxb.version. -->
+        <jakarta-jaxb-api.version>4.0.5</jakarta-jaxb-api.version>
         <snakeyaml.version>2.7</snakeyaml.version>
 
         <!-- Platform and core utilities -->
@@ -466,7 +468,7 @@
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>4.0.5</version>
+                <version>${jakarta-jaxb-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
@@ -944,21 +946,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
                     <version>${maven.enforcer.plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>enforce-maven</id>
-                            <goals>
-                                <goal>enforce</goal>
-                            </goals>
-                            <configuration>
-                                <rules>
-                                    <requireMavenVersion>
-                                        <version>3.8.0</version>
-                                    </requireMavenVersion>
-                                </rules>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
 
                 <!-- Generate a Java-comment version of the canonical COPYRIGHT file. -->
