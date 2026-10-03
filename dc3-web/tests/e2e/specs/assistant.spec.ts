@@ -102,6 +102,99 @@ test.describe('agent assistant', () => {
     expectHealthy(health);
   });
 
+  test('keeps the layout invariants: one icon axis and equal control heights', async ({page}, testInfo) => {
+    const health = watchPageHealth(page);
+    const isMobile = testInfo.project.name.includes('mobile');
+    await login(page);
+    await waitForAppSettled(page);
+    await page.locator('.agentic-launcher').click();
+    await expect(page.locator('.agentic-panel')).toBeVisible();
+
+    // every composer control sits on the same height: attach / model / send
+    const heights = await page.evaluate(() => {
+      const h = (sel: string) => {
+        const el = document.querySelector(sel);
+        return el ? Math.round(el.getBoundingClientRect().height) : null;
+      };
+      return {
+        attach: h('.agentic-composer__left button'),
+        pill: h('.agentic-model-pill'),
+        send: h('.agentic-send'),
+      };
+    });
+    expect(heights.pill).toBe(heights.send);
+    expect(heights.attach).toBe(heights.send);
+
+    if (isMobile) {
+      // mobile is the docked dialog: the panel spans the viewport width
+      const box = await page.locator('.agentic-panel').boundingBox();
+      const viewportWidth = page.viewportSize()?.width ?? 0;
+      expect(Math.abs(Math.round(box?.width ?? 0) - viewportWidth)).toBeLessThanOrEqual(4);
+      expectHealthy(health);
+      return;
+    }
+
+    // workbench: the rail icons share one vertical axis; input aligns with the stream
+    await page.getByRole('button', {name: /全屏|full.?screen/i}).first().click();
+    await expect(page.locator('.agentic-panel--expanded')).toBeVisible();
+    const geometry = await page.evaluate(() => {
+      // scope to the rail nav: the context panel reuses item-icon class names
+      const rail = document.querySelector('.agentic-sessions');
+      const centers = (sel: string) =>
+        [...(rail?.querySelectorAll(sel) ?? [])].map((el) => {
+          const r = el.getBoundingClientRect();
+          return Math.round(r.x + r.width / 2);
+        });
+      const box = (sel: string) => {
+        const el = document.querySelector(sel);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {cx: Math.round(r.x + r.width / 2), w: Math.round(r.width)};
+      };
+      return {
+        railCenters: centers('.agentic-sessions__top button, .agentic-sessions__item-icon, .agentic-sessions__footer button'),
+        shell: box('.agentic-shell'),
+        input: box('.agentic-input-shell'),
+        stream: box('.agentic-messages'),
+      };
+    });
+    // expanded rail: every conversation icon shares one left axis
+    const itemIcons = await page.evaluate(() =>
+      [...document.querySelectorAll('.agentic-sessions__view .agentic-sessions__item-icon')]
+        .filter((el) => el.getBoundingClientRect().width > 0)
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          return Math.round(r.x + r.width / 2);
+        })
+    );
+    if (itemIcons.length > 1) {
+      expect(Math.max(...itemIcons) - Math.min(...itemIcons)).toBeLessThanOrEqual(2);
+    }
+
+    // collapsed icon rail: every control shares the vertical centre axis
+    await page.locator('.agentic-sessions__collapse').click();
+    await expect(page.locator('.agentic-sessions')).toHaveClass(/is-collapsed/);
+    const collapsedCenters = await page.evaluate(() => {
+      const rail = document.querySelector('.agentic-sessions');
+      return [...(rail?.querySelectorAll('button') ?? [])]
+        .filter((el) => el.getBoundingClientRect().width > 0) // skip hidden ⋯ menus
+        .map((el) => {
+          const r = el.getBoundingClientRect();
+          return Math.round(r.x + r.width / 2);
+        });
+    });
+    expect(collapsedCenters.length).toBeGreaterThanOrEqual(3);
+    expect(Math.max(...collapsedCenters) - Math.min(...collapsedCenters)).toBeLessThanOrEqual(2);
+    await page.locator('.agentic-sessions__collapse').click();
+    // the middle column is the reference axis: input and stream both centre on it
+    expect(Math.abs((geometry.input?.cx ?? -1) - (geometry.shell?.cx ?? -2))).toBeLessThanOrEqual(2);
+    if (geometry.stream) {
+      expect(geometry.input?.w).toBe(geometry.stream.w);
+      expect(Math.abs(geometry.stream.cx - (geometry.shell?.cx ?? -2))).toBeLessThanOrEqual(2);
+    }
+    expectHealthy(health);
+  });
+
   test('renames a conversation through the rail item menu', async ({page}, testInfo) => {
     const health = watchPageHealth(page);
     const isMobile = testInfo.project.name.includes('mobile');
