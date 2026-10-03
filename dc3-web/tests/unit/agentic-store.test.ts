@@ -401,6 +401,37 @@ describe('agentic store', () => {
     expect(store.sessions.find((s) => s.conversationId === 'c2')?.sessionExt?.archived).toBeUndefined();
   });
 
+  it('stamps createTime and records attachment ids on the sent user message', async () => {
+    apiMocks.streamAgenticChatCompletion.mockImplementation(async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
+      callbacks.onDelta?.('ok');
+    });
+    apiMocks.uploadAgenticAttachment.mockResolvedValue({id: 'att-1', fileName: 'a.csv', size: 3});
+
+    const store = useAgenticStore();
+    store.newSession();
+    const conversationId = store.activeConversationId;
+    await store.uploadAttachment(new File(['x'], 'a.csv'));
+    await store.sendMessage('with attachment');
+
+    const user = store.messagesByConversation[conversationId].find((m) => m.role === 'user');
+    expect(typeof user?.createTime).toBe('string');
+    expect(user?.contentExt?.attachments).toEqual(['att-1']);
+    // the chat request carries the same ids
+    const request = apiMocks.streamAgenticChatCompletion.mock.calls[0][0];
+    expect(request.attachments).toEqual(['att-1']);
+  });
+
+  it('passes createTime through when messages are reloaded', async () => {
+    apiMocks.listAgenticMessages.mockResolvedValue([
+      {id: 'p1', role: 'user', content: 'hello', createTime: '2026-10-01 09:00:00'},
+    ]);
+    const store = useAgenticStore();
+    store.newSession();
+    const conversationId = store.activeConversationId;
+    await store.loadMessages(conversationId);
+    expect(store.messagesByConversation[conversationId][0].createTime).toBe('2026-10-01 09:00:00');
+  });
+
   it('clears the workbench flag when the panel closes or the store resets', () => {
     const store = useAgenticStore();
 
