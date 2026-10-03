@@ -68,5 +68,6 @@ public class OAuthClientRegistrationResponseVO implements Serializable {
     private String tokenEndpointAuthMethod;
 
     @JsonProperty(McpConstant.Field.CLIENT_SECRET)
+    @ToString.Exclude
     private String clientSecret;
 }
