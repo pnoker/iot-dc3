@@ -25,6 +25,7 @@ SHELL := /bin/bash
 	check validate-quality validate-web-quality validate-cli-quality validate-cli-format \
 	changelog openapi tag validate-annotations validate-logging validate-permissions validate-scripts validate-python \
 	validate-postgres-init validate-schema-fingerprint sync-schema-fingerprint validate-r2dbc-migration \
+	validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage \
 	validate-documentation validate-javadoc validate-format-java validate-checkstyle validate-java-quality \
 	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall \
 	release-backfill release-backfill-apply release-backfill-refresh
@@ -67,6 +68,7 @@ MVN_SUB_SETTINGS_ARG := $(if $(strip $(MVN_SETTINGS)),-s ../$(MVN_SETTINGS),)
 MVN := mvn $(MVN_SETTINGS_ARG)
 MVN_SUB := mvn $(MVN_SUB_SETTINGS_ARG)
 NODE ?= node
+PYTHON ?= python3
 PNPM ?= corepack pnpm
 PNPM_WEB := cd dc3-web && $(PNPM)
 PNPM_CLI := cd dc3-cli && $(PNPM)
@@ -120,7 +122,7 @@ help:
 	@printf '  %-24s %s\n' 'make test-e2e' 'Run E2E harness'
 	@printf '  %-24s %s\n' 'make coverage' 'Generate aggregated JaCoCo coverage'
 	@printf '  %-24s %s\n' 'make validate-logging' 'Run backend and frontend logging policy gates'
-	@printf '  %-24s %s\n' 'make validate-scripts' 'Validate Python, Node, and shell tools under dc3/bin'
+	@printf '  %-24s %s\n' 'make validate-scripts' 'Validate Python/Node/shell tools plus secrets and compose policy gates'
 	@printf '  %-24s %s\n' 'make validate-python' 'Compile dc3/bin Python tools for syntax validation'
 	@printf '  %-24s %s\n' 'make validate-postgres-init' 'Validate PostgreSQL initialization schema comments and syntax policy'
 	@printf '  %-24s %s\n' 'make validate-schema-fingerprint' 'Verify canonical clean-DDL fingerprints for PostgreSQL'
@@ -146,11 +148,11 @@ help:
 	@printf '%s\n' 'Shortcuts (auto-generated, no env vars needed):'
 	@printf '  %-32s %s\n' 'make <op>-<stack>[-<registry>]' 'e.g. make up-db-cn, make logs-dev, make down-app'
 	@printf '  %-32s %s\n' '  op' 'up down stop ps logs build pull restart refresh config reset'
-	@printf '  %-32s %s\n' '  stack' 'dev app db optional'
+	@printf '  %-32s %s\n' '  stack' 'dev app db optional scale'
 	@printf '  %-32s %s\n' '  registry' 'cn global (only up/pull/build/refresh)'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Variables:'
-	@printf '  %-24s %s\n' 'STACK=dev|app|db|optional' 'Compose stack selector'
+	@printf '  %-24s %s\n' 'STACK=dev|app|db|optional|scale' 'Compose stack selector'
 	@printf '  %-24s %s\n' 'REGISTRY=auto|global|cn' 'Image registry selector; auto uses .env/DC3_IMAGE_REGISTRY'
 	@printf '  %-24s %s\n' 'SERVICES="..."' 'Compose service list, empty means all services'
 	@printf '  %-24s %s\n' 'GROUP=center|core|drivers' 'Predefined service group'
@@ -211,29 +213,41 @@ validate-logging:
 	$(PNPM_WEB) exec vitest run tests/guardrails/ai-guardrails.test.ts
 
 validate-permissions:
-	python3 dc3/bin/audit_controller_permissions.py
+	$(PYTHON) dc3/bin/audit_controller_permissions.py
 
 validate-python:
-	python3 -m py_compile dc3/bin/*.py
+	$(PYTHON) -m py_compile dc3/bin/*.py
 
-validate-scripts: validate-python
+validate-scripts: validate-python validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage
 	$(NODE) --check dc3/bin/dev.mjs
 	bash -n dc3/bin/*.sh
 
 validate-postgres-init:
-	python3 dc3/bin/check_postgres_init.py
+	$(PYTHON) dc3/bin/check_postgres_init.py
 
 validate-schema-fingerprint:
-	python3 dc3/bin/schema_fingerprint.py --check
+	$(PYTHON) dc3/bin/schema_fingerprint.py --check
 
 sync-schema-fingerprint:
-	python3 dc3/bin/schema_fingerprint.py --sync
+	$(PYTHON) dc3/bin/schema_fingerprint.py --sync
 
 validate-r2dbc-migration:
-	python3 dc3/bin/check_r2dbc_migration.py
+	$(PYTHON) dc3/bin/check_r2dbc_migration.py
+
+validate-secrets:
+	$(PYTHON) dc3/bin/check_secrets_serialization.py
+
+validate-compose-vars:
+	$(PYTHON) dc3/bin/check_compose_vars.py
+
+validate-todo-ownership:
+	$(PYTHON) dc3/bin/check_todo_ownership.py
+
+validate-driver-coverage:
+	$(PYTHON) dc3/bin/check_driver_adversarial_coverage.py
 
 validate-documentation:
-	python3 dc3/bin/check_documentation.py
+	$(PYTHON) dc3/bin/check_documentation.py
 
 format: format-java format-web format-cli
 
@@ -343,7 +357,7 @@ dev-cli:
 
 # Auto-generated compose shortcuts: <op>-<stack>[-<registry>]
 #   op       : up down stop ps logs build pull restart refresh config reset
-#   stack    : dev app db optional
+#   stack    : dev app db optional scale
 #   registry : cn global   (only up/pull/build/refresh)
 # Each shortcut recurses into the base op with STACK/REGISTRY set, so all
 # existing logic (compose-file resolution, reset confirmation, SERVICES/GROUP
@@ -437,16 +451,16 @@ changelog:
 # (tags created via API do not trigger the Docker Images workflow, and the
 # 'latest' pointer is never moved). Requires gh authenticated.
 release-backfill:
-	python3 dc3/bin/release_backfill.py
+	$(PYTHON) dc3/bin/release_backfill.py
 
 release-backfill-apply:
-	python3 dc3/bin/release_backfill.py --apply
+	$(PYTHON) dc3/bin/release_backfill.py --apply
 
 # Re-render the release bodies of backfilled releases (e.g. after TITLE.md or
 # RELEASE-FOOTER.md evolves). Never touches tags, targets, or the 'latest'
 # pointer; CI-published releases (dc3.release.* tags) are left alone.
 release-backfill-refresh:
-	python3 dc3/bin/release_backfill.py --refresh --apply
+	$(PYTHON) dc3/bin/release_backfill.py --refresh --apply
 
 # Export each center's OpenAPI JSON from a running stack (dev/test profile).
 # OPENAPI_BASE overrides the gateway URL; OPENAPI_OUT the output directory.

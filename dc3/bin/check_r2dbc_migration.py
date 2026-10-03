@@ -5,6 +5,11 @@ The gate intentionally fails while legacy relation persistence remains.  Driver
 and SQL modules are the only JDBC allow-list; every other platform module must
 be free of MyBatis, JDBC relation APIs, legacy pagination/envelopes and blocking
 bridges before the flag-day build can be published.
+
+Rule "store-local timestamp decoders" keeps stores on DatabaseInstant: no
+store-private ``toLocalDateTime`` helpers, no references to the deleted
+``R2dbcTimeUtil``, and no offset-dropping ``.toLocalDateTime()`` decodes that
+skip UTC normalization first.
 """
 
 # Copyright 2016-present the IoT DC3 original author or authors.
@@ -150,6 +155,60 @@ def scan_offset_pagination() -> list[str]:
     return errors
 
 
+PRIVATE_TO_LOCAL_DATETIME_RE = re.compile(
+    r"(?m)^[ \t]*private\s+[\w<>\[\],\s.]+?\s+toLocalDateTime\s*\("
+)
+CALL_TO_LOCAL_DATETIME_RE = re.compile(r"\.toLocalDateTime\s*\(")
+
+
+def is_utc_normalized(text: str, match: re.Match[str]) -> bool:
+    """Whether the call's statement first normalizes the instant to UTC.
+
+    The statement prefix runs from the previous ``;``, ``{`` or ``}`` up to the
+    call; ``withOffsetSameInstant(ZoneOffset.UTC)`` /
+    ``withZoneSameInstant(ZoneOffset.UTC)`` inside it marks a safe conversion
+    (this is exactly what DatabaseInstant.toLocalDateTimeUtc does internally).
+    """
+    boundary = max(
+        text.rfind(";", 0, match.start()),
+        text.rfind("{", 0, match.start()),
+        text.rfind("}", 0, match.start()),
+    )
+    return "ZoneOffset.UTC" in text[boundary:match.start()]
+
+
+def scan_store_local_timestamp_decoders() -> list[str]:
+    """Stores must decode timestamps through DatabaseInstant.toLocalDateTimeUtc."""
+    errors: list[str] = []
+    for path in files(ROOT / "dc3-db", ".java"):
+        if "src" not in path.parts or "main" not in path.parts:
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        relative = path.relative_to(ROOT)
+        for match in PRIVATE_TO_LOCAL_DATETIME_RE.finditer(text):
+            line = text.count("\n", 0, match.start()) + 1
+            errors.append(
+                f"{relative}:{line}: store-local timestamp decoders: "
+                "private toLocalDateTime helper — use DatabaseInstant.toLocalDateTimeUtc"
+            )
+        for match in re.finditer(r"\bR2dbcTimeUtil\b", text):
+            line = text.count("\n", 0, match.start()) + 1
+            errors.append(
+                f"{relative}:{line}: store-local timestamp decoders: "
+                "R2dbcTimeUtil was deleted and must stay dead — use DatabaseInstant"
+            )
+        for match in CALL_TO_LOCAL_DATETIME_RE.finditer(text):
+            if is_utc_normalized(text, match):
+                continue
+            line = text.count("\n", 0, match.start()) + 1
+            errors.append(
+                f"{relative}:{line}: store-local timestamp decoders: "
+                "offset-dropping .toLocalDateTime() — normalize to UTC first "
+                "(DatabaseInstant.toLocalDateTimeUtc)"
+            )
+    return errors
+
+
 def scan_non_string_jsonb_reads() -> list[str]:
     schema_root = ROOT / "dc3" / "dependencies" / "postgres" / "initdb"
     schema_files = files(schema_root, ".sql")
@@ -223,6 +282,9 @@ def scan() -> tuple[list[str], dict[str, int]]:
     jsonb_errors = scan_non_string_jsonb_reads()
     counts["non-string JSONB reads"] = len(jsonb_errors)
     errors.extend(jsonb_errors)
+    timestamp_errors = scan_store_local_timestamp_decoders()
+    counts["store-local timestamp decoders"] = len(timestamp_errors)
+    errors.extend(timestamp_errors)
     return errors, counts
 
 

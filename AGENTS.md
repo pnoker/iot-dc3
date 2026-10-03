@@ -61,7 +61,10 @@ Run checks proportionate to the change:
 - gRPC: compile generated sources and run matching client/server contract tests.
 - Coverage-sensitive changes: `make coverage` and inspect the aggregate report.
 - Changelog tooling: `python3 -m py_compile dc3/bin/changelog.py`.
-- Compose: render/validate every touched configuration.
+- Compose: render/validate every touched configuration; variable interpolation and credential-default policy are gated by `make validate-compose-vars`.
+- Secrets in VOs: `make validate-secrets` (secret-named fields must be Jackson write-only and `@ToString.Exclude`).
+- TODO markers: `make validate-todo-ownership` (main-source TODO/FIXME/XXX/HACK must carry a `TODO(<ref>)` tracker reference; design notes are prose, not markers).
+- Driver test coverage: `make validate-driver-coverage` (every `dc3-driver-*` module must carry a `*DriverAdversarialTest` extending the shared adversarial contract in `dc3-common-test`).
 - YAML: parse after accounting for Maven placeholders such as `@project.artifactId@`.
 - Agent/docs changes: validate referenced paths, targets, scripts, test selectors, and links; `make validate-documentation`.
 - Documentation or public Javadoc changes: run `make validate-documentation` and `make validate-javadoc`.
