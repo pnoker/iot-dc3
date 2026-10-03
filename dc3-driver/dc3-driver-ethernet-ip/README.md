@@ -7,11 +7,15 @@ with Rockwell Allen-Bradley PLCs. It implements the protocol over a raw TCP sock
 message framing — no external protocol library is used — reading and writing tags via CIP Data Table Read/Write
 services.
 
-> ⚠️ **Work in progress.** This driver is a skeleton — its class documentation explicitly states "Protocol-level
-> I/O is not yet fully implemented" and the method bodies carry TODO markers. The CIP session setup is not done:
-> `getConnector()` does not send the RegisterSession / ForwardOpen commands, the EtherNet/IP encapsulation header
-> is a simplified placeholder, and `health()` only inspects the cached socket state rather than performing a real
-> protocol probe. Treat it as a starting template, not a production-ready driver.
+## Status
+
+| Area                  | Status  | Notes                                                                                |
+|-----------------------|---------|--------------------------------------------------------------------------------------|
+| Connection management | preview | TCP connect plus CIP RegisterSession; backplane slot carried in the connection path  |
+| Point read            | preview | CIP Data Table Read via UCMM sendRRData; golden-frame unit tested, PLC round-trip pending |
+| Point write           | preview | CIP Data Table Write via UCMM sendRRData                                             |
+| Device health         | preview | Cached session/socket state inspection                                               |
+| Known gaps            | —       | ForwardOpen (connection-oriented CIP transport) not implemented; UCMM read/write only |
 
 ## Module Information
 
