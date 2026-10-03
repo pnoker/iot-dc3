@@ -26,6 +26,7 @@ playwright-report/
 **/target/failsafe-reports/
 **/target/site/jacoco*/
 **/target/jacoco*.exec
+dc3-web/tests/agentic-dialogue/reports/
 
 # ===== Testcontainers state =====
 .testcontainers/

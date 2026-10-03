@@ -483,8 +483,14 @@ def validate_comment_language(errors: DocumentationErrors) -> None:
                 continue
             stripped = line.lstrip()
             is_comment = stripped.startswith(("//", "/*", "*", "<!--", "# "))
-            is_inline_comment = bool(re.search(r"\s//", line))
-            if is_comment or is_inline_comment:
+            # For inline comments only the comment text itself counts: Han characters
+            # in code before the marker (e.g. i18n test assertions matching localized
+            # output) are legitimate and must not fail this rule.
+            inline_marker = re.search(r"\s//", line)
+            cjk_inside_comment = is_comment or bool(
+                inline_marker and han_character.search(line[inline_marker.end() :])
+            )
+            if cjk_inside_comment:
                 errors.fail(
                     f"{relative(source_path)}:{line_number}: keep code comments in English"
                 )
