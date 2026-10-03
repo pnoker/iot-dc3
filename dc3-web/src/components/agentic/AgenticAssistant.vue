@@ -486,9 +486,12 @@ watch(
       }
       void nextTick(() => {
         scrollToBottom('auto');
+        // Move focus into the panel on every platform: Escape/Tab handlers
+        // live on the panel element, so without this the keyboard contract
+        // only worked for mobile (which already focused for its dialog).
+        panelRef.value?.focus();
         if (isMobile.value) {
           obscureBackground();
-          panelRef.value?.focus();
         }
       });
     } else {
