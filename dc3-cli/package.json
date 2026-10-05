@@ -47,11 +47,11 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.0.0",
-    "@typescript-eslint/parser": "^8.68.0",
+    "@typescript-eslint/parser": "^8.71.0",
     "eslint": "^9.0.0",
     "eslint-plugin-jsdoc": "^64.5.2",
-    "globals": "^17.11.0",
-    "prettier": "^3.4.0",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.9",
     "tsup": "^8.4.0",
     "typescript": "^5.7.0",
     "vitest": "^4.1.11"
