@@ -93,7 +93,9 @@ const handlePromptClick = (item: AssistantPromptItem) => {
   display: flex;
   flex-direction: column;
   gap: var(--dc3-space-5);
-  max-width: min(var(--agentic-read-width), 100%);
+  // The message canvas fills the available width; only the composer below
+  // keeps a centred reading column.
+  width: 100%;
   margin: var(--dc3-space-10) auto 0;
 }
 
@@ -102,7 +104,6 @@ const handlePromptClick = (item: AssistantPromptItem) => {
   flex-direction: column;
   width: 100%;
   min-width: 0;
-  max-width: min(var(--agentic-read-width), 100%);
   margin: 0 auto;
 
   // Rhythm: role changes breathe, same-role runs group tightly.

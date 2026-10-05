@@ -1172,9 +1172,9 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   align-items: stretch;
   flex-direction: column;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--dc3-space-3);
   min-height: 0;
-  padding: 10px 10px 9px;
+  padding: var(--dc3-space-3) var(--dc3-page-padding) var(--dc3-space-2);
   border-bottom: 1px solid var(--dc3-border-base);
   background: transparent;
 }
@@ -1351,7 +1351,10 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   position: relative;
   flex: 1;
   min-height: 0;
-  padding: 12px 4px;
+  // Same horizontal rhythm as the platform pages (--dc3-page-padding), so the
+  // panel content aligns with the surrounding layout instead of hugging its
+  // own edge.
+  padding: var(--dc3-space-3) var(--dc3-page-padding);
   overflow-x: hidden;
   overflow-y: auto;
   background: transparent;

@@ -502,7 +502,8 @@ const handleSubmit = async () => {
 }
 
 .agentic-composer {
-  padding: 10px 4px 12px;
+  // Horizontal rhythm matches the platform pages and the message body above.
+  padding: var(--dc3-space-3) var(--dc3-page-padding) var(--dc3-space-3);
   background: transparent;
 }
 
@@ -520,7 +521,7 @@ const handleSubmit = async () => {
 
 .agentic-input-shell {
   box-sizing: border-box;
-  padding: 10px;
+  padding: var(--dc3-space-3);
   border: 1px solid var(--dc3-border-base);
   border-radius: var(--dc3-radius-xl);
   background: var(--dc3-bg-elevated);
