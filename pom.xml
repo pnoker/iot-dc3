@@ -94,8 +94,8 @@
         <sqlite-jdbc.version>3.53.4.0</sqlite-jdbc.version>
 
         <!-- Serialization and data formats -->
-        <tools.jackson.version>3.2.2</tools.jackson.version>
-        <jackson.version>2.22.2</jackson.version>
+        <tools.jackson.version>3.2.3</tools.jackson.version>
+        <jackson.version>2.22.3</jackson.version>
         <jackson.annotations.version>2.22</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>
         <!-- Jakarta XML Binding API artifact line, versioned separately from the jaxb-ri impl artifacts in jaxb.version. -->
@@ -106,11 +106,11 @@
         <activation.version>2.1.4</activation.version>
         <commons.io.version>2.22.0</commons.io.version>
         <apache.commons.compress.version>1.28.0</apache.commons.compress.version>
-        <apache.commons.lang3.version>3.20.0</apache.commons.lang3.version>
+        <apache.commons.lang3.version>3.21.0</apache.commons.lang3.version>
         <apache.poi.version>5.5.1</apache.poi.version>
         <freemarker.version>2.3.35</freemarker.version>
         <jna.version>5.19.1</jna.version>
-        <oshi.version>7.6.1</oshi.version>
+        <oshi.version>7.7.0</oshi.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
         <jakarta.annotation.version>3.0.0</jakarta.annotation.version>
         <jakarta.validation.version>3.1.1</jakarta.validation.version>
@@ -145,7 +145,7 @@
         <!-- Build plugins -->
         <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <graalvm.native.version>1.1.13</graalvm.native.version>
+        <graalvm.native.version>1.1.14</graalvm.native.version>
         <maven.gpg.plugin>3.2.8</maven.gpg.plugin>
         <maven.source.plugin>3.4.0</maven.source.plugin>
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
@@ -158,8 +158,8 @@
         <maven.central.plugin.version>0.11.0</maven.central.plugin.version>
         <maven.antrun.plugin.version>3.2.0</maven.antrun.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
-        <checkstyle.version>14.1.0</checkstyle.version>
-        <spotless.version>3.10.2</spotless.version>
+        <checkstyle.version>14.3.0</checkstyle.version>
+        <spotless.version>3.10.3</spotless.version>
         <palantir.java.format.version>2.97.0</palantir.java.format.version>
 
         <!-- DC3 version (self-reference for internal dependency management) -->
@@ -176,7 +176,7 @@
              path below, so a BOM-side mockito bump that leaves this property
              behind breaks every fork with "Error opening zip file or JAR
              manifest missing". The dependencyManagement pin keeps them together. -->
-        <mockito.version>5.23.0</mockito.version>
+        <mockito.version>5.24.0</mockito.version>
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
