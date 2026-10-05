@@ -94,7 +94,7 @@ export function registerSessionCommand(program: Command): void {
     .action(async (id: string, opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.request(
-        'POST',
+        'DELETE',
         `/api/v3/agentic/session/delete?conversation_id=${encodeURIComponent(id)}`,
       );
       printAndExit(result, format);

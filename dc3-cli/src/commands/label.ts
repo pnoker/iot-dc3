@@ -17,7 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, updateManagerResource } from '../utils/manager.js';
 
 /**
  * Register the `label` command tree on the CLI program.
@@ -51,5 +51,58 @@ export function registerLabelCommand(program: Command): void {
         `/api/v3/manager/label/get_by_id?id=${encodeURIComponent(id)}`,
       );
       printAndExit(result, format);
+    });
+
+  label
+    .command('add')
+    .alias('create')
+    .description('Add a new label')
+    .requiredOption('--name <name>', 'Label name')
+    .option('--code <code>', 'Label code')
+    .option('--color <color>', 'Label color (e.g. red, #ff0000)')
+    .option('--format <format>', 'Output format')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const body: Record<string, unknown> = { labelName: opts.name };
+      if (opts.code !== undefined) body.labelCode = opts.code;
+      if (opts.color !== undefined) body.labelColor = opts.color;
+      const result = await dc3Client.post('/api/v3/manager/label/add', body);
+      printAndExit(result, format);
+    });
+
+  label
+    .command('update <id>')
+    .description('Update a label')
+    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .option('--name <name>', 'New label name')
+    .option('--code <code>', 'New label code')
+    .option('--color <color>', 'New label color')
+    .option('--format <format>', 'Output format')
+    .action(async (id, opts) => {
+      const format = detectFormat(opts.format);
+      const changes: Record<string, unknown> = {};
+      if (opts.name !== undefined) changes.labelName = opts.name;
+      if (opts.code !== undefined) changes.labelCode = opts.code;
+      if (opts.color !== undefined) changes.labelColor = opts.color;
+      const result = await updateManagerResource(
+        '/api/v3/manager/label',
+        id,
+        opts.version,
+        changes,
+      );
+      printAndExit(result, format);
+    });
+
+  label
+    .command('delete <id>')
+    .description('Delete a label')
+    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .option('--format <format>', 'Output format')
+    .action(async (id, opts) => {
+      const format = detectFormat(opts.format);
+      await dc3Client.del(
+        `/api/v3/manager/label/delete?id=${encodeURIComponent(id)}&version=${opts.version}`,
+      );
+      printAndExit(undefined, format);
     });
 }

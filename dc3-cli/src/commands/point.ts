@@ -112,7 +112,6 @@ export function registerPointCommand(program: Command): void {
     .description('Write a value to a point')
     .requiredOption('--value <value>', 'Value to write')
     .option('--device-id <id>', 'Device ID (required)')
-    .option('--confirm', 'Require user confirmation (pending action)', false)
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);

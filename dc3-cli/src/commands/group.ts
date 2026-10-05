@@ -17,7 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, updateManagerResource } from '../utils/manager.js';
 
 /**
  * Register the `group` command tree on the CLI program.
@@ -66,5 +66,37 @@ export function registerGroupCommand(program: Command): void {
         groupName: opts.name,
       });
       printAndExit(result, format);
+    });
+
+  group
+    .command('update <id>')
+    .description('Update a group')
+    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .option('--name <name>', 'New group name')
+    .option('--format <format>', 'Output format')
+    .action(async (id, opts) => {
+      const format = detectFormat(opts.format);
+      const changes: Record<string, unknown> = {};
+      if (opts.name !== undefined) changes.groupName = opts.name;
+      const result = await updateManagerResource(
+        '/api/v3/manager/group',
+        id,
+        opts.version,
+        changes,
+      );
+      printAndExit(result, format);
+    });
+
+  group
+    .command('delete <id>')
+    .description('Delete a group')
+    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .option('--format <format>', 'Output format')
+    .action(async (id, opts) => {
+      const format = detectFormat(opts.format);
+      await dc3Client.del(
+        `/api/v3/manager/group/delete?id=${encodeURIComponent(id)}&version=${opts.version}`,
+      );
+      printAndExit(undefined, format);
     });
 }

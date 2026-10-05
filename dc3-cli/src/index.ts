@@ -34,6 +34,9 @@ import { registerAnalyticsCommand } from './commands/analytics.js';
 import { registerSessionCommand, registerActionCommand } from './commands/session.js';
 import { registerGroupCommand } from './commands/group.js';
 import { registerLabelCommand } from './commands/label.js';
+import { registerProviderCommand } from './commands/provider.js';
+import { registerModelCommand } from './commands/model.js';
+import { registerAttachmentCommand } from './commands/attachment.js';
 
 const program = new Command();
 
@@ -70,6 +73,9 @@ registerToolCommand(program);
 registerAnalyticsCommand(program);
 registerSessionCommand(program);
 registerActionCommand(program);
+registerProviderCommand(program);
+registerModelCommand(program);
+registerAttachmentCommand(program);
 
 // Parse and map fatal errors to the contract exit codes (auth 3, network 2, business 1)
 program.parseAsync(process.argv).catch(handleFatalError);

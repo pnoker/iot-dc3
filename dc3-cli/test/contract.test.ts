@@ -159,6 +159,9 @@ describe('static source scans', () => {
     'analytics',
     'session',
     'action',
+    'provider',
+    'model',
+    'attachment',
   ]);
 
   it('every leaf command declares a --format option', async () => {

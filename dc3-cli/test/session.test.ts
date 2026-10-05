@@ -80,9 +80,9 @@ describe('session command group', () => {
     expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({ title: 'new-name' });
   });
 
-  it('delete posts to the delete route with the id param', async () => {
+  it('delete sends DELETE to the delete route with the id param', async () => {
     await run(['session', 'delete', 'c9']);
-    expect(fetchCalls[0].init.method).toBe('POST');
+    expect(fetchCalls[0].init.method).toBe('DELETE');
     expect(fetchCalls[0].url).toContain('/agentic/session/delete?conversation_id=c9');
   });
 });
