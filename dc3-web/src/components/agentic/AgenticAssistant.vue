@@ -949,6 +949,13 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     // Docked mode sits transparent on the shared canvas; the workbench
     // covers the page and needs an opaque backdrop of its own.
     background: var(--dc3-bg-canvas);
+
+    // The platform header's rule is hidden behind the opaque workbench, so
+    // the header draws its own separator here (docked mode reuses the
+    // platform line showing through the transparent panel).
+    .agentic-header {
+      border-bottom: 1px solid var(--dc3-border-base);
+    }
   }
 }
 // Width tracking must stay 1:1 with the pointer during a drag.
@@ -1174,8 +1181,13 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   justify-content: space-between;
   gap: var(--dc3-space-3);
   min-height: 0;
-  padding: var(--dc3-space-3) var(--dc3-page-padding) var(--dc3-space-2);
-  border-bottom: 1px solid var(--dc3-border-base);
+  padding: var(--dc3-space-2) var(--dc3-page-padding) var(--dc3-space-3);
+  // Docked: no border of its own. The panel sits transparent on the canvas,
+  // so the platform header's rule shows through at the exact header height
+  // and reads as this header's separator too — one continuous line instead
+  // of two offset ones, and the session meta rows breathe below it. The
+  // expanded workbench covers the platform header, so it draws its own rule.
+  border-bottom: none;
   background: transparent;
 }
 .agentic-session-error,
