@@ -633,7 +633,7 @@ const routePath = () => (routeRef ? unref(routeRef).fullPath : '');
 
 const currentUiState = () => ({
   mode: !visible.value ? ('closed' as const) : expanded.value ? ('workbench' as const) : ('open' as const),
-  conversationId: activeConversationId.value || undefined,
+  conversationId: visible.value ? activeConversationId.value || undefined : undefined,
 });
 
 const syncUiState = () => {

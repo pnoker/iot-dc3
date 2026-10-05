@@ -77,7 +77,10 @@ export const writeAgenticUiState = (state: AgenticUiState): void => {
  */
 export const agenticUiQuery = (state: AgenticUiState): Record<string, string | undefined> => ({
   agentic: state.mode === 'closed' ? undefined : state.mode,
-  session: state.conversationId || undefined,
+  // A closed panel must drop the session param too: parseQuery infers
+  // mode 'open' from a bare session param, so leaving it would reopen
+  // the panel on every refresh after an explicit close.
+  session: state.mode === 'closed' ? undefined : state.conversationId || undefined,
 });
 
 const parseQuery = (query: Record<string, unknown>): AgenticUiState | undefined => {
