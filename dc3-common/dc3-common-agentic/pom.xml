@@ -110,6 +110,15 @@
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Real-HTTP transport observations (429 retry behaviour) against the
+             openai-java OkHttp client; version aligned with the okhttp 4.12.0
+             that openai-java-client-okhttp provides transitively. -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <version>4.12.0</version>
+            <scope>test</scope>
+        </dependency>
         <!-- x-dc3-ai annotation gate (SP2 ratchet): scans this module's controllers in a unit test -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

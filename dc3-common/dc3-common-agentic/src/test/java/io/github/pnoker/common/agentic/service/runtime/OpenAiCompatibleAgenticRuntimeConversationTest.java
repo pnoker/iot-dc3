@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.sun.net.httpserver.HttpServer;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
@@ -174,7 +175,8 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                 chatClientFactory,
                 promptBuilder,
                 ToolCallbackProvider.from(callback),
-                new ReactiveAgenticToolRegistry(null, null));
+                new ReactiveAgenticToolRegistry(null, null),
+                new AgenticProperties());
     }
 
     private AgenticRuntimeResult await(reactor.core.publisher.Mono<AgenticRuntimeResult> result) {

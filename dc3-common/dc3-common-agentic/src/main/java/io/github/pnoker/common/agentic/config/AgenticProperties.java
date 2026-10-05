@@ -93,6 +93,23 @@ public class AgenticProperties {
     private String attachmentStoragePath = "dc3/data/upload/agentic/attachment";
 
     /**
+     * Retry attempts the transport clients (openai-java / anthropic-java OkHttp clients)
+     * perform for retryable HTTP failures — connection errors, 408, 409, 429 and 5xx —
+     * with exponential backoff before surfacing the error to the stream. The SDK
+     * default of 2 is too shallow under sustained provider rate limiting.
+     */
+    @Min(value = 0, message = "Transport max retries must not be negative")
+    private int transportMaxRetries = 4;
+
+    /**
+     * Upper bound of concurrently in-flight model requests per provider. Requests
+     * beyond the limit queue on the bounded-elastic scheduler instead of racing the
+     * provider's rate limit; throttle at the source instead of retrying into it.
+     */
+    @Min(value = 1, message = "Transport max concurrent requests must be greater than 0")
+    private int transportMaxConcurrentRequests = 4;
+
+    /**
      * Timeout budget in seconds for the L1 model-list connectivity probe. The
      * probe client never inherits the chat transport defaults: it builds a
      * one-shot OkHttp client with this timeout and zero retries.

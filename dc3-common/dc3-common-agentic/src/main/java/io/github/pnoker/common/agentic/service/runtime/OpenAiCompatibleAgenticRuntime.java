@@ -37,6 +37,7 @@ import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import com.openai.models.chat.completions.ChatCompletionTool;
 import com.openai.models.chat.completions.ChatCompletionToolMessageParam;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
@@ -96,6 +97,8 @@ public class OpenAiCompatibleAgenticRuntime {
 
     private final ReactiveAgenticToolRegistry reactiveToolRegistry;
 
+    private final AgenticProperties properties;
+
     private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
 
     /** open ai compatible agentic runtime. */
@@ -103,11 +106,13 @@ public class OpenAiCompatibleAgenticRuntime {
             ChatClientFactory chatClientFactory,
             AgenticPromptBuilder promptBuilder,
             @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
-            ReactiveAgenticToolRegistry reactiveToolRegistry) {
+            ReactiveAgenticToolRegistry reactiveToolRegistry,
+            AgenticProperties properties) {
         this.chatClientFactory = chatClientFactory;
         this.promptBuilder = promptBuilder;
         this.toolCallbackProvider = toolCallbackProvider;
         this.reactiveToolRegistry = reactiveToolRegistry;
+        this.properties = properties;
     }
 
     /**
@@ -583,9 +588,12 @@ public class OpenAiCompatibleAgenticRuntime {
     }
 
     private OpenAIClient createClient(ModelProviderBO provider) {
+        // Ephemeral per-request client (closed in doFinally); retry depth is
+        // shared with ChatClientFactory's cached clients via AgenticProperties.
         return OpenAIOkHttpClient.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
+                .maxRetries(properties.getTransportMaxRetries())
                 .build();
     }
 

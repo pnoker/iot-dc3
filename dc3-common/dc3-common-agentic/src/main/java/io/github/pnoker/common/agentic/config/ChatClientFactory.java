@@ -32,9 +32,13 @@ import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import jakarta.annotation.PreDestroy;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -47,6 +51,8 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Resolves tenant-scoped model configuration reactively and caches transport clients.
@@ -61,10 +67,18 @@ public class ChatClientFactory {
 
     private record ProviderKey(Long tenantId, Long providerId) {}
 
+    /** In-flight slot lease; {@link #UNBOUNDED} marks the unthrottled fallback path. */
+    public record InFlightLease(Semaphore semaphore) {
+        private static final InFlightLease UNBOUNDED = new InFlightLease(null);
+    }
+
     private final Map<ProviderKey, ChatClient> clientCache = new ConcurrentHashMap<>();
     private final Map<ProviderKey, ModelProviderBO> providerCache = new ConcurrentHashMap<>();
     private final Map<ConfigKey, ModelConfigBO> configCache = new ConcurrentHashMap<>();
     private final Map<Long, ModelConfigBO> defaultConfigCache = new ConcurrentHashMap<>();
+    private final Map<ProviderKey, Semaphore> inFlightSemaphores = new ConcurrentHashMap<>();
+    private final ExecutorService slotExecutor = Executors.newVirtualThreadPerTaskExecutor();
+    private final Scheduler slotScheduler = Schedulers.fromExecutorService(slotExecutor);
     private final ReactiveModelProviderStore modelProviderStore;
     private final ReactiveModelConfigStore modelConfigStore;
     private final ChatClient.Builder fallbackBuilder;
@@ -154,6 +168,53 @@ public class ChatClientFactory {
         defaultConfigCache
                 .entrySet()
                 .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
+        inFlightSemaphores.keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
+    }
+
+    /**
+     * Acquire one in-flight model-request slot for the resolved provider, parking on
+     * a virtual-thread scheduler while all slots are taken. Returns
+     * {@link InFlightLease#UNBOUNDED} when no provider config is cached — the
+     * fallback ChatClient path has no provider to throttle against.
+     */
+    public Mono<InFlightLease> acquireInFlightSlot(String model, Long tenantId) {
+        return Mono.fromSupplier(() -> {
+                    Semaphore semaphore = resolveInFlightSemaphore(model, tenantId);
+                    if (semaphore == null) {
+                        return InFlightLease.UNBOUNDED;
+                    }
+                    try {
+                        semaphore.acquire();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException("Interrupted while waiting for an agentic model slot", e);
+                    }
+                    return new InFlightLease(semaphore);
+                })
+                .subscribeOn(slotScheduler);
+    }
+
+    /** Release a lease acquired through {@link #acquireInFlightSlot(String, Long)}; null-safe. */
+    public void releaseInFlightSlot(InFlightLease lease) {
+        if (lease != null && lease.semaphore() != null) {
+            lease.semaphore().release();
+        }
+    }
+
+    private Semaphore resolveInFlightSemaphore(String model, Long tenantId) {
+        if (tenantId == null) {
+            return null;
+        }
+        ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
+        if (config == null) {
+            config = defaultConfigCache.get(tenantId);
+        }
+        if (config == null) {
+            return null;
+        }
+        ProviderKey key = new ProviderKey(tenantId, config.getProviderId());
+        return inFlightSemaphores.computeIfAbsent(
+                key, ignored -> new Semaphore(properties.getTransportMaxConcurrentRequests()));
     }
 
     /** Build a provider-specific chat options builder, or null when nothing is set. */
@@ -246,10 +307,12 @@ public class ChatClientFactory {
         OpenAIClient syncClient = OpenAIOkHttpClient.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
+                .maxRetries(properties.getTransportMaxRetries())
                 .build();
         OpenAIClientAsync asyncClient = OpenAIOkHttpClientAsync.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
+                .maxRetries(properties.getTransportMaxRetries())
                 .build();
         OpenAiChatModel model = OpenAiChatModel.builder()
                 .openAiClient(syncClient)
@@ -262,15 +325,22 @@ public class ChatClientFactory {
         AnthropicClient syncClient = AnthropicOkHttpClient.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
+                .maxRetries(properties.getTransportMaxRetries())
                 .build();
         AnthropicClientAsync asyncClient = AnthropicOkHttpClientAsync.builder()
                 .baseUrl(provider.getBaseUrl())
                 .apiKey(provider.getApiKey())
+                .maxRetries(properties.getTransportMaxRetries())
                 .build();
         AnthropicChatModel model = AnthropicChatModel.builder()
                 .anthropicClient(syncClient)
                 .anthropicClientAsync(asyncClient)
                 .build();
         return ChatClient.builder(model).build();
+    }
+
+    @PreDestroy
+    void shutdownSlotExecutor() {
+        slotExecutor.shutdownNow();
     }
 }

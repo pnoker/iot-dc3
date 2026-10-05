@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +27,8 @@ class OpenAiCompatibleAgenticRuntimeTest {
 
     @Test
     void assistantToolCallMessagePreservesReasoningContentForProviderContinuation() {
-        OpenAiCompatibleAgenticRuntime runtime = new OpenAiCompatibleAgenticRuntime(null, null, null, null);
+        OpenAiCompatibleAgenticRuntime runtime =
+                new OpenAiCompatibleAgenticRuntime(null, null, null, null, new AgenticProperties());
 
         ChatCompletionMessageParam message = runtime.assistantToolCallMessage(
                 null,
