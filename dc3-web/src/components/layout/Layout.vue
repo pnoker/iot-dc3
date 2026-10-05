@@ -99,14 +99,22 @@
                 text
                 @click="agenticStore.toggle()"
               >
-                <!-- Four-point sparkle: the AI glyph, floating above a
-                     siri-gradient "water ball" whose level bobs like liquid. -->
+                <!-- One four-point sparkle filled with the platform brand
+                     gradient (--dc3-brand-gradient): the AI glyph in the same
+                     colour language as the rest of the header. Static at rest;
+                     motion carries state — hover tilts like the settings
+                     gear, an open panel breathes. -->
                 <svg aria-hidden="true" class="assistant-sparkle" viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="dc3-spark-gradient" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#087fbd" />
+                      <stop offset="50%" stop-color="#15a3d8" />
+                      <stop offset="100%" stop-color="#5558c9" />
+                    </linearGradient>
+                  </defs>
                   <path
+                    fill="url(#dc3-spark-gradient)"
                     d="M12 1.5c1 8.4 2.1 11.6 10.5 12.5-8.4.9-9.5 4.1-10.5 12.5-1-8.4-2.1-11.6-10.5-12.5C9.9 13.1 11 9.9 12 1.5Z"
-                  />
-                  <path
-                    d="M19.5 2c.3 2.3.85 3.3 3.1 3.65-2.25.35-2.8 1.35-3.1 3.65-.3-2.3-.85-3.3-3.1-3.65 2.25-.35 2.8-1.35 3.1-3.65Z"
                   />
                 </svg>
               </el-button>
@@ -750,94 +758,54 @@ const handleCommand = async (command: string) => {
       position: relative;
       width: 32px;
       height: 32px;
-      overflow: hidden;
       border: 1px solid var(--dc3-border-base);
       background: var(--dc3-bg-interactive);
       transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
 
       .assistant-sparkle {
-        position: relative;
-        z-index: 2;
+        display: block;
         width: 19px;
         height: 19px;
-        fill: var(--el-color-white);
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28));
+        transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard), filter var(--dc3-duration-fast) var(--dc3-ease-standard);
       }
 
-      // The liquid body: oversized so translateY reads as a moving water
-      // level, with a wave-shaped surface (border-radius) that tilts.
-      &::before {
-        content: '';
-        position: absolute;
-        right: -30%;
-        bottom: -70%;
-        left: -30%;
-        z-index: 1;
-        height: 150%;
-        border-radius: 42% 46% 0 0 / 26% 30% 0 0;
-        background: linear-gradient(
-          120deg,
-          #00c6ff 0%,
-          #6f5cff 28%,
-          #c44dff 52%,
-          #ff5c8a 76%,
-          #ffb347 100%
-        );
-        background-size: 260% 260%;
-        transform-origin: 50% 100%;
-        animation:
-          assistant-water-bob 3.4s ease-in-out infinite alternate,
-          assistant-gradient-flow 8s linear infinite;
-      }
-
+      // Motion carries state: hover tilts the sparkle like the settings
+      // gear hover, an open panel breathes slowly, and at rest the glyph
+      // is perfectly still.
       &:hover,
       &:focus-visible {
         transform: translateY(-1px);
 
-        &::before {
-          animation-duration: 2.2s, 5s;
+        .assistant-sparkle {
+          filter: brightness(1.12);
         }
       }
 
-      // Panel open: the water sits higher — the "filled" state.
-      &.is-active::before {
-        bottom: -52%;
+      &:hover .assistant-sparkle,
+      &:focus-visible .assistant-sparkle {
+        transform: rotate(18deg);
+      }
+
+      &.is-active .assistant-sparkle {
+        animation: assistant-spark-breathe 2.4s ease-in-out infinite alternate;
       }
     }
 
-    @keyframes assistant-water-bob {
-      0% {
-        transform: translateY(10%) rotate(-5deg);
-      }
-
-      50% {
-        transform: translateY(2%) rotate(3deg);
-      }
-
-      100% {
-        transform: translateY(-6%) rotate(6deg);
-      }
-    }
-
-    @keyframes assistant-gradient-flow {
+    @keyframes assistant-spark-breathe {
       from {
-        background-position: 0% 50%;
+        transform: scale(1);
       }
 
       to {
-        background-position: 260% 50%;
+        transform: scale(1.08);
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
       .header_assistant_button,
-      .header_assistant_button::before {
+      .header_assistant_button .assistant-sparkle {
         transition: none;
         animation: none;
-      }
-
-      .header_assistant_button::before {
-        transform: translateY(4%);
       }
     }
 
