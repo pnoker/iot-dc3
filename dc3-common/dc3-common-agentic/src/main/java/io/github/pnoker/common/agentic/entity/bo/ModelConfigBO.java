@@ -18,8 +18,10 @@ package io.github.pnoker.common.agentic.entity.bo;
 
 import io.github.pnoker.common.entity.base.BaseBO;
 import io.github.pnoker.common.entity.common.TenantOwned;
+import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,6 +64,16 @@ public class ModelConfigBO extends BaseBO implements TenantOwned {
     private DefaultFlagEnum defaultFlag;
 
     private EnableFlagEnum enableFlag;
+
+    private ConnectivityStatusEnum lastCheckStatus;
+
+    private LocalDateTime lastCheckTime;
+
+    private Integer lastCheckLatencyMs;
+
+    private String lastCheckErrorType;
+
+    private String lastCheckErrorMessage;
 
     private Long tenantId;
 }

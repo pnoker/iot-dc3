@@ -272,19 +272,43 @@ CREATE TABLE dc3_model_provider
     operator_id    BIGINT       DEFAULT 0 NOT NULL,                 -- Operator ID
     operator_name  TEXT         DEFAULT ''::TEXT NOT NULL,          -- Operator name
     operate_time   TIMESTAMPTZ  DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    last_check_status        SMALLINT,                                   -- Last connectivity check status, NULL: not checked, 1: pass, 2: fail
+    last_check_time          TIMESTAMPTZ,                                -- Last connectivity check completion time (UTC)
+    last_check_latency_ms    INTEGER,                                    -- Last connectivity check round-trip latency in milliseconds
+    last_check_error_type    VARCHAR(32),                                -- Last connectivity check error type code, e.g. AUTH_FAILED
+    last_check_error_message VARCHAR(255),                               -- Last connectivity check sanitized error message, never contains credentials
+    last_check_model         VARCHAR(128),                               -- Model identifier used by the last L2 chat probe
     deleted        SMALLINT     DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_model_provider_provider_type CHECK (provider_type BETWEEN 0 AND 1),
     CONSTRAINT chk_model_provider_default_flag CHECK (default_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_model_provider_enable_flag CHECK (enable_flag IN (0, 1)),
+    CONSTRAINT chk_model_provider_last_check_status CHECK (last_check_status IS NULL OR last_check_status IN (1, 2)),
     CONSTRAINT chk_model_provider_deleted CHECK (deleted IN (0, 1))
 );
 
 CREATE UNIQUE INDEX idx_model_provider_tenant_name_active ON dc3_model_provider (tenant_id, name) WHERE deleted = 0;
 
+-- Bump operate_time only when a non-health-profile column changes, so last_check_* narrow updates do not pollute the config-edit timestamp.
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
     ON dc3_model_provider
     FOR EACH ROW
+    WHEN (NEW.id IS DISTINCT FROM OLD.id
+        OR NEW.name IS DISTINCT FROM OLD.name
+        OR NEW.provider_type IS DISTINCT FROM OLD.provider_type
+        OR NEW.base_url IS DISTINCT FROM OLD.base_url
+        OR NEW.api_key IS DISTINCT FROM OLD.api_key
+        OR NEW.default_flag IS DISTINCT FROM OLD.default_flag
+        OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag
+        OR NEW.tenant_id IS DISTINCT FROM OLD.tenant_id
+        OR NEW.remark IS DISTINCT FROM OLD.remark
+        OR NEW.creator_id IS DISTINCT FROM OLD.creator_id
+        OR NEW.creator_name IS DISTINCT FROM OLD.creator_name
+        OR NEW.create_time IS DISTINCT FROM OLD.create_time
+        OR NEW.operator_id IS DISTINCT FROM OLD.operator_id
+        OR NEW.operator_name IS DISTINCT FROM OLD.operator_name
+        OR NEW.operate_time IS DISTINCT FROM OLD.operate_time
+        OR NEW.deleted IS DISTINCT FROM OLD.deleted)
     EXECUTE FUNCTION update_operate_time();
 
 COMMENT ON TABLE dc3_model_provider IS 'Agentic model provider connection metadata';
@@ -303,6 +327,12 @@ COMMENT ON COLUMN dc3_model_provider.create_time IS 'Creation time';
 COMMENT ON COLUMN dc3_model_provider.operator_id IS 'Operator ID';
 COMMENT ON COLUMN dc3_model_provider.operator_name IS 'Operator name';
 COMMENT ON COLUMN dc3_model_provider.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_model_provider.last_check_status IS 'Last connectivity check status, NULL: not checked, 1: pass, 2: fail';
+COMMENT ON COLUMN dc3_model_provider.last_check_time IS 'Last connectivity check completion time (UTC)';
+COMMENT ON COLUMN dc3_model_provider.last_check_latency_ms IS 'Last connectivity check round-trip latency in milliseconds';
+COMMENT ON COLUMN dc3_model_provider.last_check_error_type IS 'Last connectivity check error type code, e.g. AUTH_FAILED';
+COMMENT ON COLUMN dc3_model_provider.last_check_error_message IS 'Last connectivity check sanitized error message, never contains credentials';
+COMMENT ON COLUMN dc3_model_provider.last_check_model IS 'Model identifier used by the last L2 chat probe';
 COMMENT ON COLUMN dc3_model_provider.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------
@@ -330,9 +360,15 @@ CREATE TABLE dc3_model_config
     operator_id    BIGINT            DEFAULT 0 NOT NULL,                 -- Operator ID
     operator_name  TEXT              DEFAULT ''::TEXT NOT NULL,          -- Operator name
     operate_time   TIMESTAMPTZ       DEFAULT CURRENT_TIMESTAMP NOT NULL, -- Operation time
+    last_check_status        SMALLINT,                                   -- Last connectivity check status, NULL: not checked, 1: pass, 2: fail
+    last_check_time          TIMESTAMPTZ,                                -- Last connectivity check completion time (UTC)
+    last_check_latency_ms    INTEGER,                                    -- Last connectivity check round-trip latency in milliseconds
+    last_check_error_type    VARCHAR(32),                                -- Last connectivity check error type code, e.g. AUTH_FAILED
+    last_check_error_message VARCHAR(255),                               -- Last connectivity check sanitized error message, never contains credentials
     deleted        SMALLINT          DEFAULT 0 NOT NULL,                 -- Logical delete flag, 0: not deleted, 1: deleted
     CONSTRAINT chk_model_config_default_flag CHECK (default_flag BETWEEN 0 AND 1),
     CONSTRAINT chk_model_config_enable_flag CHECK (enable_flag IN (0, 1)),
+    CONSTRAINT chk_model_config_last_check_status CHECK (last_check_status IS NULL OR last_check_status IN (1, 2)),
     CONSTRAINT chk_model_config_deleted CHECK (deleted IN (0, 1))
 );
 
@@ -340,10 +376,32 @@ CREATE UNIQUE INDEX idx_model_config_tenant_model_active ON dc3_model_config (te
 CREATE INDEX idx_model_config_provider ON dc3_model_config (provider_id) WHERE deleted = 0;
 CREATE INDEX idx_model_config_enable ON dc3_model_config (enable_flag, default_flag) WHERE deleted = 0;
 
+-- Bump operate_time only when a non-health-profile column changes, so last_check_* narrow updates do not pollute the config-edit timestamp.
 CREATE TRIGGER update_operate_time_trigger
     BEFORE UPDATE
     ON dc3_model_config
     FOR EACH ROW
+    WHEN (NEW.id IS DISTINCT FROM OLD.id
+        OR NEW.model IS DISTINCT FROM OLD.model
+        OR NEW.label IS DISTINCT FROM OLD.label
+        OR NEW.provider_id IS DISTINCT FROM OLD.provider_id
+        OR NEW.stream IS DISTINCT FROM OLD.stream
+        OR NEW.tool_call IS DISTINCT FROM OLD.tool_call
+        OR NEW.vision IS DISTINCT FROM OLD.vision
+        OR NEW.reasoning IS DISTINCT FROM OLD.reasoning
+        OR NEW.temperature IS DISTINCT FROM OLD.temperature
+        OR NEW.max_tokens IS DISTINCT FROM OLD.max_tokens
+        OR NEW.default_flag IS DISTINCT FROM OLD.default_flag
+        OR NEW.enable_flag IS DISTINCT FROM OLD.enable_flag
+        OR NEW.tenant_id IS DISTINCT FROM OLD.tenant_id
+        OR NEW.remark IS DISTINCT FROM OLD.remark
+        OR NEW.creator_id IS DISTINCT FROM OLD.creator_id
+        OR NEW.creator_name IS DISTINCT FROM OLD.creator_name
+        OR NEW.create_time IS DISTINCT FROM OLD.create_time
+        OR NEW.operator_id IS DISTINCT FROM OLD.operator_id
+        OR NEW.operator_name IS DISTINCT FROM OLD.operator_name
+        OR NEW.operate_time IS DISTINCT FROM OLD.operate_time
+        OR NEW.deleted IS DISTINCT FROM OLD.deleted)
     EXECUTE FUNCTION update_operate_time();
 
 COMMENT ON TABLE dc3_model_config IS 'Agentic model option metadata';
@@ -367,6 +425,11 @@ COMMENT ON COLUMN dc3_model_config.create_time IS 'Creation time';
 COMMENT ON COLUMN dc3_model_config.operator_id IS 'Operator ID';
 COMMENT ON COLUMN dc3_model_config.operator_name IS 'Operator name';
 COMMENT ON COLUMN dc3_model_config.operate_time IS 'Operation time';
+COMMENT ON COLUMN dc3_model_config.last_check_status IS 'Last connectivity check status, NULL: not checked, 1: pass, 2: fail';
+COMMENT ON COLUMN dc3_model_config.last_check_time IS 'Last connectivity check completion time (UTC)';
+COMMENT ON COLUMN dc3_model_config.last_check_latency_ms IS 'Last connectivity check round-trip latency in milliseconds';
+COMMENT ON COLUMN dc3_model_config.last_check_error_type IS 'Last connectivity check error type code, e.g. AUTH_FAILED';
+COMMENT ON COLUMN dc3_model_config.last_check_error_message IS 'Last connectivity check sanitized error message, never contains credentials';
 COMMENT ON COLUMN dc3_model_config.deleted IS 'Logical delete flag, 0: not deleted, 1: deleted';
 
 -- ----------------------------

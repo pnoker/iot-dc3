@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,7 @@ class ModelProviderServiceImplTest {
     @BeforeEach
     void setUp() {
         service = new ModelProviderServiceImpl(modelProviderStore, chatClientFactory);
+        lenient().when(modelProviderStore.clearCheckProfile(any(), any())).thenReturn(Mono.just(true));
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
         header.setPrincipalId(2L);
@@ -131,6 +133,36 @@ class ModelProviderServiceImplTest {
         when(modelProviderStore.delete(42L, header)).thenReturn(Mono.just(true));
         StepVerifier.create(service.delete(42L, header)).verifyComplete();
         verify(chatClientFactory).evict(42L);
+    }
+
+    @Test
+    void updateClearsHealthProfileWhenBaseUrlChanges() {
+        ModelProviderBO existing = provider(7L);
+        existing.setBaseUrl("https://old");
+        ModelProviderBO updated = provider(7L);
+        when(modelProviderStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(modelProviderStore.update(any(ModelProviderBO.class), any())).thenReturn(Mono.just(updated));
+
+        StepVerifier.create(service.update(updated, header)).expectNext(updated).verifyComplete();
+
+        verify(modelProviderStore).clearCheckProfile(7L, header);
+    }
+
+    @Test
+    void updateKeepsHealthProfileWhenOnlyRemarkChanges() {
+        ModelProviderBO existing = provider(7L);
+        existing.setProviderType(io.github.pnoker.common.enums.AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
+        existing.setApiKey("stored-key");
+        ModelProviderBO updated = provider(7L);
+        updated.setProviderType(io.github.pnoker.common.enums.AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
+        updated.setApiKey("stored-key");
+        updated.setRemark("new remark");
+        when(modelProviderStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(modelProviderStore.update(any(ModelProviderBO.class), any())).thenReturn(Mono.just(updated));
+
+        StepVerifier.create(service.update(updated, header)).expectNext(updated).verifyComplete();
+
+        verify(modelProviderStore, never()).clearCheckProfile(any(), any());
     }
 
     private ModelProviderBO provider(Long id) {

@@ -98,11 +98,15 @@
       <div class="things-dialog-footer">
         <el-button :disabled="submitting" @click="requestClose()">{{ $t('common.cancel') }}</el-button>
         <el-button :disabled="submitting" plain @click="onReset">{{ $t('common.reset') }}</el-button>
+        <el-button :disabled="submitting || checking" :loading="checking" plain @click="onCheck">
+          {{ checking ? $t('settings.agentic.checking') : $t('settings.agentic.testConnection') }}
+        </el-button>
         <el-button :loading="submitting" type="primary" @click="onSubmit">
           {{ $t('common.confirm') }}
         </el-button>
       </div>
     </template>
+    <provider-check-result-dialog ref="checkResultRef"/>
   </el-dialog>
 </template>
 
@@ -113,11 +117,13 @@ import type {FormInstance, FormRules} from 'element-plus';
 import {ElMessageBox} from 'element-plus';
 
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
-import type {AgenticProvider} from '@/config/types';
+import {checkAgenticProvider} from '@/api/agentic';
+import type {AgenticProvider, AgenticProviderCheckRequest} from '@/config/types';
 import {remarkRules} from '@/utils/formRuleUtil';
 import {enableFlagValue} from '@/utils/thingModelFormatUtil';
 
 import {AGENTIC_PROVIDER_TYPES} from '../providerTypes';
+import providerCheckResultDialog from '../check/ProviderCheckResultDialog.vue';
 
 const providerTypes = AGENTIC_PROVIDER_TYPES;
 
@@ -128,8 +134,10 @@ const emit = defineEmits<{
 const visible = ref(false);
 const isEdit = ref(false);
 const submitting = ref(false);
+const checking = ref(false);
 const saveError = ref(false);
 const formRef = ref<FormInstance>();
+const checkResultRef = ref<InstanceType<typeof providerCheckResultDialog>>();
 const {t} = useI18n();
 
 const initialForm = (): AgenticProvider & { apiKey?: string } => ({
@@ -250,6 +258,38 @@ const onSubmit = async () => {
   } catch {
     submitting.value = false;
     saveError.value = true;
+  }
+};
+
+const onCheck = async () => {
+  if (checking.value || submitting.value) return;
+  const session = formSession;
+  if (!visible.value) return;
+  try {
+    await formRef.value?.validate();
+    if (session !== formSession || !visible.value) return;
+  } catch {
+    return;
+  }
+  checking.value = true;
+  try {
+    // Draft check on the current form values: in edit mode the id lets blank
+    // fields (an untouched API key) fall back to the stored provider values.
+    const payload: AgenticProviderCheckRequest = isEdit.value
+      ? {
+          id: form.id,
+          providerType: form.providerType,
+          baseUrl: form.baseUrl,
+          ...(form.apiKey?.trim() ? {apiKey: form.apiKey} : {}),
+        }
+      : {providerType: form.providerType, baseUrl: form.baseUrl, apiKey: form.apiKey ?? ''};
+    const result = await checkAgenticProvider(payload);
+    if (session !== formSession) return;
+    checkResultRef.value?.show(result);
+  } catch {
+    // handled globally
+  } finally {
+    if (session === formSession) checking.value = false;
   }
 };
 

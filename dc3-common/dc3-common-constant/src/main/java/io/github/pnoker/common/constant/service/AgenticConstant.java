@@ -294,6 +294,61 @@ public class AgenticConstant {
     }
 
     /**
+     * Agentic provider/model connectivity check constants.
+     *
+     * @author pnoker
+     * @since 2016.10.1
+     */
+    public static class Check {
+
+        /**
+         * User message sent by the L2 minimal chat probe. Judged by HTTP status
+         * only, never by content quality.
+         */
+        public static final String PROBE_PROMPT = "ping";
+
+        /**
+         * Max tokens requested by the L2 minimal chat probe. Keeps the probe
+         * cost at roughly one output token per run.
+         */
+        public static final long PROBE_MAX_TOKENS = 1L;
+
+        /**
+         * Credential placeholder sent when the provider has no API key: local
+         * endpoints (Ollama/vLLM/LM Studio) ignore auth, the openai-java SDK
+         * refuses to send a request with an empty key, and an explicit value
+         * keeps the builder from falling back to the OPENAI_API_KEY env var.
+         * Cloud upstreams reject it with 401, which the check classifies as
+         * NO_KEY_CONFIGURED.
+         */
+        public static final String NO_KEY_PLACEHOLDER = "no-key-configured";
+
+        /**
+         * Result dimension: the base URL is reachable and TLS terminates.
+         */
+        public static final String DIMENSION_CONNECTIVITY = "CONNECTIVITY";
+
+        /**
+         * Result dimension: the upstream accepted the credentials.
+         */
+        public static final String DIMENSION_AUTH = "AUTH";
+
+        /**
+         * Result dimension: the target model id is visible to the key.
+         */
+        public static final String DIMENSION_MODEL_VISIBLE = "MODEL_VISIBLE";
+
+        /**
+         * Result dimension: a minimal end-to-end completion succeeded.
+         */
+        public static final String DIMENSION_INFERENCE = "INFERENCE";
+
+        private Check() {
+            throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
+        }
+    }
+
+    /**
      * Agentic runtime event constants.
      *
      * @author pnoker

@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.config.AgenticProperties;
+import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
@@ -30,6 +31,7 @@ import io.github.pnoker.common.exception.RequestException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,6 +46,7 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     private final ReactiveModelConfigStore modelConfigStore;
     private final ReactiveModelProviderStore modelProviderStore;
     private final AgenticProperties properties;
+    private final ChatClientFactory chatClientFactory;
 
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
@@ -102,19 +105,48 @@ public class ModelConfigServiceImpl implements ModelConfigService {
             return validate(entityBO, header)
                     .then(Mono.defer(() -> modelConfigStore.get(entityBO.getId(), header)))
                     .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")))
-                    .map(existing -> normalize(entityBO, existing, header))
-                    .flatMap(value -> Mono.defer(() -> modelConfigStore.update(value, header)))
-                    .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")));
+                    .flatMap(existing -> {
+                        ModelConfigBO value = normalize(entityBO, existing, header);
+                        boolean probeRelevantChanged = probeRelevantChanged(existing, value);
+                        return Mono.defer(() -> modelConfigStore.update(value, header))
+                                .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")))
+                                .doOnNext(updated -> {
+                                    chatClientFactory.evict(existing.getProviderId());
+                                    if (!Objects.equals(existing.getProviderId(), updated.getProviderId())) {
+                                        chatClientFactory.evict(updated.getProviderId());
+                                    }
+                                })
+                                .flatMap(updated -> probeRelevantChanged
+                                        ? modelConfigStore
+                                                .clearCheckProfile(updated.getId(), header)
+                                                .thenReturn(updated)
+                                        : Mono.just(updated));
+                    });
         });
     }
 
     @Override
     public Mono<Void> delete(Long id, RequestHeader.PrincipalHeader header) {
         return modelConfigStore
-                .delete(id, header)
-                .flatMap(deleted -> deleted
-                        ? Mono.<Void>empty()
-                        : Mono.error(new NotFoundException("Model config does not exist")));
+                .get(id, header)
+                .switchIfEmpty(Mono.error(new NotFoundException("Model config does not exist")))
+                .flatMap(existing -> modelConfigStore.delete(id, header).flatMap(deleted -> {
+                    if (!deleted) return Mono.error(new NotFoundException("Model config does not exist"));
+                    chatClientFactory.evict(existing.getProviderId());
+                    return Mono.<Void>empty();
+                }));
+    }
+
+    /**
+     * Whether the update changes fields the last connectivity profile depends
+     * on: model id, sampling parameters or the bound provider. Such changes
+     * invalidate the stored health profile.
+     */
+    private boolean probeRelevantChanged(ModelConfigBO existing, ModelConfigBO value) {
+        return !Objects.equals(existing.getModel(), value.getModel())
+                || !Objects.equals(existing.getProviderId(), value.getProviderId())
+                || !Objects.equals(existing.getTemperature(), value.getTemperature())
+                || !Objects.equals(existing.getMaxTokens(), value.getMaxTokens());
     }
 
     private Mono<Void> validate(ModelConfigBO entityBO, RequestHeader.PrincipalHeader header) {

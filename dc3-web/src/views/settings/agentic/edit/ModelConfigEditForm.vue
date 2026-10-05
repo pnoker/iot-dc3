@@ -39,13 +39,20 @@
     />
     <el-form ref="formRef" v-loading="submitting" :aria-busy="submitting" :model="form" :rules="rules" label-position="top">
       <el-form-item :label="$t('settings.agentic.model')" prop="model">
-        <el-input
+        <el-select
           v-model="form.model"
           :disabled="submitting"
+          :loading="modelLoading"
           :placeholder="$t('settings.agentic.modelPlaceholder')"
+          allow-create
           clearable
-          maxlength="128"
-        />
+          default-first-option
+          filterable
+          style="width: 100%"
+          @focus="onModelFocus"
+        >
+          <el-option v-for="m in modelOptions" :key="m" :label="m" :value="m"/>
+        </el-select>
       </el-form-item>
       <el-form-item :label="$t('settings.agentic.label')" prop="label">
         <el-input
@@ -110,11 +117,12 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeUnmount, reactive, ref} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
 import type {FormInstance, FormRules} from 'element-plus';
 import {ElMessageBox} from 'element-plus';
 
+import {checkAgenticProvider} from '@/api/agentic';
 import EnableFlagSegmented from '@/components/segmented/EnableFlagSegmented.vue';
 import type {AgenticModelConfig, AgenticProvider} from '@/config/types';
 import {remarkRules} from '@/utils/formRuleUtil';
@@ -133,6 +141,8 @@ const isEdit = ref(false);
 const submitting = ref(false);
 const saveError = ref(false);
 const formRef = ref<FormInstance>();
+const modelOptions = ref<string[]>([]);
+const modelLoading = ref(false);
 const {t} = useI18n();
 
 const initialForm = (): AgenticModelConfig => ({
@@ -179,6 +189,7 @@ const show = () => {
   initialFormValue.value = {...form};
   saveError.value = false;
   submitting.value = false;
+  resetModelOptions();
   visible.value = true;
 };
 
@@ -196,8 +207,51 @@ const showEdit = (row: AgenticModelConfig) => {
   initialFormValue.value = {...form};
   saveError.value = false;
   submitting.value = false;
+  resetModelOptions();
+  void loadModelOptions();
   visible.value = true;
 };
+
+/**
+ * Model ids the currently selected provider exposes, fetched with the L1
+ * model-list probe. The field stays freely typeable (allow-create) so an
+ * unreachable provider or an unlisted model never blocks saving.
+ */
+const loadModelOptions = async () => {
+  const providerId = form.providerId ? String(form.providerId) : '';
+  if (!providerId || modelLoading.value) return;
+  const session = formSession;
+  modelLoading.value = true;
+  try {
+    const result = await checkAgenticProvider({id: providerId, level: 'L1'});
+    if (session !== formSession) return;
+    const models = result.l1?.models ?? [];
+    // Keep the stored model selectable even when the list does not contain it.
+    modelOptions.value = form.model && !models.includes(form.model) ? [form.model, ...models] : models;
+  } catch {
+    // handled globally; typing a model id manually remains possible
+  } finally {
+    if (session === formSession) modelLoading.value = false;
+  }
+};
+
+const resetModelOptions = () => {
+  modelOptions.value = form.model ? [form.model] : [];
+  modelLoading.value = false;
+};
+
+const onModelFocus = () => {
+  if (!modelOptions.value.length && !modelLoading.value) void loadModelOptions();
+};
+
+watch(
+  () => form.providerId,
+  () => {
+    if (!visible.value) return;
+    resetModelOptions();
+    if (form.providerId) void loadModelOptions();
+  }
+);
 
 const onClosed = () => {
   formSession += 1;

@@ -82,6 +82,26 @@ export const agenticProviders: AgenticProvider[] = providerDefs.map((p, i) => ({
   remark: p.remark,
   createTime: CREATED,
   operateTime: UPDATED,
+  // Health-profile demo states: OpenAI passes, DeepSeek passes, Anthropic fails
+  // auth, Qwen never checked.
+  ...(i === 0 || i === 1
+    ? {
+        lastCheckStatus: 'PASS' as const,
+        lastCheckTime: UPDATED,
+        lastCheckLatencyMs: 320 + i * 90,
+        lastCheckModel: i === 0 ? 'gpt-4o' : 'deepseek-chat',
+      }
+    : {}),
+  ...(i === 2
+    ? {
+        lastCheckStatus: 'FAIL' as const,
+        lastCheckTime: UPDATED,
+        lastCheckLatencyMs: 412,
+        lastCheckErrorType: 'AUTH_FAILED',
+        lastCheckErrorMessage: 'HTTP 401 from api.anthropic.com',
+        lastCheckModel: 'claude-sonnet-4-6',
+      }
+    : {}),
 }));
 
 // ─── Agentic model configs ──────────────────────────────────────────

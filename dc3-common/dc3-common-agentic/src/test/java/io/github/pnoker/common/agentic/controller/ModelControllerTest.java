@@ -20,9 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.agentic.entity.builder.ConnectivityCheckBuilder;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.agentic.service.check.AgenticConnectivityCheckService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.security.GatewayAuthenticationToken;
 import java.util.List;
@@ -44,11 +46,18 @@ class ModelControllerTest {
     @Mock
     private ModelConfigService modelConfigService;
 
+    @Mock
+    private AgenticConnectivityCheckService connectivityCheckService;
+
+    @Mock
+    private ConnectivityCheckBuilder connectivityCheckBuilder;
+
     private ModelController controller;
 
     @BeforeEach
     void setUp() {
-        controller = new ModelController(modelConfigBuilder, modelConfigService);
+        controller = new ModelController(
+                modelConfigBuilder, modelConfigService, connectivityCheckService, connectivityCheckBuilder);
     }
 
     @Test

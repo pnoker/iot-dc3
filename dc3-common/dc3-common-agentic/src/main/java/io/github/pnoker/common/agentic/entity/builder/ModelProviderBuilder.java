@@ -32,7 +32,13 @@ import org.mapstruct.MappingTarget;
         uses = {MapStructUtil.class})
 public interface ModelProviderBuilder {
 
-    /** Convert the value object into its business-object form. */
+    /** Convert the value object into its business-object form; the health profile never crosses from requests. */
+    @Mapping(target = "lastCheckStatus", ignore = true)
+    @Mapping(target = "lastCheckTime", ignore = true)
+    @Mapping(target = "lastCheckLatencyMs", ignore = true)
+    @Mapping(target = "lastCheckErrorType", ignore = true)
+    @Mapping(target = "lastCheckErrorMessage", ignore = true)
+    @Mapping(target = "lastCheckModel", ignore = true)
     ModelProviderBO buildBOByVO(ModelProviderVO entityVO);
 
     /** Convert the value objects into their business-object forms. */

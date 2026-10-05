@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.repository;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
+import io.github.pnoker.common.agentic.entity.model.ConnectivityCheckProfile;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -38,4 +39,17 @@ public interface ReactiveModelProviderStore {
 
     /** Delete the model provider, reporting whether a row was removed. */
     Mono<Boolean> delete(Long id, RequestHeader.PrincipalHeader header);
+
+    /**
+     * Overwrite the provider's {@code last_check_*} health profile, reporting
+     * whether a row was updated. Touches no other column.
+     */
+    Mono<Boolean> updateCheckProfile(Long id, ConnectivityCheckProfile profile, RequestHeader.PrincipalHeader header);
+
+    /**
+     * Null out the provider's {@code last_check_*} health profile (called when a
+     * connectivity-relevant config field changes), reporting whether a row was
+     * updated.
+     */
+    Mono<Boolean> clearCheckProfile(Long id, RequestHeader.PrincipalHeader header);
 }

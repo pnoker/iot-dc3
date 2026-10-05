@@ -29,6 +29,7 @@ import io.github.pnoker.common.exception.RequestException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -66,10 +67,19 @@ public class ModelProviderServiceImpl implements ModelProviderService {
             return modelProviderStore
                     .get(entityBO.getId(), header)
                     .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
-                    .map(existing -> normalize(entityBO, existing, header))
-                    .flatMap(value -> modelProviderStore.update(value, header))
-                    .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
-                    .doOnNext(value -> chatClientFactory.evict(value.getId()));
+                    .flatMap(existing -> {
+                        ModelProviderBO value = normalize(entityBO, existing, header);
+                        boolean connectivityChanged = connectivityChanged(existing, value);
+                        return modelProviderStore
+                                .update(value, header)
+                                .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
+                                .doOnNext(updated -> chatClientFactory.evict(updated.getId()))
+                                .flatMap(updated -> connectivityChanged
+                                        ? modelProviderStore
+                                                .clearCheckProfile(updated.getId(), header)
+                                                .thenReturn(updated)
+                                        : Mono.just(updated));
+                    });
         });
     }
 
@@ -80,6 +90,17 @@ public class ModelProviderServiceImpl implements ModelProviderService {
             chatClientFactory.evict(id);
             return Mono.<Void>empty();
         });
+    }
+
+    /**
+     * Whether the update changes fields the last connectivity profile depends
+     * on: base URL, provider type or the effective API key. Such changes
+     * invalidate the stored health profile.
+     */
+    private boolean connectivityChanged(ModelProviderBO existing, ModelProviderBO value) {
+        return !Objects.equals(existing.getBaseUrl(), value.getBaseUrl())
+                || !Objects.equals(existing.getProviderType(), value.getProviderType())
+                || !Objects.equals(existing.getApiKey(), value.getApiKey());
     }
 
     private void validate(ModelProviderBO entityBO) {

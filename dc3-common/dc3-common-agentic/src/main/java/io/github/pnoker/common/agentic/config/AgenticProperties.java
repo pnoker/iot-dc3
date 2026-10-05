@@ -91,4 +91,34 @@ public class AgenticProperties {
      * are stored under tenant/user/conversation subfolders.
      */
     private String attachmentStoragePath = "dc3/data/upload/agentic/attachment";
+
+    /**
+     * Timeout budget in seconds for the L1 model-list connectivity probe. The
+     * probe client never inherits the chat transport defaults: it builds a
+     * one-shot OkHttp client with this timeout and zero retries.
+     */
+    @Min(value = 1, message = "L1 check timeout must be greater than 0 seconds")
+    private int checkL1TimeoutSeconds = 5;
+
+    /**
+     * Timeout budget in seconds for the L2 minimal chat probe. Real completions
+     * can be slow on cold providers, hence the wider budget than L1.
+     */
+    @Min(value = 1, message = "L2 check timeout must be greater than 0 seconds")
+    private int checkL2TimeoutSeconds = 30;
+
+    /**
+     * Time-to-live in seconds for cached connectivity check results. Repeated
+     * triggers inside the window return the cached result without touching the
+     * upstream provider again.
+     */
+    @Min(value = 1, message = "Check result cache TTL must be greater than 0 seconds")
+    private int checkCacheTtlSeconds = 30;
+
+    /**
+     * Maximum model ids returned by the L1 model-list probe. The probe reads a
+     * single page and truncates; it never walks the full catalog.
+     */
+    @Min(value = 1, message = "Check max models must be greater than 0")
+    private int checkMaxModels = 100;
 }

@@ -17,9 +17,11 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import io.github.pnoker.common.entity.base.BaseVO;
+import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -86,4 +88,33 @@ public class ModelConfigVO extends BaseVO {
 
     @Schema(description = "Identifier of the tenant this model configuration belongs to.", example = "1024")
     private String tenantId;
+
+    @Schema(
+            description =
+                    "Status of the latest connectivity check against this model configuration; null when it has never been checked. Read-only: ignored on write.",
+            example = "PASS")
+    private ConnectivityStatusEnum lastCheckStatus;
+
+    @Schema(
+            description = "Completion time of the latest connectivity check. Read-only: ignored on write.",
+            example = "2026-10-04T08:30:00")
+    private LocalDateTime lastCheckTime;
+
+    @Schema(
+            description =
+                    "Round-trip latency in milliseconds of the latest connectivity check. Read-only: ignored on write.",
+            example = "840")
+    private Integer lastCheckLatencyMs;
+
+    @Schema(
+            description =
+                    "Error type code of the latest failed connectivity check, e.g. MODEL_NOT_FOUND; null when it passed. Read-only: ignored on write.",
+            example = "MODEL_NOT_FOUND")
+    private String lastCheckErrorType;
+
+    @Schema(
+            description =
+                    "Sanitized error message of the latest failed connectivity check; never contains credentials. Read-only: ignored on write.",
+            example = "HTTP 404 model not visible to this key")
+    private String lastCheckErrorMessage;
 }

@@ -240,6 +240,10 @@ const sampleArgsRegistry: Record<string, unknown[]> = {
   ],
   resetLocalCredentialPassword: ['id-1', 'secret-1'],
   checkLoginNameAvailable: ['login-1'],
+  // Connectivity check wrappers: provider check takes a draft-or-id body,
+  // model config check takes the config id as a query param.
+  checkAgenticProvider: [{id: '1024', level: 'BOTH'}],
+  checkAgenticModelConfig: ['id-1'],
   // Device-scoped dashboard wrappers: first arg is a deviceId string
   // (numeric in the sample so the path segment stays within the URL contract).
   deviceTimeseries: ['1001', {rangeKey: '24h'}],

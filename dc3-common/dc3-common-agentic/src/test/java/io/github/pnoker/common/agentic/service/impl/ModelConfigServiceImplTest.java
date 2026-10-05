@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,12 +48,17 @@ class ModelConfigServiceImplTest {
     @Mock
     private ReactiveModelProviderStore modelProviderStore;
 
+    @Mock
+    private io.github.pnoker.common.agentic.config.ChatClientFactory chatClientFactory;
+
     private ModelConfigServiceImpl service;
     private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModelConfigServiceImpl(modelConfigStore, modelProviderStore, new AgenticProperties());
+        service = new ModelConfigServiceImpl(
+                modelConfigStore, modelProviderStore, new AgenticProperties(), chatClientFactory);
+        lenient().when(modelConfigStore.clearCheckProfile(any(), any())).thenReturn(Mono.just(true));
         injectField("fallbackModel", "gpt-4o");
         injectField("fallbackTemperature", 0.7);
         injectField("fallbackMaxTokens", 2048);
@@ -146,10 +152,86 @@ class ModelConfigServiceImplTest {
         verify(modelConfigStore, never()).update(any(), any());
     }
 
+    @Test
+    void updateEvictsProviderClientCache() {
+        ModelConfigBO existing = storedConfig(7L, 1L, "gpt-4o");
+        ModelConfigBO updated = storedConfig(7L, 1L, "gpt-4o");
+        when(modelProviderStore.get(1L, header)).thenReturn(Mono.just(provider()));
+        when(modelConfigStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(modelConfigStore.update(any(ModelConfigBO.class), any())).thenReturn(Mono.just(updated));
+
+        StepVerifier.create(service.update(configWithId(7L, 1L, "gpt-4o"), header))
+                .expectNext(updated)
+                .verifyComplete();
+
+        verify(chatClientFactory).evict(1L);
+        verify(chatClientFactory, never()).evict(2L);
+    }
+
+    @Test
+    void updateEvictsBothProvidersWhenConfigIsRebound() {
+        ModelConfigBO existing = storedConfig(7L, 1L, "gpt-4o");
+        ModelConfigBO updated = storedConfig(7L, 2L, "gpt-4o");
+        when(modelProviderStore.get(2L, header)).thenReturn(Mono.just(provider()));
+        when(modelConfigStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(modelConfigStore.update(any(ModelConfigBO.class), any())).thenReturn(Mono.just(updated));
+
+        StepVerifier.create(service.update(configWithId(7L, 2L, "gpt-4o"), header))
+                .expectNext(updated)
+                .verifyComplete();
+
+        verify(chatClientFactory).evict(1L);
+        verify(chatClientFactory).evict(2L);
+    }
+
+    @Test
+    void updateClearsHealthProfileWhenProbeRelevantFieldsChange() {
+        ModelConfigBO existing = storedConfig(7L, 1L, "gpt-4o");
+        ModelConfigBO updated = storedConfig(7L, 1L, "gpt-4o-mini");
+        when(modelProviderStore.get(1L, header)).thenReturn(Mono.just(provider()));
+        when(modelConfigStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(modelConfigStore.update(any(ModelConfigBO.class), any())).thenReturn(Mono.just(updated));
+
+        StepVerifier.create(service.update(configWithId(7L, 1L, "gpt-4o-mini"), header))
+                .expectNext(updated)
+                .verifyComplete();
+
+        verify(modelConfigStore).clearCheckProfile(7L, header);
+    }
+
+    @Test
+    void deleteEvictsProviderClientCache() {
+        when(modelConfigStore.get(42L, header)).thenReturn(Mono.just(storedConfig(42L, 5L, "gpt-4o")));
+        when(modelConfigStore.delete(42L, header)).thenReturn(Mono.just(true));
+
+        StepVerifier.create(service.delete(42L, header)).verifyComplete();
+
+        verify(chatClientFactory).evict(5L);
+    }
+
     private ModelConfigBO config(Long providerId) {
         ModelConfigBO config = new ModelConfigBO();
         config.setModel("gpt-4o");
         config.setProviderId(providerId);
+        return config;
+    }
+
+    private ModelConfigBO configWithId(Long id, Long providerId, String model) {
+        ModelConfigBO config = config(providerId);
+        config.setId(id);
+        config.setModel(model);
+        return config;
+    }
+
+    private ModelConfigBO storedConfig(Long id, Long providerId, String model) {
+        ModelConfigBO config = configWithId(id, providerId, model);
+        config.setStream(true);
+        config.setToolCall(true);
+        config.setVision(false);
+        config.setReasoning(false);
+        config.setTemperature(0.7);
+        config.setMaxTokens(2048);
+        config.setTenantId(header.getTenantId());
         return config;
     }
 

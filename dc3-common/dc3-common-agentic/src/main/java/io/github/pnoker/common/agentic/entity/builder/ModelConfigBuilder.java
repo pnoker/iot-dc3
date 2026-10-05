@@ -21,6 +21,7 @@ import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.utils.MapStructUtil;
 import java.util.List;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /** MapStruct builder converting between model configuration business and API objects. */
 @Mapper(
@@ -28,7 +29,12 @@ import org.mapstruct.Mapper;
         uses = {MapStructUtil.class})
 public interface ModelConfigBuilder {
 
-    /** Convert the value object into its business-object form. */
+    /** Convert the value object into its business-object form; the health profile never crosses from requests. */
+    @Mapping(target = "lastCheckStatus", ignore = true)
+    @Mapping(target = "lastCheckTime", ignore = true)
+    @Mapping(target = "lastCheckLatencyMs", ignore = true)
+    @Mapping(target = "lastCheckErrorType", ignore = true)
+    @Mapping(target = "lastCheckErrorMessage", ignore = true)
     ModelConfigBO buildBOByVO(ModelConfigVO entityVO);
 
     /** Convert the value objects into their business-object forms. */

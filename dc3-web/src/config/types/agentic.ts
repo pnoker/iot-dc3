@@ -42,6 +42,13 @@ export interface AgenticProvider {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+  /** Latest connectivity check outcome; absent when never checked. */
+  lastCheckStatus?: AgenticConnectivityStatus;
+  lastCheckTime?: string;
+  lastCheckLatencyMs?: number;
+  lastCheckErrorType?: string;
+  lastCheckErrorMessage?: string;
+  lastCheckModel?: string;
 
   [key: string]: unknown;
 }
@@ -74,8 +81,64 @@ export interface AgenticModelConfig {
   remark?: string;
   createTime?: string;
   operateTime?: string;
+  /** Latest connectivity check outcome; absent when never checked. */
+  lastCheckStatus?: AgenticConnectivityStatus;
+  lastCheckTime?: string;
+  lastCheckLatencyMs?: number;
+  lastCheckErrorType?: string;
+  lastCheckErrorMessage?: string;
 
   [key: string]: unknown;
+}
+
+/**
+ * Connectivity check status union: PASS/FAIL persist on the entity, SKIPPED only
+ * appears in check results for levels that were not requested.
+ */
+export type AgenticConnectivityStatus = 'PASS' | 'FAIL' | 'SKIPPED';
+
+/**
+ * Connectivity check probe level.
+ */
+export type AgenticCheckLevel = 'L1' | 'L2' | 'BOTH';
+
+/**
+ * Provider connectivity check request: probe a saved provider by id (blank
+ * fields fall back to stored values) or an unsaved draft configuration.
+ */
+export interface AgenticProviderCheckRequest {
+  id?: string;
+  providerType?: string;
+  baseUrl?: string;
+  /** Write-only; absent means "use the stored key", empty string probes with no key. */
+  apiKey?: string;
+  model?: string;
+  level?: AgenticCheckLevel;
+}
+
+/**
+ * Outcome of one probe level (L1 or L2).
+ */
+export interface AgenticCheckLevelResult {
+  status: AgenticConnectivityStatus;
+  latencyMs?: number;
+  errorType?: string;
+  message?: string;
+  upstreamStatus?: number;
+  models?: string[];
+  model?: string;
+}
+
+/**
+ * Provider connectivity check result. The endpoint always answers HTTP 200;
+ * a failed probe is a diagnosis, not a transport error.
+ */
+export interface AgenticProviderCheckResult {
+  overall: AgenticConnectivityStatus;
+  l1: AgenticCheckLevelResult;
+  l2: AgenticCheckLevelResult;
+  dimensions: string[];
+  checkedAt?: string;
 }
 
 /**

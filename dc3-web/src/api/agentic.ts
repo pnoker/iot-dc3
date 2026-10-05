@@ -26,6 +26,8 @@ import type {
   AgenticModel,
   AgenticModelConfig,
   AgenticProvider,
+  AgenticProviderCheckRequest,
+  AgenticProviderCheckResult,
   AgenticSession,
   AgenticStreamCallbacks,
   AgenticTraceEvent,
@@ -120,6 +122,30 @@ export const updateAgenticProvider = (data: AgenticProvider) =>
  */
 export const deleteAgenticProvider = (id: string) =>
   httpDelete<void>(`${API_AGENTIC_BASE}/provider/config/delete`, {params: {id}});
+
+/**
+ * Check agentic provider connectivity. Probe a saved provider by id (blank
+ * fields fall back to stored values) or an unsaved draft configuration. The
+ * endpoint always answers HTTP 200; a failed probe is a diagnosis in the
+ * result body, never a transport error. Longer timeout than the global
+ * default: the L2 minimal chat probe may take tens of seconds.
+ * @param data - saved provider id and/or draft provider fields, plus probe level
+ * @returns the L1/L2 probe outcomes with a classified error diagnosis
+ */
+export const checkAgenticProvider = (data: AgenticProviderCheckRequest) =>
+  httpPost<AgenticProviderCheckResult>(`${API_AGENTIC_BASE}/provider/check`, data, {timeout: 60000});
+
+/**
+ * Check one agentic model config end to end with a minimal chat completion.
+ * Longer timeout than the global default for the real inference round trip.
+ * @param id - model config id
+ * @returns the L2 probe outcome with a classified error diagnosis
+ */
+export const checkAgenticModelConfig = (id: string) =>
+  httpPost<AgenticProviderCheckResult>(`${API_AGENTIC_BASE}/model/config/check`, undefined, {
+    params: {id},
+    timeout: 60000,
+  });
 
 /**
  * List agentic sessions.

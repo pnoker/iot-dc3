@@ -22,6 +22,13 @@ import {mountListPage} from './_helpers';
 
 const agenticMocks = vi.hoisted(() => ({
   addAgenticModelConfig: vi.fn(() => Promise.resolve( true)),
+  checkAgenticProvider: vi.fn(() => Promise.resolve({
+    overall: 'PASS',
+    l1: {status: 'PASS', latencyMs: 120, models: ['mock-model-a']},
+    l2: {status: 'SKIPPED', latencyMs: 0},
+    dimensions: ['CONNECTIVITY', 'AUTH', 'MODEL_VISIBLE'],
+    checkedAt: '2026-10-04T08:30:00',
+  })),
   deleteAgenticModelConfig: vi.fn(() => Promise.resolve( true)),
   listAgenticModelConfigs: vi.fn(() => Promise.resolve( [])),
   listAgenticProviders: vi.fn(() => Promise.resolve( [])),

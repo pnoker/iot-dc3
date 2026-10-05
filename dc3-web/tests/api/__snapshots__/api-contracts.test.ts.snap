@@ -28,6 +28,38 @@ exports[`API wrapper contracts > agentic > addAgenticProvider maps to its transp
 }
 `;
 
+exports[`API wrapper contracts > agentic > checkAgenticModelConfig maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/agentic/model/config/check",
+    undefined,
+    {
+      "params": {
+        "id": "id-1",
+      },
+      "timeout": 60000,
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
+exports[`API wrapper contracts > agentic > checkAgenticProvider maps to its transport contract 1`] = `
+{
+  "args": [
+    "api/v3/agentic/provider/check",
+    {
+      "id": "1024",
+      "level": "BOTH",
+    },
+    {
+      "timeout": 60000,
+    },
+  ],
+  "transport": "httpPost",
+}
+`;
+
 exports[`API wrapper contracts > agentic > confirmAgenticAction maps to its transport contract 1`] = `
 {
   "args": [
@@ -89,6 +121,8 @@ exports[`API wrapper contracts > agentic > has every export covered by the contr
 [
   "addAgenticModelConfig",
   "addAgenticProvider",
+  "checkAgenticModelConfig",
+  "checkAgenticProvider",
   "confirmAgenticAction",
   "deleteAgenticModelConfig",
   "deleteAgenticProvider",

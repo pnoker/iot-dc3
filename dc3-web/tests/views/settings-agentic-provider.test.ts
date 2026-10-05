@@ -22,6 +22,13 @@ import {mountListPage} from './_helpers';
 
 const agenticMocks = vi.hoisted(() => ({
   addAgenticProvider: vi.fn(() => Promise.resolve( true)),
+  checkAgenticProvider: vi.fn(() => Promise.resolve({
+    overall: 'PASS',
+    l1: {status: 'PASS', latencyMs: 120, models: ['mock-model-a']},
+    l2: {status: 'PASS', latencyMs: 240, model: 'mock-model-a'},
+    dimensions: ['CONNECTIVITY', 'AUTH', 'MODEL_VISIBLE', 'INFERENCE'],
+    checkedAt: '2026-10-04T08:30:00',
+  })),
   deleteAgenticProvider: vi.fn(() => Promise.resolve( true)),
   listAgenticProviders: vi.fn(() => Promise.resolve( [])),
   updateAgenticProvider: vi.fn(() => Promise.resolve( true)),
@@ -38,6 +45,7 @@ describe('ProviderSettings view', () => {
       stubs: {
         providerTool: {template: '<div />'},
         providerEditForm: {template: '<div />'},
+        providerCheckResultDialog: {template: '<div />'},
         modelConfigTool: {template: '<div />'},
       },
     });

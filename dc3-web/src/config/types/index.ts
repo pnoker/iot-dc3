@@ -48,6 +48,11 @@ export type {
   AgenticChatCompletionResponse,
   AgenticStreamCallbacks,
   AgenticTraceEvent,
+  AgenticConnectivityStatus,
+  AgenticCheckLevel,
+  AgenticProviderCheckRequest,
+  AgenticCheckLevelResult,
+  AgenticProviderCheckResult,
 } from './agentic';
 
 export type {

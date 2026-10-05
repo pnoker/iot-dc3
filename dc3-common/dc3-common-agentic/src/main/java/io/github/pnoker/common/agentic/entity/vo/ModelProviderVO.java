@@ -19,9 +19,11 @@ package io.github.pnoker.common.agentic.entity.vo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.entity.base.BaseVO;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -74,4 +76,39 @@ public class ModelProviderVO extends BaseVO {
     @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String apiKey;
+
+    @Schema(
+            description =
+                    "Status of the latest connectivity check against this provider; null when it has never been checked. Read-only: ignored on write.",
+            example = "PASS")
+    private ConnectivityStatusEnum lastCheckStatus;
+
+    @Schema(
+            description = "Completion time of the latest connectivity check. Read-only: ignored on write.",
+            example = "2026-10-04T08:30:00")
+    private LocalDateTime lastCheckTime;
+
+    @Schema(
+            description =
+                    "Round-trip latency in milliseconds of the latest connectivity check. Read-only: ignored on write.",
+            example = "320")
+    private Integer lastCheckLatencyMs;
+
+    @Schema(
+            description =
+                    "Error type code of the latest failed connectivity check, e.g. AUTH_FAILED; null when it passed. Read-only: ignored on write.",
+            example = "AUTH_FAILED")
+    private String lastCheckErrorType;
+
+    @Schema(
+            description =
+                    "Sanitized error message of the latest failed connectivity check; never contains credentials. Read-only: ignored on write.",
+            example = "HTTP 401 from api.example.com")
+    private String lastCheckErrorMessage;
+
+    @Schema(
+            description =
+                    "Model identifier the latest L2 chat probe used for this provider. Read-only: ignored on write.",
+            example = "deepseek-chat")
+    private String lastCheckModel;
 }

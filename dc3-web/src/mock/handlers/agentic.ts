@@ -74,6 +74,47 @@ const cud = (url: string, key: 'agenticModelConfigs' | 'agenticProviders') => {
 };
 
 /**
+ * Deterministic connectivity-check fixtures: the Anthropic demo provider fails
+ * with AUTH_FAILED, everything else passes.
+ */
+const MOCK_CHECK_MODELS: Record<string, string[]> = {
+  deepseek: ['deepseek-chat', 'deepseek-reasoner', 'deepseek-v4-pro'],
+  anthropic: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'],
+  qwen: ['qwen-max', 'qwen-plus', 'qwen-turbo'],
+};
+
+const mockCheckFails = (seed: string): boolean => seed.toLowerCase().includes('anthropic');
+
+const mockCheckLatency = (seed: string): number => {
+  let hash = 0;
+  for (const ch of seed) hash = (hash * 31 + ch.charCodeAt(0)) % 997;
+  return 120 + (hash % 800);
+};
+
+const mockCheckModels = (seed: string): string[] => {
+  const lower = seed.toLowerCase();
+  const key = Object.keys(MOCK_CHECK_MODELS).find((k) => lower.includes(k));
+  return key ? MOCK_CHECK_MODELS[key]! : ['mock-model-a', 'mock-model-b'];
+};
+
+const mockLevelResult = (failed: boolean, latencyMs: number, models?: string[], model?: string) =>
+  failed
+    ? {
+        status: 'FAIL',
+        latencyMs,
+        errorType: 'AUTH_FAILED',
+        message: 'HTTP 401 from mock gateway',
+        upstreamStatus: 401,
+        ...(model ? {model} : {}),
+      }
+    : {
+        status: 'PASS',
+        latencyMs,
+        ...(models ? {models} : {}),
+        ...(model ? {model} : {}),
+      };
+
+/**
  * Register the agentic message handlers on the mock dispatch table.
  */
 export function registerAgenticHandlers(): void {
@@ -99,6 +140,93 @@ export function registerAgenticHandlers(): void {
     responseOf(ctx.config, ok(ctx.db.agenticProviders)),
   );
   cud('api/v3/agentic/provider/config', 'agenticProviders');
+
+  // ── agentic: connectivity checks ──
+  on('post', 'api/v3/agentic/provider/check', (ctx) => {
+    const body = (ctx.body ?? {}) as Record<string, unknown>;
+    const saved = body.id
+      ? ctx.db.agenticProviders.find((p) => String(p.id) === String(body.id))
+      : undefined;
+    const seed = String(saved?.baseUrl ?? body.baseUrl ?? saved?.name ?? body.providerType ?? 'mock');
+    const level = String(body.level ?? 'BOTH').toUpperCase();
+    const includeL1 = level === 'L1' || level === 'BOTH';
+    const includeL2 = level === 'L2' || level === 'BOTH';
+    const failed = mockCheckFails(seed);
+    const latency = mockCheckLatency(seed);
+    const models = mockCheckModels(seed);
+    const checkedAt = stamp();
+    const result = {
+      overall: failed ? 'FAIL' : 'PASS',
+      l1: includeL1 ? mockLevelResult(failed, latency, models) : {status: 'SKIPPED', latencyMs: 0},
+      l2: includeL2 ? mockLevelResult(failed, latency * 2, undefined, models[0]) : {status: 'SKIPPED', latencyMs: 0},
+      dimensions: [
+        ...(includeL1 ? ['CONNECTIVITY'] : []),
+        ...(includeL1 && !failed ? ['AUTH', 'MODEL_VISIBLE'] : []),
+        ...(includeL2 ? ['INFERENCE'] : []),
+        ...(includeL2 && !failed ? ['AUTH', 'MODEL_VISIBLE'] : []),
+      ],
+      checkedAt,
+    };
+    // Mirror the backend: only checks that include L2 persist a health profile.
+    if (saved && includeL2) {
+      Object.assign(
+        saved,
+        failed
+          ? {
+              lastCheckStatus: 'FAIL',
+              lastCheckTime: checkedAt,
+              lastCheckLatencyMs: latency * 2,
+              lastCheckErrorType: 'AUTH_FAILED',
+              lastCheckErrorMessage: 'HTTP 401 from mock gateway',
+              lastCheckModel: models[0],
+            }
+          : {
+              lastCheckStatus: 'PASS',
+              lastCheckTime: checkedAt,
+              lastCheckLatencyMs: latency * 2,
+              lastCheckErrorType: undefined,
+              lastCheckErrorMessage: undefined,
+              lastCheckModel: models[0],
+            },
+      );
+    }
+    return responseOf(ctx.config, ok(result));
+  });
+  on('post', 'api/v3/agentic/model/config/check', (ctx) => {
+    const config = ctx.db.agenticModelConfigs.find((m) => String(m.id) === String(ctx.params.id));
+    if (!config) return responseOf(ctx.config, fail('NOT_FOUND', 'Model config does not exist', 404), 404);
+    const failed = mockCheckFails(`${config.providerName ?? ''}/${config.model}`);
+    const latency = mockCheckLatency(String(config.model));
+    const checkedAt = stamp();
+    Object.assign(
+      config,
+      failed
+        ? {
+            lastCheckStatus: 'FAIL',
+            lastCheckTime: checkedAt,
+            lastCheckLatencyMs: latency,
+            lastCheckErrorType: 'MODEL_NOT_FOUND',
+            lastCheckErrorMessage: 'HTTP 404 model not visible to this key',
+          }
+        : {
+            lastCheckStatus: 'PASS',
+            lastCheckTime: checkedAt,
+            lastCheckLatencyMs: latency,
+            lastCheckErrorType: undefined,
+            lastCheckErrorMessage: undefined,
+          },
+    );
+    return responseOf(
+      ctx.config,
+      ok({
+        overall: failed ? 'FAIL' : 'PASS',
+        l1: {status: 'SKIPPED', latencyMs: 0},
+        l2: mockLevelResult(failed, latency, undefined, String(config.model)),
+        dimensions: failed ? ['INFERENCE'] : ['INFERENCE', 'AUTH', 'MODEL_VISIBLE'],
+        checkedAt,
+      }),
+    );
+  });
 
   // ── agentic: sessions & messages ──
   on('post', 'api/v3/agentic/session/list', (ctx) => {

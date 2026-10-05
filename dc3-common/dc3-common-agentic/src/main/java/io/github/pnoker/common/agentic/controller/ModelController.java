@@ -17,10 +17,13 @@
 package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
+import io.github.pnoker.common.agentic.entity.builder.ConnectivityCheckBuilder;
 import io.github.pnoker.common.agentic.entity.builder.ModelConfigBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ModelConfigVO;
 import io.github.pnoker.common.agentic.entity.vo.ModelVO;
+import io.github.pnoker.common.agentic.entity.vo.ProviderCheckResultVO;
 import io.github.pnoker.common.agentic.service.ModelConfigService;
+import io.github.pnoker.common.agentic.service.check.AgenticConnectivityCheckService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.valid.Add;
@@ -64,6 +67,10 @@ public class ModelController implements BaseController {
     private final ModelConfigBuilder modelConfigBuilder;
 
     private final ModelConfigService modelConfigService;
+
+    private final AgenticConnectivityCheckService connectivityCheckService;
+
+    private final ConnectivityCheckBuilder connectivityCheckBuilder;
 
     /**
      * List the AI model options available to the current tenant for chat selection.
@@ -203,5 +210,43 @@ public class ModelController implements BaseController {
                     @RequestParam(value = "id")
                     Long id) {
         return getPrincipalHeader().flatMap(header -> modelConfigService.delete(id, header));
+    }
+
+    /**
+     * Probe one model configuration end to end: one minimal chat completion against
+     * the bound provider using the stored model id.
+     *
+     * @param id primary key of the model configuration to check; must belong to the current tenant
+     * @return always HTTP 200 with the L2 outcome and a classified error diagnosis on failure
+     */
+    @PreAuthorize("@perm.can('model', 'get')")
+    @Operation(
+            summary = "Check AI Model Configuration",
+            description =
+                    "Probe one model configuration end to end: sends one minimal chat completion to the bound provider "
+                            + "using the stored model id, validating the model name, quota and full inference chain. Always answers 200; the latest outcome is stored as the config's health profile.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "true"),
+                                @ExtensionProperty(name = "hidden", value = "true")
+                            }))
+    @PostMapping("/config/check")
+    public Mono<ProviderCheckResultVO> check(
+            @Parameter(
+                            description =
+                                    "Primary key of the model configuration to check. Must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
+        return getPrincipalHeader()
+                .flatMap(header -> connectivityCheckService
+                        .checkModelConfig(id, header)
+                        .map(connectivityCheckBuilder::buildVOByResult));
     }
 }

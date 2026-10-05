@@ -17,9 +17,13 @@
 package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
+import io.github.pnoker.common.agentic.entity.builder.ConnectivityCheckBuilder;
 import io.github.pnoker.common.agentic.entity.builder.ModelProviderBuilder;
 import io.github.pnoker.common.agentic.entity.vo.ModelProviderVO;
+import io.github.pnoker.common.agentic.entity.vo.ProviderCheckRequestVO;
+import io.github.pnoker.common.agentic.entity.vo.ProviderCheckResultVO;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
+import io.github.pnoker.common.agentic.service.check.AgenticConnectivityCheckService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.valid.Add;
@@ -63,6 +67,10 @@ public class ProviderController implements BaseController {
     private final ModelProviderBuilder modelProviderBuilder;
 
     private final ModelProviderService modelProviderService;
+
+    private final AgenticConnectivityCheckService connectivityCheckService;
+
+    private final ConnectivityCheckBuilder connectivityCheckBuilder;
 
     /**
      * List the upstream LLM providers configured for the current tenant.
@@ -178,5 +186,37 @@ public class ProviderController implements BaseController {
                     @RequestParam(value = "id")
                     Long id) {
         return getPrincipalHeader().flatMap(header -> modelProviderService.delete(id, header));
+    }
+
+    /**
+     * Probe a provider's connectivity and configuration correctness: L1 lists the
+     * endpoint's models, L2 sends one minimal chat completion.
+     *
+     * @param request saved provider id (fields fall back to stored values) or an unsaved draft configuration
+     * @return always HTTP 200 with the L1/L2 outcomes and a classified error diagnosis on failure
+     */
+    @PreAuthorize("@perm.can('provider', 'get')")
+    @Operation(
+            summary = "Check Provider Connectivity",
+            description =
+                    "Probe a provider's connectivity and configuration correctness. With an id, missing fields fall "
+                            + "back to the stored provider (an absent API key uses the stored one); without an id the body is an unsaved draft. "
+                            + "L1 lists the endpoint's models; L2 sends one minimal chat completion. Always answers 200: a failed probe is a diagnosis, never a transport error.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "MEDIUM"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "true"),
+                                @ExtensionProperty(name = "hidden", value = "true")
+                            }))
+    @PostMapping("/check")
+    public Mono<ProviderCheckResultVO> check(@RequestBody ProviderCheckRequestVO request) {
+        return getPrincipalHeader()
+                .flatMap(header -> connectivityCheckService
+                        .checkProvider(request, header)
+                        .map(connectivityCheckBuilder::buildVOByResult));
     }
 }

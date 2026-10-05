@@ -17,8 +17,10 @@
 package io.github.pnoker.db.agentic;
 
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
+import io.github.pnoker.common.agentic.entity.model.ConnectivityCheckProfile;
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.UuidV7;
@@ -42,7 +44,9 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
     private static final String TABLE = "dc3_agentic.dc3_model_config";
     private static final String COLUMNS = "c.id, c.model, c.label, c.provider_id, c.stream, c.tool_call, c.vision,"
             + " c.reasoning, c.temperature, c.max_tokens, c.default_flag, c.enable_flag, c.tenant_id, c.remark,"
-            + " c.creator_id, c.creator_name, c.create_time, c.operator_id, c.operator_name, c.operate_time";
+            + " c.creator_id, c.creator_name, c.create_time, c.operator_id, c.operator_name, c.operate_time,"
+            + " c.last_check_status, c.last_check_time, c.last_check_latency_ms, c.last_check_error_type,"
+            + " c.last_check_error_message";
 
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
@@ -206,6 +210,49 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
                 .map(rows -> rows == 1);
     }
 
+    @Override
+    public Mono<Boolean> updateCheckProfile(
+            Long id, ConnectivityCheckProfile profile, RequestHeader.PrincipalHeader header) {
+        validateHeader(header);
+        if (id == null) return Mono.error(new IllegalArgumentException("model config id must not be null"));
+        if (profile == null) return Mono.error(new IllegalArgumentException("check profile must not be null"));
+        DatabaseClient.GenericExecuteSpec spec = databaseClient
+                .sql("UPDATE " + TABLE + " SET"
+                        + " last_check_status = :last_check_status, last_check_time = :last_check_time,"
+                        + " last_check_latency_ms = :last_check_latency_ms, last_check_error_type = :last_check_error_type,"
+                        + " last_check_error_message = :last_check_error_message"
+                        + " WHERE id = :id AND tenant_id = :tenant_id AND deleted = 0")
+                .bind("id", id)
+                .bind("tenant_id", header.getTenantId());
+        spec = profile.status() == null
+                ? spec.bindNull("last_check_status", Byte.class)
+                : spec.bind("last_check_status", profile.status().getIndex());
+        spec = profile.time() == null
+                ? spec.bindNull("last_check_time", LocalDateTime.class)
+                : spec.bind("last_check_time", profile.time());
+        spec = profile.latencyMs() == null
+                ? spec.bindNull("last_check_latency_ms", Integer.class)
+                : spec.bind("last_check_latency_ms", profile.latencyMs());
+        spec = bindText(spec, "last_check_error_type", profile.errorType());
+        spec = bindText(spec, "last_check_error_message", profile.errorMessage());
+        return spec.fetch().rowsUpdated().map(rows -> rows == 1);
+    }
+
+    @Override
+    public Mono<Boolean> clearCheckProfile(Long id, RequestHeader.PrincipalHeader header) {
+        validateHeader(header);
+        if (id == null) return Mono.error(new IllegalArgumentException("model config id must not be null"));
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET last_check_status = NULL, last_check_time = NULL,"
+                        + " last_check_latency_ms = NULL, last_check_error_type = NULL, last_check_error_message = NULL"
+                        + " WHERE id = :id AND tenant_id = :tenant_id AND deleted = 0")
+                .bind("id", id)
+                .bind("tenant_id", header.getTenantId())
+                .fetch()
+                .rowsUpdated()
+                .map(rows -> rows == 1);
+    }
+
     private Mono<Void> clearDefaults(Long tenantId, Long exceptId) {
         return databaseClient
                 .sql("UPDATE " + TABLE + " SET default_flag = 0, operate_time = :operate_time"
@@ -258,7 +305,19 @@ public class R2dbcModelConfigStore implements ReactiveModelConfigStore {
         value.setOperatorId(row.get("operator_id", Long.class));
         value.setOperatorName(row.get("operator_name", String.class));
         value.setOperateTime(time(row.get("operate_time")));
+        Number lastCheckStatus = row.get("last_check_status", Number.class);
+        value.setLastCheckStatus(
+                ConnectivityStatusEnum.ofIndex(lastCheckStatus == null ? null : lastCheckStatus.byteValue()));
+        value.setLastCheckTime(time(row.get("last_check_time")));
+        value.setLastCheckLatencyMs(row.get("last_check_latency_ms", Integer.class));
+        value.setLastCheckErrorType(row.get("last_check_error_type", String.class));
+        value.setLastCheckErrorMessage(row.get("last_check_error_message", String.class));
         return value;
+    }
+
+    private DatabaseClient.GenericExecuteSpec bindText(
+            DatabaseClient.GenericExecuteSpec spec, String name, String value) {
+        return value == null ? spec.bindNull(name, String.class) : spec.bind(name, value);
     }
 
     private Byte defaultFlag(ModelConfigBO value) {
