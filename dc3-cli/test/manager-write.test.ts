@@ -6,6 +6,8 @@ import { registerDriverCommand } from "../src/commands/driver.js";
 import { registerEventCommand } from "../src/commands/event.js";
 import { registerPointCommand } from "../src/commands/point.js";
 import { registerProfileCommand } from "../src/commands/profile.js";
+import { registerGroupCommand } from "../src/commands/group.js";
+import { registerLabelCommand } from "../src/commands/label.js";
 
 type Register = (program: Command) => void;
 type FetchCall = { url: string; init: RequestInit };
@@ -73,6 +75,18 @@ const cases: Array<{
     register: registerEventCommand,
     nameField: "eventName",
     stableField: ["eventTypeFlag", "INFO"],
+  },
+  {
+    entity: "group",
+    register: registerGroupCommand,
+    nameField: "groupName",
+    stableField: ["groupCode", "group-code"],
+  },
+  {
+    entity: "label",
+    register: registerLabelCommand,
+    nameField: "labelName",
+    stableField: ["labelCode", "label-code"],
   },
 ];
 
