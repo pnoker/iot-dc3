@@ -201,19 +201,6 @@ class ZigbeeDriverCustomServiceImplTest {
     }
 
     @Test
-    void deviceHealthIsOnlineWhenAnyPointResolvesToAKnownNode() {
-        ReflectionTestUtils.setField(service, "networkManager", networkManager);
-        Map<Long, Map<String, AttributeBO>> points = new HashMap<>();
-        points.put(9L, pointConfig());
-        when(deviceMetadata.getPointConfig(7L)).thenReturn(points);
-        when(networkManager.getNode(any(IeeeAddress.class))).thenReturn(node);
-
-        DeviceHealthState health = service.health(driverConfig(), device());
-
-        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
-    }
-
-    @Test
     void deviceHealthIsOfflineWhenNoPointCarriesANodeAddress() {
         ReflectionTestUtils.setField(service, "networkManager", networkManager);
         when(deviceMetadata.getPointConfig(7L)).thenReturn(new HashMap<>());
@@ -229,6 +216,19 @@ class ZigbeeDriverCustomServiceImplTest {
 
         assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.OFFLINE);
         verifyNoInteractions(networkManagerFactory, deviceMetadata);
+    }
+
+    @Test
+    void deviceHealthIsOnlineWhenAnyPointResolvesToAKnownNode() {
+        ReflectionTestUtils.setField(service, "networkManager", networkManager);
+        Map<Long, Map<String, AttributeBO>> points = new HashMap<>();
+        points.put(9L, pointConfig());
+        when(deviceMetadata.getPointConfig(7L)).thenReturn(points);
+        when(networkManager.getNode(any(IeeeAddress.class))).thenReturn(node);
+
+        DeviceHealthState health = service.health(driverConfig(), device());
+
+        assertThat(health.getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
     }
 
     @Test
