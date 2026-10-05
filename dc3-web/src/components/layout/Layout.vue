@@ -99,14 +99,31 @@
                 text
                 @click="agenticStore.toggle()"
               >
-                <!-- Aurora orb: a small energy sphere whose brand-colour
-                     conic gradient slowly rotates, like aurora bands on a
-                     tiny planet. Inner light + edge shadow give it depth;
-                     the glow breathes when the panel is open. -->
-                <div class="assistant-orb" aria-hidden="true">
-                  <div class="assistant-orb__aurora" />
-                  <div class="assistant-orb__light" />
-                </div>
+                <!-- Dual-sparkle AI glyph: the universal "generative AI"
+                     symbol (one large + one small four-point star) with
+                     the brand gradient and depth lighting, on the same
+                     chip as other header icons. -->
+                <svg aria-hidden="true" class="assistant-sparkle" viewBox="0 0 24 24">
+                  <defs>
+                    <linearGradient id="dc3-spark-main" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#0a90cc" />
+                      <stop offset="45%" stop-color="#15a3d8" />
+                      <stop offset="100%" stop-color="#5558c9" />
+                    </linearGradient>
+                    <linearGradient id="dc3-spark-small" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#15a3d8" />
+                      <stop offset="100%" stop-color="#7c6ce0" />
+                    </linearGradient>
+                  </defs>
+                  <path
+                    fill="url(#dc3-spark-main)"
+                    d="M12 1.5c1 8.4 2.1 11.6 10.5 12.5-8.4.9-9.5 4.1-10.5 12.5-1-8.4-2.1-11.6-10.5-12.5C9.9 13.1 11 9.9 12 1.5Z"
+                  />
+                  <path
+                    fill="url(#dc3-spark-small)"
+                    d="M19.5 2c.3 2.3.85 3.3 3.1 3.65-2.25.35-2.8 1.35-3.1 3.65-.3-2.3-.85-3.3-3.1-3.65 2.25-.35 2.8-1.35 3.1-3.65Z"
+                  />
+                </svg>
               </el-button>
             </el-tooltip>
           </div>
@@ -744,11 +761,10 @@ const handleCommand = async (command: string) => {
     // with a siri-like flowing multi-colour gradient, and the water level
     // bobs like a half-sphere of water being gently tipped. The sparkle
     // glyph floats above the liquid surface.
-    // AI assistant entry — an "aurora orb": a tiny energy sphere whose
-    // brand-colour conic gradient rotates slowly like aurora bands on a
-    // planet. It follows the platform chip grammar (same background,
-    // border and hover treatment as the settings button) while the orb
-    // itself is the one colour-rich element in the header — the AI signal.
+    // AI assistant entry — dual-sparkle glyph (the universal "generative
+    // AI" symbol): one large + one small four-point star, each with its
+    // own gradient stop range from the brand palette, with drop-shadow
+    // depth and a shimmer sweep at rest. Same chip grammar as settings.
     .header_assistant_button {
       position: relative;
       width: 32px;
@@ -756,104 +772,67 @@ const handleCommand = async (command: string) => {
       border: 1px solid var(--dc3-border-base);
       background: var(--dc3-bg-interactive);
       color: var(--dc3-text-regular);
-      transition:
-        transform var(--dc3-duration-fast) var(--dc3-ease-standard),
-        box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard);
+      transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
 
-      .assistant-orb {
-        position: relative;
-        width: 18px;
-        height: 18px;
-        border-radius: 50%;
-        overflow: hidden;
-        box-shadow: 0 0 6px rgba(21, 163, 216, 0.15);
-
-        // The rotating aurora body: oversized so the rotation never shows
-        // corners, with uneven colour stops so the flow is visible.
-        &__aurora {
-          position: absolute;
-          inset: -40%;
-          border-radius: 50%;
-          background: conic-gradient(
-            from 0deg,
-            #087fbd 0%,
-            #15a3d8 18%,
-            #5558c9 32%,
-            #7c6ce0 42%,
-            #15a3d8 58%,
-            #087fbd 72%,
-            #0a6aa0 88%,
-            #087fbd 100%
-          );
-          animation: assistant-orb-rotate 10s linear infinite;
-        }
-
-        // Inner light: bright at the upper-left like a light source,
-        // with a subtle edge shadow for sphere depth.
-        &__light {
-          position: absolute;
-          inset: 0;
-          border-radius: 50%;
-          background: radial-gradient(
-            circle at 38% 32%,
-            rgba(255, 255, 255, 0.35) 0%,
-            transparent 55%
-          );
-          box-shadow:
-            inset 0 -3px 6px rgba(0, 20, 40, 0.2),
-            inset 0 2px 3px rgba(255, 255, 255, 0.15);
-        }
+      .assistant-sparkle {
+        display: block;
+        width: 19px;
+        height: 19px;
+        filter: drop-shadow(0 1px 3px rgba(8, 127, 189, 0.2));
+        transition:
+          transform var(--dc3-duration-fast) var(--dc3-ease-standard),
+          filter var(--dc3-duration-fast) var(--dc3-ease-standard);
       }
 
-      // Hover: the orb brightens and the glow tightens.
+      // Rest: a slow shimmer sweep across the gradient — the "alive" signal.
+      &:not(.is-active) .assistant-sparkle {
+        animation: assistant-sparkle-shimmer 4s ease-in-out infinite;
+      }
+
       &:hover,
       &:focus-visible {
         background: var(--dc3-bg-interactive-active);
         transform: translateY(-1px);
 
-        .assistant-orb {
-          box-shadow: 0 0 10px rgba(21, 163, 216, 0.3);
-
-          &__aurora {
-            animation-duration: 6s;
-          }
+        .assistant-sparkle {
+          filter: drop-shadow(0 0 6px rgba(21, 163, 216, 0.35));
         }
       }
 
-      // Panel open: the orb breathes — scale plus glow pulse.
-      &.is-active .assistant-orb {
-        animation: assistant-orb-breathe 3s ease-in-out infinite alternate;
+      // Panel open: the sparkles breathe with a glow pulse.
+      &.is-active .assistant-sparkle {
+        animation: assistant-sparkle-breathe 2.4s ease-in-out infinite alternate;
       }
     }
 
-    @keyframes assistant-orb-rotate {
-      from {
-        transform: rotate(0deg);
+    @keyframes assistant-sparkle-shimmer {
+      0%,
+      100% {
+        filter: drop-shadow(0 1px 3px rgba(8, 127, 189, 0.2));
       }
 
-      to {
-        transform: rotate(360deg);
+      50% {
+        filter: drop-shadow(0 0 6px rgba(21, 163, 216, 0.3));
       }
     }
 
-    @keyframes assistant-orb-breathe {
+    @keyframes assistant-sparkle-breathe {
       from {
         transform: scale(1);
-        box-shadow: 0 0 6px rgba(21, 163, 216, 0.15);
+        filter: drop-shadow(0 1px 3px rgba(8, 127, 189, 0.2));
       }
 
       to {
-        transform: scale(1.06);
-        box-shadow: 0 0 14px rgba(21, 163, 216, 0.35);
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 8px rgba(21, 163, 216, 0.45));
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .header_assistant_button .assistant-orb__aurora,
-      .header_assistant_button .assistant-orb,
-      .header_assistant_button {
-        animation: none;
+      .header_assistant_button,
+      .header_assistant_button .assistant-sparkle {
         transition: none;
+        animation: none;
       }
     }
 
