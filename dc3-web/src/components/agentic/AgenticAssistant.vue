@@ -905,11 +905,13 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
 </script>
 
 <style lang="scss" scoped>
-// The panel lives in ONE coordinate system for both modes: fixed under
-// the header, anchored right. Docked width comes from panelStyle; the
-// workbench just widens to 100% — because both states are fixed, the
-// width transition animates continuously instead of snapping between
-// layout flow and fixed positioning (the old "slide projector" cut).
+// The panel lives in ONE coordinate system for both modes: fixed at full
+// height, anchored right — it docks over the header's right end (the
+// header yields through the --dc3-agentic-dock-width padding, and the
+// expanded workbench simply covers it). Docked width comes from
+// panelStyle; the workbench just widens to 100% — because both states are
+// fixed, the width transition animates continuously instead of snapping
+// between layout flow and fixed positioning (the old "slide projector" cut).
 .agentic-panel {
   // One reading column for messages, the empty state and the composer -
   // docked the panel is narrower so this is a no-op there; the workbench
@@ -919,7 +921,7 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   --agentic-context-width: 300px;
 
   position: fixed;
-  top: var(--dc3-header-height);
+  top: 0;
   right: 0;
   bottom: 0;
   display: flex;

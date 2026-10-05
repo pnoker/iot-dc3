@@ -625,6 +625,11 @@ const handleCommand = async (command: string) => {
     height: var(--dc3-header-height);
     padding-block: 9px;
     padding-inline: var(--dc3-page-padding);
+    // The docked assistant panel now runs the full height: the header yields
+    // its right end through the same dock-width var the body consumes, so the
+    // panel reads as a layout column instead of a layer under the header.
+    padding-right: calc(var(--dc3-page-padding) + var(--dc3-agentic-dock-width, 0px));
+    transition: padding-right var(--dc3-agentic-body-transition, var(--dc3-duration-slow)) var(--dc3-ease-standard);
     border-bottom: 1px solid var(--dc3-border-base);
     background:
       radial-gradient(circle at 12% -80%, var(--dc3-ambient-primary), transparent 36%),
