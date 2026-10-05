@@ -30,9 +30,15 @@
           <span class="header_actions_divider" aria-hidden="true" />
           <div class="header_utilities">
             <app-preferences v-if="!isMobile" compact />
+            <!-- The preference cluster (theme trio + language) is one group;
+                 the divider separates it from the action chips (settings,
+                 assistant) so the grouping reads at every desktop/tablet
+                 width. On phone the cluster folds into the "…" chip, so the
+                 divider hides with it. -->
+            <span v-if="!isMobile" class="header_actions_divider" aria-hidden="true" />
             <!-- Phone folds language/theme switching behind one "…" chip so
                  the primary menu keeps its place in the capsule (A3). -->
-            <el-popover v-else :width="196" placement="bottom-end" trigger="click">
+            <el-popover v-if="isMobile" :width="196" placement="bottom-end" trigger="click">
               <template #reference>
                 <el-button
                   :aria-label="t('layout.preferences')"
@@ -694,6 +700,14 @@ const handleCommand = async (command: string) => {
       display: flex;
       align-items: center;
       gap: var(--dc3-space-2);
+
+      // Element Plus injects margin-left: 12px between sibling .el-button
+      // elements, which stacks on the container gap and made the icon
+      // rhythm 8/11/20/17px depending on which neighbours were buttons.
+      // The container gap owns the rhythm uniformly.
+      .el-button + .el-button {
+        margin-left: 0;
+      }
     }
 
     // Settings and the phone-only preferences ("…") chip share one utility
@@ -862,7 +876,7 @@ const handleCommand = async (command: string) => {
     .header_actions_divider {
       flex: 0 0 1px;
       width: 1px;
-      height: 22px;
+      height: var(--dc3-divider-height);
       margin: 0 var(--dc3-space-2);
       background: var(--dc3-border-base);
     }

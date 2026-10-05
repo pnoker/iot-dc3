@@ -586,7 +586,7 @@ const handleSubmit = async () => {
 
 .agentic-composer__divider {
   width: 1px;
-  height: 24px;
+  height: var(--dc3-divider-height);
   background: var(--dc3-border-base);
 }
 

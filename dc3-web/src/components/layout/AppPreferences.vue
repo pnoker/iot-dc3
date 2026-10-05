@@ -204,7 +204,7 @@ const setLocale = (value: 'en' | 'zh') => {
 
 .app-preferences__divider {
   width: 1px;
-  height: 20px;
+  height: var(--dc3-divider-height);
   background: var(--dc3-border-base);
 }
 </style>

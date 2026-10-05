@@ -79,6 +79,9 @@
   --dc3-text-muted: #78909f;
   --dc3-text-brand: #087fbd;
   --dc3-border-base: rgba(100, 148, 174, 0.2);
+  // One vertical-divider grammar across the app: 1px wide, this height,
+  // --dc3-border-base colour — header capsule, preference cluster, composer.
+  --dc3-divider-height: 22px;
   --dc3-border-strong: rgba(62, 143, 184, 0.3);
   --dc3-brand-gradient: linear-gradient(118deg, #087fbd 0%, #15a3d8 48%, #5558c9 100%);
   --dc3-brand-gradient-soft: linear-gradient(118deg, rgba(18, 150, 219, 0.14), rgba(85, 88, 201, 0.1));
