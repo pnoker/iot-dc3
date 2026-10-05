@@ -51,6 +51,7 @@ export default {
       serverErrorMessage: '服务器处理请求时出错({status})，请稍后重试。',
       networkError: '网络错误',
       networkErrorMessage: '无法连接到服务器，请检查您的网络连接。',
+      suppressedSuffix: '（已抑制 {n} 条重复报错）',
     },
     search: '搜索',
     reset: '重置',

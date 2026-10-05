@@ -51,6 +51,7 @@ export default {
       serverErrorMessage: 'The server encountered an error ({status}). Please try again later.',
       networkError: 'Network Error',
       networkErrorMessage: 'Unable to reach the server. Please check your connection.',
+      suppressedSuffix: ' ({n} repeated errors suppressed)',
     },
     search: 'Search',
     reset: 'Reset',

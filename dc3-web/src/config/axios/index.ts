@@ -23,6 +23,7 @@ import i18n from '@/config/i18n';
 import router from '@/config/router';
 import {buildAuthHeaders, resetAuthSession} from '@/utils/authSession';
 import {failMessage, warnMessage} from '@/utils/notificationUtil';
+import {notifyAggregatedFailure} from '@/utils/problemNotifier';
 
 /**
  * Custom Axios instance with default configuration
@@ -54,16 +55,39 @@ const notifyProblem = (status: number, problem: ProblemPayload) => {
   if (typeof problem.code === 'string' && PASSWORD_CHANGE_CODES.includes(problem.code as (typeof PASSWORD_CHANGE_CODES)[number])) {
     return;
   }
+  // All toasts flow through the failure aggregator: a burst of failing
+  // requests (dev stack without backend, gateway restart, polling loop)
+  // shows at most a handful of notifications with repeat counts, not one
+  // toast per request.
   if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-    warnMessage(i18n.global.t('common.axios.unauthorized'), i18n.global.t('common.axios.unauthorizedTitle'));
+    notifyAggregatedFailure(
+        'auth-401',
+        (message, title) => warnMessage(message, title),
+        i18n.global.t('common.axios.unauthorizedTitle'),
+        i18n.global.t('common.axios.unauthorized'));
     resetAuthSession();
     router.push({name: 'login'}).catch(() => {});
   } else if (status >= 500) {
-    failMessage(i18n.global.t('common.axios.serverErrorMessage', {status}), i18n.global.t('common.axios.serverError'));
+    notifyAggregatedFailure(
+        `http-${status}`,
+        failMessage,
+        i18n.global.t('common.axios.serverError'),
+        i18n.global.t('common.axios.serverErrorMessage', {status}));
   } else if (status > 0) {
-    failMessage(i18n.global.t('common.axios.requestError'), problem.code ?? problem.title, problem);
+    // Same argument shape as before the aggregator: the request-error label
+    // reads as the toast message, the problem code as the title.
+    notifyAggregatedFailure(
+        `code-${problem.code ?? status}`,
+        failMessage,
+        String(problem.code ?? problem.title ?? ''),
+        i18n.global.t('common.axios.requestError'),
+        problem);
   } else {
-    failMessage(i18n.global.t('common.axios.networkErrorMessage'), i18n.global.t('common.axios.networkError'));
+    notifyAggregatedFailure(
+        'network',
+        failMessage,
+        i18n.global.t('common.axios.networkError'),
+        i18n.global.t('common.axios.networkErrorMessage'));
   }
 };
 
