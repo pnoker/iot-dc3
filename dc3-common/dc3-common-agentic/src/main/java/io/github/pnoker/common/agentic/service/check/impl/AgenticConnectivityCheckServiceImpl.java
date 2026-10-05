@@ -89,9 +89,11 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
             boolean includeL2 = level == ConnectivityCheckLevelEnum.L2 || level == ConnectivityCheckLevelEnum.BOTH;
             return resolveTarget(request, header).flatMap(target -> {
                 Long providerId = parseProviderId(request);
+                // The cache key carries the level: an L1-only call (model-select
+                // dropdown) must never serve a cached BOTH result or vice versa.
                 String key = providerId != null
-                        ? header.getTenantId() + ":provider:" + providerId
-                        : header.getTenantId() + ":draft:" + draftFingerprint(target);
+                        ? header.getTenantId() + ":provider:" + providerId + ":" + level.getCode()
+                        : header.getTenantId() + ":draft:" + draftFingerprint(target) + ":" + level.getCode();
                 return coordinated(
                         key,
                         () -> runProviderCheck(target, providerId, request.getModel(), includeL1, includeL2, header));

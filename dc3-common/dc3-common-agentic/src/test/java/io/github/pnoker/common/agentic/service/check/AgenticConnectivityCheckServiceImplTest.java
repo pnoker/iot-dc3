@@ -29,6 +29,7 @@ import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.ConnectivityCheckProfile;
+import io.github.pnoker.common.agentic.entity.model.ConnectivityCheckResult;
 import io.github.pnoker.common.agentic.entity.model.ConnectivityLevelResult;
 import io.github.pnoker.common.agentic.entity.vo.ProviderCheckRequestVO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
@@ -36,6 +37,7 @@ import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.check.impl.AgenticConnectivityCheckServiceImpl;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.github.pnoker.common.enums.ConnectivityCheckLevelEnum;
 import io.github.pnoker.common.enums.ConnectivityErrorTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
@@ -274,6 +276,28 @@ class AgenticConnectivityCheckServiceImplTest {
 
         verify(checker, times(1)).checkL1(any(ModelProviderBO.class));
         verify(modelProviderStore, times(1)).updateCheckProfile(any(), any(), any());
+    }
+
+    @Test
+    void cacheKeyIsLevelIsolated() {
+        // A BOTH check followed by an L1-only call must re-probe (the dropdown
+        // path), never serve the cached BOTH result with its non-skipped L2.
+        when(modelProviderStore.get(100L, header)).thenReturn(Mono.just(savedProvider()));
+        stubPassingProbes();
+        when(modelConfigStore.list(header, true)).thenReturn(Flux.just(configOf("deepseek-chat", 100L)));
+        when(modelProviderStore.updateCheckProfile(any(), any(), any())).thenReturn(Mono.just(true));
+
+        ProviderCheckRequestVO both = new ProviderCheckRequestVO();
+        both.setId("100");
+        service.checkProvider(both, header).block();
+
+        ProviderCheckRequestVO l1Only = new ProviderCheckRequestVO();
+        l1Only.setId("100");
+        l1Only.setLevel(ConnectivityCheckLevelEnum.L1);
+        ConnectivityCheckResult l1Result = service.checkProvider(l1Only, header).block();
+
+        assertEquals(ConnectivityStatusEnum.SKIPPED, l1Result.l2().status());
+        verify(checker, times(2)).checkL1(any(ModelProviderBO.class));
     }
 
     @Test
