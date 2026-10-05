@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { SilentExit } from '../src/utils/format.js';
 import { Command } from "commander";
 import { registerCommandCommand } from "../src/commands/command.js";
 import { registerDeviceCommand } from "../src/commands/device.js";
@@ -106,7 +107,7 @@ async function run(register: Register, args: string[]): Promise<string> {
     return true;
   });
   vi.spyOn(process, "exit").mockImplementation((() => undefined) as never);
-  await program.parseAsync(args, { from: "user" });
+  try { await program.parseAsync(args, { from: "user" }); } catch (e) { if (!(e instanceof SilentExit)) throw e; }
   return output;
 }
 

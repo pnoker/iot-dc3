@@ -20,6 +20,25 @@ import { detectFormat, printAndExit } from '../utils/format.js';
 
 const BASE = '/api/v3/agentic/model';
 
+const parseTemperature = (value: string): number => {
+  const parsed = parseFloat(value);
+  if (Number.isNaN(parsed)) {
+    throw new Error(`option '--temperature ${value}' is not a valid number`);
+  }
+  if (parsed < 0 || parsed > 2) {
+    throw new Error(`option '--temperature ${value}' is out of range (0.0–2.0)`);
+  }
+  return parsed;
+};
+
+const parseMaxTokens = (value: string): number => {
+  const parsed = parseInt(value, 10);
+  if (Number.isNaN(parsed) || parsed < 1) {
+    throw new Error(`option '--max-tokens ${value}' must be a positive integer`);
+  }
+  return parsed;
+};
+
 /**
  * Register the `model` command tree on the CLI program.
  * @param program - commander program to attach the command to
@@ -61,8 +80,8 @@ export function registerModelCommand(program: Command): void {
     .option('--no-vision', 'Disable vision input (default)')
     .option('--reasoning', 'Enable reasoning mode')
     .option('--no-reasoning', 'Disable reasoning mode (default)')
-    .option('--temperature <t>', 'Sampling temperature (0.0-2.0)', parseFloat)
-    .option('--max-tokens <n>', 'Maximum output tokens', parseInt)
+    .option('--temperature <t>', 'Sampling temperature (0.0-2.0)', parseTemperature)
+    .option('--max-tokens <n>', 'Maximum output tokens', parseMaxTokens)
     .option('--default', 'Set as the tenant default model')
     .option('--enable', 'Enable the model (default)')
     .option('--disable', 'Disable the model')
@@ -100,8 +119,8 @@ export function registerModelCommand(program: Command): void {
     .option('--no-vision', 'Disable vision')
     .option('--reasoning', 'Enable reasoning')
     .option('--no-reasoning', 'Disable reasoning')
-    .option('--temperature <t>', 'New sampling temperature (0.0-2.0)', parseFloat)
-    .option('--max-tokens <n>', 'New maximum output tokens', parseInt)
+    .option('--temperature <t>', 'New sampling temperature (0.0-2.0)', parseTemperature)
+    .option('--max-tokens <n>', 'New maximum output tokens', parseMaxTokens)
     .option('--default', 'Set as tenant default')
     .option('--enable', 'Enable the model')
     .option('--disable', 'Disable the model')

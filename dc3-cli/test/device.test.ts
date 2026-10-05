@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { SilentExit } from '../src/utils/format.js';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -42,6 +43,8 @@ async function run(args: string[]): Promise<string> {
   vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
   try {
     await program.parseAsync(args, {from: 'user'});
+  } catch (error) {
+    if (!(error instanceof SilentExit)) throw error;
   } finally {
     (process.stdout.write as ReturnType<typeof vi.spyOn>).mockRestore();
   }

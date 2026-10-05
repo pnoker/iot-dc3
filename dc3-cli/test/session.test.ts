@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { SilentExit } from '../src/utils/format.js';
 
 const fetchCalls: Array<{ url: string; init: RequestInit }> = [];
 
@@ -38,7 +39,7 @@ async function run(args: string[]): Promise<string> {
   });
   vi.spyOn(process, 'exit').mockImplementation(((code?: number) => undefined) as never);
   try {
-    await program.parseAsync(args, { from: 'user' });
+    try { await program.parseAsync(args, { from: 'user' }); } catch (e) { if (!(e instanceof SilentExit)) throw e; }
   } finally {
     (process.stdout.write as ReturnType<typeof vi.spyOn>).mockRestore();
   }

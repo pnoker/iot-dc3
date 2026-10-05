@@ -34,14 +34,13 @@ function setTty(value: boolean | undefined): void {
 
 /** Run handleFatalError and return the exit code it selected. */
 function exitCodeFor(err: Error): number {
+  process.exitCode = 0;
   try {
     handleFatalError(err);
-  } catch (thrown) {
-    if (thrown instanceof ExitSignal) {
-      return thrown.code;
-    }
-    throw thrown;
+  } catch {
+    // handleFatalError prints, sets process.exitCode, and re-throws; read the code
   }
+  return process.exitCode ?? 1;
   throw new Error('handleFatalError returned without exiting');
 }
 
@@ -92,10 +91,11 @@ describe('detectFormat resolution chain', () => {
     expect(detectFormat()).toBe('json');
   });
 
-  it('invalid format values are ignored at every level', async () => {
+  it('invalid format values are rejected with a stderr error', async () => {
     (configManager.getSettings as ReturnType<typeof vi.fn>).mockResolvedValue({});
-    await applyGlobalOptions({ format: 'xml' });
-    expect(detectFormat('xml')).toBe('json');
+    vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    await expect(applyGlobalOptions({ format: 'xml' })).rejects.toThrow();
+    (process.stderr.write as ReturnType<typeof vi.spyOn>).mockRestore();
   });
 
   it('applyGlobalOptions routes --profile to the validated profile override', async () => {

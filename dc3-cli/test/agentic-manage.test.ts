@@ -65,7 +65,7 @@ const run = async (args: string[]): Promise<void> => {
   vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
   vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   try {
-    await program.parseAsync(args, { from: 'user' });
+    try { await program.parseAsync(args, { from: 'user' }); } catch (e) { if (e?.name !== 'SilentExit') throw e; }
   } finally {
     (process.exit as unknown as ReturnType<typeof vi.spyOn>).mockRestore?.();
     (process.stdout.write as ReturnType<typeof vi.spyOn>).mockRestore();
@@ -133,6 +133,10 @@ describe('provider command', () => {
     vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
     try {
       await program.parseAsync(['provider', 'check', '--format', 'json'], { from: 'user' });
+      expect.unreachable('should have thrown SilentExit');
+    } catch (error) {
+      expect((error as Error).name).toBe('SilentExit');
+      expect(process.exitCode).toBe(1);
     } finally {
       (process.stdout.write as ReturnType<typeof vi.spyOn>).mockRestore();
     }

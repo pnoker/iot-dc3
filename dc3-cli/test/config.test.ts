@@ -1,3 +1,4 @@
+import { SilentExit } from '../src/utils/format.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -157,7 +158,17 @@ describe('config file corruption handling', () => {
 
     let code = 0;
     try {
-      await program.parseAsync(['config', 'set', key, value], { from: 'user' });
+      try {
+        await program.parseAsync(['config', 'set', key, value], { from: 'user' });
+      } catch (e) {
+        if (e instanceof ExitSignal) {
+          code = e.code;
+        } else if (e?.name === 'SilentExit') {
+          code = process.exitCode ?? 0;
+        } else {
+          throw e;
+        }
+      }
     } catch (error) {
       if (error instanceof ExitSignal) {
         code = error.code;

@@ -63,11 +63,15 @@ export class ApiError extends Error {
  */
 export function handleFatalError(err: Error): never {
   process.stderr.write(`Error: ${err.message}\n`);
+  // Set the exit code and throw instead of process.exit(): the abrupt exit
+  // crashes Node on Windows with a libuv assertion while fetch keep-alive
+  // handles are still open. The entry point's catch unwinds cleanly.
   if (err instanceof AuthError) {
-    process.exit(3);
+    process.exitCode = 3;
+  } else if (err instanceof NetworkError) {
+    process.exitCode = 2;
+  } else {
+    process.exitCode = 1;
   }
-  if (err instanceof NetworkError) {
-    process.exit(2);
-  }
-  process.exit(1);
+  throw err;
 }

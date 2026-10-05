@@ -19,6 +19,15 @@ import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 const BASE = '/api/v3/agentic/provider';
+const PROVIDER_TYPES = ['OPENAI_COMPATIBLE', 'ANTHROPIC'] as const;
+
+const parseProviderType = (value: string): string => {
+  const upper = value.toUpperCase();
+  if (!PROVIDER_TYPES.includes(upper as (typeof PROVIDER_TYPES)[number])) {
+    throw new Error(`option '--type ${value}' is invalid. allowed: ${PROVIDER_TYPES.join(', ')}`);
+  }
+  return upper;
+};
 
 /**
  * Register the `provider` command tree on the CLI program.
@@ -42,7 +51,7 @@ export function registerProviderCommand(program: Command): void {
     .description('Add a new AI model provider')
     .requiredOption('--name <name>', 'Provider display name')
     .requiredOption('--base-url <url>', 'API base URL (e.g. https://api.deepseek.com)')
-    .option('--type <type>', 'Provider protocol type (OPENAI_COMPATIBLE or ANTHROPIC)', 'OPENAI_COMPATIBLE')
+    .option('--type <type>', 'Provider protocol type (OPENAI_COMPATIBLE or ANTHROPIC)', parseProviderType, 'OPENAI_COMPATIBLE')
     .option('--api-key <key>', 'API key (omit for local endpoints without auth)')
     .option('--default', 'Set as the tenant default provider')
     .option('--enable', 'Enable the provider (default)')
@@ -69,7 +78,7 @@ export function registerProviderCommand(program: Command): void {
     .description('Update an AI model provider (blank api-key keeps the stored one)')
     .option('--name <name>', 'New display name')
     .option('--base-url <url>', 'New API base URL')
-    .option('--type <type>', 'New protocol type (OPENAI_COMPATIBLE or ANTHROPIC)')
+    .option('--type <type>', 'New protocol type (OPENAI_COMPATIBLE or ANTHROPIC)', parseProviderType)
     .option('--api-key <key>', 'New API key (omit to keep the stored one)')
     .option('--default', 'Set as the tenant default')
     .option('--enable', 'Enable the provider')
@@ -111,7 +120,7 @@ export function registerProviderCommand(program: Command): void {
     .description('Check provider connectivity (L1 model-list + L2 minimal chat probe)')
     .option('--id <id>', 'Provider ID to check (saved configuration)')
     .option('--base-url <url>', 'Draft mode: check an unsaved base URL')
-    .option('--type <type>', 'Draft mode: protocol type (OPENAI_COMPATIBLE or ANTHROPIC)')
+    .option('--type <type>', 'Protocol type (required for draft mode; default OPENAI_COMPATIBLE)', parseProviderType)
     .option('--api-key <key>', 'Draft mode: API key (optional)')
     .option('--model <model>', 'Model to use for the L2 chat probe')
     .option('--level <level>', 'Probe level: L1 (model list only), L2 (chat only), or BOTH (default)', 'BOTH')
@@ -128,7 +137,10 @@ export function registerProviderCommand(program: Command): void {
       const body: Record<string, unknown> = { level: opts.level };
       if (opts.id) body.id = opts.id;
       if (opts.baseUrl) body.baseUrl = opts.baseUrl;
-      if (opts.type) body.providerType = opts.type;
+      // Draft mode: default to OPENAI_COMPATIBLE when type is not specified
+      // (the backend requires an explicit type for draft checks).
+      if (opts.baseUrl) body.providerType = opts.type || 'OPENAI_COMPATIBLE';
+      else if (opts.type) body.providerType = opts.type;
       if (opts.apiKey !== undefined) body.apiKey = opts.apiKey;
       if (opts.model !== undefined) body.model = opts.model;
       const result = await dc3Client.post(`${BASE}/check`, body);

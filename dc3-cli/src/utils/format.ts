@@ -115,8 +115,15 @@ export function formatOutput(data: unknown, format: OutputFormat = 'json'): stri
  * @returns the format to render with
  */
 export function detectFormat(explicit?: string): OutputFormat {
-  if (explicit === 'json' || explicit === 'table' || explicit === 'yaml') {
-    return explicit;
+  if (explicit !== undefined && explicit !== '') {
+    if (explicit === 'json' || explicit === 'table' || explicit === 'yaml') {
+      return explicit;
+    }
+    // Reject unknown formats instead of silently falling back — the user
+    // explicitly asked for something the CLI does not support.
+    process.stderr.write(`error: unknown format '${explicit}' (expected json, table, or yaml)\n`);
+    process.exitCode = 1;
+    throw new SilentExit();
   }
   const globalOverride = getGlobalFormatOverride();
   if (globalOverride) {
@@ -138,5 +145,17 @@ export function detectFormat(explicit?: string): OutputFormat {
 export function printAndExit(data: unknown, format: OutputFormat = 'json', exitCode = 0): never {
   const output = formatOutput(data, format);
   if (output) process.stdout.write(output + '\n');
-  process.exit(exitCode);
+  // Use exitCode + throw instead of process.exit(): the abrupt exit crashes
+  // Node on Windows with a libuv assertion when fetch keep-alive handles are
+  // still open. Setting the code and unwinding lets the runtime close them.
+  process.exitCode = exitCode;
+  throw new SilentExit();
+}
+
+/** Control-flow signal: unwinds to the top-level catch which exits cleanly. */
+export class SilentExit extends Error {
+  constructor() {
+    super('silent exit');
+    this.name = 'SilentExit';
+  }
 }

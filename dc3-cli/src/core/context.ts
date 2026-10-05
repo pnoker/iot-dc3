@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { configManager } from './config-manager.js';
-import type { OutputFormat } from '../utils/format.js';
+import { SilentExit, type OutputFormat } from '../utils/format.js';
 
 const OUTPUT_FORMATS: readonly OutputFormat[] = ['json', 'table', 'yaml'];
 
@@ -46,6 +46,14 @@ export async function applyGlobalOptions(opts: {
 }): Promise<void> {
   if (opts.profile && opts.profile.trim()) {
     await configManager.setProfileOverride(opts.profile.trim());
+  }
+  // Reject unknown --format values here rather than silently dropping them:
+  // commander routes --format to the program level even when the subcommand
+  // also declares it, so detectFormat never sees the raw invalid string.
+  if (opts.format !== undefined && opts.format !== '' && !OUTPUT_FORMATS.includes(opts.format as OutputFormat)) {
+    process.stderr.write(`error: unknown format '${opts.format}' (expected json, table, or yaml)\n`);
+    process.exitCode = 1;
+    throw new SilentExit();
   }
   const settings = await configManager.getSettings();
   globalFormat = parseFormat(opts.format);

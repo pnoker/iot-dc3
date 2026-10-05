@@ -16,6 +16,7 @@
  */
 import { Command } from 'commander';
 import { handleFatalError } from './core/errors.js';
+import { SilentExit } from './utils/format.js';
 import { applyGlobalOptions } from './core/context.js';
 import { registerConfigCommand } from './commands/config.js';
 import { registerAuthCommand } from './commands/auth.js';
@@ -77,5 +78,15 @@ registerProviderCommand(program);
 registerModelCommand(program);
 registerAttachmentCommand(program);
 
-// Parse and map fatal errors to the contract exit codes (auth 3, network 2, business 1)
-program.parseAsync(process.argv).catch(handleFatalError);
+// Parse and map fatal errors to the contract exit codes (auth 3, network 2, business 1).
+// SilentExit is the control-flow signal from printAndExit — the exit code is already
+// set on process.exitCode, so just terminate without printing an error.
+program.parseAsync(process.argv).catch((error: unknown) => {
+  if (error instanceof SilentExit) return;
+  try {
+    handleFatalError(error instanceof Error ? error : new Error(String(error)));
+  } catch {
+    // handleFatalError printed the message and set process.exitCode already;
+    // swallow the re-thrown error so the process unwinds cleanly.
+  }
+});
