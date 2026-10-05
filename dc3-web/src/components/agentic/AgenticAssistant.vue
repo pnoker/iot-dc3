@@ -22,7 +22,7 @@
     ref="panelRef"
     :aria-label="t('agentic.title')"
     :aria-modal="isMobile || undefined"
-    :class="['agentic-panel', {'agentic-panel--expanded': expanded}]"
+    :class="['agentic-panel', {'agentic-panel--expanded': expanded, 'is-dragging': isDragging}]"
     :role="isMobile ? 'dialog' : 'complementary'"
     :style="expanded ? undefined : panelStyle"
     tabindex="-1"
@@ -398,6 +398,11 @@ const BOTTOM_THRESHOLD_PX = 80;
 const panelRef = ref<HTMLElement>();
 const panelWidth = ref<number>();
 const resizeFrame = ref<number>();
+const isDragging = ref(false);
+// Pauses .body-main's margin-right transition during a drag by collapsing
+// its duration to 0s on documentElement — same channel as
+// --dc3-agentic-dock-width, instead of reaching into Layout's styles.
+const DRAG_BODY_TRANSITION_PROPERTY = '--dc3-agentic-body-transition';
 const obscuredElements = ref<Array<{element: HTMLElement; wasInert: boolean}>>([]);
 const lastFocusElement = ref<HTMLElement>();
 const renamePopoverVisible = ref(false);
@@ -553,7 +558,9 @@ onBeforeUnmount(() => {
   }
   window.removeEventListener('mousemove', handleResizeMove);
   window.removeEventListener('mouseup', handleResizeEnd);
+  isDragging.value = false;
   document.body.classList.remove('agentic-resizing');
+  document.documentElement.style.removeProperty(DRAG_BODY_TRANSITION_PROPERTY);
   restoreMainContent();
   if (streaming.value) agenticStore.stopStreaming();
 });
@@ -754,7 +761,9 @@ const handleResizeStart = (event: MouseEvent) => {
   event.preventDefault();
   window.addEventListener('mousemove', handleResizeMove);
   window.addEventListener('mouseup', handleResizeEnd);
+  isDragging.value = true;
   document.body.classList.add('agentic-resizing');
+  document.documentElement.style.setProperty(DRAG_BODY_TRANSITION_PROPERTY, '0s');
 };
 
 const setPanelWidth = (width: number) => {
@@ -781,7 +790,9 @@ const handleResizeKeydown = (delta: number) => {
 const handleResizeEnd = () => {
   window.removeEventListener('mousemove', handleResizeMove);
   window.removeEventListener('mouseup', handleResizeEnd);
+  isDragging.value = false;
   document.body.classList.remove('agentic-resizing');
+  document.documentElement.style.removeProperty(DRAG_BODY_TRANSITION_PROPERTY);
   if (panelWidth.value) {
     localStorage.setItem(ASSISTANT_WIDTH_STORAGE_KEY, String(panelWidth.value));
   }
@@ -939,7 +950,7 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   }
 }
 // Width tracking must stay 1:1 with the pointer during a drag.
-body.agentic-resizing .agentic-panel {
+.agentic-panel.is-dragging {
   transition: none;
 }
 // Open / close: slide in from the right edge with a soft fade.
@@ -1388,7 +1399,9 @@ body.agentic-resizing .agentic-panel {
 :deep(.agentic-markdown) {
   max-width: 100%;
   min-width: 0;
-  overflow-wrap: anywhere;
+  // break-word only wraps a word when it cannot fit on its own line;
+  // unspaced runs (code, long URLs/hashes) opt into anywhere below.
+  overflow-wrap: break-word;
 
   p {
     margin: 0 0 8px;
@@ -1410,7 +1423,7 @@ body.agentic-resizing .agentic-panel {
     max-width: 100%;
     margin: 8px 0;
     padding: 10px 12px 10px 38px;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
     border: 1px solid var(--el-color-primary-light-5);
     border-left: 3px solid var(--el-color-primary-light-3);
     border-radius: var(--dc3-radius-md);
@@ -1452,12 +1465,14 @@ body.agentic-resizing .agentic-panel {
     background: var(--dc3-bg-muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 12px;
+    overflow-wrap: anywhere;
   }
 
   pre {
     box-sizing: border-box;
     max-width: 100%;
     overflow: auto;
+    overflow-wrap: anywhere;
     padding: 10px;
     border: 1px solid var(--dc3-border-base);
     border-radius: var(--dc3-radius-md);
@@ -1470,11 +1485,16 @@ body.agentic-resizing .agentic-panel {
     }
   }
 
+  // Markdown tables: use the browser's native table layout so tables fill
+  // 100% of the message card width. `display: block` (the previous approach)
+  // breaks the table layout algorithm — the anonymous table box inside a
+  // block-level table shrinks to content width, producing inconsistent
+  // card-to-card sizing. With `display: table` the column widths distribute
+  // proportionally and the table always spans the full card width; cell
+  // content wraps via overflow-wrap instead of overflowing.
   table {
-    display: block;
+    display: table;
     width: 100%;
-    max-width: 100%;
-    overflow-x: auto;
     border-collapse: collapse;
   }
 
@@ -1482,6 +1502,14 @@ body.agentic-resizing .agentic-panel {
   td {
     padding: 6px 8px;
     border: 1px solid var(--dc3-border-base);
+    overflow-wrap: break-word;
+  }
+
+  th {
+    color: var(--dc3-text-primary);
+    font-weight: 600;
+    text-align: left;
+    background: var(--dc3-surface-2, var(--el-fill-color-light));
   }
 }
 @media (max-width: $breakpoint-sm-max) {
@@ -1508,7 +1536,9 @@ body.agentic-resizing .agentic-panel {
     position: absolute;
     inset: 0;
     z-index: 20;
-    width: 100% !important;
+    // No width here: on this tier panelStyle already returns width:100%
+    // (isMobile === xs) and the expanded state sets its own width — an
+    // !important override would fight values that are always equal.
     min-width: 0;
     max-width: none;
     border-left: 0;
@@ -1563,15 +1593,13 @@ body.agentic-resizing .agentic-panel {
 </style>
 
 <style lang="scss">
+// Drag interaction feedback only (cursor / selection are genuinely global
+// state during a drag). Layout negotiation no longer rides this class:
+// pausing .body-main's transition goes through --dc3-agentic-body-transition
+// on documentElement, next to --dc3-agentic-dock-width.
 .agentic-resizing {
   cursor: col-resize;
   user-select: none;
-}
-
-// Width tracking must stay 1:1 with the pointer during a drag — the main
-// column slides through --dc3-agentic-dock-width and must not lag either.
-body.agentic-resizing .body-main {
-  transition: none !important;
 }
 
 // Teleported poppers live outside the panel's stacking context (the panel is

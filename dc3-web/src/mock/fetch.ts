@@ -138,6 +138,9 @@ export const charts = {
 };
 
 interface Scenario {
+  // Lower number wins when several scenarios match — array order must not
+  // decide routing (more specific query intents get smaller numbers).
+  priority: number;
   match: RegExp;
   events: { type: string; title: string; detail?: string; phase?: string; status?: string; name?: string }[];
   text: string;
@@ -145,8 +148,9 @@ interface Scenario {
   charts: () => AgenticVisualizationSpec[];
 }
 
-const scenarios: Scenario[] = [
+export const scenarios: Scenario[] = [
   {
+    priority: 20,
     match: /温度|temp|发热|过热/i,
     events: [
       {type: 'tool', title: '查询位号历史值', name: 'point_value_list', phase: 'start', status: 'running'},
@@ -160,6 +164,7 @@ const scenarios: Scenario[] = [
     charts: () => [charts.tempTrend(), charts.deviceStatus(), charts.alarmSummary()],
   },
   {
+    priority: 30,
     match: /能耗|用电|电量|energy|功率/i,
     events: [
       {type: 'tool', title: '聚合设备能耗', name: 'point_value_stats', phase: 'start', status: 'running'},
@@ -173,6 +178,7 @@ const scenarios: Scenario[] = [
     charts: () => [charts.energyWeek(), charts.powerTrend()],
   },
   {
+    priority: 40,
     match: /驱动|driver|掉线|负载/i,
     events: [
       {type: 'tool', title: '查询驱动运行状态', name: 'driver_status_list', phase: 'start', status: 'running'},
@@ -186,6 +192,7 @@ const scenarios: Scenario[] = [
     charts: () => [charts.driverLoad(), charts.deviceStatus()],
   },
   {
+    priority: 10,
     match: /位号|point|点位|实时/i,
     events: [
       {type: 'tool', title: '查询位号实时值', name: 'point_value_latest', phase: 'start', status: 'running'},
@@ -197,7 +204,8 @@ const scenarios: Scenario[] = [
   },
 ];
 
-const defaultScenario: Scenario = {
+export const defaultScenario: Scenario = {
+  priority: 999,
   match: /.*/,
   events: [
     {type: 'tool', title: '查询设备总览', name: 'dashboard_stats', phase: 'start', status: 'running'},
@@ -211,8 +219,18 @@ const defaultScenario: Scenario = {
   charts: () => [charts.deviceStatus(), charts.tempTrend(), charts.alarmSummary()],
 };
 
-const pickScenario = (prompt: string): Scenario =>
-  scenarios.find((s) => s.match.test(prompt)) ?? defaultScenario;
+/**
+ * Pick the demo scenario for a prompt: scenarios are evaluated by ascending
+ * priority so overlapping keywords route to the most specific intent, and
+ * the default scenario answers everything unmatched.
+ *
+ * @param prompt - user prompt to route
+ * @returns the highest-priority matching scenario, or the default
+ */
+export const pickScenario = (prompt: string): Scenario =>
+  [...scenarios]
+    .sort((a, b) => a.priority - b.priority)
+    .find((s) => s.match.test(prompt)) ?? defaultScenario;
 
 const scenarioText = (scenario: Scenario) => currentMockLocale() === 'zh' ? scenario.text : scenario.textEn;
 

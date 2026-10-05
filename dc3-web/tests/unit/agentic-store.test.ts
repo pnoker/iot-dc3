@@ -19,7 +19,8 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
 
 import {useAgenticStore} from '@/store';
-import type {AgenticStreamCallbacks} from '@/config/types';
+import {mergeEphemeralAssistantState} from '@/store/modules/agentic';
+import type {AgenticMessage, AgenticStreamCallbacks} from '@/config/types';
 
 const apiMocks = vi.hoisted(() => ({
   completeAgenticChatCompletion: vi.fn(),
@@ -444,5 +445,127 @@ describe('agentic store', () => {
     store.setWorkbenchExpanded(true);
     store.reset();
     expect(store.workbenchExpanded).toBe(false);
+  });
+});
+
+describe('mergeEphemeralAssistantState', () => {
+  const msg = (id: string, role: 'user' | 'assistant', extra: Partial<AgenticMessage> = {}): AgenticMessage => ({
+    id,
+    role,
+    content: extra.content ?? (role === 'user' ? 'question' : 'answer'),
+    createTime: '2026-10-03 00:00:00',
+    ...extra,
+  });
+
+  const chart = (id: string) => ({
+    id,
+    type: 'line',
+    title: `Chart ${id}`,
+    dataset: [{index: 0, value: 1}],
+    encode: {x: 'index', y: 'value'},
+  });
+
+  it('merges a single optimistic turn onto the server copy via tail alignment', () => {
+    const previous = [
+      msg('user-1', 'user'),
+      msg('assistant-optimistic-1', 'assistant', {
+        reasoning: 'checking sensors,',
+        finishReason: 'stop',
+        contentExt: {charts: [chart('optimistic-chart')]},
+      }),
+    ];
+    const loaded = [msg('user-1', 'user'), msg('assistant-server-1', 'assistant')];
+
+    const merged = mergeEphemeralAssistantState(previous, loaded);
+
+    expect(merged).toHaveLength(2);
+    expect(merged[1]).toMatchObject({
+      id: 'assistant-server-1',
+      reasoning: 'checking sensors,',
+      finishReason: 'stop',
+    });
+    expect(merged[1]!.contentExt?.charts).toEqual([expect.objectContaining({id: 'optimistic-chart'})]);
+  });
+
+  it('merges multiple consecutive optimistic turns across interleaved user messages', () => {
+    const previous = [
+      msg('user-1', 'user'),
+      msg('assistant-optimistic-1', 'assistant', {reasoning: 'reasoning one'}),
+      msg('user-2', 'user'),
+      msg('assistant-optimistic-2', 'assistant', {reasoning: 'reasoning two'}),
+      msg('user-3', 'user'),
+      msg('assistant-optimistic-3', 'assistant', {reasoning: 'reasoning three'}),
+    ];
+    const loaded = [
+      msg('user-1', 'user'),
+      msg('assistant-server-1', 'assistant'),
+      msg('user-2', 'user'),
+      msg('assistant-server-2', 'assistant'),
+      msg('user-3', 'user'),
+      msg('assistant-server-3', 'assistant'),
+    ];
+
+    const merged = mergeEphemeralAssistantState(previous, loaded);
+
+    expect(merged[1]!.reasoning).toBe('reasoning one');
+    expect(merged[3]!.reasoning).toBe('reasoning two');
+    expect(merged[5]!.reasoning).toBe('reasoning three');
+  });
+
+  it('keeps optimistic state off an assistant message another client inserted', () => {
+    const previous = [
+      msg('user-1', 'user'),
+      msg('assistant-optimistic-1', 'assistant', {reasoning: 'local reasoning'}),
+    ];
+    // Another client's assistant message landed between the user turn and
+    // this client's optimistic turn; index pairing would pin the local
+    // reasoning onto the inserted message.
+    const loaded = [
+      msg('user-1', 'user'),
+      msg('assistant-inserted', 'assistant'),
+      msg('assistant-server-1', 'assistant'),
+    ];
+
+    const merged = mergeEphemeralAssistantState(previous, loaded);
+
+    expect(merged[1]!.id).toBe('assistant-inserted');
+    expect(merged[1]!.reasoning).toBeUndefined();
+    expect(merged[2]).toMatchObject({id: 'assistant-server-1', reasoning: 'local reasoning'});
+  });
+
+  it('does not shift ephemeral state when another client deleted a middle message', () => {
+    const previous = [
+      msg('user-1', 'user'),
+      msg('assistant-server-1', 'assistant', {reasoning: 'old reasoning'}),
+      msg('user-2', 'user'),
+      msg('assistant-optimistic-2', 'assistant', {reasoning: 'latest reasoning'}),
+    ];
+    // The first assistant turn was deleted server-side; index pairing would
+    // hand its stale reasoning to the surviving tail message.
+    const loaded = [msg('user-1', 'user'), msg('user-2', 'user'), msg('assistant-server-2', 'assistant')];
+
+    const merged = mergeEphemeralAssistantState(previous, loaded);
+
+    expect(merged).toHaveLength(3);
+    expect(merged[2]).toMatchObject({id: 'assistant-server-2', reasoning: 'latest reasoning'});
+  });
+
+  it('re-merges by id for history that already carries server ids', () => {
+    const previous = [
+      msg('user-1', 'user'),
+      // Refresh path: the cached history was already merged once, so its ids
+      // match the server's and only the id-based pass applies.
+      msg('assistant-server-1', 'assistant', {reasoning: 'persisted locally'}),
+      msg('user-2', 'user'),
+    ];
+    const loaded = [
+      msg('user-1', 'user'),
+      msg('assistant-server-1', 'assistant'),
+      msg('user-2', 'user'),
+    ];
+
+    const merged = mergeEphemeralAssistantState(previous, loaded);
+
+    expect(merged[1]).toMatchObject({id: 'assistant-server-1', reasoning: 'persisted locally'});
   });
 });

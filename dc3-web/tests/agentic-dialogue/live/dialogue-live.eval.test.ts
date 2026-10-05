@@ -74,8 +74,15 @@ const judgeConfig: JudgeConfig | undefined = JUDGE_URL
 
 const scores: CaseScore[] = [];
 const failures: string[] = [];
+const transportFailures: string[] = [];
 const conversationIds = new Map<string, string>();
 const chainChecks: Array<{name: string; pass: boolean; detail?: string}> = [];
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Transport-shaped outcomes (stream error, empty reply, missing finish frame). */
+const isTransportShaped = (outcome: LiveOutcome): boolean =>
+  Boolean(outcome.error) || !outcome.content.trim() || !outcome.finishReason;
 
 const runCase = async (item: DialogueCase): Promise<CaseScore> => {
   const attempt = async (): Promise<LiveOutcome> => {
@@ -103,17 +110,15 @@ const runCase = async (item: DialogueCase): Promise<CaseScore> => {
   };
 
   let finalOutcome = await attempt();
-  let score = scoreCase(item, finalOutcome);
-
-  // Parallel SSE streams occasionally drop mid-reply (empty content / missing
-  // finish frame). That is a transport artifact, not a model-quality signal,
-  // so retry once before recording; quality failures are never retried.
-  const transportShaped =
-    Boolean(finalOutcome.error) || !finalOutcome.content.trim() || !finalOutcome.finishReason;
-  if (!score.hardPass && transportShaped) {
+  // Parallel SSE streams occasionally fail transport-wise (upstream 429 rate
+  // limits, dropped streams). Back off and retry before recording — these are
+  // infra artifacts, not model-quality signals; quality failures never retry.
+  for (const delay of [5_000, 15_000, 45_000]) {
+    if (!isTransportShaped(finalOutcome)) break;
+    await sleep(delay);
     finalOutcome = await attempt();
-    score = scoreCase(item, finalOutcome);
   }
+  const score = scoreCase(item, finalOutcome);
 
   if (judgeConfig) {
     const judged = await judgeCase(judgeConfig, item, finalOutcome.content);
@@ -129,9 +134,11 @@ const runCase = async (item: DialogueCase): Promise<CaseScore> => {
   if (!score.hardPass) {
     const failed = score.checks.filter((check) => check.hard && !check.pass).map((check) => check.name);
     const shape = `finish=${finalOutcome.finishReason ?? '-'} len=${finalOutcome.content.length} events=${finalOutcome.events.length} viz=${finalOutcome.visualizationCount}`;
-    failures.push(
-      `${item.id} [${item.family}] → ${failed.join(', ')} | ${shape}${finalOutcome.error ? ` | cause: ${finalOutcome.error.slice(0, 160)}` : ''}`
-    );
+    const entry = `${item.id} [${item.family}] → ${failed.join(', ')} | ${shape}${
+      finalOutcome.error ? ` | cause: ${finalOutcome.error.slice(0, 160)}` : ''
+    }`;
+    if (isTransportShaped(finalOutcome)) transportFailures.push(entry);
+    else failures.push(entry);
   }
   return score;
 };
@@ -166,6 +173,7 @@ describe.runIf(Boolean(BASE_URL))('live full-chain dialogue evaluation', () => {
     await Promise.all(workers);
     expect(scores.length).toBe(selectedCorpus.length);
     expect(failures).toEqual([]);
+    expect(transportFailures).toEqual([]);
   }, 24 * 60 * 60 * 1000);
 
   it('persists conversation turns and replays them from the backend', async () => {
@@ -215,6 +223,7 @@ describe.runIf(Boolean(BASE_URL))('live full-chain dialogue evaluation', () => {
       concurrency: CONCURRENCY,
       chainChecks,
       failures,
+      transportFailures,
       rows,
       scores,
     });
@@ -227,6 +236,7 @@ describe.runIf(Boolean(BASE_URL))('live full-chain dialogue evaluation', () => {
         `Endpoint: ${BASE_URL} · Model: ${MODEL} · Concurrency: ${CONCURRENCY} · Judge: ${judgeConfig ? judgeConfig.model : 'off'}`,
         '',
         `Corpus size: **${corpusStats(selectedCorpus).total}** (filter: ${FAMILY_FILTER || 'none'}${LIMIT ? `, limit ${LIMIT}` : ''}) · Hard-pass: **${scores.filter((s) => s.hardPass).length}/${scores.length}**`,
+        `Transport failures after retries (upstream rate limits / dropped streams): **${transportFailures.length}** — reported separately from reply-quality failures.`,
         '',
         '## Full-chain checks',
         '',
@@ -238,9 +248,13 @@ describe.runIf(Boolean(BASE_URL))('live full-chain dialogue evaluation', () => {
           (row) => `| ${row.family} | ${row.cases} | ${row.pass} | ${row.passRate} | ${row.avgScore} | ${row.avgLatencyMs}ms |`
         ),
         '',
-        '## Failures',
+        '## Reply-quality failures',
         '',
         ...(failures.length === 0 ? ['None — every case passed its hard checks.'] : failures.map((line) => `- ${line}`)),
+        '',
+        '## Transport failures (excluded from quality pass rate)',
+        '',
+        ...(transportFailures.length === 0 ? ['None.'] : transportFailures.map((line) => `- ${line}`)),
       ].join('\n')
     );
   });

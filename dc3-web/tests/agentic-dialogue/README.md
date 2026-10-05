@@ -20,6 +20,27 @@ dialogue chain, plus an env-gated live LLM evaluation runner for a real backend.
 | `live/` | Live LLM evaluation: SSE client (`sse.ts`), rule scorer + optional LLM judge (`evaluator.ts`), env-gated runner (`dialogue-live.eval.test.ts`) |
 | `reports/` | Generated artifacts (gitignored) |
 
+## Realistic conversation scenarios
+
+Unlike the per-utterance coverage corpus, **scenario tests** run coherent multi-turn
+dialogues (8-11 turns per session) that mirror real user behavior — one session per
+scenario, testing context continuity, tool call timing, topic management, and safety
+boundaries mid-conversation.
+
+| Path | Purpose |
+|---|---|
+| `corpus/scenarios.ts` | 12 business scenarios (inspection, alarm handling, energy audit, troubleshooting, topic switching, onboarding, emergency, security probes, corrections, batch analysis, casual→business, deep dive) |
+| `scenario-corpus.test.ts` | Scenario integrity self-check |
+| `live/scenario-live.eval.test.ts` | Live evaluation runner (env-gated) |
+
+```powershell
+# Live scenario evaluation (same env contract as dialogue-live)
+$env:AGENTIC_SCENARIO_BASE_URL = 'http://127.0.0.1:8000'
+pnpm --dir dc3-web eval:agentic-scenarios
+```
+
+Output: `reports/scenario-eval-report.md` with per-scenario turn-by-turn results.
+
 ## Running
 
 ```bash
@@ -55,6 +76,8 @@ message replay are verified through the gateway afterwards.
 | `AGENTIC_EVAL_MODEL` | Model name sent in requests (default `dc3-agentic`) |
 | `AGENTIC_EVAL_CONCURRENCY` | Parallel conversations (default `4`) |
 | `AGENTIC_EVAL_TIMEOUT_MS` | Per-case timeout (default `120000`) |
+| `AGENTIC_EVAL_FAMILY_FILTER` | Regex limiting evaluation to matching families (smoke runs) |
+| `AGENTIC_EVAL_LIMIT` | Evaluate only the first N selected cases (smoke runs) |
 | `AGENTIC_EVAL_JUDGE_URL` | Optional OpenAI-compatible judge base URL |
 | `AGENTIC_EVAL_JUDGE_KEY` / `AGENTIC_EVAL_JUDGE_MODEL` | Judge credentials (default model `gpt-4o`) |
 

@@ -928,8 +928,11 @@ const handleCommand = async (command: string) => {
       // Slide over when the assistant panel docks: the panel is
       // position:fixed, so the page reserves its width through this var
       // (published by AgenticAssistant from panelStyle, including drag-resize).
+      // During a drag the panel collapses this duration to 0s via
+      // --dc3-agentic-body-transition so width tracking stays 1:1 with the
+      // pointer — it must not animate while the user is still dragging.
       margin-right: var(--dc3-agentic-dock-width, 0px);
-      transition: margin-right var(--dc3-duration-slow) var(--dc3-ease-standard);
+      transition: margin-right var(--dc3-agentic-body-transition, var(--dc3-duration-slow)) var(--dc3-ease-standard);
 
       > .el-scrollbar {
         flex: 1;

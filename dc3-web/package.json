@@ -44,6 +44,7 @@
     "test:guard": "vitest run tests/guardrails",
     "test:agentic-dialogue": "vitest run tests/agentic-dialogue",
     "eval:agentic-dialogue": "vitest run tests/agentic-dialogue/live/dialogue-live.eval.test.ts",
+    "eval:agentic-scenarios": "vitest run tests/agentic-dialogue/live/scenario-live.eval.test.ts",
     "test:impact": "node scripts/testing/changed-test-plan.mjs",
     "test:ci": "vitest run --coverage",
     "test:coverage": "vitest run --coverage",

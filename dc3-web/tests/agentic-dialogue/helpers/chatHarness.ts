@@ -57,6 +57,18 @@ export const ensureMockChatEngine = (): void => {
 };
 
 /**
+ * Reset the agentic collections of the shared mock DB. The db is a module
+ * singleton and `persistMockTurn` accumulates every turn in it; tests that
+ * reuse a fixed conversationId across cases must call this in beforeEach so
+ * earlier turns cannot bleed into later assertions (per-case isolation
+ * otherwise comes from the harness's fresh conversation ids).
+ */
+export const resetMockChatEngine = (): void => {
+  db.agenticMessages.length = 0;
+  db.agenticSessions.length = 0;
+};
+
+/**
  * Apply the mock locale under test for a case.
  * @param item - case whose expectations declare the reply language
  */

@@ -60,6 +60,22 @@ describe('RenderedAssistantMessage', () => {
     expect(html).not.toContain('javascript:');
   });
 
+  it('renders markdown tables with native table layout that fills the card width', () => {
+    const wrapper = mountAssistant({
+      content: '| 名称 | 值 |\n|---|---|\n| 温度 | 24.5°C |\n| 湿度 | 58% |',
+    });
+
+    const table = wrapper.find('.agentic-markdown table');
+    expect(table.exists()).toBe(true);
+    // The table renders as a real table element with header and data rows,
+    // not a block-level container that shrinks to content width.
+    expect(table.findAll('th').length).toBeGreaterThanOrEqual(2);
+    expect(table.findAll('td').length).toBeGreaterThanOrEqual(4);
+    expect(table.text()).toContain('温度');
+    expect(table.text()).toContain('24.5');
+    expect(table.text()).toContain('湿度');
+  });
+
   it('renders one ChartBlock per attached visualization spec', () => {
     const wrapper = mountAssistant({
       content: 'see chart',

@@ -975,8 +975,16 @@ export const useAgenticStore = defineStore('agentic', () => {
     ];
   };
 
+  // Persist only the active conversation: the cache exists so a refresh
+  // restores the visible thread instantly — other conversations are fetched
+  // from the server on selection anyway, and caching every conversation's
+  // full history grows unbounded against the localStorage quota
+  // (setStorage swallows QuotaExceededError silently, so overflow would
+  // freeze the cache at a stale version with no signal).
   const persistMessages = () => {
-    setStorage(MESSAGE_STORAGE_KEY, messagesByConversation.value);
+    const activeId = activeConversationId.value;
+    if (!activeId) return;
+    setStorage(MESSAGE_STORAGE_KEY, {[activeId]: messagesByConversation.value[activeId] || []});
   };
 
   return {
@@ -1135,20 +1143,24 @@ const shouldGenerateSessionTitle = (title?: string) => {
   return !title || normalizeTitle(title) === defaultSessionTitle();
 };
 
-const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: AgenticMessage[]) => {
-  const previousAssistantState = previous
-    .filter((message) => message.role === 'assistant')
-    .map((message) => ({
-      reasoning: message.reasoning,
-      finishReason: message.finishReason,
-      charts: message.contentExt?.charts,
-    }));
-  let assistantIndex = 0;
-  return loaded.map((message) => {
-    if (message.role !== 'assistant') {
-      return message;
-    }
-    const state = previousAssistantState[assistantIndex++];
+/**
+ * Merge front-end ephemeral assistant state (streaming reasoning, charts,
+ * finish reason) into a server snapshot. History that already carries server
+ * ids pairs by id; optimistic placeholders (front-end generated ids the
+ * server never saw) sit at the tail and pair with the loaded tail walking
+ * head-wards across interleaved user turns.
+ *
+ * @param previous - locally held messages (optimistic turn at the tail)
+ * @param loaded - server messages to merge ephemeral state into
+ * @returns loaded messages with ephemeral state re-attached
+ */
+export const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: AgenticMessage[]) => {
+  const stateOf = (message: AgenticMessage) => ({
+    reasoning: message.reasoning,
+    finishReason: message.finishReason,
+    charts: message.contentExt?.charts,
+  });
+  const apply = (message: AgenticMessage, state?: ReturnType<typeof stateOf>) => {
     if (!state) {
       return message;
     }
@@ -1161,7 +1173,44 @@ const mergeEphemeralAssistantState = (previous: AgenticMessage[], loaded: Agenti
           ? message.contentExt
           : {...(message.contentExt || {}), charts: state.charts},
     };
-  });
+  };
+
+  const loadedIds = new Set(loaded.map((message) => message.id));
+  const previousById = new Map(previous.map((message) => [message.id, stateOf(message)]));
+
+  // Optimistic placeholders (front-end generated ids that never travelled to
+  // the server) sit at the tail of `previous`; pair them with the not-yet-
+  // matched assistants at the tail of `loaded`, walking head-wards across
+  // interleaved user turns. Positional pairing over the whole list would
+  // misalign as soon as another client inserts or deletes any assistant
+  // message; tail alignment only breaks if another client appended a newer
+  // assistant turn after this client's — the residual risk documented in
+  // docs/tech-debt-ai-assistant.md P0-2.
+  const tailPairs = new Map<string, ReturnType<typeof stateOf>>();
+  let l = loaded.length - 1;
+  for (let p = previous.length - 1; p >= 0; p--) {
+    const prev = previous[p]!;
+    if (prev.role === 'user') {
+      continue;
+    }
+    if (prev.role !== 'assistant' || loadedIds.has(prev.id)) {
+      break; // reached the history block; id-based pairing takes over below
+    }
+    while (l >= 0 && loaded[l]!.role !== 'assistant') {
+      l--;
+    }
+    if (l < 0) {
+      break;
+    }
+    tailPairs.set(loaded[l]!.id, stateOf(prev));
+    l--;
+  }
+
+  return loaded.map((message) =>
+    message.role === 'assistant'
+      ? apply(message, tailPairs.get(message.id) ?? previousById.get(message.id))
+      : message
+  );
 };
 
 type RawAgenticSessionExt = AgenticSessionExt & {
@@ -1173,6 +1222,17 @@ type RawAgenticSession = AgenticSession & {
   session_ext?: RawAgenticSessionExt;
 };
 
+/**
+ * Parse legacy string-encoded booleans from server session ext payloads.
+ * The ext map survives a stringly round-trip on the backend; recognized
+ * shapes are boolean / number / the canonical true/false string forms.
+ * Unrecognized strings stay undefined so callers can distinguish "off"
+ * from "absent" (e.g. sessionExt.archived).
+ * TODO(agentic-native-ext-bool): remove once the backend emits native JSON booleans in session ext.
+ *
+ * @param value - raw ext payload value
+ * @returns the parsed boolean, or undefined when absent/unknown
+ */
 const normalizeBoolean = (value: unknown): boolean | undefined => {
   if (value === undefined || value === null || value === '') {
     return undefined;
@@ -1183,11 +1243,11 @@ const normalizeBoolean = (value: unknown): boolean | undefined => {
   if (typeof value === 'number') {
     return value !== 0;
   }
-  const normalized = String(value).trim().toLowerCase();
-  if (['true', '1', 'yes', 'y', 'on', 'enable', 'enabled'].includes(normalized)) {
+  const v = String(value).trim().toLowerCase();
+  if (v === 'true' || v === '1' || v === 'on' || v === 'yes') {
     return true;
   }
-  if (['false', '0', 'no', 'n', 'off', 'disable', 'disabled'].includes(normalized)) {
+  if (v === 'false' || v === '0' || v === 'off' || v === 'no') {
     return false;
   }
   return undefined;
