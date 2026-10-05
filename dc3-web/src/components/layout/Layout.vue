@@ -793,7 +793,9 @@ const handleCommand = async (command: string) => {
         background: var(--dc3-bg-interactive-active);
 
         .assistant-sparkle {
-          transform: scale(1.12);
+          // Same hover verb as the settings gear (rotate), angled to the
+          // star's half-symmetry period for equivalent visual displacement.
+          transform: rotate(22.5deg);
           filter: drop-shadow(0 0 6px rgba(21, 163, 216, 0.35));
         }
       }
