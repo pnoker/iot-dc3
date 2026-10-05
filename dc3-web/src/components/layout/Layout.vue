@@ -708,6 +708,14 @@ const handleCommand = async (command: string) => {
       .el-button + .el-button {
         margin-left: 0;
       }
+
+      // The capsule dividers carry their own 8px shoulders for the gap-less
+      // .header_actions_glass host; inside this gapped container the margin
+      // would double the shoulder to 16px, so the container gap owns it here
+      // and every divider breathes the same 8px as its siblings.
+      .header_actions_divider {
+        margin: 0;
+      }
     }
 
     // Settings and the phone-only preferences ("…") chip share one utility
