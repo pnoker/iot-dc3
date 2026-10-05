@@ -772,7 +772,6 @@ const handleCommand = async (command: string) => {
       border: 1px solid var(--dc3-border-base);
       background: var(--dc3-bg-interactive);
       color: var(--dc3-text-regular);
-      transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
 
       .assistant-sparkle {
         display: block;
@@ -792,9 +791,9 @@ const handleCommand = async (command: string) => {
       &:hover,
       &:focus-visible {
         background: var(--dc3-bg-interactive-active);
-        transform: translateY(-1px);
 
         .assistant-sparkle {
+          transform: scale(1.12);
           filter: drop-shadow(0 0 6px rgba(21, 163, 216, 0.35));
         }
       }
