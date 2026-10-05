@@ -99,22 +99,20 @@
                 text
                 @click="agenticStore.toggle()"
               >
-                <!-- One four-point sparkle filled with the platform brand
-                     gradient (--dc3-brand-gradient): the AI glyph in the same
-                     colour language as the rest of the header. Static at rest;
-                     motion carries state — hover tilts like the settings
-                     gear, an open panel breathes. -->
+                <!-- Claude-style refined star: a four-point spark with
+                     gentler entry curves than a classic sparkle, filled
+                     with the brand gradient on a white glass chip. -->
                 <svg aria-hidden="true" class="assistant-sparkle" viewBox="0 0 24 24">
                   <defs>
                     <linearGradient id="dc3-spark-gradient" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stop-color="#087fbd" />
+                      <stop offset="0%" stop-color="#0a90cc" />
                       <stop offset="50%" stop-color="#15a3d8" />
                       <stop offset="100%" stop-color="#5558c9" />
                     </linearGradient>
                   </defs>
                   <path
                     fill="url(#dc3-spark-gradient)"
-                    d="M12 1.5c1 8.4 2.1 11.6 10.5 12.5-8.4.9-9.5 4.1-10.5 12.5-1-8.4-2.1-11.6-10.5-12.5C9.9 13.1 11 9.9 12 1.5Z"
+                    d="M12 1.5c.8 6.7 1.7 9.3 8.4 10.2-6.7.9-7.6 3.5-8.4 10.2-.8-6.7-1.7-9.3-8.4-10.2C10.3 10.8 11.2 8.2 12 1.5Z"
                   />
                 </svg>
               </el-button>
@@ -754,38 +752,50 @@ const handleCommand = async (command: string) => {
     // with a siri-like flowing multi-colour gradient, and the water level
     // bobs like a half-sphere of water being gently tipped. The sparkle
     // glyph floats above the liquid surface.
+    // AI assistant entry — Claude-style refined star on a glass chip.
+    // The four-point spark carries the brand gradient (with a subtler
+    // entry cyan for depth) and a soft drop shadow for layer separation.
+    // The chip itself uses a white glass surface with an inner top-light
+    // and a faint brand-tinted outer shadow — the same optical grammar
+    // as polished product icons.
     .header_assistant_button {
       position: relative;
       width: 32px;
       height: 32px;
-      border: 1px solid var(--dc3-border-base);
-      background: var(--dc3-bg-interactive);
-      transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard);
+      border: 1px solid rgba(100, 148, 174, 0.15);
+      background: #ffffff;
+      box-shadow:
+        0 2px 8px rgba(8, 127, 189, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition:
+        transform var(--dc3-duration-fast) var(--dc3-ease-standard),
+        box-shadow var(--dc3-duration-fast) var(--dc3-ease-standard);
 
       .assistant-sparkle {
         display: block;
-        width: 19px;
-        height: 19px;
-        transition: transform var(--dc3-duration-fast) var(--dc3-ease-standard), filter var(--dc3-duration-fast) var(--dc3-ease-standard);
+        width: 18px;
+        height: 18px;
+        filter: drop-shadow(0 1px 3px rgba(8, 127, 189, 0.25));
+        transition:
+          transform var(--dc3-duration-fast) var(--dc3-ease-standard),
+          filter var(--dc3-duration-fast) var(--dc3-ease-standard);
       }
 
-      // Motion carries state: hover tilts the sparkle like the settings
-      // gear hover, an open panel breathes slowly, and at rest the glyph
-      // is perfectly still.
+      // Hover: the chip lifts and the shadow deepens; the sparkle gains a
+      // faint outer glow — the "waking up" affordance.
       &:hover,
       &:focus-visible {
         transform: translateY(-1px);
+        box-shadow:
+          0 4px 14px rgba(8, 127, 189, 0.15),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
         .assistant-sparkle {
-          filter: brightness(1.12);
+          filter: drop-shadow(0 0 6px rgba(21, 163, 216, 0.35));
         }
       }
 
-      &:hover .assistant-sparkle,
-      &:focus-visible .assistant-sparkle {
-        transform: rotate(18deg);
-      }
-
+      // Panel open: the spark breathes — the "AI is alive" signal.
       &.is-active .assistant-sparkle {
         animation: assistant-spark-breathe 2.4s ease-in-out infinite alternate;
       }
@@ -794,10 +804,12 @@ const handleCommand = async (command: string) => {
     @keyframes assistant-spark-breathe {
       from {
         transform: scale(1);
+        filter: drop-shadow(0 1px 3px rgba(8, 127, 189, 0.25));
       }
 
       to {
         transform: scale(1.08);
+        filter: drop-shadow(0 0 8px rgba(21, 163, 216, 0.4));
       }
     }
 
