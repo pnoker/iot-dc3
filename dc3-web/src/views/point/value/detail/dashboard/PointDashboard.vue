@@ -76,8 +76,8 @@
     <div class="point-dashboard__stats">
       <stat-card
         :icon="OdometerIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('current')"
+        :on-refresh="() => reloadDashboard('current')"
         :subtitle="unit || '—'"
         :title="$t('pointValue.dashboard.kpi.current')"
         :value="currentValueCard"
@@ -85,8 +85,8 @@
       />
       <stat-card
         :icon="DataLineIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('average')"
+        :on-refresh="() => reloadDashboard('average')"
         :subtitle="$t('pointValue.dashboard.kpi.averageSub')"
         :title="$t('pointValue.dashboard.kpi.average')"
         :value="averageValueCard"
@@ -94,8 +94,8 @@
       />
       <stat-card
         :icon="TrendChartsIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('range')"
+        :on-refresh="() => reloadDashboard('range')"
         :subtitle="$t('pointValue.dashboard.kpi.windowRangeSub')"
         :title="$t('pointValue.dashboard.kpi.windowRange')"
         :value="stats ? `${formatValue(stats.min)} ~ ${formatValue(stats.max)}` : '--'"
@@ -103,8 +103,8 @@
       />
       <stat-card
         :icon="TimerIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('interval')"
+        :on-refresh="() => reloadDashboard('interval')"
         :subtitle="$t('pointValue.dashboard.kpi.medianIntervalSub')"
         :title="$t('pointValue.dashboard.kpi.medianInterval')"
         :value="stats ? formatMs(stats.medianIntervalMs) : '—'"
@@ -112,8 +112,8 @@
       />
       <stat-card
         :icon="CollectionIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('samples')"
+        :on-refresh="() => reloadDashboard('samples')"
         :subtitle="samplesSubtitle"
         :title="$t('pointValue.dashboard.kpi.samples')"
         :value="stats ? formatSampleCount(stats.sampleCount, stats.truncated) : '--'"
@@ -121,8 +121,8 @@
       />
       <stat-card
         :icon="WarningIcon"
-        :loading="dashboard.loading.value"
-        :on-refresh="reloadDashboard"
+        :loading="cardLoading('gaps')"
+        :on-refresh="() => reloadDashboard('gaps')"
         :subtitle="$t('pointValue.dashboard.kpi.gapsSub')"
         :title="$t('pointValue.dashboard.kpi.gaps')"
         :value="gapCount"
@@ -135,11 +135,11 @@
       <el-col :span="24">
         <trend-band-card
           :data="dashboard.data.value?.trend ?? []"
-          :loading="dashboard.loading.value"
+          :loading="cardLoading('trend')"
           :range-hours="rangeHours"
           :status="dashboard.status.value"
           :unit="unit"
-          @refresh="reloadDashboard"
+          @refresh="() => reloadDashboard('trend')"
           @update:range-hours="onRangeChange"
         />
       </el-col>
@@ -152,10 +152,10 @@
           :gaps="dashboard.data.value?.gaps ?? []"
           :hourly-volume="dashboard.data.value?.hourlyVolume ?? []"
           :interval-histogram="dashboard.data.value?.intervalHistogram ?? []"
-          :loading="dashboard.loading.value"
+          :loading="cardLoading('collection')"
           :range-hours="rangeHours"
           :status="dashboard.status.value"
-          @refresh="reloadDashboard"
+          @refresh="() => reloadDashboard('collection')"
         />
       </el-col>
     </el-row>
@@ -165,11 +165,11 @@
       <el-col :lg="16" :md="24" :sm="24" :xl="16" :xs="24">
         <value-profile-card
           :histogram="dashboard.data.value?.valueHistogram ?? []"
-          :loading="dashboard.loading.value"
+          :loading="cardLoading('profile')"
           :status="dashboard.status.value"
           :typical-day="dashboard.data.value?.typicalDay ?? []"
           :unit="unit"
-          @refresh="reloadDashboard"
+          @refresh="() => reloadDashboard('profile')"
         />
       </el-col>
       <el-col :lg="8" :md="24" :sm="24" :xl="8" :xs="24">
@@ -274,9 +274,33 @@ const unit = computed(() => props.unit);
 const stats = computed(() => dashboard.data.value?.stats ?? null);
 const gapCount = computed(() => dashboard.data.value?.gaps?.length ?? 0);
 
-const reloadDashboard = () => {
+// --- Per-card refresh loading -------------------------------------------------
+// The dashboard payload is one API call shared by every window-scoped card.
+// On initial load and window switch, the full-board skeleton is appropriate.
+// On a card's own refresh click, only that card should flash its loading
+// state — not every sibling on the board.
+const refreshingCard = ref<string | null>(null);
+
+/**
+ * Whether a given card should show its loading state. When no specific card
+ * is refreshing (initial load / window switch), all dashboard cards load;
+ * when a card's own refresh button was clicked, only that card flashes.
+ * @param cardId - stable section identifier (e.g. 'current', 'trend')
+ * @returns true when the card should render its loading skeleton
+ */
+const cardLoading = (cardId: string) =>
+  dashboard.loading.value && (!refreshingCard.value || refreshingCard.value === cardId);
+
+/**
+ * Reload the dashboard payload, scoped to the card that requested it.
+ * @param cardId - which card's refresh button triggered this (null = full board)
+ */
+const reloadDashboard = (cardId: string | null = null) => {
   if (!deviceId.value || !pointId.value) return;
-  void loadDashboard(deviceId.value, pointId.value, rangeHours.value);
+  refreshingCard.value = cardId;
+  void loadDashboard(deviceId.value, pointId.value, rangeHours.value).finally(() => {
+    refreshingCard.value = null;
+  });
 };
 
 const reloadAlertSections = () => {
@@ -296,8 +320,8 @@ const onRangeChange = (hours: number) => {
 };
 
 // Window switch re-fetches the window-scoped payload; id changes re-fetch
-// every section.
-watch(() => [deviceId.value, pointId.value, rangeHours.value], reloadDashboard, {immediate: true});
+// every section. Pass null cardId so all cards load together.
+watch(() => [deviceId.value, pointId.value, rangeHours.value], () => reloadDashboard(null), {immediate: true});
 watch(
   () => [deviceId.value, pointId.value],
   () => {

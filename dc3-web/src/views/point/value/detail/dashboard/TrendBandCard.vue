@@ -138,7 +138,8 @@ const draw = () => {
       .encode('x', 'label')
       .encode('y', ['min', 'max'])
       .style('fill', primary)
-      .style('fillOpacity', 0.12)
+      .style('fillOpacity', 0.08)
+      .style('connectNulls', false)
       .scale('y', {nice: true})
       .axis({
         x: {title: false, labelAutoHide: true},
@@ -210,6 +211,15 @@ watch(
   },
   {deep: true, flush: 'post'}
 );
+
+// When the loading/empty state clears and the canvas slot re-mounts, the
+// ref becomes available after the data watch already fired — draw here too.
+watch(chartRef, async (el) => {
+  if (el && hasData.value) {
+    await nextTick();
+    draw();
+  }
+});
 
 onMounted(async () => {
   await nextTick();
