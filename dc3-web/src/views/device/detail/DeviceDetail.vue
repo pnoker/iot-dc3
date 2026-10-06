@@ -43,44 +43,17 @@
       >
         <el-tab-pane :label="$t('device.detail.dashboard')" name="dashboard">
           <div class="device-dashboard">
-            <!-- Device card: tone-tile hero (name + attachment + status chip)
-                 with the machine code and live meta demoted to a quiet footer. -->
-            <div class="device-dashboard__banner">
-              <div class="device-dashboard__hero">
-                <span class="device-dashboard__tile" aria-hidden="true">
-                  <el-icon :size="26"><Management/></el-icon>
-                </span>
-                <div class="device-dashboard__title">
-                  <span class="device-dashboard__name">{{ reactiveData.data.deviceName || '-' }}</span>
-                  <span class="device-dashboard__attach">
-                    {{ reactiveData.driver.driverName || '-' }} · {{ reactiveData.profile.profileName || '-' }}
-                  </span>
-                </div>
-                <span class="device-dashboard__status-chip" :class="`is-${statusCode}`">
-                  <span class="device-dashboard__status-dot"></span>
-                  {{ statusLabel }}
-                </span>
-              </div>
-              <div class="device-dashboard__footer">
-                <button
-                  v-if="reactiveData.data.deviceCode"
-                  class="device-dashboard__code"
-                  :title="reactiveData.data.deviceCode"
-                  type="button"
-                  @click="copyCode"
-                >
-                  {{ reactiveData.data.deviceCode }}
-                </button>
-                <span class="device-dashboard__live-meta">
-                  {{ $t('device.detail.heartbeatTime') }} {{ heartbeatLabel }}
-                  <span aria-hidden="true">·</span>
-                  {{ $t('device.detail.timeoutConfig') }} {{ timeoutLabel }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Stat cards: point count, data quality, missing points, last update. -->
+            <!-- Stat cards — 6 tiles on a 3-wide grid. The first tile doubles
+                 as the identity card: device name as title, driver·profile·status
+                 as subtitle, online status as the colored value. -->
             <div class="device-dashboard__stats">
+              <stat-card
+                :icon="Management"
+                :subtitle="identitySubtitle"
+                :title="reactiveData.data.deviceName || $t('device.detail.totalPoints')"
+                :value="statusLabel"
+                :tone="statusTone"
+              />
               <stat-card
                 :icon="ListIcon"
                 :loading="coverageLoading"
@@ -116,6 +89,13 @@
                 :title="$t('device.detail.latestUpdate')"
                 :value="latestUpdateLabel"
                 tone="purple"
+              />
+              <stat-card
+                :icon="OdometerIcon"
+                :subtitle="timeoutLabel"
+                :title="$t('device.detail.heartbeatTime')"
+                :value="heartbeatLabel"
+                tone="blue"
               />
             </div>
 
@@ -234,7 +214,6 @@ import LatencyChart from '@/views/home/components/LatencyChart.vue';
 import LiveDataFeed from '@/views/home/components/LiveDataFeed.vue';
 import AlertList from '@/views/home/components/AlertList.vue';
 import {timestamp} from '@/utils/dateUtil';
-import {copy} from '@/utils/commonUtil';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import type {DeviceRecord, DriverRecord, PointRecord, ProfileRecord} from '@/config/types/manager';
 import type {DeviceCoverageGap, DeviceQuality, DeviceSilentSource, DeviceStatusDetail} from '@/config/types/dashboard';
@@ -359,8 +338,6 @@ const totalPointsLabel = computed(() => coverageData.value?.totalPoints || point
 
 const statusCode = computed(() => String(statusDetail.value.status || '').toLowerCase());
 
-const copyCode = () => copy(String(reactiveData.data.deviceCode || ''), t('device.detail.copyCode'));
-
 const statusLabel = computed(() => {
   switch (statusCode.value) {
     case 'online':
@@ -374,6 +351,29 @@ const statusLabel = computed(() => {
     default:
       return t('status.unknown');
   }
+});
+
+// Map device status to a StatCard tone: green=online, red=offline/fault, orange=maintain.
+const statusTone = computed(() => {
+  switch (statusCode.value) {
+    case 'online':
+      return 'green';
+    case 'offline':
+    case 'fault':
+      return 'red';
+    case 'maintain':
+      return 'orange';
+    default:
+      return 'blue';
+  }
+});
+
+// Identity subtitle for the first stat tile: driver · profile · device code.
+const identitySubtitle = computed(() => {
+  const parts: string[] = [];
+  if (reactiveData.driver.driverName) parts.push(reactiveData.driver.driverName);
+  if (reactiveData.profile.profileName) parts.push(reactiveData.profile.profileName);
+  return parts.join(' · ') || '—';
 });
 
 const heartbeatLabel = computed(() => {
