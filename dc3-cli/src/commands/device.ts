@@ -20,6 +20,7 @@ import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { dc3Client } from '../core/client.js';
 import type { OperationAccepted, OperationView } from '../core/contracts.js';
+import { CliError, TimeoutError, ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
@@ -31,20 +32,178 @@ const DEVICE_BASE = '/api/v3/manager/device';
 
 const TERMINAL_OPERATION_STATUSES = new Set(['SUCCEEDED', 'FAILED', 'CANCELLED', 'EXPIRED']);
 
+/** Grace added to the operation's own expiresAt when clamping the wait deadline. */
+const OPERATION_EXPIRY_GRACE_MS = 30_000;
+
+/** Ceiling for the exponentially growing delay between status polls. */
+const MAX_POLL_INTERVAL_MS = 10_000;
+
+/** Floor for the delay between status polls, kept from the pre-deadline behavior. */
+const MIN_POLL_INTERVAL_MS = 100;
+
 function operationPath(statusUri: string): string {
   const url = new URL(statusUri, 'http://dc3.invalid');
   return `${url.pathname}${url.search}`;
 }
 
-async function waitForOperation(
+/**
+ * Structured wait deadline failure: carries the polling coordinates so an
+ * agent can inspect or resume the operation instead of re-running the import
+ * (report F010).
+ */
+class OperationWaitTimeout extends TimeoutError {
+  public readonly operationId: string;
+  public readonly lastStatus: string;
+  public readonly elapsedMs: number;
+  public readonly statusUri: string;
+
+  constructor(accepted: OperationAccepted, last: OperationView, elapsedMs: number) {
+    super(
+      `timed out waiting for operation ${accepted.operationId} after ` +
+        `${Math.round(elapsedMs / 100) / 10}s: last status ${last.status}; poll ${accepted.statusUri}`,
+    );
+    this.operationId = accepted.operationId;
+    this.lastStatus = last.status;
+    this.elapsedMs = elapsedMs;
+    this.statusUri = accepted.statusUri;
+  }
+}
+
+/**
+ * Structured SIGINT outcome of an interrupted wait: names the last observed
+ * status and the status URI. Maps onto the documented exit-code taxonomy
+ * (exit 1) with the dedicated `INTERRUPTED` machine code.
+ */
+class OperationWaitInterrupted extends CliError {
+  constructor(accepted: OperationAccepted, last: OperationView | undefined) {
+    super(
+      `wait for operation ${accepted.operationId} interrupted: last status ` +
+        `${last?.status ?? 'UNKNOWN'}; poll ${accepted.statusUri}`,
+      { kind: 'timeout', exitCode: 1, code: 'INTERRUPTED' },
+    );
+  }
+}
+
+/**
+ * Clamp the wait deadline to the operation's own expiry plus a grace window:
+ * an operation the gateway will never finish cannot hang the CLI past the
+ * moment it is guaranteed to be dead (report F010).
+ * @param deadline - current deadline in epoch milliseconds
+ * @param expiresAt - operation expiry timestamp, when the gateway reports one
+ * @returns the effective deadline in epoch milliseconds
+ */
+function clampDeadlineToOperationExpiry(deadline: number, expiresAt: string | null): number {
+  if (!expiresAt) {
+    return deadline;
+  }
+  const expiry = Date.parse(expiresAt);
+  return Number.isFinite(expiry) ? Math.min(deadline, expiry + OPERATION_EXPIRY_GRACE_MS) : deadline;
+}
+
+/**
+ * Sleep until the wake time or an abort, whichever comes first.
+ * @param wakeAtMs - epoch millisecond timestamp to sleep until
+ * @param signal - abort signal that ends the sleep early
+ * @returns a promise settling at the wake time or on abort
+ */
+function delayUntil(wakeAtMs: number, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve) => {
+    const onAbort = (): void => {
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', onAbort);
+      resolve();
+    }, Math.max(0, wakeAtMs - Date.now()));
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+}
+
+/**
+ * Wait for a durable operation to reach a terminal status with a bounded,
+ * interruptible polling loop (report F010):
+ *
+ * - The overall deadline comes from `--wait-timeout` seconds (default 600) and
+ *   is additionally clamped to the operation's `expiresAt` plus a grace
+ *   window, so the wait always ends even when the gateway keeps answering
+ *   PENDING/RUNNING forever.
+ * - The poll delay grows exponentially from the base interval and is capped
+ *   at 10 seconds; it also never sleeps past the deadline.
+ * - SIGINT aborts the wait; the raised error carries the last observed status
+ *   and the status URI so the operation can be inspected manually.
+ *
+ * Exported as the seam for the deadline/backoff/interrupt guard tests.
+ * @param accepted - the 202 Accepted envelope of the submitted operation
+ * @param pollIntervalMs - base polling interval in milliseconds (floored at 100)
+ * @param waitTimeoutMs - caller-supplied maximum wait in milliseconds
+ * @param interruptSignal - extra abort signal honored alongside SIGINT
+ * @returns the operation view in a terminal status
+ */
+export async function waitForOperation(
   accepted: OperationAccepted,
   pollIntervalMs: number,
+  waitTimeoutMs: number,
+  interruptSignal?: AbortSignal,
 ): Promise<OperationView> {
-  while (true) {
-    const operation = await dc3Client.get<OperationView>(operationPath(accepted.statusUri));
-    if (TERMINAL_OPERATION_STATUSES.has(operation.status)) return operation;
-    await new Promise((resolve) => setTimeout(resolve, pollIntervalMs));
+  const startedAt = Date.now();
+  let deadline = startedAt + waitTimeoutMs;
+  let delayMs = Math.max(MIN_POLL_INTERVAL_MS, pollIntervalMs);
+  let last: OperationView | undefined;
+
+  const controller = new AbortController();
+  const onSigint = (): void => controller.abort();
+  const forwardAbort = (): void => controller.abort();
+  process.on('SIGINT', onSigint);
+  if (interruptSignal) {
+    if (interruptSignal.aborted) {
+      controller.abort();
+    } else {
+      interruptSignal.addEventListener('abort', forwardAbort);
+    }
   }
+  try {
+    while (true) {
+      if (controller.signal.aborted) {
+        throw new OperationWaitInterrupted(accepted, last);
+      }
+      const operation = await dc3Client.get<OperationView>(operationPath(accepted.statusUri));
+      last = operation;
+      if (TERMINAL_OPERATION_STATUSES.has(operation.status)) {
+        return operation;
+      }
+      deadline = clampDeadlineToOperationExpiry(deadline, operation.expiresAt);
+      if (Date.now() >= deadline) {
+        throw new OperationWaitTimeout(accepted, operation, Date.now() - startedAt);
+      }
+      await delayUntil(Date.now() + Math.min(delayMs, MAX_POLL_INTERVAL_MS, deadline - Date.now()), controller.signal);
+      delayMs = Math.min(delayMs * 2, MAX_POLL_INTERVAL_MS);
+    }
+  } finally {
+    process.removeListener('SIGINT', onSigint);
+    interruptSignal?.removeEventListener('abort', forwardAbort);
+  }
+}
+
+/**
+ * Map an import file read failure to a structured validation error naming the
+ * path exactly as the user supplied it: the raw errno message embeds the
+ * resolved absolute path, which the CLI must not leak (report F047).
+ * @param userPath - import file path as supplied on the command line
+ * @param error - the error raised by readFile
+ * @returns the validation error to raise
+ */
+function importReadError(userPath: string, error: unknown): ValidationError {
+  const code = (error as { code?: unknown } | null)?.code;
+  const reason =
+    code === 'ENOENT'
+      ? 'not found'
+      : code === 'EISDIR'
+        ? 'is a directory'
+        : code === 'EACCES' || code === 'EPERM'
+          ? 'is not readable'
+          : 'could not be read';
+  return new ValidationError(`Import file ${reason}: ${userPath}`);
 }
 
 /**
@@ -107,7 +266,7 @@ export function registerDeviceCommand(program: Command): void {
         driverId: opts.driverId,
         profileId: opts.profileId,
       };
-      if (opts.description) body.remark = opts.description;
+      if (opts.description !== undefined) body.remark = opts.description;
       if (opts.groupId) body.groupId = opts.groupId;
       const result = await dc3Client.post(`${DEVICE_BASE}/add`, body);
       printAndExit(result, format);
@@ -126,10 +285,10 @@ export function registerDeviceCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(DEVICE_BASE, id, opts.version, {
-        ...(opts.name ? { deviceName: opts.name } : {}),
+        ...(opts.name !== undefined ? { deviceName: opts.name } : {}),
         ...(opts.driverId ? { driverId: opts.driverId } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
-        ...(opts.description ? { remark: opts.description } : {}),
+        ...(opts.description !== undefined ? { remark: opts.description } : {}),
       });
       printAndExit(result, format);
     });
@@ -167,9 +326,11 @@ export function registerDeviceCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.post('/api/v3/data/device/status/list', {
-        id,
-      });
+      // Single-device status is a GET path param (DeviceStatusController L176),
+      // not the POST /list query body used for paginated status listings.
+      const result = await dc3Client.get(
+        `/api/v3/data/device/status/${encodeURIComponent(id)}`,
+      );
       printAndExit(result, format);
     });
 
@@ -187,17 +348,26 @@ export function registerDeviceCommand(program: Command): void {
       parseNonNegativeInteger,
       500,
     )
+    .option(
+      '--wait-timeout <seconds>',
+      'Maximum seconds to wait for the operation (also clamped by its expiry; 0 gives up after the first poll)',
+      parseNonNegativeInteger,
+      600,
+    )
     .option('--format <format>', 'Output format')
     .action(async (file: string, opts) => {
       const format = detectFormat(opts.format);
       if (!file.toLowerCase().endsWith('.xlsx')) {
-        printAndExit({ ok: false, message: 'Import file must use the .xlsx extension' }, format, 1);
-        return;
+        throw new ValidationError('Import file must use the .xlsx extension');
       }
-      const content = await readFile(file);
+      let content: Buffer;
+      try {
+        content = await readFile(file);
+      } catch (error) {
+        throw importReadError(file, error);
+      }
       if (content.length === 0) {
-        printAndExit({ ok: false, message: 'Import file must not be empty' }, format, 1);
-        return;
+        throw new ValidationError('Import file must not be empty');
       }
       const form = new FormData();
       form.append(
@@ -211,6 +381,11 @@ export function registerDeviceCommand(program: Command): void {
           ],
           { type: 'application/json' },
         ),
+        // Pin the part disposition with an explicit filename instead of the
+        // serializer default filename="blob" (report F046); the part keeps its
+        // application/json content type, which is what the gateway
+        // @RequestPart("request") converter keys on.
+        'request.json',
       );
       form.append(
         'file',
@@ -228,7 +403,11 @@ export function registerDeviceCommand(program: Command): void {
         printAndExit(accepted, format);
         return;
       }
-      const operation = await waitForOperation(accepted, Math.max(100, opts.pollInterval));
+      const operation = await waitForOperation(
+        accepted,
+        Math.max(100, opts.pollInterval),
+        opts.waitTimeout * 1000,
+      );
       printAndExit(operation, format, operation.status === 'SUCCEEDED' ? 0 : 1);
     });
 }

@@ -91,8 +91,8 @@ export function registerDriverCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(DRIVER_BASE, id, opts.version, {
-        ...(opts.name ? { driverName: opts.name } : {}),
-        ...(opts.serviceName ? { serviceName: opts.serviceName } : {}),
+        ...(opts.name !== undefined ? { driverName: opts.name } : {}),
+        ...(opts.serviceName !== undefined ? { serviceName: opts.serviceName } : {}),
         ...(opts.serviceHost ? { serviceHost: opts.serviceHost } : {}),
         ...(opts.type ? { driverTypeFlag: opts.type } : {}),
       });
@@ -112,13 +112,21 @@ export function registerDriverCommand(program: Command): void {
 
   driver
     .command('status <id>')
-    .description('Get driver status')
+    .description('Get driver online status')
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.post('/api/v3/data/driver/status/list', {
-        id,
-      });
-      printAndExit(result, format);
+      // The driver status endpoint returns a Map<driverId, status> for all
+      // drivers; extract the requested one. The query record validates
+      // page bounds (limit >= 1), so send explicit pagination.
+      const all = await dc3Client.post<Record<string, string>>(
+        '/api/v3/data/driver/status/list',
+        { offset: 0, limit: 100 },
+      );
+      const status = all?.[id] ?? all?.[String(id)];
+      if (status === undefined) {
+        printAndExit({ ok: false, message: `Driver ${id} status not found` }, format, 1);
+      }
+      printAndExit({ id, status }, format);
     });
 }
