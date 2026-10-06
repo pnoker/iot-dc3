@@ -132,21 +132,24 @@ const draw = () => {
   const data = rows.value;
 
   disposeChart = mountG2Chart(el, (chart) => {
+    // Band as the bottom layer: G2 v5's rangeY() mark ignores both
+    // fillOpacity and opacity style props (renders opaque), so draw the
+    // min/max envelope as an area() mark with rgba fill — area marks
+    // honor transparency reliably.
     chart
-      .rangeY()
+      .area()
       .data(data)
       .encode('x', 'label')
       .encode('y', ['min', 'max'])
       .style('fill', primary)
-      .style('fillOpacity', 0.08)
+      .style('fillOpacity', 0.1)
       .style('connectNulls', false)
       .scale('y', {nice: true})
-      .axis({
-        x: {title: false, labelAutoHide: true},
-        y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))},
-      })
+      .axis(false)
       .legend(false);
 
+    // Average line on top of the band (later marks render above earlier
+    // ones in G2 v5's SVG paint order).
     chart
       .line()
       .data(data)
@@ -155,17 +158,10 @@ const draw = () => {
       .encode('shape', 'smooth')
       .style('stroke', primary)
       .style('lineWidth', 2)
-      .axis(false)
-      .legend(false);
-
-    chart
-      .point()
-      .data(data)
-      .encode('x', 'label')
-      .encode('y', 'avg')
-      .style('fill', primary)
-      .style('r', 2.5)
-      .axis(false)
+      .axis({
+        x: {title: false, labelAutoHide: true},
+        y: {title: false, labelFormatter: (d: number) => compactNumber(Number(d))},
+      })
       .legend(false);
 
     chart.interaction('tooltip', {
