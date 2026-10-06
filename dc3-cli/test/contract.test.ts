@@ -106,6 +106,7 @@ describe('detectFormat resolution chain', () => {
 
 describe('exit-code mapping (top-level fatal handler)', () => {
   beforeEach(() => {
+    vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
     vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
       throw new ExitSignal(code ?? 0);
@@ -120,6 +121,18 @@ describe('exit-code mapping (top-level fatal handler)', () => {
     const err = new AuthError('Not logged in. Run: dc3 auth login');
     expect(exitCodeFor(err)).toBe(3);
     expect(process.stderr.write).toHaveBeenCalledWith(`Error: ${err.message}\n`);
+  });
+
+  it('failures also emit the stdout machine envelope for structured formats (F015)', () => {
+    const err = new NetworkError('gateway unreachable');
+    expect(exitCodeFor(err)).toBe(2);
+    const envelope = JSON.parse(
+      String((process.stdout.write as ReturnType<typeof vi.fn>).mock.calls[0]?.[0]),
+    );
+    expect(envelope).toEqual({
+      ok: false,
+      error: { kind: 'network', code: 'NETWORK', message: err.message },
+    });
   });
 
   it('NetworkError exits 2', () => {

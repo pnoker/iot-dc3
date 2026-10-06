@@ -10,7 +10,12 @@ vi.mock('../src/core/token-manager.js', () => ({
   tokenManager: {
     getState: vi.fn(async () => null),
     saveState: vi.fn(async () => undefined),
+    saveStateIfEpochUnchanged: vi.fn(async () => true),
+    getEpoch: vi.fn(async () => 0),
   },
+  credentialIdentifier: vi.fn(
+    (state: { username: string; tenant: string }) => `${state.username}@${state.tenant}`,
+  ),
 }));
 
 vi.mock('../src/core/credential-store.js', () => ({

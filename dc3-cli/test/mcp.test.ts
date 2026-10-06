@@ -26,17 +26,41 @@ import { McpClient } from '../src/core/mcp.js';
 const oauthState = { token: 'rs256.jwt.value', authType: 'oauth' };
 const loginState = { token: 'hs.jwt.value', authType: 'login' };
 
+/** Fetch mock answering application/json while echoing the request id (F040). */
+function echoJsonRpc(mutate?: (payload: Record<string, unknown>) => void) {
+  return vi.fn(async (_url: string, init?: RequestInit) => {
+    const request = JSON.parse(String(init?.body)) as Record<string, unknown>;
+    const payload: Record<string, unknown> = { jsonrpc: '2.0', id: request.id };
+    mutate?.(payload);
+    return new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+}
+
+/** Fetch mock answering a text/event-stream body built from the request id. */
+function sseRpc(frames: Array<(id: number) => string>) {
+  return vi.fn(async (_url: string, init?: RequestInit) => {
+    const request = JSON.parse(String(init?.body)) as { id: number };
+    const body = frames.map((frame) => `event: message\ndata: ${frame(request.id)}\n\n`).join('');
+    return new Response(`: keep-alive\n\n${body}`, {
+      status: 200,
+      headers: { 'Content-Type': 'text/event-stream' },
+    });
+  });
+}
+
 describe('McpClient', () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
+    getState.mockResolvedValue(oauthState);
+    vi.unstubAllGlobals();
   });
 
   it('sends a JSON-RPC tools/list with the Bearer ticket to /mcp', async () => {
-    getState.mockResolvedValue(oauthState);
-    const fetchMock = vi.fn().mockResolvedValue(new Response(
-      JSON.stringify({ jsonrpc: '2.0', id: 1, result: { tools: [{ name: 'read_device' }] } }),
-      { status: 200 },
-    ));
+    const fetchMock = echoJsonRpc((payload) => {
+      payload.result = { tools: [{ name: 'read_device' }] };
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const client = new McpClient();
@@ -62,11 +86,12 @@ describe('McpClient', () => {
   });
 
   it('surfaces JSON-RPC error objects as failures', async () => {
-    getState.mockResolvedValue(oauthState);
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(
-      JSON.stringify({ jsonrpc: '2.0', id: 1, error: { code: -32000, message: 'denied' } }),
-      { status: 200 },
-    )));
+    vi.stubGlobal(
+      'fetch',
+      echoJsonRpc((payload) => {
+        payload.error = { code: -32000, message: 'denied' };
+      }),
+    );
 
     const client = new McpClient();
     await expect(client.listTools()).rejects.toThrow(/MCP error -32000: denied/);
@@ -81,11 +106,9 @@ describe('McpClient', () => {
   });
 
   it('passes tool name and arguments through on tools/call', async () => {
-    getState.mockResolvedValue(oauthState);
-    const fetchMock = vi.fn().mockResolvedValue(new Response(
-      JSON.stringify({ jsonrpc: '2.0', id: 7, result: { content: [{ text: 'ok' }] } }),
-      { status: 200 },
-    ));
+    const fetchMock = echoJsonRpc((payload) => {
+      payload.result = { content: [{ text: 'ok' }] };
+    });
     vi.stubGlobal('fetch', fetchMock);
 
     const client = new McpClient();
@@ -94,5 +117,100 @@ describe('McpClient', () => {
     const body = JSON.parse(fetchMock.mock.calls[0][1].body);
     expect(body.method).toBe('tools/call');
     expect(body.params).toEqual({ name: 'read_device', arguments: { deviceId: 1 } });
+  });
+});
+
+describe('McpClient SSE and id handling (F022/F040)', () => {
+  beforeEach(() => {
+    getState.mockResolvedValue(oauthState);
+    vi.unstubAllGlobals();
+  });
+
+  it('decodes SSE-framed JSON-RPC responses (F022)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      sseRpc([(id) => JSON.stringify({ jsonrpc: '2.0', id, result: { tools: [] } })]),
+    );
+
+    const result = await new McpClient().listTools();
+
+    expect(result).toEqual({ tools: [] });
+  });
+
+  it('selects the SSE frame matching the request id from a multi-frame stream', async () => {
+    vi.stubGlobal(
+      'fetch',
+      sseRpc([
+        () => JSON.stringify({ jsonrpc: '2.0', id: 424242, result: { tools: [{ name: 'other' }] } }),
+        (id) => JSON.stringify({ jsonrpc: '2.0', id, result: { tools: [{ name: 'mine' }] } }),
+      ]),
+    );
+
+    const result = await new McpClient().listTools();
+
+    expect(result.tools?.map((tool) => tool.name)).toEqual(['mine']);
+  });
+
+  it('fails loudly when an SSE stream carries no decodable JSON-RPC frame', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(': keep-alive\n\nevent: message\ndata: not-json\n\n', {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        }),
+      ),
+    );
+
+    await expect(new McpClient().listTools()).rejects.toThrow(/no JSON-RPC response frames/u);
+  });
+
+  it('rejects unsupported response content types with an explicit diagnostic', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response('col1,col2', { status: 200, headers: { 'Content-Type': 'text/csv' } }),
+      ),
+    );
+
+    await expect(new McpClient().listTools()).rejects.toThrow(
+      /Unsupported \/mcp response content-type: text\/csv/u,
+    );
+  });
+
+  it('rejects a JSON response whose id does not match the request', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ jsonrpc: '2.0', id: 424242, result: {} }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+
+    await expect(new McpClient().listTools()).rejects.toThrow(/MCP response id mismatch/u);
+  });
+
+  it('assigns distinct ids even within the same frozen millisecond (F040)', async () => {
+    vi.useFakeTimers();
+    try {
+      const ids: number[] = [];
+      vi.stubGlobal(
+        'fetch',
+        echoJsonRpc((payload) => {
+          ids.push(payload.id as number);
+          payload.result = { tools: [] };
+        }),
+      );
+      const client = new McpClient();
+      await client.listTools();
+      await client.callTool('read_device', {});
+
+      expect(ids[0]).not.toBe(ids[1]);
+      expect(typeof ids[0]).toBe('number');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

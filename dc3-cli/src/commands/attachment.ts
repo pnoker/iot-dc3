@@ -42,10 +42,16 @@ export function registerAttachmentCommand(program: Command): void {
       } catch {
         printAndExit({ ok: false, message: `Cannot read file: ${file}` }, format, 1);
       }
-      const result = await dc3Client.post(
+      if (content.length === 0) {
+        printAndExit({ ok: false, message: 'Attachment file must not be empty' }, format, 1);
+      }
+      // The backend's AttachmentController expects a multipart/form-data `file`
+      // part (Spring @RequestPart), same grammar as the device XLSX import.
+      const form = new FormData();
+      form.append('file', new Blob([content]), basename(file));
+      const result = await dc3Client.postForm(
         `${BASE}/upload?conversation_id=${encodeURIComponent(opts.conversationId)}`,
-        content,
-        { 'Content-Type': 'application/octet-stream', 'X-Filename': basename(file) },
+        form,
       );
       printAndExit(result, format);
     });
