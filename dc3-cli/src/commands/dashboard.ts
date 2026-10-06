@@ -113,7 +113,7 @@ export function registerDashboardCommand(program: Command): void {
     .action(async (opts: { mode: string; format?: string }) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        withQuery('/api/v3/data/dashboard/topology', { mode: opts.mode }),
+        withQuery('/api/v3/manager/dashboard/topology', { mode: opts.mode }),
       );
       printAndExit(result, format);
     });

@@ -148,12 +148,12 @@ describe('dashboard command group', () => {
 
   it('topology applies the default cardinality mode', async () => {
     await run(['dashboard', 'topology']);
-    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/data/dashboard/topology?mode=cardinality');
+    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/manager/dashboard/topology?mode=cardinality');
   });
 
   it('topology accepts the volume mode and rejects unknown modes (F017)', async () => {
     await run(['dashboard', 'topology', '--mode', 'volume']);
-    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/data/dashboard/topology?mode=volume');
+    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/manager/dashboard/topology?mode=volume');
 
     const { err } = await runCapture(['dashboard', 'topology', '--mode', 'volume&evil=1']);
     expect(err).toBeInstanceOf(Error);
