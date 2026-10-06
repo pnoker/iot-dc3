@@ -328,3 +328,186 @@ const samplesSubtitle = computed(() =>
 );
 
 const collectTimeLabel = computed(() => String(props.latest?.createTime || '—'));</script>
+<style lang="scss" scoped>
+.point-dashboard {
+  // Identity banner — the point-card header anatomy (tone tile + name +
+  // attach) scaled up, with the rw flag as a soft chip and the point id +
+  // collect time demoted to a quiet footer.
+  &__banner {
+    padding: var(--dc3-space-4);
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--dc3-bg-elevated);
+    margin-bottom: var(--dc3-gutter);
+  }
+
+  &__hero {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+  }
+
+  &__tile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid color-mix(in srgb, var(--el-color-success) 20%, transparent);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--el-color-success-light-9);
+    color: var(--el-color-success);
+  }
+
+  &__title {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__name {
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 650;
+    color: var(--dc3-text-primary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__attach {
+    overflow: hidden;
+    font-size: 12px;
+    color: var(--dc3-text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // Device name doubles as a quiet link to the device detail page.
+  &__attach-link {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--dc3-text-secondary);
+    font-size: inherit;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--dc3-text-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  // Soft tone chip — the same language as the device status chip.
+  &__status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    height: 24px;
+    padding: 0 10px;
+    margin-left: auto;
+    border: 1px solid var(--dc3-border-base);
+    border-radius: var(--dc3-radius-full);
+    background: var(--el-fill-color-light);
+    color: var(--dc3-text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+
+    &.is-rw {
+      border-color: color-mix(in srgb, var(--el-color-success) 30%, transparent);
+      background: var(--el-color-success-light-9);
+      color: var(--el-color-success);
+    }
+
+    &.is-ro {
+      border-color: color-mix(in srgb, var(--el-color-warning) 30%, transparent);
+      background: var(--el-color-warning-light-9);
+      color: var(--el-color-warning);
+    }
+
+    &.is-wo {
+      border-color: var(--dc3-border-base);
+      background: var(--el-fill-color-light);
+      color: var(--dc3-text-secondary);
+    }
+  }
+
+  &__status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--dc3-space-3);
+    margin-top: var(--dc3-space-3);
+    padding-top: var(--dc3-space-3);
+    border-top: 1px solid var(--dc3-border-base);
+  }
+
+  // Point id: copyable, monospace, ellipsized — a UUID is for copying,
+  // not reading.
+  &__code {
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--dc3-text-muted);
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      color: var(--dc3-text-brand);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  }
+
+  &__live-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--dc3-space-2);
+    flex-shrink: 0;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--dc3-text-secondary);
+  }
+
+  // Stat-card strip: 3 across on desktop, 2 on tablet, 1 on mobile —
+  // six tiles close every tier with no half-empty row.
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--dc3-space-2);
+    margin-bottom: var(--dc3-gutter);
+
+    @media (max-width: $breakpoint-md-max) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: $breakpoint-xs-max) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__row {
+    row-gap: var(--dc3-gutter);
+    margin-bottom: var(--dc3-gutter);
+
+    &--last {
+      margin-bottom: 0;
+    }
+  }
+}
+</style>
