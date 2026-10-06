@@ -22,31 +22,17 @@
  *   - dashboard  — GET /point_value/dashboard (window-scoped, range-hours driven)
  *   - alertProfile — GET /dashboard/alert/point_profile (30-day profile, point-scoped)
  *   - recentAlerts — POST /dashboard/alert/page (source=point, latest 5)
- *   - peers      — listPointByDeviceId + getPointValueLatest (device peers)
  */
 
 import {ref} from 'vue';
 
 import {listAlertPage, getPointAlertProfile} from '@/api/dashboard/alert';
-import {getPointValueLatest, getPointValueDashboard, listPointByDeviceId} from '@/api/point';
+import {getPointValueDashboard} from '@/api/point';
 import type {AlertEventRow, PointAlertProfile, PointValueDashboard} from '@/config/types/dashboard';
-import type {PointRecord} from '@/config/types/manager';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 
 /**
- * One neighbour point card row: the point metadata plus its latest value,
- * joined on pointId.
- */
-export interface PeerSnapshotItem {
-  pointId: string;
-  pointName: string;
-  unit: string;
-  value: string | null;
-  createTime: string | null;
-}
-
-/**
- * The composable handle: four independent loader states plus their payloads.
+ * The composable handle: three independent loader states plus their payloads.
  */
 export interface PointDashboardState {
   dashboard: {
@@ -67,12 +53,6 @@ export interface PointDashboardState {
     status: ReturnType<typeof useAsyncLoader>['status'];
     rows: Readonly<ReturnType<typeof ref<AlertEventRow[]>>>;
   };
-  peers: {
-    loading: ReturnType<typeof useAsyncLoader>['loading'];
-    error: ReturnType<typeof useAsyncLoader>['error'];
-    status: ReturnType<typeof useAsyncLoader>['status'];
-    items: Readonly<ReturnType<typeof ref<PeerSnapshotItem[]>>>;
-  };
 }
 
 /**
@@ -88,8 +68,6 @@ export const usePointDashboard = () => {
   const alertProfileData = ref<PointAlertProfile | null>(null);
   const recentAlerts = useAsyncLoader();
   const recentAlertRows = ref<AlertEventRow[]>([]);
-  const peers = useAsyncLoader();
-  const peerItems = ref<PeerSnapshotItem[]>([]);
 
   /**
    * Load the window-scoped dashboard payload. When `sections` is provided
@@ -158,47 +136,6 @@ export const usePointDashboard = () => {
       }
     );
 
-  /**
-   * Load the neighbour snapshot: every other point of the device joined
-   * with its latest value on pointId.
-   * @param deviceId - device id whose points are listed
-   * @param currentPointId - point id to exclude from the snapshot
-   * @returns the resolved peer snapshot items
-   */
-  const loadPeers = (deviceId: string, currentPointId: string) =>
-    peers.run(
-      async () => {
-        if (!deviceId) return [] as PeerSnapshotItem[];
-        const [points, latest] = await Promise.all([
-          listPointByDeviceId(deviceId).catch(() => [] as PointRecord[]),
-          getPointValueLatest({deviceId, offset: 0, limit: 50}).catch(() => null),
-        ]);
-        const latestById = new Map<string, Record<string, unknown>>();
-        for (const row of Array.isArray(latest?.items) ? latest.items : []) {
-          const pid = String(row.pointId ?? '');
-          if (pid) latestById.set(pid, row);
-        }
-        return (Array.isArray(points) ? points : [])
-          .filter((point) => String(point.id ?? '') !== currentPointId)
-          .map((point) => {
-            const pid = String(point.id ?? '');
-            const row = latestById.get(pid);
-            return {
-              pointId: pid,
-              pointName: String(point.pointName ?? pid),
-              unit: String(point.unit ?? '').trim(),
-              value: row != null && row.calValue !== undefined && row.calValue !== null ? String(row.calValue) : null,
-              createTime: row?.createTime != null ? String(row.createTime) : null,
-            };
-          });
-      },
-      {
-        apply: (items) => {
-          peerItems.value = items ?? [];
-        },
-      }
-    );
-
   return {
     dashboard: {
       loading: dashboard.loading,
@@ -218,15 +155,8 @@ export const usePointDashboard = () => {
       status: recentAlerts.status,
       rows: recentAlertRows,
     },
-    peers: {
-      loading: peers.loading,
-      error: peers.error,
-      status: peers.status,
-      items: peerItems,
-    },
     loadDashboard,
     loadAlertProfile,
     loadRecentAlerts,
-    loadPeers,
   };
 };

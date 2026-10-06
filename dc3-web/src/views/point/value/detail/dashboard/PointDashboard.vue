@@ -19,7 +19,7 @@
      with the device detail page's design language — identity banner (tone
      tile + name + device link + rw chip + footer), StatCard strip, trend
      band with the shared window selector, collection health trio, value
-     profile, alarm profile and the peer snapshot. All data flows in through
+     profile and alarm profile. All data flows in through
      the usePointDashboard composable; switching the window re-fetches the
      dashboard payload and every window-scoped chart at once. -->
 
@@ -107,7 +107,7 @@
         :on-refresh="() => reloadDashboard('interval')"
         :subtitle="$t('pointValue.dashboard.kpi.medianIntervalSub')"
         :title="$t('pointValue.dashboard.kpi.medianInterval')"
-        :value="stats ? formatMs(stats.medianIntervalMs) : '—'"
+        :value="stats ? `${Number(stats.medianIntervalMs) / 1000}s` : '—'"
         tone="purple"
       />
       <stat-card
@@ -184,19 +184,6 @@
         />
       </el-col>
     </el-row>
-
-    <!-- Peer snapshot. -->
-    <el-row :gutter="8" class="point-dashboard__row point-dashboard__row--last">
-      <el-col :span="24">
-        <peer-snapshot-card
-          :device-id="deviceId"
-          :items="peers.items.value"
-          :loading="peers.loading.value"
-          :status="peers.status.value"
-          @refresh="reloadPeers"
-        />
-      </el-col>
-    </el-row>
   </div>
 </template>
 
@@ -204,6 +191,7 @@
 import type {PropType} from 'vue';
 import {computed, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
+import {useRouter} from 'vue-router';
 import {
   Collection as CollectionIcon,
   Cpu,
@@ -214,57 +202,29 @@ import {
   Warning as WarningIcon,
 } from '@element-plus/icons-vue';
 
-import StatCard from '@/components/card/stat/StatCard.vue';
-import router from '@/config/router';
-import {copy} from '@/utils/commonUtil';
-import {timestampLabel} from '@/utils/dateUtil';
-import {rwFlagKey} from '@/utils/pointFormatUtil';
-import {formatMs} from '@/utils/timeUtil';
 import AlertProfileCard from './AlertProfileCard.vue';
 import CollectionHealthCard from './CollectionHealthCard.vue';
-import PeerSnapshotCard from './PeerSnapshotCard.vue';
 import TrendBandCard from './TrendBandCard.vue';
 import ValueProfileCard from './ValueProfileCard.vue';
 import {usePointDashboard} from './usePointDashboard';
 import {formatSampleCount, formatValue} from './util';
+import StatCard from '@/components/card/stat/StatCard.vue';
+import {rwFlagKey} from '@/utils/pointFormatUtil';
 
 const props = defineProps({
-  /** Device id of the point being boarded. */
-  deviceId: {
-    type: String,
-    default: '',
-  },
-  /** Device name of the point being boarded, resolved by the detail page. */
-  deviceName: {
-    type: String,
-    default: '',
-  },
-  /** Point id of the point being boarded. */
-  pointId: {
-    type: String,
-    default: '',
-  },
-  /** Point name of the point being boarded, resolved by the detail page. */
-  pointName: {
-    type: String,
-    default: '',
-  },
-  /** Latest point value record already loaded by the detail page. */
-  latest: {
-    type: Object as PropType<Record<string, unknown>>,
-    default: () => ({}),
-  },
-  /** Unit of the point, resolved by the detail page. */
-  unit: {
-    type: String,
-    default: '',
-  },
+  deviceId: {type: String, default: ''},
+  deviceName: {type: String, default: ''},
+  latest: {type: Object as PropType<Record<string, any>>, default: () => ({})},
+  pointId: {type: String, default: ''},
+  pointName: {type: String, default: ''},
+  unit: {type: String, default: ''},
 });
 
 const {t} = useI18n();
+const router = useRouter();
 const rangeHours = ref(24);
 
-const {dashboard, alertProfile, recentAlerts, peers, loadDashboard, loadAlertProfile, loadRecentAlerts, loadPeers} =
+const {dashboard, alertProfile, recentAlerts, loadDashboard, loadAlertProfile, loadRecentAlerts} =
   usePointDashboard();
 
 const deviceId = computed(() => String(props.deviceId || ''));
@@ -275,15 +235,8 @@ const stats = computed(() => dashboard.data.value?.stats ?? null);
 const gapCount = computed(() => dashboard.data.value?.gaps?.length ?? 0);
 
 // --- Per-card refresh loading + selective data application -------------------
-// The dashboard payload is one API call shared by every window-scoped card.
-// On initial load and window switch, the full-board skeleton is appropriate.
-// On a card's own refresh click: (a) only that card flashes its loading
-// state, and (b) only the payload keys that card consumes are applied —
-// keys consumed by other cards keep their old object references so their
-// chart watchers don't fire and the charts don't re-render.
 const refreshingCard = ref<string | null>(null);
 
-/** Payload keys each card consumes (for selective merge on manual refresh). */
 const CARD_SECTIONS: Record<string, readonly string[]> = {
   current: ['stats'],
   average: ['stats'],
@@ -296,22 +249,9 @@ const CARD_SECTIONS: Record<string, readonly string[]> = {
   profile: ['valueHistogram', 'typicalDay'],
 };
 
-/**
- * Whether a given card should show its loading state. When no specific card
- * is refreshing (initial load / window switch), all dashboard cards load;
- * when a card's own refresh button was clicked, only that card flashes.
- * @param cardId - stable section identifier (e.g. 'current', 'trend')
- * @returns true when the card should render its loading skeleton
- */
 const cardLoading = (cardId: string) =>
   dashboard.loading.value && (!refreshingCard.value || refreshingCard.value === cardId);
 
-/**
- * Reload the dashboard payload. For a single-card refresh, only that card's
- * data sections are applied to the shared ref; for null (initial/window
-// switch), the entire payload replaces the old data.
- * @param cardId - which card's refresh button triggered this (null = full board)
- */
 const reloadDashboard = (cardId: string | null = null) => {
   if (!deviceId.value || !pointId.value) return;
   refreshingCard.value = cardId;
@@ -327,276 +267,64 @@ const reloadAlertSections = () => {
   void loadRecentAlerts(pointId.value);
 };
 
-const reloadPeers = () => {
-  if (!deviceId.value || !pointId.value) return;
-  void loadPeers(deviceId.value, pointId.value);
-};
-
 const onRangeChange = (hours: number) => {
   if (!Number.isFinite(hours) || hours <= 0 || hours > 168) return;
   rangeHours.value = hours;
 };
 
-// Window switch re-fetches the window-scoped payload; id changes re-fetch
-// every section. Pass null cardId so all cards load together.
 watch(() => [deviceId.value, pointId.value, rangeHours.value], () => reloadDashboard(null), {immediate: true});
 watch(
   () => [deviceId.value, pointId.value],
   () => {
-    reloadAlertSections();
-    reloadPeers();
+    if (pointId.value) reloadAlertSections();
   },
   {immediate: true}
 );
 
-// ---- banner ------------------------------------------------------------
+// ---- banner helpers --------------------------------------------------------
 
-// Read/write chip: the same tone language as the device status chip —
-// read-write = success, read-only = warning, write-only = default.
 const rwFlag = computed(() => String(props.latest?.rwFlag || '').toUpperCase());
 const isReadOnly = computed(() => ['R', 'READ_ONLY'].includes(rwFlag.value));
-const isReadWrite = computed(() => ['RW', 'READ_WRITE'].includes(rwFlag.value));
-const rwChipClass = computed(() => {
-  if (isReadWrite.value) return 'is-rw';
-  if (isReadOnly.value) return 'is-ro';
-  return 'is-wo';
-});
-const rwLabel = computed(() => t(rwFlagKey(String(props.latest?.rwFlag || ''))));
+const isWriteOnly = computed(() => ['W', 'WRITE_ONLY'].includes(rwFlag.value));
+const rwChipClass = computed(() =>
+  isWriteOnly.value
+    ? 'point-dashboard__status-chip--default'
+    : isReadOnly.value
+      ? 'point-dashboard__status-chip--warning'
+      : 'point-dashboard__status-chip--success'
+);
+const rwLabel = computed(() => t(rwFlagKey(rwFlag.value)));
 
-// Device attachment routes to the device detail page — same contract as
-// jumpUtil's device jump ({name: 'deviceDetail', query: {id}}).
 const openDevice = () => {
-  void router.push({name: 'deviceDetail', query: {id: deviceId.value}}).catch(() => {
-    // Navigation duplicated — the board stays where it is.
+  if (!deviceId.value) return;
+  router.push({name: 'deviceDetail', query: {id: deviceId.value}}).catch(() => {
+    // handled globally
   });
 };
 
-const copyPointId = () => copy(pointId.value, t('pointValue.dashboard.banner.copyId'));
+const copyPointId = async () => {
+  if (!pointId.value) return;
+  try {
+    await navigator.clipboard.writeText(pointId.value);
+  } catch {
+    // clipboard unavailable — silent
+  }
+};
 
-const collectTimeLabel = computed(() => timestampLabel(props.latest?.createTime));
-
-// ---- stat strip labels -------------------------------------------------
-
-// The latest value may be a numeric string ("42.5") or a non-numeric payload
-// of string-typed points — numeric ones format with precision, others pass
-// through verbatim.
-const latestValueLabel = computed(() => {
-  const raw = props.latest?.calValue;
-  if (raw == null || raw === '') return t('pointValue.dashboard.kpi.noValue');
-  const num = Number(raw);
-  return String(raw).trim() !== '' && Number.isFinite(num) ? formatValue(num) : String(raw);
-});
+// ---- stat card values -------------------------------------------------------
 
 const currentValueCard = computed(() => {
-  const label = latestValueLabel.value;
-  if (label === t('pointValue.dashboard.kpi.noValue') || !unit.value) return label;
-  return `${label} ${unit.value}`;
+  const raw = props.latest?.calValue;
+  if (raw === undefined || raw === null) return '--';
+  return `${formatValue(Number(raw))} ${unit.value || ''}`.trim();
 });
 
-// Window average shares the current value's unit treatment so the two value
-// tiles read as one family.
-const averageValueCard = computed(() => {
-  if (!stats.value || stats.value.avg == null || !Number.isFinite(stats.value.avg)) return '--';
-  const label = formatValue(Number(stats.value.avg));
-  return unit.value ? `${label} ${unit.value}` : label;
-});
+const averageValueCard = computed(() =>
+  stats.value ? `${formatValue(stats.value.avg)} ${unit.value || ''}`.trim() : '--'
+);
 
-const samplesSubtitle = computed(() => {
-  if (stats.value?.truncated) return t('pointValue.dashboard.kpi.samplesTruncated');
-  return rangeHoursLabel.value;
-});
+const samplesSubtitle = computed(() =>
+  stats.value ? `${rangeHours.value}h window` : `${rangeHours.value}h window`
+);
 
-const rangeHoursLabel = computed(() => {
-  const map: Record<number, string> = {
-    1: '1h',
-    6: '6h',
-    24: '24h',
-    168: '7d',
-  };
-  return map[rangeHours.value] || `${rangeHours.value}h`;
-});
-</script>
-
-<style lang="scss" scoped>
-.point-dashboard {
-  // Identity banner — the point-card header anatomy (tone tile + name +
-  // attach) scaled up, with the rw flag as a soft chip and the point id +
-  // collect time demoted to a quiet footer.
-  &__banner {
-    padding: var(--dc3-space-4);
-    border: 1px solid var(--dc3-border-base);
-    border-radius: var(--dc3-radius-lg);
-    background: var(--dc3-bg-elevated);
-    margin-bottom: var(--dc3-gutter);
-  }
-
-  &__hero {
-    display: flex;
-    align-items: center;
-    gap: var(--dc3-space-3);
-  }
-
-  &__tile {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border: 1px solid color-mix(in srgb, var(--el-color-success) 20%, transparent);
-    border-radius: var(--dc3-radius-lg);
-    background: var(--el-color-success-light-9);
-    color: var(--el-color-success);
-  }
-
-  &__title {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-
-  &__name {
-    overflow: hidden;
-    font-size: 16px;
-    font-weight: 650;
-    color: var(--dc3-text-primary);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__attach {
-    overflow: hidden;
-    font-size: 12px;
-    color: var(--dc3-text-muted);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  // Device name doubles as a quiet link to the device detail page.
-  &__attach-link {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--dc3-text-secondary);
-    font-size: inherit;
-    cursor: pointer;
-
-    &:hover {
-      color: var(--dc3-text-brand);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-  }
-
-  // Soft tone chip — the same language as the device status chip.
-  &__status-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-    height: 24px;
-    padding: 0 10px;
-    margin-left: auto;
-    border: 1px solid var(--dc3-border-base);
-    border-radius: var(--dc3-radius-full);
-    background: var(--el-fill-color-light);
-    color: var(--dc3-text-secondary);
-    font-size: 12px;
-    font-weight: 600;
-
-    &.is-rw {
-      border-color: color-mix(in srgb, var(--el-color-success) 30%, transparent);
-      background: var(--el-color-success-light-9);
-      color: var(--el-color-success);
-    }
-
-    &.is-ro {
-      border-color: color-mix(in srgb, var(--el-color-warning) 30%, transparent);
-      background: var(--el-color-warning-light-9);
-      color: var(--el-color-warning);
-    }
-
-    &.is-wo {
-      border-color: var(--dc3-border-base);
-      background: var(--el-fill-color-light);
-      color: var(--dc3-text-secondary);
-    }
-  }
-
-  &__status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: currentColor;
-    flex-shrink: 0;
-  }
-
-  &__footer {
-    display: flex;
-    align-items: center;
-    gap: var(--dc3-space-3);
-    margin-top: var(--dc3-space-3);
-    padding-top: var(--dc3-space-3);
-    border-top: 1px solid var(--dc3-border-base);
-  }
-
-  // Point id: copyable, monospace, ellipsized — a UUID is for copying,
-  // not reading.
-  &__code {
-    overflow: hidden;
-    max-width: 100%;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--dc3-text-muted);
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
-    font-size: 12px;
-    cursor: pointer;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    &:hover {
-      color: var(--dc3-text-brand);
-      text-decoration: underline;
-      text-underline-offset: 3px;
-    }
-  }
-
-  &__live-meta {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--dc3-space-2);
-    flex-shrink: 0;
-    margin-left: auto;
-    font-size: 12px;
-    color: var(--dc3-text-secondary);
-  }
-
-  // Stat-card strip: 3 across on desktop, 2 on tablet, 1 on mobile —
-  // six tiles close every tier with no half-empty row.
-  &__stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--dc3-space-2);
-    margin-bottom: var(--dc3-gutter);
-
-    @media (max-width: $breakpoint-md-max) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    @media (max-width: $breakpoint-xs-max) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  &__row {
-    row-gap: var(--dc3-gutter);
-    margin-bottom: var(--dc3-gutter);
-
-    &--last {
-      margin-bottom: 0;
-    }
-  }
-}
-</style>
+const collectTimeLabel = computed(() => String(props.latest?.createTime || '—'));</script>
