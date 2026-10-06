@@ -42,6 +42,8 @@ interface RunResult {
  * Parse argv like the bin entry does: exitOverride surfaces commander
  * failures as rejections, and escaped failures flow through the same
  * chokepoint runCli uses.
+ * @param args - arguments after `dc3`
+ * @returns captured streams and effective exit code
  */
 async function run(args: string[]): Promise<RunResult> {
   const program = new Command();
@@ -75,7 +77,11 @@ async function run(args: string[]): Promise<RunResult> {
   return { stdout, stderr, exitCode: process.exitCode ?? 0 };
 }
 
-/** Decode the single machine envelope a failure path may write to stdout. */
+/**
+ * Decode the single machine envelope a failure path may write to stdout.
+ * @param stdout - the captured stdout of a failed invocation
+ * @returns the parsed envelope, after asserting it is a single document
+ */
 function parseEnvelope(stdout: string): {
   ok: boolean;
   error: { kind: string; code: string; message: string };
@@ -85,7 +91,11 @@ function parseEnvelope(stdout: string): {
   return JSON.parse(lines[0]) as { ok: boolean; error: { kind: string; code: string; message: string } };
 }
 
-/** Fetch mock answering a JSON-RPC result while recording the request body. */
+/**
+ * Fetch mock answering a JSON-RPC result while recording the request body.
+ * @param result - the JSON-RPC result field of the response
+ * @returns a fetch stub for the /mcp endpoint
+ */
 function mcpFetch(result: unknown) {
   return vi.fn(async (_url: string, init?: RequestInit) => {
     const request = JSON.parse(String(init?.body)) as Record<string, unknown>;
@@ -96,7 +106,11 @@ function mcpFetch(result: unknown) {
   });
 }
 
-/** Decode the JSON-RPC params of the single captured /mcp request. */
+/**
+ * Decode the JSON-RPC params of the single captured /mcp request.
+ * @param fetchMock - the fetch stub whose single call is inspected
+ * @returns the parsed JSON-RPC params object
+ */
 function mcpRequestBody(fetchMock: ReturnType<typeof mcpFetch>): Record<string, unknown> {
   expect(fetchMock).toHaveBeenCalledTimes(1);
   return JSON.parse(String(fetchMock.mock.calls[0][1]?.body)) as Record<string, unknown>;

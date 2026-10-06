@@ -18,7 +18,6 @@ import { fileURLToPath } from 'node:url';
  */
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
-const fixtures = join(repoRoot, 'test', 'fixtures');
 
 /** Upper bound for a child that must terminate on its own (hang guard). */
 const CHILD_TIMEOUT_MS = 30_000;
@@ -33,9 +32,12 @@ interface ChildResult {
  * Spawn a fixture child with a redirected HOME and a controllable stdin.
  * @param fixture - fixture script under test/fixtures
  * @param args - arguments after the fixture path
+ * @param options - child spawn options
  * @param options.stdin - 'answer' writes one line and ends; 'closed' uses
  *   'ignore'; 'silent' keeps the pipe open without ever writing
+ * @param options.stdinLine - the line written in 'answer' mode
  * @param options.envHome - directory used as the child's HOME/USERPROFILE
+ * @param options.envExtra - extra environment entries for the child
  * @returns exit code and captured streams
  */
 function runChild(

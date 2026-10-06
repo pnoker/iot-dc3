@@ -1,6 +1,7 @@
 // Child fixture running the REAL CLI entry (src/index.ts) through Node type
 // stripping, for process-level guards: real exit codes, real stderr/stdout
 // channels, real state files under the redirected HOME.
+/* global process */
 import { buildProgram, handleProgramFailure } from '../../src/index.ts';
 
 const program = buildProgram();

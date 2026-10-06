@@ -124,6 +124,7 @@ dc3 device delete <id> --version <n>
 dc3 device count --driver-id <id>
 dc3 device status <id>
 dc3 device import <file.xlsx> --driver-id <id> --profile-id <id> [--idempotency-key <key>] [--no-wait] [--poll-interval <ms>] [--wait-timeout <seconds>]
+dc3 device import-template --driver-id <id> --profile-id <id> [--output <path>]
 ```
 
 `device import` submits a canonical multipart request (`request` JSON part plus `file` XLSX
@@ -133,7 +134,9 @@ operation until a terminal status, with exponential backoff from `--poll-interva
 operation's own expiry can only tighten the deadline). A timeout ends with a structured
 non-zero error (`kind: "timeout"`) instead of hanging. Terminal statuses `FAILED`,
 `CANCELLED`, and `EXPIRED` exit 1. Use `--no-wait` to return the `202 Accepted` resource
-immediately.
+immediately. `device import-template` downloads the matching XLSX template
+(`device-import-template.xlsx` by default, override with `--output`) shaped for the given
+driver/profile pair.
 
 ### Driver (`dc3 driver`)
 
@@ -243,6 +246,7 @@ dc3 alert change-impact [--days <days>] [--query source=device]
 dc3 alert latency
 dc3 alert silent-sources [--baseline-days <days>] [--silent-minutes <minutes>] [--limit <limit>]
 dc3 alert coverage-gap [--limit <limit>]
+dc3 alert point-profile <point_id>
 dc3 alert bulk-confirm --args '{"items":[{"source":"device","id":789}]}'
 dc3 alert bulk-confirm --args-file payload.json
 ```
@@ -498,4 +502,4 @@ contract above).
 
 ## License
 
-MIT
+AGPL-3.0-or-later (see the repository's `LICENSE-AGPL.txt`).

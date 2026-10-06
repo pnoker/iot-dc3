@@ -107,7 +107,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-function stubFetch(responder: (call: FetchCall) => Response | Promise<Response>): void {
+function stubFetch(responder: (_call: FetchCall) => Response | Promise<Response>): void {
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string, init?: RequestInit) => {

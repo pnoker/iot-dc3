@@ -21,11 +21,15 @@ const promptModuleUrl = pathToFileURL(
 /** Descriptor of the real process.stdin, restored after every test. */
 let originalStdin: PropertyDescriptor;
 
-/** Install a controllable stdin and (re)import the prompt module against it. */
+/**
+ * Install a controllable stdin and (re)import the prompt module against it.
+ * @param tty - whether the fake stdin reports itself as a TTY
+ * @returns the freshly imported prompt API plus the fake stdin
+ */
 async function freshPrompt(tty = true): Promise<{
-  prompt: (question: string) => Promise<string>;
-  passwordPrompt: (question: string) => Promise<string>;
-  confirm: (question: string) => Promise<boolean>;
+  prompt: (_question: string) => Promise<string>;
+  passwordPrompt: (_question: string) => Promise<string>;
+  confirm: (_question: string) => Promise<boolean>;
   stdin: Readable;
 }> {
   const fake = new Readable({ read() {} });
@@ -33,14 +37,20 @@ async function freshPrompt(tty = true): Promise<{
   Object.defineProperty(process, 'stdin', { value: fake, configurable: true });
   vi.resetModules();
   const module = (await import(promptModuleUrl)) as {
-    prompt: (question: string) => Promise<string>;
-    passwordPrompt: (question: string) => Promise<string>;
-    confirm: (question: string) => Promise<boolean>;
+    prompt: (_question: string) => Promise<string>;
+    passwordPrompt: (_question: string) => Promise<string>;
+    confirm: (_question: string) => Promise<boolean>;
   };
   return { ...module, stdin: fake };
 }
 
-/** Race a promise against a timeout so a regression shows up as a failure, not a hang. */
+/**
+ * Race a promise against a timeout so a regression shows up as a failure, not a hang.
+ * @param promise - the settlement under test
+ * @param ms - timeout budget in milliseconds
+ * @param label - failure label naming what failed to settle
+ * @returns the promise's settled value, or a timeout rejection
+ */
 function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
   const timeout = new Promise<never>((_, reject) => {

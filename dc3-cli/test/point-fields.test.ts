@@ -33,7 +33,11 @@ function buildProgram(): Command {
   return program;
 }
 
-/** Run a command expected to succeed; returns the printed output. */
+/**
+ * Run a command expected to succeed; returns the printed output.
+ * @param args - arguments after `dc3`
+ * @returns everything the command printed to stdout
+ */
 async function run(args: string[]): Promise<string> {
   const program = buildProgram();
   let output = '';
@@ -51,7 +55,11 @@ async function run(args: string[]): Promise<string> {
   return output;
 }
 
-/** Run a command expected to fail; returns the rejection. */
+/**
+ * Run a command expected to fail; returns the rejection.
+ * @param args - arguments after `dc3`
+ * @returns the rejection reason, or null when the command unexpectedly succeeded
+ */
 async function runExpectingFailure(args: string[]): Promise<unknown> {
   return buildProgram()
     .parseAsync(args, { from: 'user' })

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatOutput, detectFormat } from "../src/utils/format";
+import { formatOutput } from "../src/utils/format";
 
 describe("format utils", () => {
   it("formatOutput json should stringify", () => {

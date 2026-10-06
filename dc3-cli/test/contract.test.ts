@@ -27,21 +27,28 @@ class ExitSignal extends Error {
   }
 }
 
-/** Override process.stdout.isTTY for the duration of a test. */
+/**
+ * Override process.stdout.isTTY for the duration of a test.
+ * @param value - the isTTY value the format chain should observe
+ */
 function setTty(value: boolean | undefined): void {
   Object.defineProperty(process.stdout, 'isTTY', { value, configurable: true });
 }
 
-/** Run handleFatalError and return the exit code it selected. */
+/**
+ * Run handleFatalError and return the exit code it selected.
+ * @param err - the failure to report through the chokepoint
+ * @returns the exit code handleFatalError installed
+ */
 function exitCodeFor(err: Error): number {
   process.exitCode = 0;
   try {
     handleFatalError(err);
   } catch {
-    // handleFatalError prints, sets process.exitCode, and re-throws; read the code
+    // handleFatalError prints, sets process.exitCode, and re-throws by
+    // contract (its return type is never); the code is read below.
   }
   return process.exitCode ?? 1;
-  throw new Error('handleFatalError returned without exiting');
 }
 
 describe('detectFormat resolution chain', () => {

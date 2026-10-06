@@ -53,7 +53,11 @@ interface RunResult {
   error?: { name?: string; message?: string };
 }
 
-/** Run the config command tree in-process against the current temp HOME. */
+/**
+ * Run the config command tree in-process against the current temp HOME.
+ * @param args - arguments after `config`
+ * @returns captured streams, effective exit code, and escaped error shape
+ */
 async function runConfig(args: string[]): Promise<RunResult> {
   vi.resetModules();
   const { registerConfigCommand } = await import('../src/commands/config.js');
@@ -79,7 +83,7 @@ async function runConfig(args: string[]): Promise<RunResult> {
   const prevExitCode = process.exitCode;
   process.exitCode = undefined;
 
-  let result: RunResult = { stdout, stderr, code: 0 };
+  let result: RunResult;
   try {
     await program.parseAsync(['config', ...args], { from: 'user' });
     result = { stdout, stderr, code: process.exitCode ?? 0 };
@@ -278,7 +282,12 @@ describe('config reset clears every local auth store (F016)', () => {
 describe('every "dc3 ..." remediation string points at a registered command (F007)', () => {
   const srcRoot = join(dirname(fileURLToPath(import.meta.url)), '..', 'src');
 
-  /** Walk the command tree from a token sequence, consuming matching children. */
+  /**
+   * Walk the command tree from a token sequence, consuming matching children.
+   * @param program - command tree root to resolve from
+   * @param tokens - command path segments (flags and placeholders stop the walk)
+   * @returns how far the walk got, where it stopped, and whether it reached a leaf
+   */
   function resolveReference(
     program: Command,
     tokens: string[],

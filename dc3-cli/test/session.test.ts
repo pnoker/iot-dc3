@@ -41,7 +41,7 @@ async function run(args: string[]): Promise<string> {
     out += String(chunk);
     return true;
   });
-  vi.spyOn(process, 'exit').mockImplementation(((code?: number) => undefined) as never);
+  vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
   try {
     try { await program.parseAsync(args, { from: 'user' }); } catch (e) { if (!(e instanceof SilentExit)) throw e; }
   } finally {

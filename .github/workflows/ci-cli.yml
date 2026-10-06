@@ -48,6 +48,9 @@ jobs:
       - name: Lint Check
         run: pnpm exec eslint src test
 
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Test
         run: pnpm test
 

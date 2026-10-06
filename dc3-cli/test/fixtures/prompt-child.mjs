@@ -1,6 +1,7 @@
 // Child fixture driving the REAL prompt module (src/utils/prompt.ts) through
 // Node type stripping, so channel and termination contracts are verified at
 // process level (stdout cleanliness, EOF exit codes, no hangs).
+/* global process */
 import { prompt, passwordPrompt, confirm } from '../../src/utils/prompt.ts';
 
 const mode = process.argv[2] ?? 'password';

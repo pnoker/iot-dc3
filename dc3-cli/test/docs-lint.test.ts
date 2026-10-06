@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { CommanderError } from 'commander';
 
@@ -121,7 +122,9 @@ function dummyFor(placeholder: string): string {
   if (key.includes('format')) return 'json';
   if (key.includes('url')) return 'http://gw.test/';
   if (key.includes('file') || key.endsWith('.xlsx')) return 'file.xlsx';
-  if (key.includes('path')) return 'payload.json';
+  // Output paths point into the temp dir so README examples that WRITE a file
+  // (device import-template --output) never dirty the working tree.
+  if (key.includes('path')) return join(tmpdir(), 'dc3-docs-lint-output.json');
   if (key.includes('cursor')) return 'cursor-1';
   if (key.includes('json') || key.includes('args')) return '{}';
   if (key.includes('scope')) return 'scope-1';
@@ -194,14 +197,8 @@ const readmeCommands = collectReadmeCommands();
  */
 async function runThroughProgram(argv: string[]): Promise<unknown> {
   const program = buildProgram();
-  let stdout = '';
-  let stderr = '';
-  const outSpy = vi
-    .spyOn(process.stdout, 'write')
-    .mockImplementation((chunk) => ((stdout += String(chunk)), true));
-  const errSpy = vi
-    .spyOn(process.stderr, 'write')
-    .mockImplementation((chunk) => ((stderr += String(chunk)), true));
+  const outSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
+  const errSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
   process.exitCode = 0;
   let escaped: unknown = null;
   try {
@@ -236,7 +233,7 @@ describe('docs-lint: README bash fences validate against the real program (F028 
     resetCliContext();
     vi.stubGlobal(
       'fetch',
-      vi.fn(async (_url: string | URL, init?: RequestInit) => {
+      vi.fn(async (_url: string | URL, init?: Parameters<typeof fetch>[1]) => {
         if (init?.method === 'DELETE') return new Response(null, { status: 204 });
         return new Response(JSON.stringify({}), {
           status: 200,

@@ -14,7 +14,7 @@ vi.mock('node:child_process', () => ({
     file: string,
     args: string[],
     opts: Record<string, unknown>,
-    callback: (err: Error | null, result?: { stdout: string; stderr: string }) => void,
+    callback: (_err: Error | null, _result?: { stdout: string; stderr: string }) => void,
   ) => {
     child.calls.push({ file, args, opts });
     if (child.failNext) {

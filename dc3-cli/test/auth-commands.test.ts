@@ -67,8 +67,6 @@ interface RunResult {
 
 describe('auth login: input sources, store selection, and reporting', () => {
   let home: string;
-  let configPath: string;
-  let tokensPath: string;
   let fetchCalls: Array<{ url: string; body: Record<string, unknown> }>;
   let prevExitCode: number | string | undefined;
 
@@ -106,6 +104,7 @@ describe('auth login: input sources, store selection, and reporting', () => {
   /**
    * Seed a default profile so consumption (getActiveProfile) succeeds; the
    * login action then overwrites the identity fields with the login values.
+   * @param overrides - extra profile fields merged into the seeded default
    */
   async function seedProfile(overrides: Record<string, unknown> = {}): Promise<void> {
     await mkdir(join(home, '.dc3'), { recursive: true });
@@ -123,7 +122,11 @@ describe('auth login: input sources, store selection, and reporting', () => {
     );
   }
 
-  /** Run the auth command tree in-process against the current temp HOME. */
+  /**
+   * Run the auth command tree in-process against the current temp HOME.
+   * @param args - arguments after `auth`
+   * @returns captured streams, effective exit code, and escaped error shape
+   */
   async function runAuth(args: string[]): Promise<RunResult> {
     vi.resetModules();
     const { registerAuthCommand } = await import('../src/commands/auth.js');
@@ -149,7 +152,7 @@ describe('auth login: input sources, store selection, and reporting', () => {
     prevExitCode = process.exitCode;
     process.exitCode = undefined;
 
-    let result: RunResult = { stdout, stderr, code: 0 };
+    let result: RunResult;
     try {
       await program.parseAsync(['auth', ...args], { from: 'user' });
       result = { stdout, stderr, code: process.exitCode ?? 0 };
@@ -411,7 +414,7 @@ describe('auth logout: guaranteed local cleanup (F025)', () => {
     });
     prevExitCode = process.exitCode;
     process.exitCode = undefined;
-    let result: RunResult = { stdout, stderr, code: 0 };
+    let result: RunResult;
     try {
       await program.parseAsync(['auth', 'logout'], { from: 'user' });
       result = { stdout, stderr, code: process.exitCode ?? 0 };

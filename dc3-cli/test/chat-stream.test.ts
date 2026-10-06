@@ -28,7 +28,11 @@ vi.mock('../src/core/token-manager.js', () => ({
 
 import { registerChatCommand } from '../src/commands/chat.js';
 
-/** Run the chat command and capture everything written to stdout. */
+/**
+ * Run the chat command and capture everything written to stdout.
+ * @param args - arguments after `chat`
+ * @returns captured stdout and effective exit code
+ */
 async function run(args: string[]): Promise<{ stdout: string; exitCode: number }> {
   const program = new Command();
   program.exitOverride();

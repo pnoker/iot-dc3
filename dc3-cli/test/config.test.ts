@@ -1,4 +1,3 @@
-import { SilentExit } from '../src/utils/format.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
@@ -156,6 +155,9 @@ describe('config file corruption handling', () => {
    * Run `config set` on a freshly imported CLI so the singleton config manager is rebuilt
    * against the current temp HOME. Captures stdout/stderr and the (mocked) exit code.
    * Non-exit errors propagate to the caller (the real CLI routes them to the fatal handler).
+   * @param key - config key passed as the first argument
+   * @param value - config value passed as the second argument
+   * @returns captured stdout, stderr, and exit code
    */
   async function runSet(key: string, value: string): Promise<{ stdout: string; stderr: string; code: number }> {
     vi.resetModules();
@@ -386,7 +388,10 @@ describe('fresh-install bootstrap (F007)', () => {
   });
 });
 
-/** A minimal valid config used as the pre-existing state for input-validation tests. */
+/**
+ * A minimal valid config used as the pre-existing state for input-validation tests.
+ * @returns serialized valid configuration JSON
+ */
 function validConfig(): string {
   return JSON.stringify(
     {

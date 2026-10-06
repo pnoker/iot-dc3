@@ -10,7 +10,7 @@ import { registerProfileCommand } from "../src/commands/profile.js";
 import { registerGroupCommand } from "../src/commands/group.js";
 import { registerLabelCommand } from "../src/commands/label.js";
 
-type Register = (program: Command) => void;
+type Register = (_program: Command) => void;
 type FetchCall = { url: string; init: RequestInit };
 
 const fetchCalls: FetchCall[] = [];

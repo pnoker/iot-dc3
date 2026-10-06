@@ -26,8 +26,12 @@ import { McpClient } from '../src/core/mcp.js';
 const oauthState = { token: 'rs256.jwt.value', authType: 'oauth' };
 const loginState = { token: 'hs.jwt.value', authType: 'login' };
 
-/** Fetch mock answering application/json while echoing the request id (F040). */
-function echoJsonRpc(mutate?: (payload: Record<string, unknown>) => void) {
+/**
+ * Fetch mock answering application/json while echoing the request id (F040).
+ * @param mutate - optional payload mutation applied before the response is built
+ * @returns a fetch stub returning the JSON-RPC response
+ */
+function echoJsonRpc(mutate?: (_payload: Record<string, unknown>) => void) {
   return vi.fn(async (_url: string, init?: RequestInit) => {
     const request = JSON.parse(String(init?.body)) as Record<string, unknown>;
     const payload: Record<string, unknown> = { jsonrpc: '2.0', id: request.id };
@@ -39,8 +43,12 @@ function echoJsonRpc(mutate?: (payload: Record<string, unknown>) => void) {
   });
 }
 
-/** Fetch mock answering a text/event-stream body built from the request id. */
-function sseRpc(frames: Array<(id: number) => string>) {
+/**
+ * Fetch mock answering a text/event-stream body built from the request id.
+ * @param frames - per-frame builders receiving the echoed request id
+ * @returns a fetch stub returning the SSE-framed response
+ */
+function sseRpc(frames: Array<(_id: number) => string>) {
   return vi.fn(async (_url: string, init?: RequestInit) => {
     const request = JSON.parse(String(init?.body)) as { id: number };
     const body = frames.map((frame) => `event: message\ndata: ${frame(request.id)}\n\n`).join('');

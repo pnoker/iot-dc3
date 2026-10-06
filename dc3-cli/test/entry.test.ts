@@ -57,6 +57,8 @@ interface RunResult {
 /**
  * Parse argv like the bin entry does: exitOverride surfaces commander
  * failures as rejections, which flow through the same handler runCli uses.
+ * @param args - arguments after `dc3`
+ * @returns captured streams and effective exit code
  */
 async function run(args: string[]): Promise<RunResult> {
   const program = buildProgram();
@@ -79,12 +81,19 @@ async function run(args: string[]): Promise<RunResult> {
   return { stdout, stderr, exitCode: process.exitCode ?? 0 };
 }
 
-/** Override process.stdout.isTTY for the duration of a test. */
+/**
+ * Override process.stdout.isTTY for the duration of a test.
+ * @param value - the isTTY value the format chain should observe
+ */
 function setTty(value: boolean | undefined): void {
   Object.defineProperty(process.stdout, 'isTTY', { value, configurable: true });
 }
 
-/** Decode the machine envelope written to stdout by the failure chokepoint. */
+/**
+ * Decode the machine envelope written to stdout by the failure chokepoint.
+ * @param stdout - the captured stdout of a failed invocation
+ * @returns the parsed envelope, after asserting it is a single document
+ */
 function parseEnvelope(stdout: string): { ok: boolean; error: { kind: string; code: string; message: string } } {
   const lines = stdout.split('\n').filter((line) => line.trim() !== '');
   expect(lines, `exactly one envelope document, got: ${stdout}`).toHaveLength(1);
@@ -435,7 +444,11 @@ describe('entry: failure envelope on the real path (F015)', () => {
 });
 
 describe('failure chokepoint taxonomy (F015, F030, F007)', () => {
-  /** Run handleFatalError directly and capture both streams plus the exit code. */
+  /**
+   * Run handleFatalError directly and capture both streams plus the exit code.
+   * @param err - the failure to report through the chokepoint
+   * @returns captured streams and the installed exit code
+   */
   function report(err: Error): RunResult {
     let stdout = '';
     let stderr = '';

@@ -31,7 +31,7 @@ vi.mock('../src/core/credential-keychain.js', () => ({
     async isAvailable(): Promise<boolean> {
       return keychainMock.available;
     }
-    async getPassword(identifier: string): Promise<string | null> {
+    async getPassword(_identifier: string): Promise<string | null> {
       if (keychainMock.failGet) {
         throw new Error('keychain transport error');
       }
@@ -48,7 +48,6 @@ vi.mock('../src/core/credential-keychain.js', () => ({
 
 describe('credential store chain (F033) and save contract (F005)', () => {
   let home: string;
-  let stderr: string;
 
   beforeEach(async () => {
     home = await mkdtemp(join(tmpdir(), 'dc3-cli-chain-'));
@@ -60,10 +59,7 @@ describe('credential store chain (F033) and save contract (F005)', () => {
     keychainMock.deleted = [];
     delete process.env.DC3_PASSWORD;
     vi.resetModules();
-    stderr = '';
-    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
-      stderr += args.join(' ');
-    });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(async () => {

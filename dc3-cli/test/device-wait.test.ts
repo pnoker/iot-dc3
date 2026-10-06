@@ -55,7 +55,13 @@ function useWaitFakeTimers(): void {
   vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date'], now: 0 });
 }
 
-/** Advance the faked clock until the condition holds or the budget runs out. */
+/**
+ * Advance the faked clock until the condition holds or the budget runs out.
+ * @param condition - checked after every step
+ * @param maxFakeMs - total fake-millisecond budget
+ * @param stepMs - fake-millisecond step per iteration
+ * @returns whether the condition eventually held
+ */
 async function advanceUntil(condition: () => boolean, maxFakeMs: number, stepMs: number): Promise<boolean> {
   for (let advanced = 0; advanced < maxFakeMs && !condition(); advanced += stepMs) {
     await vi.advanceTimersByTimeAsync(stepMs);
@@ -70,6 +76,10 @@ const PENDING = Symbol('pending');
  * Advance the faked clock until the execution settles. If it never settles
  * the final await outlives the vitest timeout — which is exactly the
  * regression signal these guard tests exist to raise.
+ * @param execution - the promise under test
+ * @param maxFakeMs - total fake-millisecond budget
+ * @param stepMs - fake-millisecond step per iteration
+ * @returns the settled value (resolved value or rejection reason), or undefined
  */
 async function driveUntilSettled(execution: Promise<unknown>, maxFakeMs: number, stepMs: number): Promise<unknown> {
   let outcome: unknown = PENDING;
@@ -90,12 +100,18 @@ async function driveUntilSettled(execution: Promise<unknown>, maxFakeMs: number,
   return outcome === PENDING ? undefined : (outcome as { value: unknown }).value;
 }
 
-/** True once the import POST reached the stubbed fetch. */
+/**
+ * True once the import POST reached the stubbed fetch.
+ * @returns whether the import request was issued
+ */
 function importSubmitted(): boolean {
   return fetchCalls.some((call) => call.url.includes('/device/import'));
 }
 
-/** Status-poll timestamps recorded by the fetch stub, normalized to the first poll. */
+/**
+ * Status-poll timestamps recorded by the fetch stub, normalized to the first poll.
+ * @returns per-poll offsets in fake milliseconds
+ */
 function pollOffsets(): number[] {
   const times = fetchCalls.filter((call) => !call.url.includes('/device/import')).map((call) => call.atMs);
   return times.map((at) => at - times[0]);

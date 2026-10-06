@@ -79,7 +79,11 @@ function parseParts(body: Buffer, boundary: string): CapturedPart[] {
   return parts;
 }
 
-/** Run the attachment command against the capture server. */
+/**
+ * Run the attachment command against the capture server.
+ * @param args - arguments after `attachment`
+ * @returns captured stdout and effective exit code
+ */
 async function run(args: string[]): Promise<{ stdout: string; exitCode: number }> {
   const program = new Command();
   program.exitOverride();
