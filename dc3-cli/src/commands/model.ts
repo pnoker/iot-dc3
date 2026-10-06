@@ -19,6 +19,7 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { ApiError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { requireResourceId } from '../utils/manager.js';
 
 const BASE = '/api/v3/agentic/model';
 
@@ -43,11 +44,10 @@ const MODEL_UPDATE_FIELDS = [
 
 const parseTemperature = (value: string): number => {
   const parsed = parseFloat(value);
-  if (Number.isNaN(parsed)) {
-    throw new InvalidArgumentError(`option '--temperature ${value}' is not a valid number`);
-  }
-  if (parsed < 0 || parsed > 2) {
-    throw new InvalidArgumentError(`option '--temperature ${value}' is out of range (0.0–2.0)`);
+  if (Number.isNaN(parsed) || parsed < 0 || parsed > 2) {
+    // commander already renders `option '--temperature <t>' <message>`; only
+    // the reason belongs here (audit G15).
+    throw new InvalidArgumentError('must be a number between 0.0 and 2.0');
   }
   return parsed;
 };
@@ -55,7 +55,7 @@ const parseTemperature = (value: string): number => {
 const parseMaxTokens = (value: string): number => {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed < 1) {
-    throw new InvalidArgumentError(`option '--max-tokens ${value}' must be a positive integer`);
+    throw new InvalidArgumentError('must be a positive integer');
   }
   return parsed;
 };
@@ -221,6 +221,9 @@ export function registerModelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The id keys the delete — reject empty ids before the wire (audit
+      // G13/G27).
+      requireResourceId(`${BASE}/config/delete`, id);
       await dc3Client.del(`${BASE}/config/delete?id=${encodeURIComponent(id)}`);
       printAndExit(undefined, format);
     });
@@ -231,6 +234,9 @@ export function registerModelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The id keys the probe — reject empty ids before the wire (audit
+      // G13/G27).
+      requireResourceId(`${BASE}/config/check`, id);
       const result = await dc3Client.post(`${BASE}/config/check?id=${encodeURIComponent(id)}`);
       printAndExit(result, format);
     });

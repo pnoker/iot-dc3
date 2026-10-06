@@ -27,20 +27,24 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 /**
- * REST controller exposing attachment upload and listing endpoints.
+ * REST controller exposing attachment upload, listing, and delete endpoints.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -130,5 +134,39 @@ public class AttachmentController implements BaseController {
                         .list(conversationId, header)
                         .map(attachmentBuilder::buildVOByBO)
                         .collectList());
+    }
+
+    /**
+     * Delete one uploaded attachment by id for the current tenant and user.
+     *
+     * @param id primary key of the attachment to delete; must belong to the current tenant and user
+     * @return empty body; the metadata row is soft-deleted and the stored file removed best-effort
+     */
+    @PreAuthorize("@perm.can('attachment', 'delete')")
+    @Operation(
+            summary = "Delete Attachment",
+            description =
+                    "Delete one uploaded attachment by id within the current tenant and user. "
+                            + "Soft-deletes the metadata row and removes the stored file best-effort; the file is no longer referenceable in the conversation.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "HIGH"),
+                                @ExtensionProperty(name = "destructive", value = "true"),
+                                @ExtensionProperty(name = "idempotent", value = "false"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @DeleteMapping("/delete")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> delete(
+            @Parameter(
+                            description =
+                                    "Primary key of the attachment to delete. Must belong to the current tenant and user.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "id")
+                    Long id) {
+        return getPrincipalHeader().flatMap(header -> attachmentService.delete(id, header).then());
     }
 }

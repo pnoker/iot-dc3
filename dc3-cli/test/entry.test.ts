@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Command, CommanderError } from 'commander';
+import { CommanderError } from 'commander';
 import { z, ZodError } from 'zod';
 
 // Mock the state singletons behind the entry layer so tests never touch ~/.dc3.
@@ -392,7 +392,10 @@ describe('entry: deprecated create alias (F029)', () => {
     ]);
 
     expect(result.exitCode).toBe(0);
-    expect(result.stderr).toContain("'create' is a deprecated compat alias of 'add'");
+    // Warning-prefix casing is part of the stderr contract: every degradation
+    // or deprecation warning in the CLI uses capitalised 'Warning: '.
+    expect(result.stderr).toContain("Warning: 'create' is a deprecated compat alias of 'add'");
+    expect(result.stderr).not.toMatch(/(?<![A-Za-z])warning:/u);
     expect(result.stderr).toContain('dc3 device add');
     expect(result.stderr).not.toContain('dc3 device create');
     expect(fetchCalls.some((call) => call.url.endsWith('/manager/device/add'))).toBe(true);
@@ -578,6 +581,51 @@ describe('entry seam contracts', () => {
     expect(program.version()).toBe('0.1.0');
     expect(program.name()).toBe('dc3');
     expect(program.commands.length).toBeGreaterThan(20);
-    expect(new Command().version()).not.toBe('0.1.0');
+    // Asserting `new Command().version()` here was a tautology (a bare
+    // commander program never carries our version); the buildProgram-based
+    // assertions above are the real regression guard.
+  });
+});
+
+describe('entry: full-tree help equivalence (F014)', () => {
+  /**
+   * Walk the program tree and collect every command path below the root,
+   * skipping the internal `help` commands. Copied from docs-lint.test.ts's
+   * walker rather than cross-imported between test files.
+   * @returns space-joined paths like `config profile create`
+   */
+  function collectCommandPaths(): string[] {
+    const paths: string[] = [];
+    const walk = (
+      command: { name(): string; commands: readonly unknown[] },
+      prefix: string[],
+    ): void => {
+      for (const child of command.commands as { name(): string; commands: readonly unknown[] }[]) {
+        if (child.name() === 'help') continue;
+        const path = [...prefix, child.name()].join(' ');
+        paths.push(path);
+        walk(child, [...prefix, child.name()]);
+      }
+    };
+    walk(buildProgram(), []);
+    return paths;
+  }
+
+  it('for every group/subcommand path, `help <path>` and `<path> --help` agree', async () => {
+    const paths = collectCommandPaths().filter((path) => path.split(' ').length >= 2);
+    expect(paths.length).toBeGreaterThan(60);
+
+    for (const path of paths) {
+      const segments = path.split(' ');
+      const viaHelp = await run(['help', ...segments]);
+      const viaFlag = await run([...segments, '--help']);
+
+      expect(viaHelp.exitCode, `exit of "help ${path}"`).toBe(0);
+      expect(viaFlag.exitCode, `exit of "${path} --help"`).toBe(0);
+      const helpFirst = viaHelp.stdout.split('\n')[0];
+      const flagFirst = viaFlag.stdout.split('\n')[0];
+      expect(helpFirst, `first help line of "${path}"`).toBe(flagFirst);
+      expect(helpFirst.startsWith('Usage: dc3 '), `usage header of "${path}"`).toBe(true);
+    }
   });
 });

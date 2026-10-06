@@ -441,3 +441,86 @@ describe('docs-lint: README .mcp.json snippets satisfy the mcpServers schema (F0
     expect(problems).toContain('server "dc3" pairs "url" with type "stdio"');
   });
 });
+
+describe('docs-lint: README mcp.json snippets are strict JSON (G18)', () => {
+  /**
+   * Strip `//` line comments (string-aware) WITHOUT comma stripping: the
+   * fenced body must already be strict-JSON parseable, so a pasted
+   * `.mcp.json` works verbatim instead of failing on jsonc trailing commas.
+   * @param text - fenced snippet content
+   * @returns the comment-stripped text
+   */
+  function stripCommentsOnly(text: string): string {
+    let out = '';
+    let inString = false;
+    for (let i = 0; i < text.length; i += 1) {
+      const char = text[i];
+      if (inString) {
+        out += char;
+        if (char === '\\') {
+          out += text[i + 1] ?? '';
+          i += 1;
+        } else if (char === '"') {
+          inString = false;
+        }
+        continue;
+      }
+      if (char === '"') {
+        inString = true;
+        out += char;
+        continue;
+      }
+      if (char === '/' && text[i + 1] === '/') {
+        while (i < text.length && text[i] !== '\n') i += 1;
+        continue;
+      }
+      out += char;
+    }
+    return out;
+  }
+
+  /** All fenced snippets that declare an mcpServers object. */
+  const mcpFences: { fence: number; text: string }[] = [];
+  {
+    const fence = /```(?:jsonc|json)\r?\n([\s\S]*?)```/g;
+    let match: RegExpExecArray | null;
+    let index = 0;
+    while ((match = fence.exec(readme)) !== null) {
+      index += 1;
+      if (match[1].includes('mcpServers')) mcpFences.push({ fence: index, text: match[1] });
+    }
+  }
+
+  it('the README contains at least one mcpServers fence to guard', () => {
+    expect(mcpFences.length).toBeGreaterThan(0);
+  });
+
+  it.each(mcpFences.map((snippet) => [snippet.fence, snippet] as const))(
+    'mcp.json snippet %i is strict-JSON parseable after comment stripping only',
+    (_fence, snippet) => {
+      expect(() => JSON.parse(stripCommentsOnly(snippet.text))).not.toThrow();
+    },
+  );
+
+  it('negative control: the pre-fix jsonc trailing commas are rejected by strict JSON', () => {
+    const legacy = [
+      '// Claude Code: .mcp.json',
+      '{',
+      '  "mcpServers": {',
+      '    "dc3": {',
+      '      "type": "http",',
+      '      "url": "http://localhost:8000/mcp",',
+      '    },',
+      '  },',
+      '}',
+    ].join('\n');
+    expect(() => JSON.parse(stripCommentsOnly(legacy))).toThrow();
+  });
+
+  it('negative control: the comment stripper keeps // inside string values', () => {
+    const parsed = JSON.parse(
+      stripCommentsOnly('{ "url": "http://localhost:8000/mcp" } // trailing note'),
+    ) as Record<string, string>;
+    expect(parsed.url).toBe('http://localhost:8000/mcp');
+  });
+});

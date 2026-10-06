@@ -50,20 +50,6 @@ import reactor.core.publisher.Mono;
  * Dashboard / home-page aggregate endpoints. All tenant-scoped via
  * {@link BaseController#getTenantId()}.
  *
- * <p>
- * Route summary (all GET, all under {@code /api/v3/data/dashboard}):
- * </p>
- * <ul>
- * <li>{@code /stats/today} — today total + yesterday total for delta</li>
- * <li>{@code /stats/timeseries?granularity=hour|day&rangeHours=24}</li>
- * <li>{@code /top?dimension=device|point|driver&rangeHours=24&limit=10}</li>
- * <li>{@code /stream?limit=20} — most recent rows (user-triggered refresh)</li>
- * <li>{@code /alert/stats} — total + unconfirmed + by-type breakdown</li>
- * <li>{@code /alert/latest?limit=10} — most recent alerts</li>
- * <li>{@code /device/{deviceId}/stats/timeseries} — device-scoped trend chart</li>
- * <li>{@code /device/{deviceId}/stream?limit=20} — device-scoped live feed</li>
- * </ul>
- *
  * @author pnoker
  * @since 2026.5.2
  */

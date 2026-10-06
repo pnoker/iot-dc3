@@ -18,8 +18,8 @@ import { Command, InvalidArgumentError } from 'commander';
 import { configManager } from '../core/config-manager.js';
 import type { ProfileConfig } from '../core/config-manager.js';
 import { resetAllLocalState } from '../core/credential-store.js';
-import { UsageError } from '../core/errors.js';
-import { detectFormat, printAndExit, type OutputFormat } from '../utils/format.js';
+import { UsageError, ValidationError } from '../core/errors.js';
+import { detectFormat, printAndExit } from '../utils/format.js';
 import { parseNonNegativeInteger } from '../utils/manager.js';
 import { confirm } from '../utils/prompt.js';
 
@@ -27,22 +27,30 @@ import { confirm } from '../utils/prompt.js';
 const STORE_TYPES = ['keychain', 'encrypted', 'env', 'prompt'] as const;
 
 /**
- * Parse a numeric `config set` value, rejecting invalid input before anything is persisted.
+ * Strip the optional `settings.` prefix from a config key. Applied
+ * symmetrically on `config set` and `config get` so both accept
+ * `settings.color` and `color` for the same setting (report F036).
+ * @param key - config key as typed by the user
+ * @returns the bare settings key
+ */
+function bareSettingsKey(key: string): string {
+  return key.startsWith('settings.') ? key.slice('settings.'.length) : key;
+}
+
+/**
+ * Parse a numeric `config set` value, rejecting invalid input before anything
+ * is persisted. Failures throw a typed ValidationError so they flow through
+ * the single failure chokepoint (report F015).
  * @param key - full config key as typed by the user, used in the error message
  * @param value - raw CLI value to parse
- * @param format - output format for the error report
  * @returns the parsed non-negative integer
  */
-function parseSettingInteger(key: string, value: string, format: OutputFormat): number {
+function parseSettingInteger(key: string, value: string): number {
   try {
     return parseNonNegativeInteger(value);
   } catch (error) {
     const reason = error instanceof InvalidArgumentError ? error.message : String(error);
-    printAndExit(
-      { ok: false, message: `Invalid value for ${key}: "${value}" (${reason})` },
-      format,
-      1,
-    );
+    throw new ValidationError(`Invalid value for ${key}: "${value}" (${reason})`);
   }
 }
 
@@ -63,6 +71,7 @@ export function registerConfigCommand(program: Command): void {
     .action(async (key: string, value: string, options) => {
       const format = detectFormat(options.format);
       const profileName = await configManager.getActiveProfileName();
+      const settingKey = bareSettingsKey(key);
 
       switch (key) {
         case 'gateway':
@@ -81,14 +90,9 @@ export function registerConfigCommand(program: Command): void {
           break;
         case 'auth.store':
         case 'credential_store':
-          if (!['keychain', 'encrypted', 'env', 'prompt'].includes(value)) {
-            printAndExit(
-              {
-                ok: false,
-                message: `Invalid store type: ${value}. Must be one of: keychain, encrypted, env, prompt`,
-              },
-              format,
-              1,
+          if (!(STORE_TYPES as readonly string[]).includes(value)) {
+            throw new ValidationError(
+              `Invalid store type: ${value}. Must be one of: keychain, encrypted, env, prompt`,
             );
           }
           await configManager.setProfile(profileName, {
@@ -100,31 +104,43 @@ export function registerConfigCommand(program: Command): void {
           );
           break;
         default:
-          // Generic setting
-          if (key.startsWith('settings.')) {
-            const settingKey = key.replace('settings.', '');
-            if (settingKey === 'output_format') {
+          // Generic settings key; the `settings.` prefix is optional and both
+          // spellings address the same setting (report F036). Failures throw
+          // typed errors so the chokepoint emits the unified envelope
+          // (report F015) and nothing is persisted.
+          switch (settingKey) {
+            case 'output_format': {
               if (!['json', 'table', 'yaml'].includes(value)) {
-                printAndExit({ ok: false, message: `Invalid format: ${value}` }, format, 1);
+                throw new ValidationError(
+                  `Invalid value for settings.output_format: "${value}" (expected json, table, or yaml)`,
+                );
               }
               await configManager.setSetting('output_format', value as 'json' | 'table' | 'yaml');
-            } else if (settingKey === 'color') {
+              break;
+            }
+            case 'color': {
+              // Booleans accept exactly the two boolean lexemes — never a
+              // silent truthiness coercion of whatever string arrived
+              // (report F036).
+              if (value !== 'true' && value !== 'false') {
+                throw new ValidationError(
+                  `Invalid value for settings.color: "${value}" (must be exactly "true" or "false")`,
+                );
+              }
               await configManager.setSetting('color', value === 'true');
-            } else if (settingKey === 'renewal_threshold_hours') {
+              break;
+            }
+            case 'renewal_threshold_hours':
               await configManager.setSetting(
                 'renewal_threshold_hours',
-                parseSettingInteger(key, value, format),
+                parseSettingInteger(key, value),
               );
-            } else if (settingKey === 'retry_count') {
-              await configManager.setSetting(
-                'retry_count',
-                parseSettingInteger(key, value, format),
-              );
-            } else {
-              printAndExit({ ok: false, message: `Unknown setting: ${settingKey}` }, format, 1);
-            }
-          } else {
-            printAndExit({ ok: false, message: `Unknown config key: ${key}` }, format, 1);
+              break;
+            default:
+              // Settings that no longer exist (e.g. the removed inert
+              // `retry_count` knob) land here: an honest unknown-key refusal,
+              // never a silent write of a value nothing consumes.
+              throw new ValidationError(`Unknown config key: ${key}`);
           }
           printAndExit({ ok: true, key, value, message: `${key} set to ${value}` }, format);
       }
@@ -145,11 +161,7 @@ export function registerConfigCommand(program: Command): void {
       const settings = configData.settings;
 
       if (!profile) {
-        printAndExit(
-          { ok: false, message: `No profile configured. Run: dc3 config set gateway <url>` },
-          format,
-          1,
-        );
+        throw new ValidationError('No profile configured. Run: dc3 config set gateway <url>');
       }
 
       if (!key) {
@@ -184,12 +196,14 @@ export function registerConfigCommand(program: Command): void {
           printAndExit(profile.credential_store, format);
           break;
         default: {
-          // Try settings
-          const ks = key! as keyof typeof settings;
+          // Settings lookup shares the set-side normalization: the optional
+          // `settings.` prefix is stripped, so `get settings.color`
+          // resolves the same setting as `get color` (report F036).
+          const ks = bareSettingsKey(key!) as keyof typeof settings;
           if (ks in settings) {
             printAndExit(settings[ks], format);
           } else {
-            printAndExit({ ok: false, message: `Unknown config key: ${key}` }, format, 1);
+            throw new ValidationError(`Unknown config key: ${key}`);
           }
         }
       }

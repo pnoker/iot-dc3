@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Command } from 'commander';
@@ -86,9 +86,9 @@ describe('auth login: input sources, store selection, and reporting', () => {
           body: init?.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : {},
         });
         if (String(url).endsWith('/token/salt')) {
-          return new Response('salt-abc', { status: 200 });
+          return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
         }
-        return new Response(VALID_TOKEN, { status: 200 });
+        return new Response(JSON.stringify({ token: VALID_TOKEN }), { status: 200 });
       }),
     );
   });
@@ -187,7 +187,13 @@ describe('auth login: input sources, store selection, and reporting', () => {
     expect(fetchCalls[1].body).toMatchObject({ name: 'admin', tenant: 'tenantA', password: 'env-pw' });
     const payload = JSON.parse(result.stdout);
     expect(payload.ok).toBe(true);
-    expect(payload.password_saved).toBe(true);
+    // The env store is per-process by design: nothing was persisted, so the
+    // login output must never claim password_saved:true (password_saved
+    // semantics) — and the warning must point renewal at DC3_PASSWORD.
+    expect(payload.password_saved).toBe(false);
+    expect(payload.credential_store).toBe('env');
+    expect(result.stderr).toMatch(/NOT saved/u);
+    expect(result.stderr).toMatch(/DC3_PASSWORD/u);
     // The token state was persisted for the active profile.
     const tokens = JSON.parse(await readFile(join(home, '.dc3', 'tokens.json'), 'utf8'));
     expect(tokens.states.default.username).toBe('admin');
@@ -219,6 +225,8 @@ describe('auth login: input sources, store selection, and reporting', () => {
     const result = await runAuth(['login', '-u', 'admin', '-p', 'pw']);
     expect(result.code).toBe(1);
     expect(result.error?.message).toMatch(/--tenant/u);
+    // Non-secret inputs never mention the password variable (F004 residual).
+    expect(result.error?.message).not.toMatch(/DC3_PASSWORD/u);
     expect(fetchCalls).toHaveLength(0);
   });
 
@@ -335,6 +343,17 @@ describe('auth login: input sources, store selection, and reporting', () => {
     const result = await runAuth(['login', '--oauth']);
     expect(result.code).toBe(1);
     expect(result.error?.message).toMatch(/--client-id/u);
+    // --client-id is not a secret: the error must stay on topic.
+    expect(result.error?.message).not.toMatch(/DC3_PASSWORD/u);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('missing username on non-interactive stdin stays on topic (no DC3_PASSWORD hint)', async () => {
+    await seedProfile();
+    const result = await runAuth(['login', '-t', 'tenantA', '-p', 'pw']);
+    expect(result.code).toBe(1);
+    expect(result.error?.message).toMatch(/--username/u);
+    expect(result.error?.message).not.toMatch(/DC3_PASSWORD/u);
     expect(fetchCalls).toHaveLength(0);
   });
 });
@@ -472,6 +491,10 @@ describe('auth logout: guaranteed local cleanup (F025)', () => {
     expect(payload).toEqual({ ok: true, message: 'Logged out successfully' });
     const { tokenManager } = await import('../src/core/token-manager.js');
     expect(await tokenManager.getState('default')).toBeNull();
+    // No other profiles held credentials: logout leaves no decryptable slice
+    // behind — ciphertext AND its AES key are gone (F016 residue).
+    expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(false);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(false);
   });
 });
 
@@ -545,9 +568,9 @@ describe('identity mismatch warning and renewal keying, end-to-end (F037)', () =
           url: String(url),
           body: init?.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : {},
         });
-        if (String(url).endsWith('/token/salt')) return new Response('salt-new', { status: 200 });
+        if (String(url).endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-new' }), { status: 200 });
         if (String(url).endsWith('/token/generate')) {
-          return new Response(VALID_TOKEN, { status: 200 });
+          return new Response(JSON.stringify({ token: VALID_TOKEN }), { status: 200 });
         }
         return new Response(JSON.stringify([]), { status: 200 });
       }),
@@ -568,5 +591,294 @@ describe('identity mismatch warning and renewal keying, end-to-end (F037)', () =
     expect(stderr).toMatch(/admin@tenantA/u);
     expect(stderr).toMatch(/bob@tenantB/u);
     expect(stderr).toMatch(/Warning: profile "default"/u);
+  });
+});
+
+describe('auth status / auth token: user-visible contract (F016)', () => {
+  let home: string;
+  let prevExitCode: number | string | undefined;
+
+  beforeEach(async () => {
+    home = await mkdtemp(join(tmpdir(), 'dc3-cli-status-'));
+    osStub.home = home;
+    // Fresh modules so the managers bake this test's temp HOME into their
+    // file paths before any seeding happens.
+    vi.resetModules();
+    keychainMock.available = false;
+    keychainMock.saved = [];
+    keychainMock.deleted = [];
+    delete process.env.DC3_PASSWORD;
+  });
+
+  afterEach(async () => {
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+    osStub.home = '';
+    await rm(home, { recursive: true, force: true });
+  });
+
+  /** Seed a usable default profile (encrypted store, loopback gateway). */
+  async function seedConfig(): Promise<void> {
+    await mkdir(join(home, '.dc3'), { recursive: true });
+    await writeFile(
+      join(home, '.dc3', 'config.json'),
+      JSON.stringify({
+        version: 1,
+        current_profile: 'default',
+        settings: {},
+        profiles: {
+          default: {
+            gateway: 'http://127.0.0.1:9400',
+            username: 'admin',
+            credential_store: 'encrypted',
+          },
+        },
+      }),
+      'utf8',
+    );
+  }
+
+  /**
+   * Persist a token state for the default profile through the real manager.
+   * @param state - token descriptor to persist
+   * @param state.token - raw token value
+   * @param state.expiresAt - epoch-seconds expiry
+   * @param state.authType - optional session type ('oauth' for Bearer)
+   */
+  async function seedTokenState(state: {
+    token: string;
+    expiresAt: number;
+    authType?: 'oauth';
+  }): Promise<void> {
+    const { tokenManager } = await import('../src/core/token-manager.js');
+    await tokenManager.saveState(
+      {
+        token: state.token,
+        salt: 'salt-abc',
+        tenant: 'tenantA',
+        username: 'admin',
+        issuedAt: NOW - 60,
+        expiresAt: state.expiresAt,
+        ...(state.authType ? { authType: state.authType } : {}),
+      },
+      'default',
+    );
+  }
+
+  /**
+   * Run the auth command tree in-process against the current temp HOME.
+   * @param args - arguments after `auth`
+   * @returns captured streams, effective exit code, and escaped error shape
+   */
+  async function runAuth(args: string[]): Promise<RunResult> {
+    vi.resetModules();
+    const { registerAuthCommand } = await import('../src/commands/auth.js');
+    const { classifyError } = await import('../src/core/errors.js');
+    const program = new Command();
+    program.exitOverride();
+    program.configureOutput({ writeOut: () => undefined, writeErr: () => undefined });
+    registerAuthCommand(program);
+
+    let stdout = '';
+    let stderr = '';
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdout += String(chunk);
+      return true;
+    });
+    vi.spyOn(process.stderr, 'write').mockImplementation((chunk) => {
+      stderr += String(chunk);
+      return true;
+    });
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      stderr += args.join(' ');
+    });
+    prevExitCode = process.exitCode;
+    process.exitCode = undefined;
+
+    let result: RunResult;
+    try {
+      await program.parseAsync(['auth', ...args], { from: 'user' });
+      result = { stdout, stderr, code: process.exitCode ?? 0 };
+    } catch (error) {
+      if ((error as Error)?.name === 'SilentExit') {
+        result = { stdout, stderr, code: process.exitCode ?? 0 };
+      } else {
+        result = {
+          stdout,
+          stderr,
+          code: classifyError(error as Error).exitCode,
+          error: error as { name?: string; message?: string },
+        };
+      }
+    }
+    process.exitCode = prevExitCode;
+    return result;
+  }
+
+  describe('auth status', () => {
+    it('logged in: authenticated:true with expires_at matching the persisted state', async () => {
+      await seedConfig();
+      await seedTokenState({ token: VALID_TOKEN, expiresAt: NOW + 7200 });
+
+      const result = await runAuth(['status']);
+
+      expect(result.code, result.stderr).toBe(0);
+      const payload = JSON.parse(result.stdout);
+      expect(payload.authenticated).toBe(true);
+      expect(payload.tenant).toBe('tenantA');
+      expect(payload.username).toBe('admin');
+      expect(payload.expires_at).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/u);
+      const tokens = JSON.parse(await readFile(join(home, '.dc3', 'tokens.json'), 'utf8'));
+      expect(new Date(payload.expires_at).getTime()).toBe(tokens.states.default.expiresAt * 1000);
+      // Remaining time is sane for a 2h token: 1-2 whole hours, minutes 0-59.
+      expect(payload.remaining).toMatch(/^\d+h \d+m$/u);
+      const hours = Number(payload.remaining.match(/^(\d+)h/u)?.[1]);
+      expect(hours).toBeGreaterThanOrEqual(1);
+      expect(hours).toBeLessThanOrEqual(2);
+    });
+
+    it('not logged in: exit 0 with authenticated:false — the query itself succeeded', async () => {
+      await seedConfig();
+      const result = await runAuth(['status']);
+      // Documented contract: status is a query, so exit 0 means the answer was
+      // produced; scripts discriminate on the `authenticated` field.
+      expect(result.code, result.stderr).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual({
+        authenticated: false,
+        message: 'Not logged in. Run: dc3 auth login',
+      });
+    });
+
+    it('expired token: authenticated:false with remaining "expired"', async () => {
+      await seedConfig();
+      const expired = fakeJwt({ sub: '1', iat: NOW - 7200, exp: NOW - 60 });
+      await seedTokenState({ token: expired, expiresAt: NOW - 60 });
+
+      const result = await runAuth(['status']);
+
+      expect(result.code, result.stderr).toBe(0);
+      const payload = JSON.parse(result.stdout);
+      expect(payload.authenticated).toBe(false);
+      expect(payload.remaining).toBe('expired');
+      expect(new Date(payload.expires_at).getTime()).toBe((NOW - 60) * 1000);
+    });
+
+    it('corrupt tokens.json: exit 0, authenticated:false, loud quarantine warning (pinned contract)', async () => {
+      await seedConfig();
+      await writeFile(join(home, '.dc3', 'tokens.json'), '}{ not json', 'utf8');
+
+      const result = await runAuth(['status']);
+
+      // Same documented contract as "not logged in": the corrupt state is
+      // quarantined with a loud warning and the status query answers false.
+      expect(result.code, result.stderr).toBe(0);
+      expect(JSON.parse(result.stdout).authenticated).toBe(false);
+      expect(result.stderr).toMatch(/tokens\.json/u);
+      expect(result.stderr).toMatch(/not valid JSON/u);
+      const quarantined = (await readdir(join(home, '.dc3'))).filter((name) =>
+        name.startsWith('tokens.json.corrupt-'),
+      );
+      expect(quarantined.length).toBe(1);
+    });
+  });
+
+  describe('auth token', () => {
+    it('logged out: typed AuthError with exit 3', async () => {
+      await seedConfig();
+      const result = await runAuth(['token']);
+      expect(result.code).toBe(3);
+      expect(result.error?.name).toBe('AuthError');
+      expect(result.error?.message).toMatch(/Not logged in/u);
+      expect(result.stdout).toBe('');
+    });
+
+    it('logged in --header: exact X-Auth-* header document', async () => {
+      await seedConfig();
+      await seedTokenState({ token: VALID_TOKEN, expiresAt: NOW + 7200 });
+
+      const result = await runAuth(['token', '--header']);
+
+      expect(result.code, result.stderr).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual({
+        'Content-Type': 'application/json',
+        'X-Auth-Tenant': 'tenantA',
+        'X-Auth-Login': 'admin',
+        'X-Auth-Token': JSON.stringify({ salt: 'salt-abc', token: VALID_TOKEN }),
+      });
+    });
+
+    it('oauth session --header: Authorization Bearer, never X-Auth-* headers', async () => {
+      await seedConfig();
+      await seedTokenState({ token: VALID_TOKEN, expiresAt: NOW + 3600, authType: 'oauth' });
+
+      const result = await runAuth(['token', '--header']);
+
+      expect(result.code, result.stderr).toBe(0);
+      expect(JSON.parse(result.stdout)).toEqual({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${VALID_TOKEN}`,
+      });
+    });
+
+    it('plain output is the raw token value (scripting contract)', async () => {
+      await seedConfig();
+      await seedTokenState({ token: VALID_TOKEN, expiresAt: NOW + 7200 });
+
+      const result = await runAuth(['token', '--format', 'json']);
+
+      expect(result.code, result.stderr).toBe(0);
+      expect(result.stdout.trim()).toBe(JSON.stringify(VALID_TOKEN));
+    });
+  });
+
+  describe('auth login --oauth (F049 oauth arm)', () => {
+    it('ok:true envelope whose expires_at equals the persisted state instant', async () => {
+      await seedConfig();
+      const oauthToken = fakeJwt({ sub: 'svc', iat: NOW, exp: NOW + 3600 });
+      const urls: string[] = [];
+      let oauthBody = '';
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (url: string, init?: RequestInit) => {
+          urls.push(String(url));
+          if (String(url).endsWith('/oauth2/token')) {
+            oauthBody = String(init?.body ?? '');
+            return new Response(
+              JSON.stringify({ access_token: oauthToken, scope: 'mcp:read mcp:write' }),
+              { status: 200, headers: { 'content-type': 'application/json' } },
+            );
+          }
+          return new Response(null, { status: 204 });
+        }),
+      );
+
+      const result = await runAuth([
+        'login',
+        '--oauth',
+        '--client-id',
+        'mcp-client',
+        '--client-secret',
+        'shh',
+      ]);
+
+      expect(result.code, result.stderr).toBe(0);
+      expect(urls).toHaveLength(1);
+      expect(urls[0].endsWith('/oauth2/token')).toBe(true);
+      expect(oauthBody).toBe('grant_type=client_credentials');
+      const payload = JSON.parse(result.stdout);
+      expect(payload.ok).toBe(true);
+      expect(payload.auth_type).toBe('oauth');
+      expect(payload.client_id).toBe('mcp-client');
+      expect(payload.scope).toEqual(['mcp:read', 'mcp:write']);
+      expect(payload.expires_at).toMatch(/^\d{4}-\d{2}-\d{2}T/u);
+      // F049 oauth arm: the printed instant IS the persisted one.
+      const tokens = JSON.parse(await readFile(join(home, '.dc3', 'tokens.json'), 'utf8'));
+      expect(new Date(payload.expires_at).getTime()).toBe(tokens.states.default.expiresAt * 1000);
+      expect(tokens.states.default.authType).toBe('oauth');
+      expect(tokens.states.default.username).toBe('mcp-client');
+      // OAuth logins never persist a password anywhere.
+      expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(false);
+      expect(result.stderr).toBe('');
+    });
   });
 });

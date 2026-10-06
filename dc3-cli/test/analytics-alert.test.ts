@@ -9,7 +9,7 @@ vi.mock('../src/core/config-manager.js', () => ({
     getActiveProfile: vi.fn(async () => ({ gateway: 'http://gw.test/', tenant: 't', username: 'u', credential_store: 'env' })),
     getActiveProfileName: vi.fn(async () => 'default'),
     load: vi.fn(async () => ({ current_profile: 'default' })),
-    getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12, output_format: 'json', color: false, retry_count: 1 })),
+    getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12, output_format: 'json', color: false })),
   },
 }));
 
@@ -156,6 +156,41 @@ describe('alert deep-analysis commands', () => {
     const url = new URL(fetchCalls[0].url);
     expect(url.searchParams.get('source')).toBe('dev&x');
     expect(url.searchParams.get('x')).toBeNull();
+  });
+
+  it('point-profile encodes the point id and passes days/range_key through (G31)', async () => {
+    await run(['alert', 'point-profile', 'pt A&B', '--days', '7', '--range-key', '24h']);
+    const url = new URL(fetchCalls[0].url);
+    expect(url.pathname).toBe('/api/v3/data/dashboard/alert/point_profile');
+    expect(url.searchParams.get('point_id')).toBe('pt A&B');
+    expect(url.searchParams.get('days')).toBe('7');
+    expect(url.searchParams.get('range_key')).toBe('24h');
+  });
+
+  it('point-profile without flags sends only the point id (server default window)', async () => {
+    await run(['alert', 'point-profile', 'pt-1']);
+    const url = new URL(fetchCalls[0].url);
+    expect(url.searchParams.get('point_id')).toBe('pt-1');
+    expect(url.searchParams.has('days')).toBe(false);
+    expect(url.searchParams.has('range_key')).toBe(false);
+  });
+
+  it('point-profile rejects an empty point id with zero requests (G13/G27)', async () => {
+    const { err } = await runCapture(['alert', 'point-profile', ' ']);
+    expect(err).toBeInstanceOf(ValidationError);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('point-profile rejects a garbage --days before any request (G21 class)', async () => {
+    const { err } = await runCapture(['alert', 'point-profile', 'pt-1', '--days', 'abc']);
+    expect((err as Error).message).toMatch(/integer/i);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('point-profile rejects an unknown --range-key before any request (G31)', async () => {
+    const { err } = await runCapture(['alert', 'point-profile', 'pt-1', '--range-key', 'month']);
+    expect((err as Error).message).toMatch(/allowed: today, 24h, 7d, 30d/u);
+    expect(fetchCalls).toHaveLength(0);
   });
 
   it.each([

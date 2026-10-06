@@ -160,6 +160,25 @@ async function encryptAndWriteLocked(
 }
 
 /**
+ * Remove the ciphertext and the AES key together (idempotent, ENOENT-tolerant).
+ * The key exists only to decrypt entries: keeping it after the last entry is
+ * gone — or wiping entries but keeping the key — leaves residue that
+ * contradicts logout/reset hygiene (report F016). Must be called while
+ * holding the credentials lock.
+ */
+async function removeStoreFilesLocked(): Promise<void> {
+  for (const path of [ENC_PATH, KEY_PATH]) {
+    try {
+      await unlink(path);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw error;
+      }
+    }
+  }
+}
+
+/**
  * Quarantine an unreadable credentials file and report loudly. The corrupt
  * bytes survive under a timestamped sibling; the store continues empty so the
  * surviving entries in the quarantine copy stay recoverable (they are never
@@ -272,16 +291,24 @@ export class EncryptedFileStore implements CredentialStore {
       }
       delete entries[identifier];
       if (Object.keys(entries).length === 0) {
-        try {
-          await unlink(ENC_PATH);
-        } catch {
-          // Already gone
-        }
+        // Last entry gone: drop the ciphertext AND the AES key — a key file
+        // for ciphertext that no longer exists is logout residue.
+        await removeStoreFilesLocked();
       } else {
         const key = await ensureKeyFileLocked();
         await encryptAndWriteLocked(key, entries);
       }
     });
+  }
+
+  /**
+   * Remove the whole store — ciphertext and AES key together (config reset).
+   * Per-identifier deletion cannot guarantee an empty result when identifier
+   * sources are incomplete, and the reset contract is "no slice of local auth
+   * state survives": wipe both files wholesale. Idempotent.
+   */
+  async clear(): Promise<void> {
+    await withLock(ENC_PATH, async () => removeStoreFilesLocked());
   }
 
   /**

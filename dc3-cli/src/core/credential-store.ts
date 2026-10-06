@@ -179,6 +179,13 @@ export async function savePasswordToStore(
   if (!storeType) {
     throw new Error('No profile configured; cannot save password');
   }
+  if (storeType === 'env') {
+    // The env store is process-scoped by design: passwords arrive via
+    // DC3_PASSWORD and are never written back, so a save can never claim
+    // persistence — the login output must report password_saved:false and
+    // point renewal at DC3_PASSWORD (password_saved semantics).
+    return { persisted: false, store: 'env' };
+  }
   const store = selectStore(storeType);
   if (!(await store.isAvailable())) {
     return { persisted: false, store: store.name };
@@ -215,9 +222,11 @@ export async function deletePasswordFromStore(
 
 /**
  * Delete every known identifier from every storage backend (config reset).
- * Collects identifiers from the token states (logged-in identities) and from
- * the encrypted store (entries whose token already expired away); the OS
- * keychain has no portable enumeration and is scrubbed by identifier only.
+ * The OS keychain has no portable enumeration and is scrubbed by identifier
+ * only (token-state identities plus encrypted-store identifiers, which may
+ * outlive their token). The encrypted store is wiped wholesale through
+ * {@link EncryptedFileStore.clear}: ciphertext and AES key go together, so a
+ * reset can never leave a decryptable slice behind (report F016).
  * @param identifiers - extra identifiers to scrub (e.g. from token states)
  */
 export async function clearAllStoredCredentials(identifiers: string[]): Promise<void> {
@@ -238,11 +247,11 @@ export async function clearAllStoredCredentials(identifiers: string[]): Promise<
     } catch {
       failures.push(`keychain:${identifier}`);
     }
-    try {
-      await encryptedStore.deletePassword(identifier);
-    } catch {
-      failures.push(`encrypted:${identifier}`);
-    }
+  }
+  try {
+    await encryptedStore.clear();
+  } catch {
+    failures.push('encrypted:all');
   }
   if (failures.length > 0) {
     throw new Error(`failed to delete: ${failures.join(', ')}`);

@@ -32,12 +32,12 @@ const hasDefaultIdentity = (body: Record<string, unknown>) =>
 export function registerAuthHandlers(): void {
   on('post', 'api/v3/auth/token/salt', (ctx) =>
     hasDefaultIdentity(ctx.body)
-      ? responseOf(ctx.config, ok('mock-salt'))
+      ? responseOf(ctx.config, ok({salt: 'mock-salt'}))
       : responseOf(ctx.config, fail('R4010', 'Invalid tenant or username', 401), 401),
   );
   on('post', 'api/v3/auth/token/generate', (ctx) =>
     hasDefaultIdentity(ctx.body) && String(ctx.body.password ?? '') === DEFAULT_PASSWORD
-      ? responseOf(ctx.config, ok('ok'))
+      ? responseOf(ctx.config, ok({token: 'mock-token'}))
       : responseOf(ctx.config, fail('R4010', 'Invalid credentials', 401), 401),
   );
   on('post', 'api/v3/auth/token/check', (ctx) => responseOf(ctx.config, ok(hasDefaultIdentity(ctx.body))));

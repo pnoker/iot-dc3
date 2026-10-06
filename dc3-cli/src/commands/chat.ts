@@ -15,12 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { Command } from 'commander';
-import { dc3Client, AuthError, NetworkError } from '../core/client.js';
+import { dc3Client, AuthError, NetworkError, extractErrorDetail } from '../core/client.js';
 import { ApiError, UsageError, suppressFailureEnvelope } from '../core/errors.js';
 import { configManager } from '../core/config-manager.js';
 import { tokenManager } from '../core/token-manager.js';
 import { fetchOrNetworkError, normalizeGateway, readBodyText } from '../core/http.js';
 import { SilentExit, detectFormat, printAndExit } from '../utils/format.js';
+import { requireResourceId } from '../utils/manager.js';
 
 /**
  * Register the `chat` command tree on the CLI program.
@@ -39,17 +40,21 @@ export function registerChatCommand(program: Command): void {
     .option('--format <format>', 'Output format (non-streaming only)')
     .action(async (prompt, opts) => {
       const format = detectFormat(opts.format);
-      if (!prompt && !opts.conversationId) {
+      if (!prompt && opts.conversationId === undefined) {
         throw new UsageError('Please provide a prompt or --conversation-id to continue');
       }
-
-      const conversationId = opts.conversationId || undefined;
+      // The conversation id keys the continuation — an explicitly empty value
+      // is invalid input, not an absent flag (audit G32).
+      const conversationId =
+        opts.conversationId === undefined
+          ? undefined
+          : requireResourceId('--conversation-id', opts.conversationId);
       const body: Record<string, unknown> = {
         stream: opts.stream,
         messages: prompt ? [{ role: 'user', content: prompt }] : [],
       };
-      if (conversationId) body.conversationId = conversationId;
-      if (opts.model) body.model = opts.model;
+      if (conversationId !== undefined) body.conversationId = conversationId;
+      if (opts.model !== undefined) body.model = opts.model;
 
       if (opts.stream) {
         // Streaming needs direct access to the response body for SSE, so it
@@ -78,7 +83,7 @@ export function registerChatCommand(program: Command): void {
         );
 
         if (res.status === 401) {
-          throw new AuthError(`Authentication failed (401): ${await readBodyText(res)}`);
+          throw new AuthError(`Authentication failed (401): ${extractErrorDetail(await readBodyText(res))}`);
         }
         if (!res.ok) {
           const text = await readBodyText(res);
@@ -107,7 +112,11 @@ export function registerChatCommand(program: Command): void {
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n');
             buffer = lines.pop() || '';
-            for (const line of lines) {
+            for (const rawLine of lines) {
+              // The SSE spec allows CRLF line terminators; strip the trailing
+              // CR so `data: [DONE]\r` still matches the terminator instead
+              // of hanging until the server closes (report F023, CRLF variant).
+              const line = rawLine.endsWith('\r') ? rawLine.slice(0, -1) : rawLine;
               // Spring WebFlux ServerSentEvent emits `data:{json}` (no space
               // after the colon); the SSE spec allows an optional single
               // leading space, so match both `data: ` and `data:`.

@@ -52,7 +52,7 @@ public class ReactiveApiServiceImpl implements ReactiveApiService {
         if (!valid(id)) return Mono.error(new RequestException("API ID is required"));
         return Mono.defer(() -> store.getById(id))
                 .map(builder::buildBOByDO)
-                .switchIfEmpty(Mono.error(new NotFoundException("API")));
+                .switchIfEmpty(Mono.error(new NotFoundException("API does not exist")));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class ReactiveApiServiceImpl implements ReactiveApiService {
                             : Mono.defer(() -> store.update(api))
                                     .doOnSuccess(saved -> invalidateAll())
                                     .map(builder::buildBOByDO))
-                    .switchIfEmpty(Mono.error(new NotFoundException("API")))
+                    .switchIfEmpty(Mono.error(new NotFoundException("API does not exist")))
                     .onErrorMap(
                             DuplicateKeyException.class, error -> new DuplicateException("API code is already in use"));
         });
@@ -108,8 +108,9 @@ public class ReactiveApiServiceImpl implements ReactiveApiService {
                 .then(Mono.defer(() -> store.delete(id, operatorId, operatorName)))
                 .defaultIfEmpty(false)
                 .doOnSuccess(deleted -> invalidateAll())
-                .flatMap(deleted ->
-                        Boolean.TRUE.equals(deleted) ? Mono.<Void>empty() : Mono.error(new NotFoundException("API")));
+                .flatMap(deleted -> Boolean.TRUE.equals(deleted)
+                        ? Mono.<Void>empty()
+                        : Mono.error(new NotFoundException("API does not exist")));
     }
 
     private void validate(ApiBO api, boolean update) {

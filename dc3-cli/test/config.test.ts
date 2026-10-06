@@ -92,6 +92,8 @@ describe('config schemas', () => {
       expect(result.data.output_format).toBeUndefined();
       expect(result.data.color).toBe(true);
       expect(result.data.renewal_threshold_hours).toBe(1);
+      // The inert retry_count knob is gone from the settings surface.
+      expect(Object.keys(result.data)).not.toContain('retry_count');
     }
   });
 
@@ -208,32 +210,11 @@ describe('config file corruption handling', () => {
     const original = validConfig();
     await writeConfigFile(original);
 
-    const result = await runSet('settings.renewal_threshold_hours', 'abc');
-
-    expect(result.code).toBe(1);
-    expect(result.stdout).toContain('abc');
-    expect((await readBytes(configPath)).equals(Buffer.from(original))).toBe(true);
-    expect(existsSync(`${configPath}.bak`)).toBe(false);
-  });
-
-  it('config set rejects a non-numeric retry_count and leaves the file untouched', async () => {
-    const original = validConfig();
-    await writeConfigFile(original);
-
-    const result = await runSet('settings.retry_count', 'xyz');
-
-    expect(result.code).toBe(1);
-    expect(result.stdout).toContain('xyz');
-    expect((await readBytes(configPath)).equals(Buffer.from(original))).toBe(true);
-    expect(existsSync(`${configPath}.bak`)).toBe(false);
-  });
-
-  it('config set rejects an out-of-range retry_count before persisting (F006)', async () => {
-    const original = validConfig();
-    await writeConfigFile(original);
-
-    await expect(runSet('settings.retry_count', '99')).rejects.toThrow(/must be <= 3/u);
-    // Negative guard: the file is byte-for-byte unchanged, no backup churn.
+    // Typed validation error escapes to the chokepoint (report F015): the
+    // human line lands on stderr, the machine envelope on stdout.
+    await expect(runSet('settings.renewal_threshold_hours', 'abc')).rejects.toThrow(
+      /renewal_threshold_hours: "abc"/u,
+    );
     expect((await readBytes(configPath)).equals(Buffer.from(original))).toBe(true);
     expect(existsSync(`${configPath}.bak`)).toBe(false);
   });
@@ -249,10 +230,10 @@ describe('config file corruption handling', () => {
   it('a settings validation error is one readable line, never a zod issues dump (F006)', async () => {
     vi.resetModules();
     const { configManager } = await import('../src/core/config-manager');
-    const err = await configManager.setSetting('retry_count', 99).catch((e: Error) => e);
+    const err = await configManager.setSetting('renewal_threshold_hours', 99).catch((e: Error) => e);
     expect(err).toBeInstanceOf(Error);
-    expect(err.message).toMatch(/^Invalid value for settings\.retry_count/u);
-    expect(err.message).toMatch(/must be <= 3/u);
+    expect(err.message).toMatch(/^Invalid value for settings\.renewal_threshold_hours/u);
+    expect(err.message).toMatch(/must be <= 12/u);
     expect(err.message).not.toMatch(/issues/u);
     expect(err.message).not.toMatch(/\[\{/u);
   });
@@ -288,16 +269,46 @@ describe('config file corruption handling', () => {
   it('a write after a salvaged load keeps the surviving profile (F006 negative)', async () => {
     await writeConfigFile(invalidFieldConfig);
 
-    const result = await runSet('settings.retry_count', '2');
+    const result = await runSet('settings.color', 'false');
 
     expect(result.code).toBe(0);
     const persisted = JSON.parse((await readBytes(configPath)).toString('utf8'));
-    expect(persisted.settings.retry_count).toBe(2);
+    expect(persisted.settings.color).toBe(false);
     expect(persisted.settings.renewal_threshold_hours).toBe(1);
     // The whole point of salvage: the profile must survive the next write.
     expect(persisted.profiles.default.username).toBe('kept-in-salvage');
     // Last-readable bytes are snapshotted to .bak before overwriting.
     expect((await readBytes(`${configPath}.bak`)).equals(Buffer.from(invalidFieldConfig))).toBe(true);
+  });
+
+  it('a config persisted with the removed retry_count knob still loads, the key silently dropped', async () => {
+    // validConfig() intentionally still carries settings.retry_count: it is the
+    // exact shape an older CLI writes. The plain (non-strict) settings schema
+    // must strip the unknown key on load — no salvage warning, no quarantine,
+    // profiles intact.
+    const legacy = validConfig();
+    await writeConfigFile(legacy);
+
+    vi.resetModules();
+    const { configManager } = await import('../src/core/config-manager');
+    let stderr = '';
+    vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+      stderr += args.join(' ');
+    });
+
+    const config = await configManager.load();
+
+    expect(config.profiles.default?.username).toBe('u');
+    expect('retry_count' in config.settings).toBe(false);
+    expect(config.settings.renewal_threshold_hours).toBe(2);
+    // The strip is silent: an unknown-but-harmless key is not a degradation.
+    expect(stderr).toBe('');
+    // Reads never rewrite the file.
+    expect((await readBytes(configPath)).equals(Buffer.from(legacy))).toBe(true);
+    const siblings = (await readdir(join(home, '.dc3'))).filter((n) =>
+      n.startsWith('config.json.corrupt-'),
+    );
+    expect(siblings).toEqual([]);
   });
 
   it('a structurally corrupt config is quarantined and defaults are used in-memory (F027)', async () => {

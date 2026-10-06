@@ -17,7 +17,14 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, updateManagerResource } from '../utils/manager.js';
+import {
+  deleteManagerResource,
+  getManagerResource,
+  parseNonNegativeInteger,
+  updateManagerResource,
+} from '../utils/manager.js';
+
+const GROUP_BASE = '/api/v3/manager/group';
 
 /**
  * Register the `group` command tree on the CLI program.
@@ -47,9 +54,8 @@ export function registerGroupCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/manager/group/get_by_id?id=${encodeURIComponent(id)}`,
-      );
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(GROUP_BASE, id);
       printAndExit(result, format);
     });
 
@@ -78,12 +84,7 @@ export function registerGroupCommand(program: Command): void {
       const format = detectFormat(opts.format);
       const changes: Record<string, unknown> = {};
       if (opts.name !== undefined) changes.groupName = opts.name;
-      const result = await updateManagerResource(
-        '/api/v3/manager/group',
-        id,
-        opts.version,
-        changes,
-      );
+      const result = await updateManagerResource(GROUP_BASE, id, opts.version, changes);
       printAndExit(result, format);
     });
 
@@ -94,9 +95,8 @@ export function registerGroupCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      await dc3Client.del(
-        `/api/v3/manager/group/delete?id=${encodeURIComponent(id)}&version=${opts.version}`,
-      );
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      await deleteManagerResource(GROUP_BASE, id, opts.version);
       printAndExit(undefined, format);
     });
 }

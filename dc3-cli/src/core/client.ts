@@ -50,11 +50,12 @@ function parseJsonOrUndefined(text: string): unknown {
  * Extract the human-readable detail from an error body: the RFC 7807
  * `detail`/`title` fields when the body is JSON, otherwise the raw text. Never
  * returns an empty string so error messages never end in a dangling colon
- * (report F042).
+ * (report F042). Exported for the other authenticated transports (chat stream)
+ * that read their own responses but must report errors the same way.
  * @param text - raw error response body
  * @returns the detail line for the error message
  */
-function extractErrorDetail(text: string): string {
+export function extractErrorDetail(text: string): string {
   const trimmed = text.trim();
   if (trimmed === '') {
     return '(empty body)';
@@ -89,10 +90,14 @@ function decodeResponseBody<T>(status: number, contentType: string | null, text:
   try {
     return JSON.parse(text) as T;
   } catch {
+    // The status says success but the body is not the JSON contract: keep the
+    // status on the error for diagnostics, but the machine code must never
+    // read as a plain `API_200` success-status failure (error-kind precision).
     throw new ApiError(
       `Gateway returned a non-JSON ${status} response (Content-Type: ${contentType ?? 'unknown'}): ${snippetOf(text)}`,
       status,
       text,
+      'API_BAD_BODY',
     );
   }
 }
@@ -182,21 +187,26 @@ export class Dc3Client {
   }
 
   /**
-   * Main request method. Call this for every API operation.
+   * Shared authenticated fetch machinery behind {@link Dc3Client.request} and
+   * {@link Dc3Client.requestForBytes}: proactive renewal, header injection,
+   * the single 401 renewal-retry, and the typed error mapping (401/403 →
+   * AuthError exit 3, everything else → ApiError). Returns the raw Response
+   * with the body still unconsumed on 2xx — only the error paths read the
+   * body, so binary payloads survive intact.
    * @param method - HTTP method for the request
    * @param path - gateway-relative request path
    * @param body - request body payload
    * @param retryOn401 - whether to retry once after a silent token renewal
    * @param extraHeaders - headers merged into the request
-   * @returns the decoded response body
+   * @returns the gateway response (2xx, body unconsumed)
    */
-  async request<T = unknown>(
+  private async fetchAuthenticated(
     method: string,
     path: string,
-    body?: unknown,
-    retryOn401 = true,
-    extraHeaders: Record<string, string> = {},
-  ): Promise<T> {
+    body: unknown,
+    retryOn401: boolean,
+    extraHeaders: Record<string, string>,
+  ): Promise<Response> {
     const gateway = await this.getGateway();
     const profile = await configManager.getActiveProfile();
     const profileName = await configManager.getActiveProfileName();
@@ -206,11 +216,19 @@ export class Dc3Client {
     const state = await tokenManager.getState(profileName);
     warnIdentityMismatch(state, profile, profileName);
 
+    // Epoch snapshot the request anchors every renewal save to: the epoch
+    // stamped into the observed state (report F024). While an entry exists it
+    // equals the profile's current epoch — only clearState (logout) bumps it,
+    // and it deletes the entry in the same atomic write. A renewal that read
+    // the epoch lazily (after its own mint started) would capture the
+    // already-bumped counter and resurrect the logged-out session.
+    const epoch = state?.epoch ?? 0;
+
     // Proactive renewal. renewToken derives the password lookup key from the
     // persisted token-state identity first, falling back to the profile values
     // (report F037).
     if (await tokenManager.needsRenewal(profileName, thresholdSec)) {
-      await this.renewToken(profileName, profile.tenant, profile.username);
+      await this.renewToken(profileName, profile.tenant, profile.username, epoch);
     }
 
     const currentState = await tokenManager.getState(profileName);
@@ -235,11 +253,15 @@ export class Dc3Client {
       headers,
       body: requestBody,
     });
-    const text = await readBodyText(res);
 
-    // 401 fallback — renew and retry once
-    if (res.status === 401 && retryOn401) {
-      const renewed = await this.renewToken(profileName, profile.tenant, profile.username);
+    // 401 fallback — renew and retry once. Only a request that WENT OUT with
+    // a stored session (currentState) may renew: after a logout cleared the
+    // state there is no session to heal, and minting one from a lingering
+    // stored password would resurrect the logged-out session (report F024).
+    // The renewal persists against the epoch captured at request entry, so a
+    // logout that landed mid-request refuses the save and surfaces this 401.
+    if (res.status === 401 && retryOn401 && currentState) {
+      const renewed = await this.renewToken(profileName, profile.tenant, profile.username, epoch);
       if (renewed) {
         const newState = await tokenManager.getState(profileName);
         const newHeaders = newState ? tokenManager.buildHeaders(newState) : headers;
@@ -252,19 +274,54 @@ export class Dc3Client {
           headers: newHeaders,
           body: requestBody,
         });
-        const retryText = await readBodyText(retryRes);
         if (!retryRes.ok) {
-          throw this.buildError(retryRes.status, retryText);
+          throw this.buildError(retryRes.status, await readBodyText(retryRes));
         }
-        return decodeResponseBody<T>(retryRes.status, retryRes.headers.get('content-type'), retryText);
+        return retryRes;
       }
     }
 
     if (!res.ok) {
-      throw this.buildError(res.status, text);
+      throw this.buildError(res.status, await readBodyText(res));
     }
 
-    return decodeResponseBody<T>(res.status, res.headers.get('content-type'), text);
+    return res;
+  }
+
+  /**
+   * Main request method. Call this for every API operation.
+   * @param method - HTTP method for the request
+   * @param path - gateway-relative request path
+   * @param body - request body payload
+   * @param retryOn401 - whether to retry once after a silent token renewal
+   * @param extraHeaders - headers merged into the request
+   * @returns the decoded response body
+   */
+  async request<T = unknown>(
+    method: string,
+    path: string,
+    body?: unknown,
+    retryOn401 = true,
+    extraHeaders: Record<string, string> = {},
+  ): Promise<T> {
+    const res = await this.fetchAuthenticated(method, path, body, retryOn401, extraHeaders);
+    return decodeResponseBody<T>(res.status, res.headers.get('content-type'), await readBodyText(res));
+  }
+
+  /**
+   * Binary-capable authenticated request (audit G24): shares request()'s
+   * proactive renewal, 401-retry renewal, epoch-capture-before-mint contract,
+   * and error mapping (401/403 → AuthError exit 3, never an `API_401` business
+   * failure), but hands the caller the raw Response so a non-JSON payload
+   * (e.g. an XLSX template download) is never round-tripped through the JSON
+   * decoder. The returned response is always 2xx; failures already threw.
+   * @param method - HTTP method for the request
+   * @param path - gateway-relative request path
+   * @param body - request body payload
+   * @returns the raw gateway response with the body unconsumed
+   */
+  async requestForBytes(method: string, path: string, body?: unknown): Promise<Response> {
+    return this.fetchAuthenticated(method, path, body, true, {});
   }
 
   // Convenience methods
@@ -312,12 +369,16 @@ export class Dc3Client {
    * @param profileName - profile name used for the lookup
    * @param fallbackTenant - tenant to use when no token state exists
    * @param fallbackUsername - username to use when no token state exists
+   * @param expectedEpoch - epoch the caller captured before its request work
+   *   started (report F024); the guarded save persists only while it is
+   *   unchanged, so a logout that raced the request discards the fresh token
    * @returns true when the token was renewed
    */
   async renewToken(
     profileName: string,
     fallbackTenant: string,
     fallbackUsername: string,
+    expectedEpoch?: number,
   ): Promise<boolean> {
     const current = await tokenManager.getState(profileName);
     if (current?.authType === 'oauth') {
@@ -336,10 +397,13 @@ export class Dc3Client {
       const gateway = await this.getGateway();
       warnInsecureTransport(gateway);
 
-      // Capture the invalidation epoch BEFORE minting: a logout that lands
-      // mid-renewal bumps it, and the guarded save below refuses to
-      // resurrect the session (spec item 5).
-      const epoch = await tokenManager.getEpoch(profileName);
+      // Epoch guarding the persisted save. Callers that already did network
+      // work (both renewal paths inside request()) pass the epoch they
+      // captured BEFORE that work: reading it here would already observe a
+      // logout that landed meanwhile, and the save would resurrect the
+      // session it just cleared (report F024). Standalone callers keep the
+      // capture-before-minting contract.
+      const epoch = expectedEpoch ?? (await tokenManager.getEpoch(profileName));
 
       // Step 1: Get salt
       const saltRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/salt`, {
@@ -349,7 +413,7 @@ export class Dc3Client {
       });
       const saltText = await readBodyText(saltRes);
       if (!saltRes.ok) throw this.buildError(saltRes.status, saltText);
-      const salt = parseScalarResource(saltText, 'Salt');
+      const salt = parseAuthField(saltText, 'salt', 'Salt');
 
       // Step 2: Generate token
       const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
@@ -364,7 +428,7 @@ export class Dc3Client {
       });
       const tokenText = await readBodyText(tokenRes);
       if (!tokenRes.ok) throw this.buildError(tokenRes.status, tokenText);
-      const token = parseTokenResource(parseScalarResource(tokenText, 'Token'));
+      const token = parseTokenResource(parseAuthField(tokenText, 'token', 'Token'));
 
       // Step 3: Parse and persist — guarded by the captured epoch. When a
       // logout won the race, discard the fresh token and cancel it
@@ -436,7 +500,17 @@ export class Dc3Client {
         : extractErrorDetail(body);
       throw new AuthError(`OAuth token request failed (${res.status}): ${detail}`);
     }
-    const payload = (await res.json()) as Record<string, unknown>;
+    const body = await readBodyText(res);
+    const payload = parseJsonOrUndefined(body);
+    if (!isRecord(payload)) {
+      // A 2xx with a non-JSON body (HTML error page, empty proxy reply) used to
+      // escape as a raw SyntaxError classified api/INTERNAL. This is the auth
+      // plane, so fail typed — mirroring decodeResponseBody's API_BAD_BODY
+      // treatment but on the AuthError taxonomy (exit 3).
+      throw new AuthError(
+        `OAuth token endpoint returned a non-JSON 2xx response (Content-Type: ${res.headers.get('content-type') ?? 'unknown'}): ${snippetOf(body)}`,
+      );
+    }
     if (typeof payload.access_token !== 'string') {
       throw new AuthError('OAuth token endpoint returned no access_token');
     }
@@ -485,7 +559,7 @@ export class Dc3Client {
     });
     const saltText = await readBodyText(saltRes);
     if (!saltRes.ok) throw this.buildError(saltRes.status, saltText);
-    const salt = parseScalarResource(saltText, 'Salt');
+    const salt = parseAuthField(saltText, 'salt', 'Salt');
 
     // Step 2: generate
     const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
@@ -500,7 +574,7 @@ export class Dc3Client {
     });
     const tokenText = await readBodyText(tokenRes);
     if (!tokenRes.ok) throw this.buildError(tokenRes.status, tokenText);
-    const token = parseTokenResource(parseScalarResource(tokenText, 'Token'));
+    const token = parseTokenResource(parseAuthField(tokenText, 'token', 'Token'));
     const jwtPayload = decodeJwt(token);
     await tokenManager.saveState(
       {
@@ -557,7 +631,7 @@ export class Dc3Client {
 
     if (remoteError !== null) {
       process.stderr.write(
-        `Warning: the token for ${state.username}@${state.tenant} could not be revoked remotely ` +
+        `Warning: the token for ${state.username}@${state.tenant} could not be revoked remotely — ` +
           `${(remoteError as Error).message}. ` +
           `Local session state and the stored password were removed; the gateway-side token ` +
           `stays valid until it expires.\n`,
@@ -596,39 +670,45 @@ export class Dc3Client {
 
 /**
  * Validate the direct token resource returned by the auth endpoint.
- * @param value - value to set
- * @returns the transformed value
+ * @param value - token string returned by the auth endpoint, validated as a 3-part JWT
+ * @returns the validated token, unchanged
  */
 export function parseTokenResource(value: unknown): string {
   if (typeof value !== 'string' || !/^eyJ[\w-]*\.[\w-]*\.[\w-]*$/u.test(value)) {
-    throw new Error('Token endpoint returned an invalid resource');
+    // Response-shape failure on the login endpoint: classify as the dedicated
+    // API_BAD_BODY machine code (mirroring decodeResponseBody) instead of a
+    // plain Error that the chokepoint would render as code INTERNAL.
+    throw new ApiError('Token endpoint returned an invalid resource', undefined, undefined, 'API_BAD_BODY');
   }
   return value;
 }
 
 /**
- * Parse a scalar auth resource (salt, token). The auth endpoints answer as
- * text/plain with a bare value; a JSON-encoded string is tolerated as well.
- * @param body - request body payload
- * @param label - display label
- * @returns the transformed value
+ * Extract a named field from a JSON auth resource. The auth endpoints answer
+ * with JSON objects ({"salt": ...}, {"token": ...}); anything else is a
+ * contract violation.
+ * @param body - response body text from the auth endpoint
+ * @param field - the field name to extract (salt or token)
+ * @param label - display label naming the resource in error messages (e.g. Salt)
+ * @returns the non-empty field value
  */
-export function parseScalarResource(body: string, label: string): string {
-  const trimmed = body.trim();
-  if (trimmed.startsWith('"')) {
-    try {
-      const parsed: unknown = JSON.parse(trimmed);
-      if (typeof parsed === 'string' && parsed.length > 0) {
-        return parsed;
-      }
-    } catch {
-      // Not JSON after all; fall back to the raw text below.
-    }
+export function parseAuthField(body: string, field: string, label: string): string {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    parsed = undefined;
   }
-  if (trimmed.length === 0) {
-    throw new Error(`${label} endpoint returned an invalid resource`);
+  if (parsed !== null && typeof parsed === 'object' && typeof (parsed as Record<string, unknown>)[field] === 'string') {
+    const value = (parsed as Record<string, string>)[field];
+    if (value.length > 0) return value;
   }
-  return trimmed;
+  throw new ApiError(
+    `${label} endpoint returned an invalid resource`,
+    undefined,
+    undefined,
+    'API_BAD_BODY',
+  );
 }
 
 /** Singleton instance */

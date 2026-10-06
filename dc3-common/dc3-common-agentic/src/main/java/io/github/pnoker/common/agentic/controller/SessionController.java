@@ -22,6 +22,7 @@ import io.github.pnoker.common.agentic.entity.vo.SessionVO;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -118,7 +119,7 @@ public class SessionController implements BaseController {
         return getPrincipalHeader()
                 .flatMap(header -> sessionService
                         .get(conversationId, header)
-                        .switchIfEmpty(Mono.error(new RequestException("Session not found")))
+                        .switchIfEmpty(Mono.error(new NotFoundException("Session does not exist")))
                         .map(sessionBuilder::buildVOByBO)
                         .doOnNext(this::sanitizeSession));
     }
@@ -173,7 +174,7 @@ public class SessionController implements BaseController {
             SessionVO payload = Objects.requireNonNullElseGet(request, SessionVO::new);
             return sessionService
                     .update(conversationId, payload.getSessionExt(), payload.getTitle(), header)
-                    .switchIfEmpty(Mono.error(new RequestException("Session not found")))
+                    .switchIfEmpty(Mono.error(new NotFoundException("Session does not exist")))
                     .map(sessionBuilder::buildVOByBO)
                     .doOnNext(this::sanitizeSession);
         });

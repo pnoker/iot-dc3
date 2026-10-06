@@ -60,7 +60,9 @@ describe('table rendering of list envelopes (F020)', () => {
 
     const lines = table.split('\n');
     expect(lines[0].indexOf('a')).toBeLessThan(lines[0].indexOf('b'));
-    expect(lines[2]).toBe('1 |  ');
+    // The last column is never padded: rows end at their content (no
+    // trailing whitespace), including rows with an empty last cell.
+    expect(lines[2]).toBe('1 |');
     expect(lines[3]).toBe('  | 2');
     expect(lines[4]).toBe('3 | 4');
   });

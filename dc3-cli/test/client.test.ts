@@ -142,6 +142,9 @@ describe('response body decoding (F042)', () => {
     expect(apiError.message).toMatch(/text\/plain/);
     expect(apiError.message).toMatch(/plain ok/);
     expect(apiError.statusCode).toBe(200);
+    // The machine code must never read as a success-status failure (error-kind
+    // precision): API_200 would suggest the request itself was fine.
+    expect(apiError.code).toBe('API_BAD_BODY');
   });
 
   it('an empty 500 body never produces a dangling-colon detail', async () => {
@@ -242,8 +245,8 @@ describe('token-state identity cross-check (F016/F037)', () => {
     mocks.getState.mockResolvedValue({ ...loginState });
     mocks.resolvePassword.mockResolvedValue('dc3dc3dc3');
     stubFetch((call) => {
-      if (call.url.endsWith('/token/salt')) return new Response('salt-abc', { status: 200 });
-      return new Response(fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }), { status: 200 });
+      if (call.url.endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
+      return new Response(JSON.stringify({ token: fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }) }), { status: 200 });
     });
     const renewed = await new Dc3Client().renewToken('default', 'tenantB', 'bob');
 
@@ -262,8 +265,8 @@ describe('token-state identity cross-check (F016/F037)', () => {
     mocks.getState.mockResolvedValue(null);
     mocks.resolvePassword.mockResolvedValue('dc3dc3dc3');
     stubFetch((call) => {
-      if (call.url.endsWith('/token/salt')) return new Response('salt-abc', { status: 200 });
-      return new Response(fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }), { status: 200 });
+      if (call.url.endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
+      return new Response(JSON.stringify({ token: fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }) }), { status: 200 });
     });
     const renewed = await new Dc3Client().renewToken('default', 'tenantB', 'bob');
 
@@ -344,9 +347,9 @@ describe('logout ordering and guaranteed local cleanup (F024/F025)', () => {
     // The epoch moved between capture and save: a logout landed mid-renewal.
     mocks.saveStateIfEpochUnchanged.mockResolvedValueOnce(false);
     stubFetch((call) => {
-      if (call.url.endsWith('/token/salt')) return new Response('salt-abc', { status: 200 });
+      if (call.url.endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
       if (call.url.endsWith('/token/cancel')) return new Response(null, { status: 204 });
-      return new Response(newToken, { status: 200 });
+      return new Response(JSON.stringify({ token: newToken }), { status: 200 });
     });
 
     const renewed = await new Dc3Client().renewToken('default', 'tenantA', 'admin');
@@ -357,6 +360,185 @@ describe('logout ordering and guaranteed local cleanup (F024/F025)', () => {
     expect(cancel).toBeDefined();
     const headers = cancel?.init.headers as Record<string, string>;
     expect(JSON.parse(headers['X-Auth-Token'])).toMatchObject({ token: newToken });
+  });
+});
+
+describe('renewal vs logout race across the request lifecycle (F024 residual)', () => {
+  const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+  it('the 401-retry renewal refuses to resurrect a session logged out mid-request', async () => {
+    // The reproduced race (9/9): logout's clearState + epoch bump land while
+    // the original request is failing with 401, before deletePassword. A
+    // renewal that reads the epoch lazily would capture the already-bumped
+    // counter, its guarded save would succeed, and the session would be back.
+    let loggedOut = false;
+    let epoch = 0;
+    const newToken = fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 });
+    mocks.getState.mockImplementation(async () => (loggedOut ? null : { ...loginState }));
+    mocks.getEpoch.mockImplementation(async () => epoch);
+    mocks.saveStateIfEpochUnchanged.mockImplementation(
+      async (_state: unknown, _profile: string, expected: number) => epoch === expected,
+    );
+    mocks.resolvePassword.mockResolvedValue('dc3dc3dc3');
+    stubFetch((call) => {
+      if (call.url.endsWith('/manager/device/list')) {
+        // The logout completes while the failed request is unwinding.
+        loggedOut = true;
+        epoch += 1;
+        return new Response(JSON.stringify({ detail: 'token expired' }), { status: 401 });
+      }
+      if (call.url.endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
+      if (call.url.endsWith('/token/generate')) {
+        // Injected delay between generate and save.
+        return sleep(25).then(() => new Response(JSON.stringify({ token: newToken }), { status: 200 }));
+      }
+      return new Response(null, { status: 204 });
+    });
+
+    const error = await new Dc3Client()
+      .get('/api/v3/manager/device/list')
+      .catch((err: unknown) => err);
+
+    // The original 401 surfaces — the session is NOT healed.
+    expect(error).toBeInstanceOf(AuthError);
+    // The guarded save persisted against the epoch captured at request entry
+    // (0), not the post-logout counter (1), so it was refused...
+    expect(mocks.saveStateIfEpochUnchanged).toHaveBeenCalledWith(
+      expect.objectContaining({ token: newToken }),
+      'default',
+      0,
+    );
+    expect(mocks.saveState).not.toHaveBeenCalled();
+    // ...the minted token was cancelled server-side...
+    const cancel = fetchCalls.find((call) => call.url.endsWith('/token/cancel'));
+    expect(cancel).toBeDefined();
+    const headers = cancel?.init.headers as Record<string, string>;
+    expect(JSON.parse(headers['X-Auth-Token'])).toMatchObject({ token: newToken });
+    // ...and no retry was sent with the resurrected ticket.
+    expect(fetchCalls.filter((call) => call.url.endsWith('/manager/device/list'))).toHaveLength(1);
+  });
+
+  it('the proactive renewal window stays guarded: a logout between generate and save discards the token', async () => {
+    let loggedOut = false;
+    let epoch = 0;
+    const newToken = fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 });
+    mocks.needsRenewal.mockResolvedValue(true);
+    mocks.getState.mockImplementation(async () => (loggedOut ? null : { ...loginState }));
+    mocks.getEpoch.mockImplementation(async () => epoch);
+    mocks.saveStateIfEpochUnchanged.mockImplementation(
+      async (_state: unknown, _profile: string, expected: number) => epoch === expected,
+    );
+    mocks.resolvePassword.mockResolvedValue('dc3dc3dc3');
+    stubFetch((call) => {
+      if (call.url.endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
+      if (call.url.endsWith('/token/generate')) {
+        // Injected delay between generate and save; the logout lands in it.
+        return sleep(25).then(() => {
+          loggedOut = true;
+          epoch += 1;
+          return new Response(JSON.stringify({ token: newToken }), { status: 200 });
+        });
+      }
+      if (call.url.endsWith('/token/cancel')) return new Response(null, { status: 204 });
+      return new Response(JSON.stringify({ detail: 'missing X-Auth-Token header' }), {
+        status: 401,
+      });
+    });
+
+    const error = await new Dc3Client()
+      .get('/api/v3/manager/device/list')
+      .catch((err: unknown) => err);
+
+    expect(error).toBeInstanceOf(AuthError);
+    expect(mocks.saveStateIfEpochUnchanged).toHaveBeenCalledWith(
+      expect.objectContaining({ token: newToken }),
+      'default',
+      0,
+    );
+    expect(mocks.saveState).not.toHaveBeenCalled();
+    expect(fetchCalls.find((call) => call.url.endsWith('/token/cancel'))).toBeDefined();
+  });
+
+  it('a request that started without a session never mints one from a lingering stored password', async () => {
+    // Post-logout window: the state is gone but deletePassword has not run
+    // yet. A 401 on an unauthenticated request must surface, not auto-login.
+    mocks.getState.mockResolvedValue(null);
+    mocks.resolvePassword.mockResolvedValue('dc3dc3dc3');
+    stubFetch(
+      () => new Response(JSON.stringify({ detail: 'missing X-Auth-Token header' }), { status: 401 }),
+    );
+
+    const error = await new Dc3Client()
+      .get('/api/v3/manager/device/list')
+      .catch((err: unknown) => err);
+
+    expect(error).toBeInstanceOf(AuthError);
+    expect(fetchCalls.filter((call) => call.url.includes('/token/'))).toHaveLength(0);
+    expect(mocks.saveState).not.toHaveBeenCalled();
+    expect(mocks.saveStateIfEpochUnchanged).not.toHaveBeenCalled();
+  });
+});
+
+describe('OAuth client_credentials login (F049 oauth arm)', () => {
+  const OAUTH_JWT = fakeJwt({ sub: 'svc', iat: 100, exp: 2_000_000_000 });
+
+  it('sends Basic auth with the form-encoded grant and persists a Bearer state', async () => {
+    stubFetch(
+      () =>
+        new Response(JSON.stringify({ access_token: OAUTH_JWT, scope: 'mcp:read mcp:write' }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+    );
+    const client = new Dc3Client();
+
+    const result = await client.loginOAuth('cid', 'csecret', 'mcp:read mcp:write', 'default');
+
+    expect(fetchCalls).toHaveLength(1);
+    expect(fetchCalls[0].url.endsWith('/oauth2/token')).toBe(true);
+    const headers = fetchCalls[0].init.headers as Record<string, string>;
+    // RFC 6749 client_credentials: Basic authorization, form-encoded body.
+    expect(headers['Authorization']).toBe(
+      `Basic ${Buffer.from('cid:csecret').toString('base64')}`,
+    );
+    expect(headers['Content-Type']).toBe('application/x-www-form-urlencoded');
+    const form = new URLSearchParams(String(fetchCalls[0].init.body));
+    expect(form.get('grant_type')).toBe('client_credentials');
+    // Space-separated scopes travel as one joined scope value.
+    expect(form.get('scope')).toBe('mcp:read mcp:write');
+    // Expiry comes from the token payload, scopes from the response.
+    expect(result.expiresAt).toBe(2_000_000_000);
+    expect(result.scope).toEqual(['mcp:read', 'mcp:write']);
+    // The persisted state is an oauth/Bearer session, not an X-Auth-* one.
+    expect(mocks.saveState).toHaveBeenCalledWith(
+      expect.objectContaining({
+        token: OAUTH_JWT,
+        authType: 'oauth',
+        username: 'cid',
+        salt: '',
+        expiresAt: 2_000_000_000,
+      }),
+      'default',
+    );
+  });
+
+  it('a failing token endpoint surfaces a typed AuthError naming the status and detail', async () => {
+    stubFetch(
+      () =>
+        new Response(JSON.stringify({ error: 'invalid_client', error_description: 'unknown client' }), {
+          status: 401,
+          headers: { 'content-type': 'application/json' },
+        }),
+    );
+
+    const error = await new Dc3Client()
+      .loginOAuth('cid', 'bad', undefined, 'default')
+      .catch((err: unknown) => err);
+
+    expect(error).toBeInstanceOf(AuthError);
+    expect((error as AuthError).message).toMatch(/OAuth token request failed \(401\)/u);
+    expect((error as AuthError).message).toMatch(/unknown client/u);
+    expect(mocks.saveState).not.toHaveBeenCalled();
   });
 });
 
@@ -375,8 +557,8 @@ describe('cleartext transport warning (F055)', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => {
-        if (String(url).endsWith('/token/salt')) return new Response('salt-abc', { status: 200 });
-        return new Response(fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }), { status: 200 });
+        if (String(url).endsWith('/token/salt')) return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
+        return new Response(JSON.stringify({ token: fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }) }), { status: 200 });
       }),
     );
     await new FreshClient().login('t', 'u', 'pw', 'default');

@@ -616,3 +616,74 @@ multi:nested 小队（~65 次调用，11 个 Bash 批次 + 2 个 commander 最�
 ## 附录：环境与 harness 说明
 
 测试环境：Windows 11 Pro（10.0.26200），Git Bash（POSIX sh），Node v24.19.0，commander 12.1.0（仓库依赖），被测产物为 `dc3-cli/dist/index.js`（构建于 2026-10-06 08:45 本地 = 00:45Z，验证阶段逐项核对与 src 一致；git `338357430bef28baa67685d796d57848410e5358`，2026-10-06 08:33 +08:00 提交）。隔离方法：`mktemp -d` + `cygpath -m` 生成临时目录并以 USERPROFILE/HOME 环境变量覆盖实现隔离 home（真实 `C:/Users/pnoker/.dc3` 全程未触碰，各小队以 mtime 前后比对确认）。网络面：共享 `mock-gateway.mjs` harness（支持 MOCK_TOKEN_TTL_SEC / MOCK_OP_MODE / MOCK_RICH_ENTITY / MOCK_FAIL_LOGIN / MOCK_SSE_HOLD_MS 等模式开关，多小队按需扩展私有副本并记录 mock.log）；live 网关 `http://127.0.0.1:8080` 仅经私有 live-snapshot 副本做只读验证。所有命令置于 `timeout 15` 之下；各小队结束后按 PID taskkill + netstat 复核清理全部 mock/stub 进程，`git status --porcelain` 保持 clean。注意事项：测试期间工作树存在并发修改（chat.ts / provider.ts），全部验证以"当时 dist 与 src 一致"为前提；本报告所有时间均为本地时间（UTC+8）；第 4 节 31 条 UNVERIFIACBLE 项的数据可信度以发现小队的执行证据为准，未经统一对抗复核，落地修复前建议先按其 repro 复现确认。
+---
+
+## 12. 修复战役后记（2026-10-06 下午闭环）
+
+**修复执行**：8 个修复小队分三波（核心层 → 命令层 → 文档/构建），按文件所有权并行、波间串行；随后回归验证轮（10 个验证员）+ 二轮精准修补。结果：**55/55 可修发现全部根治落地**（86 项分层修复 + 二轮 6 项残留修补），唯一 N-A 为 F044（后端 AttachmentController 无 delete 路由，属平台级缺口）。
+
+**回归判定（负向验证，重放原始复现）**：首轮 51/56 FIXED-VERIFIED + 4 STILL-BROKEN（F015/F024/F036/F053 跨组缝隙）+ 0 REGRESSED；二轮修补后 4 项全部转正（F024 竞态以确定性交错强制复现验证：复活令牌被丢弃并服务端 cancel）。
+
+**质量门禁（终态）**：vitest **685/685**（战役前 99）· `tsc --noEmit` 干净（已接入 build/CI）· eslint 0 问题 · `pnpm build` 成功 · 覆盖率 statements **42.36% → 90.14%**、branches 33.8% → 77.06%、functions 45.8% → 95.34%。
+
+**防复发守护**：每条缺陷带负向守护测试；contract.test.ts 静态扫描禁止 failure-path `printAndExit({ok:false})` 复发；docs-lint 161 测试锁定 README 命令契约（含 .mcp.json schema 校验）。
+
+**已知遗留（记录在案，非回归）**：Windows 默认 keychain 深层对接（cmdkey/CredRead）未实施——现状为快速、如实报告的 no-op + 警告，用户可 `--store encrypted`；错误 kind 分类的零星边缘（plain-Error 兜底仍为 api/INTERNAL）；quarantine 后 `auth status` exit 0；darwin keychain 密码走 argv（无注入面，进程表可见）；README MCP 片段带 jsonc 尾逗号需用户手工去除。完整清单见回归验证 newIssues 记录。
+
+**提交状态**：三波主修复已由并发会话提交（97c5bd58e 等 7 个提交，338357430..b2ce0ab69）；二轮精准修补（F024/F015 残留/F036/F053/kind 精准化/password_saved 语义 + eslint no-undef 根因）在工作树待提交。
+
+---
+
+## 13. 查漏补缺轮后记（2026-10-06 傍晚闭环）
+
+**审计**：6 个并行审计员（守护测试完备性 / newIssues 积压 triage / 并发会话 6 提交契约合规 / 12 类缺陷模式复发扫描 / CLI↔后端契约+F044 / 真实网关 live 冒烟）产出 **43 个缺口**。
+
+**修补**：5 组零文件冲突并行（GATES 测试基建 / AUTHCORE 认证核心 / CMDS 命令面 / SCANS 类级扫描 / JAVA 后端）+ 终局门禁 + 2 处收尾点修。要点：
+
+- **测试基建**：coverage 进 CI 并设阈值门禁（当前 92.62/80.72/96.23/93.42 vs 阈值 89/76/94/88）；测试文件进类型门（tsconfig.test.json ratchet + `typecheck:test`）；`eslint .` 从 131 错误到 0；**F011 跨进程并发登录风暴守护**（6 并发 CLI 子进程 × 共享 HOME × 精确 N 条断言 + AES-GCM 解密验证）落地；dist 行为冒烟进 CI。
+- **后端（Java）**：F044 端到端闭环——store（tenant+user+deleted 作用域 SQL）→ service（NotFound + 尽力 unlink）→ `DELETE /api/v3/agentic/attachment/delete?id=` → 204（`@perm.can('attachment','delete')`）；session 软删的事务内 SELECT + 提交后 unlink（AttachmentFileCleaner，根目录守卫）；driver-status 单路由 `GET /driver/status/get_by_driver_id`。`mvn` 全仓编译 EXIT=0，dc3-common-agentic + dc3-common-data **437 测试 0 失败**。
+- **CLI 镜像**：`dc3 attachment delete <id>` 对齐新路由并守护。
+- **收尾点修**：chat SSE 的 CRLF `[DONE]` 终止符剥离（SCANS 组发现的所有权外残留）+ hold 连接守护测试。
+- **并发会话代码合规**：2 个新命令（alert point-profile、device import-template）经审计+实测符合全部战役契约。
+
+**终局门禁**：vitest **799/799**（37 文件）· tsc（src+test 双门）干净 · eslint 0 · build 成功 · dist 五项冒烟过 · 38 类缺口逐一负向取证闭合 · 真实 8080 网关只读冒烟三项通过（真实 ~/.dc3 全程 mtime 不变）。
+
+**明确留待后续（非缺陷）**：① driver status CLI 切换到后端单路由——后端返回 text/plain 与 CLI JSON 响应契约冲突，需跨栈协调返回形状，post-merge follow-up；② 后端存在但 CLI 未暴露的参数面（topology range_key、storm_sources hours/min_count 等）——功能面扩展，建议专门轮次；③ tsconfig.test.json ratchet 外的 11 个遗留测试文件（~44 个历史 strict 错误）渐进收编；④ R2dbcSessionStore 清理接线的 db-module 测试（该模块暂无测试基建）。
+
+---
+
+## 14. 三栈日志/注释/错误返回审计后记（2026-10-06 晚）
+
+**范围**：后端（Java 全模块）+ CLI + dc3-web（只读）× 三个维度（日志 / 注释 / 错误返回）。35 项发现 → 后端 3 组 + CLI 2 组修补（31 修 4 部分跨组残留，已由主循环点状收口）→ web 6 项只报告（并发会话地盘）。
+
+**最重要发现（本轮唯一 HIGH，后端安全）**：JWT claims 内嵌 `DC3_SECURITY_KEY`（拿到任意 token 即可提取签名密钥伪造任意身份）。已根治：issuer/subject/tenantId 规范化 claims（requireIssuer/requireSubject/require("tenantId") 校验），**硬切换设计**——旧格式 token 全部失效强制重登（12h TTL + CLI 自动续期把影响限制在窗口内）。
+
+**后端修复要点**：attachment 错误契约（跨租户 not-found 不可区分、上传失败 4xx/5xx 分类、破坏性删除后 log.info 带 tenant/user 上下文、ExceptionConfig 对 5xx 业务失败恰好记一次无栈 warn、4xx 静默）；traceId 贯穿 problem+json（RequestIdWebFilter exchange attribute + 回退入站 header）；token 校验日志降噪（预期 JwtException → INFO 单行带租户/主体关联，非 JWT 异常保留 WARN 全栈）；过时/自相矛盾 Javadoc 清理；@since 修正。
+
+**CLI 修复要点**：session/action/profile id 预校验接线、OAuth 2xx-body 类型化失败、锁超时类型化（TimeoutError/kind timeout，杜绝 deadline 被误报 INTERNAL）、死设置 retry_count 全根拔除（含守护测试钉死 set/get 双向拒绝 + 旧配置静默丢弃键）、README 错误契约过度声明修正、空洞 JSDoc 重写。
+
+**终局门禁**：`make validate-secrets`（120 文件，1 项 RFC 7591 白名单带理由）/ `validate-todo-ownership`（2405 文件 0 违规）/ `validate-javadoc`（doclint=all failOnWarnings BUILD SUCCESS）/ `validate-documentation` 全过；mvn 全仓编译 exit 0 零警告；CLI 818/818 + tsc + eslint 全绿（三连跑确认）。
+
+**遗留与决策项**：① web 六项（登录 401 双 toast 且误导"credentials expired"+不想要的重置、附件上传双错误提示、2 处硬编码英文 toast、no-console 未强制 eslint、过时"capped at 1000"注释、死代码 X-Auth-Token 常量）——留给 web 并发会话或后续轮；② 后端 security-chain 直连场景 body-less 401/403（绕过网关才可达，改动收益低于风险）；③ 破坏性删除的统一审计日志架构（跨模块 port 抽取）推迟；④ **driver-status 单路由返回 text/plain vs JSON 的跨栈形状决策待用户拍板**；⑤ openapi-agentic.json 快照早于 attachment delete（需起栈 `make openapi` 刷新）；⑥ 并发风暴守护在全量 CPU 饱和下出现过一次 exit-0-但条目缺失的罕见交错（4 次全量 1 次、三连跑不可复现、静态排查无静默窗口）——守护已加固为失败即转储全部子进程输出与文件原文，再触发可一次定位。
+
+---
+
+## 15. 标量端点契约根治后记（2026-10-06 夜，三栈一次切换）
+
+**根因**：`Mono<String>` 返回类型被 WebFlux CharSequenceEncoder 抢先序列化为 text/plain，而同控制器/同平台的 `Mono<Long>`/`Mono<Boolean>` 走 Jackson 输出 JSON——类型系统意外决定序列化通道，同一平台出现两套 HTTP 契约（铁证：TokenController 内 salt/generate=text、change_password=JSON `true`、cancel=204 三风格并存）。
+
+**统一标准（零发明、同构对齐）**：一个平台一套契约——全部响应体 `application/json`；wire 形状归表示层（service 返回领域值不动，controller 包 JSON 壳）：
+
+| 端点 | 旧 | 新 |
+|---|---|---|
+| POST /auth/token/salt | text 裸 salt | `{"salt":"..."}` |
+| POST /auth/token/generate | text 裸 JWT | `{"token":"..."}`（对齐自家 OAuth2 端点 JSON 风格）|
+| POST /command_history/call | text record id | `{"id":"<uuid>"}` |
+| POST /event_history/report | text record id | `{"id":"<uuid>"}`（RabbitMQ/gRPC 内部重载不受影响）|
+| GET /driver/status/get_by_driver_id | text 状态码 | 单键 map `{"1024":"ONLINE"}`（与 /list 同构）|
+
+**三栈同步落地**：后端 4 controller + Javadoc/@Operation + 测试（data 260 + auth 110 全绿）；CLI 删除 `parseScalarResource`（新 `parseAuthField` 拒绝裸文本——负向守护钉死旧形状非法）、driver status 切单路由（分页 walk 与死常量全删、URL 编码断言、单键回显契约守护、404 typed error）；web `api/token.ts` 泛型 + store `.salt` 解包 + mock handlers（type-check/lint/test:api 319 全绿）。gateway 路由白名单与安全链 matcher 无需变更。
+
+**端到端冒烟（mock 新形状）**：login exit 0 → `driver status 10` → `{"id":"10","status":"ONLINE"}` → `driver status 999` 404 → stdout envelope `{"ok":false,"error":{"kind":"api","code":"API_404",...}}` + stderr 单行——完整新契约链贯通。
+
+**遗留**：openapi 快照（auth/data 模块）现落后两轮端点变更，需起栈统一 `make openapi` 刷新（与 attachment delete 一并）。

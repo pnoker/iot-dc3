@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { InvalidArgumentError } from 'commander';
+import { ValidationError } from '../src/core/errors.js';
 
 /*
  * Guard tests for utils/manager.ts: F035 (lexical integer parsing), F038
@@ -63,19 +64,21 @@ describe('lexical integer parsing (F035)', () => {
 });
 
 describe('resource id hygiene (F053b)', () => {
+  // Business validation, not an argv-shape error: the id must fail as a
+  // typed ValidationError (kind "validation", exit 1) before any request.
   it.each(['', ' ', '   '])('delete rejects the empty/whitespace id %s before any request', async (id) => {
-    await expect(deleteManagerResource(BASE, id, 3)).rejects.toBeInstanceOf(InvalidArgumentError);
+    await expect(deleteManagerResource(BASE, id, 3)).rejects.toBeInstanceOf(ValidationError);
     expect(dc3Client.del).not.toHaveBeenCalled();
   });
 
   it.each(['', ' '])('update rejects the empty/whitespace id %s before any request', async (id) => {
-    await expect(updateManagerResource(BASE, id, 3, {})).rejects.toBeInstanceOf(InvalidArgumentError);
+    await expect(updateManagerResource(BASE, id, 3, {})).rejects.toBeInstanceOf(ValidationError);
     expect(dc3Client.get).not.toHaveBeenCalled();
     expect(dc3Client.post).not.toHaveBeenCalled();
   });
 
   it.each(['', ' '])('get rejects the empty/whitespace id %s before any request', async (id) => {
-    await expect(getManagerResource(BASE, id)).rejects.toBeInstanceOf(InvalidArgumentError);
+    await expect(getManagerResource(BASE, id)).rejects.toBeInstanceOf(ValidationError);
     expect(dc3Client.get).not.toHaveBeenCalled();
   });
 

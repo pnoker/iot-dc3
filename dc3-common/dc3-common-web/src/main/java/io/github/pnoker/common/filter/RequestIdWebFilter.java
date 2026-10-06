@@ -49,7 +49,8 @@ import reactor.util.context.Context;
  *   <li>The current OpenTelemetry Trace ID</li>
  *   <li>A fresh UUID as a last resort</li>
  * </ol>
- * The same id is echoed back on the response via {@code X-Request-Id}, so callers can
+ * The same id is echoed back on the response via {@code X-Request-Id} and stored as an
+ * exchange attribute, so callers and non-reactive readers such as the exception advice can
  * correlate a failing request with server logs and distributed traces.
  *
  * <p><b>Why Reactor Context:</b> Reactor chains may change execution threads. Publishing the id in
@@ -62,6 +63,13 @@ import reactor.util.context.Context;
 @AutoConfiguration
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestIdWebFilter implements WebFilter {
+
+    /**
+     * Exchange attribute key holding the request id this filter resolved (inbound header,
+     * trace id, or generated fallback). The exception advice reads it so problem details
+     * carry the id even when it was generated server-side and no inbound header exists.
+     */
+    public static final String EXCHANGE_ATTRIBUTE_KEY = "dc3.requestId.exchange";
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -86,6 +94,9 @@ public class RequestIdWebFilter implements WebFilter {
         String finalRequestId = requestId;
         // Echo back so callers can correlate a failing request with server-side logs and traces.
         exchange.getResponse().getHeaders().add(RequestIdConstant.HEADER, finalRequestId);
+        // Also publish as an exchange attribute for non-reactive readers, notably the exception
+        // advice: without it, problem-details traceId is null whenever the id was generated here.
+        exchange.getAttributes().put(EXCHANGE_ATTRIBUTE_KEY, finalRequestId);
         // Publish in the Reactor context so downstream reactive operators retain the
         // correlation id even when execution changes threads.
         return chain.filter(exchange)

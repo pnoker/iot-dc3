@@ -141,7 +141,7 @@ describe('provider command', () => {
   it('check rejects an invalid --level before any request (F021)', async () => {
     await expect(
       run(['provider', 'check', '--id', '1', '--level', 'GARBAGE_LEVEL', '--format', 'json']),
-    ).rejects.toThrow(/'--level GARBAGE_LEVEL' is invalid\. allowed: L1, L2, BOTH/u);
+    ).rejects.toThrow(/allowed: L1, L2, BOTH/u);
     expect(fetchCalls).toHaveLength(0);
   });
 

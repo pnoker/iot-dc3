@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const child = vi.hoisted(() => ({
   calls: [] as Array<{ file: string; args: string[]; opts: Record<string, unknown> }>,
   failNext: false,
+  hangNext: false,
   stdout: '',
 }));
 
@@ -20,6 +21,16 @@ vi.mock('node:child_process', () => ({
     if (child.failNext) {
       child.failNext = false;
       callback(new Error('command failed'));
+      return;
+    }
+    if (child.hangNext) {
+      child.hangNext = false;
+      // Real execFile semantics: the `timeout` option kills the child and
+      // errors once the budget elapses. Without the option the call never
+      // settles — exactly like an unbounded spawn against a hung binary.
+      if (typeof opts?.timeout === 'number' && opts.timeout > 0) {
+        setTimeout(() => callback(new Error('spawn ETIMEDOUT')), opts.timeout);
+      }
       return;
     }
     callback(null, { stdout: child.stdout, stderr: '' });
@@ -44,11 +55,13 @@ describe('KeychainStore transport security (execFile argv, secrets on stdin)', (
     store = new KeychainStore();
     child.calls.length = 0;
     child.failNext = false;
+    child.hangNext = false;
     child.stdout = '';
   });
 
   afterEach(() => {
     stubPlatform(REAL_PLATFORM);
+    vi.useRealTimers();
   });
 
   describe('isAvailable (fast bounded probe)', () => {
@@ -70,6 +83,40 @@ describe('KeychainStore transport security (execFile argv, secrets on stdin)', (
       child.failNext = true;
       expect(await store.isAvailable()).toBe(false);
     });
+
+    it('win32: a probe whose child never answers settles false once the 2s budget elapses (F005 guard c, fake timers)', async () => {
+      stubPlatform('win32');
+      vi.useFakeTimers();
+      child.hangNext = true;
+      let settled = false;
+      const probe = store.isAvailable().finally(() => {
+        settled = true;
+      });
+
+      await vi.advanceTimersByTimeAsync(2001);
+
+      // The settle must come from the timeout option the code passes: drop
+      // the option and this never settles; stretch the budget past ~2s and
+      // it settles only after the latency bound is already broken.
+      expect(settled, 'isAvailable() must settle within the 2s probe budget').toBe(true);
+      await expect(probe).resolves.toBe(false);
+    });
+
+    it('win32: wall-clock bound — a hanging probe answers false within 2.5s of real time (F005 guard c)', async () => {
+      stubPlatform('win32');
+      child.hangNext = true;
+      const startedAt = Date.now();
+
+      await expect(store.isAvailable()).resolves.toBe(false);
+
+      const elapsed = Date.now() - startedAt;
+      // Upper bound: the probe budget (~2s) plus scheduling slack, not the
+      // 10s operation timeout and not an unbounded hang.
+      expect(elapsed).toBeLessThanOrEqual(2500);
+      // Lower bound: it really waited for the probe budget instead of
+      // resolving instantly from a shortcut.
+      expect(elapsed).toBeGreaterThanOrEqual(1900);
+    }, 10_000);
 
     it('linux: the probe never spawns a process (pure PATH existence check)', async () => {
       stubPlatform('linux');

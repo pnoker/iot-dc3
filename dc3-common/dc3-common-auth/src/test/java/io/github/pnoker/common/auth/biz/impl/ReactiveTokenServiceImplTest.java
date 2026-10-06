@@ -29,6 +29,7 @@ import io.github.pnoker.common.auth.service.ReactivePrincipalService;
 import io.github.pnoker.common.auth.service.ReactiveTenantService;
 import io.github.pnoker.common.enums.RequirePasswordChangeFlagEnum;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.utils.KeyUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,5 +101,28 @@ class ReactiveTokenServiceImplTest {
                 .verifyComplete();
 
         verify(credentialService, never()).getByLoginName(7L, "alice");
+    }
+
+    @Test
+    void tokenForDifferentTenantIsRejectedAsInvalidNotAsError() {
+        String previousKey = System.getProperty("dc3.security.key");
+        System.setProperty("dc3.security.key", "token-service-test-key-0123456789abcdef");
+        try {
+            when(tenantService.getByCode("tenant-a")).thenReturn(Mono.just(tenant));
+            when(credentialService.getByLoginName(7L, "alice")).thenReturn(Mono.just(credential));
+            String foreignTenantToken = KeyUtil.generateToken("19", 8L);
+
+            StepVerifier.create(service.checkValid("alice", foreignTenantToken, "tenant-a"))
+                    .assertNext(result -> {
+                        org.assertj.core.api.Assertions.assertThat(result.isValid())
+                                .isFalse();
+                        org.assertj.core.api.Assertions.assertThat(result.getExpireTime())
+                                .isNull();
+                    })
+                    .verifyComplete();
+        } finally {
+            if (previousKey == null) System.clearProperty("dc3.security.key");
+            else System.setProperty("dc3.security.key", previousKey);
+        }
     }
 }

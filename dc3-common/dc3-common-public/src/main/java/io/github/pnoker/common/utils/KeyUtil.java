@@ -18,7 +18,6 @@ package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.AlgorithmConstant;
 import io.github.pnoker.common.constant.common.ExceptionConstant;
-import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.entity.auth.Keys;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -71,6 +70,19 @@ public class KeyUtil {
     private static final int GCM_TAG_LENGTH_BITS = 128;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
+    /**
+     * Stable issuer claim for every token issued by this platform. Deliberately a constant, never derived from the
+     * signing key: the claims set is readable by anyone holding the token, so no key material may appear in it.
+     */
+    private static final String ISSUER = "dc3-auth";
+
+    /**
+     * Name of the claim carrying the tenant ID. The value is stored as a string on both sign and verify sides so the
+     * equality check never trips over JSON number widening (for example tenant 100 deserializing as Integer while the
+     * caller holds a Long).
+     */
+    private static final String TENANT_ID_CLAIM = "tenantId";
 
     private KeyUtil() {
         throw new IllegalStateException(ExceptionConstant.UTILITY_CLASS);
@@ -251,6 +263,11 @@ public class KeyUtil {
 
     /**
      * Generate a JWT token.
+     * <p>
+     * The claims set carries only non-secret data: a constant issuer, the given subject, and the tenant ID as a string
+     * claim. The signing key itself never appears in the token; subject and tenant binding is enforced by the HMAC
+     * signature plus the required-claim checks in {@link #parserToken(String, String, Long)}. Tokens signed in the
+     * legacy format (key-prefixed issuer/subject) fail validation and callers must re-authenticate.
      *
      * @param subject  token subject, normally principal ID
      * @param tenantId Tenant ID
@@ -260,8 +277,9 @@ public class KeyUtil {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtBuilder builder = Jwts.builder()
-                .issuer(securityKey + SymbolConstant.COLON + tenantId)
-                .subject(securityKey + SymbolConstant.COLON + subject)
+                .issuer(ISSUER)
+                .subject(subject)
+                .claim(TENANT_ID_CLAIM, String.valueOf(tenantId))
                 .issuedAt(new Date())
                 .signWith(key, Jwts.SIG.HS256)
                 .expiration(TimeUtil.expireTime(TokenTtl.hours(), Calendar.HOUR));
@@ -269,7 +287,11 @@ public class KeyUtil {
     }
 
     /**
-     * Parse and validate a JWT token.
+     * Parse and validate a JWT token issued by {@link #generateToken(String, Long)}.
+     * <p>
+     * Requires the constant issuer, the exact subject, and the string tenant claim; any mismatch (including legacy
+     * key-prefixed tokens) raises {@code IncorrectClaimException}, and signature or expiry failures raise their
+     * respective {@code JwtException} subtypes.
      *
      * @param subject  token subject, normally principal ID
      * @param token    Token string
@@ -280,8 +302,9 @@ public class KeyUtil {
         String securityKey = getSecurityKey();
         SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(DecodeUtil.stringToByte(securityKey));
         JwtParser parser = Jwts.parser()
-                .requireIssuer(securityKey + SymbolConstant.COLON + tenantId)
-                .requireSubject(securityKey + SymbolConstant.COLON + subject)
+                .requireIssuer(ISSUER)
+                .requireSubject(subject)
+                .require(TENANT_ID_CLAIM, String.valueOf(tenantId))
                 .verifyWith(key)
                 .build();
         return parser.parseSignedClaims(token).getPayload();

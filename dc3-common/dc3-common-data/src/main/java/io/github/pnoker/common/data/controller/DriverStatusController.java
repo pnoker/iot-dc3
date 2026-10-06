@@ -82,6 +82,41 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
+     * Query the current ONLINE/OFFLINE status of one driver instance for the tenant.
+     *
+     * @param driverId identifier of the driver whose status is queried; must belong to the current tenant
+     * @return single-key JSON object mapping the driver id to its current ONLINE/OFFLINE status, isomorphic to the status map endpoint
+     */
+    @PreAuthorize("@perm.can('driver_status', 'get')")
+    @Operation(
+            summary = "Get Driver Status by Driver",
+            description =
+                    "Return the current ONLINE/OFFLINE status of one driver instance for the current tenant as a single-key JSON object mapping the driver id to its status, isomorphic to the driver status map."
+                            + " Use when a single driver's status is needed without paging through the driver status map.",
+            extensions =
+                    @Extension(
+                            name = "x-dc3-ai",
+                            properties = {
+                                @ExtensionProperty(name = "riskLevel", value = "LOW"),
+                                @ExtensionProperty(name = "destructive", value = "false"),
+                                @ExtensionProperty(name = "idempotent", value = "true"),
+                                @ExtensionProperty(name = "openWorld", value = "false")
+                            }))
+    @GetMapping("/get_by_driver_id")
+    public Mono<Map<String, String>> getByDriverId(
+            @Parameter(
+                            description =
+                                    "Identifier of the driver whose status is queried; must belong to the current tenant.",
+                            example = "1024")
+                    @NotNull
+                    @RequestParam(value = "driver_id")
+                    Long driverId) {
+        return getTenantId()
+                .flatMap(tenantId -> driverStatusService.get(tenantId, driverId))
+                .map(status -> Map.of(String.valueOf(driverId), status));
+    }
+
+    /**
      * Count the devices currently online under one driver for the tenant.
      *
      * @param driverId identifier of the driver whose online device count is queried; must belong to the current tenant

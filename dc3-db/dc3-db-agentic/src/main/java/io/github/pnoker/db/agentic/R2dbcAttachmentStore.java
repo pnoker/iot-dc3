@@ -115,6 +115,39 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
         return statement.map(this::map).all();
     }
 
+    @Override
+    public Mono<AttachmentBO> getById(Long id, RequestHeader.PrincipalHeader header) {
+        if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
+        if (id == null) return Mono.error(new IllegalArgumentException("id must not be null"));
+        return databaseClient
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
+                        + " WHERE id = :id AND tenant_id = :tenant_id AND user_id = :user_id AND deleted = 0"
+                        + " LIMIT 1")
+                .bind("id", id)
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .map(this::map)
+                .one();
+    }
+
+    @Override
+    public Mono<Long> delete(Long id, RequestHeader.PrincipalHeader header) {
+        if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
+        if (id == null) return Mono.error(new IllegalArgumentException("id must not be null"));
+        return transactionalOperator.transactional(databaseClient
+                .sql("UPDATE " + TABLE + " SET deleted = 1, operator_id = :operator_id,"
+                        + " operate_time = :operate_time WHERE id = :id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id AND deleted = 0")
+                .bind("operator_id", header.getUserId())
+                .bind("operate_time", utcNow())
+                .bind("id", id)
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .fetch()
+                .rowsUpdated()
+                .map(Long::valueOf));
+    }
+
     private Mono<AttachmentBO> getByPath(String path, Long tenantId, Long userId) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE

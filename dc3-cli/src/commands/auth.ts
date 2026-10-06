@@ -54,20 +54,53 @@ function flagValue(value: string, hint: string): string {
 }
 
 /**
+ * Whether a persisted expiry instant reads as already expired. A non-finite
+ * expiresAt (hand-edited or legacy state persisted before JWT payload
+ * validation) must count as expired: `NaN < Date.now()` is false, which used
+ * to keep malformed sessions authenticated forever with a NaN remaining time.
+ * @param expiresAt - persisted epoch-seconds expiry
+ * @returns true when the session is expired or the expiry is unreadable
+ */
+function expiryIsPast(expiresAt: number): boolean {
+  return !Number.isFinite(expiresAt) || expiresAt * 1000 < Date.now();
+}
+
+/**
+ * Render a persisted expiry for machine output, degrading unreadable
+ * (non-finite) instants to the explicit 'unknown' marker instead of throwing
+ * inside Date#toISOString.
+ * @param expiresAt - persisted epoch-seconds expiry
+ * @returns the ISO-8601 timestamp, or 'unknown' when unreadable
+ */
+function expiryLabel(expiresAt: number): string {
+  return Number.isFinite(expiresAt) ? isoTimestamp(expiresAt) : 'unknown';
+}
+
+/**
  * Collect one mandatory input from a flag or an interactive question. Callers
  * gate on `stdin.isTTY` (spec item 4): with a non-interactive stdin the
  * question could never be answered (it would hang on an open pipe or exit 0 on
  * a closed one — report F004), so the missing value fails fast as a usage
- * error naming the flag the script should pass instead.
+ * error naming the flag the script should pass instead. Only secret inputs
+ * mention DC3_PASSWORD — a --tenant/--username/--client-id error pointing at
+ * a password variable is off-topic noise (report F004 residual).
  * @param hint - flag the value can be passed with, used in the error message
  * @param ask - interactive question asked when stdin can answer
+ * @param secret - whether the value is a secret (points headless users at
+ *   DC3_PASSWORD; non-secret inputs point at the flag/TTY only)
  * @returns the collected value
  */
-async function requiredInput(hint: string, ask: () => Promise<string>): Promise<string> {
+async function requiredInput(
+  hint: string,
+  ask: () => Promise<string>,
+  secret = false,
+): Promise<string> {
   if (!process.stdin.isTTY) {
     throw new UsageError(
       `${hint} is required when stdin is not interactive; ` +
-        'pass the flag (for secrets, set DC3_PASSWORD) or run dc3 in an interactive terminal',
+        (secret
+          ? 'pass the flag or set DC3_PASSWORD'
+          : 'pass the flag or run dc3 in an interactive terminal'),
     );
   }
   const answer = await ask();
@@ -132,8 +165,10 @@ export function registerAuthCommand(program: Command): void {
         options.password ??
         (process.env.DC3_PASSWORD && process.env.DC3_PASSWORD.length > 0
           ? process.env.DC3_PASSWORD
-          : await requiredInput('--password <password> (or set DC3_PASSWORD)', () =>
-              passwordPrompt('Password: '),
+          : await requiredInput(
+              '--password <password>',
+              () => passwordPrompt('Password: '),
+              true,
             ));
 
       const token = await dc3Client.login(tenant, username, password, profileName);
@@ -169,11 +204,15 @@ export function registerAuthCommand(program: Command): void {
         passwordSaved = result.persisted;
         saveStore = result.store;
         if (!result.persisted) {
-          process.stderr.write(
-            `Warning: the password was NOT saved — credential store "${result.store}" is not available ` +
-              `on this machine. Silent token renewal is impossible until a working store is configured ` +
-              `(dc3 config set auth.store encrypted, or pass --store explicitly).\n`,
-          );
+          const reason =
+            result.store === 'env'
+              ? // The env store never persists: DC3_PASSWORD is per-process, so
+                // each new session must export it again for silent renewal.
+                'the env store never persists passwords; set DC3_PASSWORD in every session that needs silent token renewal'
+              : `credential store "${result.store}" is not available on this machine. ` +
+                'Silent token renewal is impossible until a working store is configured ' +
+                '(dc3 config set auth.store encrypted, or pass --store explicitly)';
+          process.stderr.write(`Warning: the password was NOT saved — ${reason}.\n`);
         }
       }
 
@@ -219,7 +258,11 @@ export function registerAuthCommand(program: Command): void {
         : await requiredInput('--client-id <id>', () => prompt('Client id: '));
     const clientSecret =
       options.clientSecret ??
-      (await requiredInput('--client-secret <secret>', () => passwordPrompt('Client secret: ')));
+      (await requiredInput(
+        '--client-secret <secret>',
+        () => passwordPrompt('Client secret: '),
+        true,
+      ));
     const result = await dc3Client.loginOAuth(clientId, clientSecret, options.scope, profileName);
     const expiresAt = isoTimestamp(result.expiresAt);
     printAndExit(
@@ -277,12 +320,12 @@ export function registerAuthCommand(program: Command): void {
         const states = await tokenManager.getAllStates();
         const result: Record<string, unknown> = {};
         for (const [name, state] of Object.entries(states)) {
-          const isExpired = state.expiresAt * 1000 < Date.now();
+          const isExpired = expiryIsPast(state.expiresAt);
           result[name] = {
             tenant: state.tenant,
             username: state.username,
             authenticated: !isExpired,
-            expires_at: isoTimestamp(state.expiresAt),
+            expires_at: expiryLabel(state.expiresAt),
             remaining: isExpired
               ? 'expired'
               : `${Math.floor((state.expiresAt * 1000 - Date.now()) / 3600000)}h`,
@@ -301,6 +344,11 @@ export function registerAuthCommand(program: Command): void {
       const state = await tokenManager.getState(profileName);
 
       if (!state) {
+        // Status is a query: exit 0 with authenticated:false is the documented
+        // contract — scripts discriminate on the `authenticated` field, the
+        // exit code only says the query itself succeeded. The same applies to
+        // a quarantined/corrupt tokens.json (state reads as empty after the
+        // loud quarantine warning).
         printAndExit(
           {
             authenticated: false,
@@ -310,14 +358,14 @@ export function registerAuthCommand(program: Command): void {
         );
       }
 
-      const isExpired = state!.expiresAt * 1000 < Date.now();
+      const isExpired = expiryIsPast(state!.expiresAt);
       const remainingMs = state!.expiresAt * 1000 - Date.now();
       printAndExit(
         {
           authenticated: !isExpired,
           tenant: state!.tenant,
           username: state!.username,
-          expires_at: isoTimestamp(state!.expiresAt),
+          expires_at: expiryLabel(state!.expiresAt),
           remaining: isExpired
             ? 'expired'
             : `${Math.floor(remainingMs / 3600000)}h ${Math.floor((remainingMs % 3600000) / 60000)}m`,

@@ -9,7 +9,7 @@ vi.mock('../src/core/config-manager.js', () => ({
     getActiveProfile: vi.fn(async () => ({ gateway: 'http://gw.test/', tenant: 't', username: 'u', credential_store: 'env' })),
     getActiveProfileName: vi.fn(async () => 'default'),
     load: vi.fn(async () => ({ current_profile: 'default' })),
-    getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12, output_format: 'json', color: false, retry_count: 1 })),
+    getSettings: vi.fn(async () => ({ renewal_threshold_hours: 12, output_format: 'json', color: false })),
   },
 }));
 
@@ -212,6 +212,43 @@ describe('action approval loop', () => {
     const { err } = await runCapture(['action', 'pending', '--conversation-id', 'conv-1', flag, value]);
     expect(err).toBeInstanceOf(Error);
     expect((err as Error).message).toMatch(/integer/i);
+    expect(fetchCalls).toHaveLength(0);
+  });
+});
+
+describe('empty ids are rejected before the gate and the wire (F053 residual)', () => {
+  beforeEach(() => {
+    fetchCalls.length = 0;
+    vi.stubGlobal('fetch', vi.fn(async (url: string, init?: RequestInit) => {
+      fetchCalls.push({ url, init: init ?? {} });
+      return new Response(JSON.stringify({ ok: true, data: {} }), { status: 200 });
+    }));
+  });
+
+  it.each([
+    ['session', 'get', ''],
+    ['session', 'messages', ' '],
+    ['session', 'rename', '', '--name', 'n'],
+    ['session', 'delete', '', '--yes'],
+    ['action', 'confirm', '', '--yes'],
+    ['action', 'reject', '  ', '--yes'],
+  ])('%s %s with an empty id throws ValidationError and issues zero requests', async (...args) => {
+    const { err } = await runCapture(args);
+
+    expect(err).toMatchObject({ name: 'ValidationError', kind: 'validation', exitCode: 1 });
+    expect((err as Error).message).toMatch(/non-empty/u);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('an empty delete/confirm id fails BEFORE the TTY confirmation prompt', async () => {
+    const deleted = await runCapture(['session', 'delete', '']);
+    expect(deleted.err).toMatchObject({ name: 'ValidationError' });
+
+    const confirmed = await runCapture(['action', 'confirm', '']);
+    expect(confirmed.err).toMatchObject({ name: 'ValidationError' });
+
+    // The gate never ran: validation owns the failure, not a declined prompt.
+    expect(confirmMock).not.toHaveBeenCalled();
     expect(fetchCalls).toHaveLength(0);
   });
 });

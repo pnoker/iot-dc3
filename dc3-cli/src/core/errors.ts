@@ -27,7 +27,7 @@
  * Exit codes stay 0 ok / 1 business or usage error / 2 network error / 3 auth
  * error (compatibility decision: agents discriminate via `error.kind`).
  */
-import { CommanderError } from 'commander';
+import { CommanderError, InvalidArgumentError } from 'commander';
 import { ZodError } from 'zod';
 import { getGlobalFormatOverride, getSettingsFormatOverride } from './context.js';
 
@@ -39,7 +39,9 @@ export type ErrorKind = 'usage' | 'validation' | 'auth' | 'network' | 'api' | 't
 
 /**
  * Base class of the CLI error taxonomy. Carries the envelope `kind`, a stable
- * machine `code`, and the process `exitCode` the failure maps to.
+ * machine `code`, and the process `exitCode` the failure maps to. An optional
+ * `cause` chains the triggering low-level error (e.g. the EEXIST behind a lock
+ * timeout) for diagnostics without changing how the failure is reported.
  */
 export class CliError extends Error {
   public readonly kind: ErrorKind;
@@ -48,9 +50,9 @@ export class CliError extends Error {
 
   constructor(
     message: string,
-    details: { kind: ErrorKind; exitCode: number; code: string },
+    details: { kind: ErrorKind; exitCode: number; code: string; cause?: unknown },
   ) {
-    super(message);
+    super(message, details.cause !== undefined ? { cause: details.cause } : undefined);
     this.name = new.target.name;
     this.kind = details.kind;
     this.exitCode = details.exitCode;
@@ -102,14 +104,19 @@ export class NetworkError extends CliError {
  * Error thrown when a long-running operation exceeds its deadline. Exit code 1.
  */
 export class TimeoutError extends CliError {
-  constructor(message: string) {
-    super(message, { kind: 'timeout', exitCode: 1, code: 'TIMEOUT' });
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, { kind: 'timeout', exitCode: 1, code: 'TIMEOUT', cause: options?.cause });
   }
 }
 
 /**
  * Error thrown for non-2xx gateway responses, carrying the HTTP status and
  * the decoded problem payload when available. Exit code 1.
+ *
+ * The machine `code` defaults to `API_<status>`; response-shape failures that
+ * carry a status anyway (e.g. a 2xx body that is not JSON) pass an explicit
+ * code such as `API_BAD_BODY` so a "200" never reads as success in the
+ * envelope.
  */
 export class ApiError extends CliError {
   public readonly statusCode?: number;
@@ -117,11 +124,11 @@ export class ApiError extends CliError {
   /** Raw problem payload; only set when provided (keeps `'problem' in error` false otherwise). */
   public declare readonly problem?: unknown;
 
-  constructor(message: string, statusCode?: number, problem?: unknown) {
+  constructor(message: string, statusCode?: number, problem?: unknown, code?: string) {
     super(message, {
       kind: 'api',
       exitCode: 1,
-      code: statusCode !== undefined ? `API_${statusCode}` : 'API',
+      code: code ?? (statusCode !== undefined ? `API_${statusCode}` : 'API'),
     });
     this.statusCode = statusCode;
     if (problem !== undefined) {
@@ -166,6 +173,13 @@ export function classifyError(err: unknown): FailureShape {
   }
   if (err instanceof ZodError) {
     return { kind: 'validation', code: 'VALIDATION', message: collapseZodError(err), exitCode: 1 };
+  }
+  if (err instanceof InvalidArgumentError) {
+    // commander raises this from argument/option value parsers: the argv shape
+    // is fine, a VALUE failed validation, so it reports as validation — usage
+    // stays reserved for malformed command lines (error-kind precision).
+    const message = err.message.replace(/^error:\s*/, '');
+    return { kind: 'validation', code: 'VALIDATION', message, exitCode: err.exitCode || 1 };
   }
   if (err instanceof CommanderError) {
     // commander prefixes its messages with "error: "; the chokepoint adds its

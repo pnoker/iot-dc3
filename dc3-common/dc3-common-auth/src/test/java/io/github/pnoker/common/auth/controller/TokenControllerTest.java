@@ -72,11 +72,11 @@ class TokenControllerTest {
     }
 
     @Test
-    void generateSaltReturnsDirectResource() {
+    void generateSaltReturnsJsonField() {
         when(tokenService.generateSalt("alice", "tenant-A")).thenReturn(Mono.just("salt-value"));
 
         StepVerifier.create(controller.generateSalt(request()))
-                .expectNext("salt-value")
+                .expectNext(java.util.Map.of("salt", "salt-value"))
                 .verifyComplete();
     }
 
@@ -91,12 +91,12 @@ class TokenControllerTest {
     }
 
     @Test
-    void generateTokenReturnsDirectResourceAndSetsCookie() {
+    void generateTokenReturnsJsonFieldAndSetsCookie() {
         when(tokenService.generateToken("alice", "hash", "tenant-A")).thenReturn(Mono.just("jwt-token"));
         ServerHttpResponse httpResponse = new MockServerHttpResponse();
 
         StepVerifier.create(controller.generateToken(request(), httpResponse))
-                .expectNext("jwt-token")
+                .expectNext(java.util.Map.of("token", "jwt-token"))
                 .verifyComplete();
 
         ResponseCookie cookie = httpResponse.getCookies().getFirst(RequestConstant.Header.TOKEN_COOKIE);

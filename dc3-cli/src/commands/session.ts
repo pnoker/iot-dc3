@@ -17,7 +17,7 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, parsePositiveInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, parsePositiveInteger, requireResourceId } from '../utils/manager.js';
 
 /**
  * Session & action plane of the agentic center: conversation lifecycle plus the
@@ -27,7 +27,9 @@ import { parseNonNegativeInteger, parsePositiveInteger } from '../utils/manager.
  * Destructive operations (session delete, action confirm/reject) are gated by
  * the TTY confirmation channel; `--yes` skips the prompt for scripts, CI, and
  * non-interactive agents, and a declined confirmation exits before any request
- * is built (report F045).
+ * is built (report F045). Every id-keyed subcommand rejects an empty or
+ * whitespace id as kind validation BEFORE the gate and the wire — the shared
+ * requireResourceId contract (report F053).
  * @param program - commander program to attach the command to
  */
 export function registerSessionCommand(program: Command): void {
@@ -55,6 +57,7 @@ export function registerSessionCommand(program: Command): void {
     .description('Fetch one conversation by id')
     .option('--format <format>', 'Output format')
     .action(async (id: string, opts) => {
+      requireResourceId('session get <conversation_id>', id);
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
         `/api/v3/agentic/session/get_by_conversation_id?conversation_id=${encodeURIComponent(id)}`,
@@ -68,6 +71,7 @@ export function registerSessionCommand(program: Command): void {
     .description('List messages of a conversation')
     .option('--format <format>', 'Output format')
     .action(async (id: string, opts) => {
+      requireResourceId('session messages <conversation_id>', id);
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
         `/api/v3/agentic/message/list?conversation_id=${encodeURIComponent(id)}`,
@@ -82,6 +86,7 @@ export function registerSessionCommand(program: Command): void {
     .requiredOption('--name <name>', 'New conversation name')
     .option('--format <format>', 'Output format')
     .action(async (id: string, opts) => {
+      requireResourceId('session rename <conversation_id>', id);
       const format = detectFormat(opts.format);
       const result = await dc3Client.request(
         'POST',
@@ -98,6 +103,9 @@ export function registerSessionCommand(program: Command): void {
     .option('--yes', 'Skip the confirmation prompt (scripts, CI, non-interactive agents)')
     .option('--format <format>', 'Output format')
     .action(async (id: string, opts: { yes?: boolean; format?: string }) => {
+      // Validate before the TTY gate: an empty id must fail as kind validation
+      // without prompting, mirroring attachment/chat (report F053).
+      requireResourceId('session delete <conversation_id>', id);
       const format = detectFormat(opts.format);
       if (!opts.yes) {
         const { confirm } = await import('../utils/prompt.js');
@@ -130,6 +138,9 @@ export function registerActionCommand(program: Command): void {
       .option('--yes', 'Skip the confirmation prompt (scripts, CI, non-interactive agents)')
       .option('--format <format>', 'Output format')
       .action(async (actionId: string, opts: { yes?: boolean; format?: string }) => {
+        // Validate before the TTY gate: an empty action id must fail as kind
+        // validation without prompting or issuing a request (report F053).
+        requireResourceId(`action ${sub} <action_id>`, actionId);
         const format = detectFormat(opts.format);
         if (!opts.yes) {
           const { confirm } = await import('../utils/prompt.js');
@@ -157,6 +168,9 @@ export function registerActionCommand(program: Command): void {
     .option('--limit <n>', 'Maximum results to return', parsePositiveInteger)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
+      // Same contract as attachment/chat: an explicitly empty conversation id
+      // is invalid input, never `?conversation_id=` on the wire.
+      requireResourceId('--conversation-id', opts.conversationId);
       const format = detectFormat(opts.format);
       const params = new URLSearchParams({ conversation_id: opts.conversationId });
       if (opts.offset !== undefined) params.set('offset', String(opts.offset));

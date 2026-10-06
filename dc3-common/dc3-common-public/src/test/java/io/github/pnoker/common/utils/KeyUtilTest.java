@@ -18,6 +18,7 @@ package io.github.pnoker.common.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import io.github.pnoker.common.entity.auth.Keys;
 import io.jsonwebtoken.Claims;
@@ -82,9 +83,34 @@ class KeyUtilTest {
     void jwtRoundTripsForValidIssuerAndSubject() {
         String token = KeyUtil.generateToken("alice", 100L);
         Claims claims = KeyUtil.parserToken("alice", token, 100L);
-        assertThat(claims.getSubject()).contains("alice");
-        assertThat(claims.getIssuer()).contains("100");
+        assertThat(claims.getSubject()).isEqualTo("alice");
+        assertThat(claims.getIssuer()).isEqualTo("dc3-auth");
+        assertThat(claims.get("tenantId", String.class)).isEqualTo("100");
         assertThat(claims.getExpiration()).isAfter(claims.getIssuedAt());
+    }
+
+    @Test
+    void jwtPayloadNeverDisclosesTheConfiguredSecurityKey() {
+        // getSecurityKey prefers DC3_SECURITY_KEY over the system property, so this guard is only meaningful when the
+        // environment variable is absent; otherwise the property override below would not reach the signer.
+        assumeTrue(
+                System.getenv("DC3_SECURITY_KEY") == null,
+                "DC3_SECURITY_KEY env var takes precedence over the property");
+        String previousKey = System.getProperty("dc3.security.key");
+        String uniqueKey = "guard-unique-key-0123456789abcdefghijklmnopqrstuv";
+        System.setProperty("dc3.security.key", uniqueKey);
+        try {
+            String token = KeyUtil.generateToken("alice", 100L);
+            String payload = new String(
+                    java.util.Base64.getUrlDecoder().decode(token.split("\\.")[1]),
+                    java.nio.charset.StandardCharsets.UTF_8);
+            // Sanity-check the decode targeted the payload segment before asserting the absence.
+            assertThat(payload).contains("alice");
+            assertThat(payload).doesNotContain(uniqueKey);
+        } finally {
+            if (previousKey == null) System.clearProperty("dc3.security.key");
+            else System.setProperty("dc3.security.key", previousKey);
+        }
     }
 
     @Test

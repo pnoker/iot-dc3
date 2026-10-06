@@ -44,6 +44,10 @@ public interface ReactiveSessionStore {
     Mono<SessionBO> update(
             String conversationId, SessionExt sessionExt, String title, RequestHeader.PrincipalHeader header);
 
-    /** Delete the session. */
+    /**
+     * Delete the session. Implementations also remove the session's stored attachment files
+     * best-effort after the database delete commits; file cleanup failures must not fail the
+     * delete.
+     */
     Mono<Long> delete(String conversationId, RequestHeader.PrincipalHeader header);
 }

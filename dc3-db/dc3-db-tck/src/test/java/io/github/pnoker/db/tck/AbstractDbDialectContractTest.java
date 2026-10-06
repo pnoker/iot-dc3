@@ -18,8 +18,10 @@ package io.github.pnoker.db.tck;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
+import io.github.pnoker.common.agentic.service.impl.AttachmentFileCleaner;
 import io.github.pnoker.common.auth.entity.bo.RoleBO;
 import io.github.pnoker.common.auth.entity.model.RoleDO;
 import io.github.pnoker.common.auth.repository.RoleFilter;
@@ -187,7 +189,8 @@ abstract class AbstractDbDialectContractTest {
                 tx(),
                 new SpringR2dbcPageTransaction(new R2dbcTransactionManager(factory())),
                 JsonUtil.getJsonMapper(),
-                dialect());
+                dialect(),
+                new AttachmentFileCleaner(new AgenticProperties()));
     }
 
     @Test

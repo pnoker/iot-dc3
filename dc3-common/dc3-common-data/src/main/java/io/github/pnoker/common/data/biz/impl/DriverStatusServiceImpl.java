@@ -55,6 +55,16 @@ public class DriverStatusServiceImpl implements DriverStatusService {
     }
 
     @Override
+    public Mono<String> get(Long tenantId, Long driverId) {
+        return driverFacade
+                .getByIdReactive(tenantId, driverId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Driver does not exist")))
+                .flatMap(ignored -> stateStore
+                        .listStateFlags(tenantId, EntityTypeEnum.DRIVER, List.of(driverId))
+                        .map(flags -> statusCode(flags.get(driverId))));
+    }
+
+    @Override
     public Mono<Long> countOnlineDevices(Long tenantId, Long driverId) {
         return driverFacade
                 .getByIdReactive(tenantId, driverId)

@@ -20,6 +20,7 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { requireResourceId } from '../utils/manager.js';
 
 const BASE = '/api/v3/agentic/attachment';
 
@@ -37,6 +38,9 @@ export function registerAttachmentCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (file, opts) => {
       const format = detectFormat(opts.format);
+      // The conversation id keys the upload — reject empty ids before any
+      // file read or request (audit G13/G27).
+      requireResourceId('--conversation-id', opts.conversationId);
       let content: Buffer;
       try {
         content = await readFile(file);
@@ -66,9 +70,26 @@ export function registerAttachmentCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
+      // Same empty-id contract as upload (audit G13/G27).
+      requireResourceId('--conversation-id', opts.conversationId);
       const result = await dc3Client.get(
         `${BASE}/list?conversation_id=${encodeURIComponent(opts.conversationId)}`,
       );
       printAndExit(result, format);
+    });
+
+  attachment
+    .command('delete <id>')
+    .description('Delete a chat attachment')
+    .option('--format <format>', 'Output format')
+    .action(async (id, opts) => {
+      const format = detectFormat(opts.format);
+      // The id keys the delete — reject empty ids before the wire (audit
+      // G13/G27).
+      requireResourceId(`${BASE}/delete`, id);
+      // Pinned wire contract (mirrors model delete / ModelController.delete):
+      // DELETE /attachment/delete?id=<id> answered by 204 with an empty body.
+      await dc3Client.del(`${BASE}/delete?id=${encodeURIComponent(id)}`);
+      printAndExit(undefined, format);
     });
 }

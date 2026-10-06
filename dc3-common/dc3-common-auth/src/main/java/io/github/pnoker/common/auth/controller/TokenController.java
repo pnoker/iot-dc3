@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -66,7 +67,7 @@ public class TokenController implements BaseController {
      * Generate a random password salt for a user under the given tenant.
      *
      * @param entityVO query carrying the user name and tenant used to mint the salt
-     * @return the salt string (expires in 5 minutes), or a failure when the user cannot be resolved
+     * @return JSON object carrying the salt (expires in 5 minutes), or a failure when the user cannot be resolved
      */
     // Public endpoint: invoked before login, so no @PreAuthorize. Path is also
     // permitted in WebFluxSecurityConfig (POST /token/salt).
@@ -83,7 +84,7 @@ public class TokenController implements BaseController {
             summary = "Generate Token Salt",
             description =
                     "Generate a random salt for a user under the given tenant, "
-                            + "used to salt the password on the subsequent token-generation call. The salt expires in 5 minutes; returns it as a string.",
+                            + "used to salt the password on the subsequent token-generation call. The salt expires in 5 minutes; returned as the \"salt\" field of a JSON object.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -95,15 +96,15 @@ public class TokenController implements BaseController {
                                 @ExtensionProperty(name = "hidden", value = "true")
                             }))
     @PostMapping("/salt")
-    public Mono<String> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
-        return tokenService.generateSalt(entityVO.getName(), entityVO.getTenant());
+    public Mono<Map<String, String>> generateSalt(@Validated @RequestBody TokenQuery entityVO) {
+        return tokenService.generateSalt(entityVO.getName(), entityVO.getTenant()).map(salt -> Map.of("salt", salt));
     }
 
     /**
      * Issue an access token for a user after validating name, salt, password and tenant.
      *
      * @param entityVO query carrying the user name, salt, password and tenant
-     * @return the access token (valid for 12 hours), or a failure when credentials are invalid
+     * @return JSON object carrying the access token (valid for 12 hours), or a failure when credentials are invalid
      */
     // Public endpoint: invoked during login (before a token exists), so no
     // @PreAuthorize. Path is also permitted in WebFluxSecurityConfig (POST /token/generate).
@@ -120,7 +121,7 @@ public class TokenController implements BaseController {
     @Operation(
             summary = "Generate Token",
             description = "Issue an access token for a user by validating name, salt, password and tenant. "
-                    + "Call after generating a salt; the returned token authenticates the user for 12 hours.",
+                    + "Call after generating a salt; the token authenticates the user for 12 hours and is returned as the \"token\" field of a JSON object.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -132,7 +133,7 @@ public class TokenController implements BaseController {
                                 @ExtensionProperty(name = "hidden", value = "true")
                             }))
     @PostMapping("/generate")
-    public Mono<String> generateToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
+    public Mono<Map<String, String>> generateToken(@Validated @RequestBody TokenQuery entityVO, ServerHttpResponse response) {
         return tokenService
                 .generateToken(entityVO.getName(), entityVO.getPassword(), entityVO.getTenant())
                 .doOnNext(token -> response.addCookie(ResponseCookie.from(RequestConstant.Header.TOKEN_COOKIE, token)
@@ -141,7 +142,8 @@ public class TokenController implements BaseController {
                         .sameSite("Strict")
                         .path("/")
                         .maxAge(Duration.ofHours(12))
-                        .build()));
+                        .build()))
+                .map(token -> Map.of("token", token));
     }
 
     /**

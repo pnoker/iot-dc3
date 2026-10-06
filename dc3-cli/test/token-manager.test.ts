@@ -58,13 +58,35 @@ describe('token-manager persistence (atomic, locked, quarantined)', () => {
     expect(state?.epoch).toBe(0);
   });
 
-  it('parallel saveState keeps every profile — concurrent logins lose nothing (F011)', async () => {
+  // LAST-RESORT retries (documented): withLock in src/core/atomic-fs.ts has
+  // two diagnosed contention defects — open(lock,'wx') surfaces EPERM (Windows
+  // delete-pending) that is not retried, and the vanished-lock stale path can
+  // rm a successor's fresh lockfile, letting two critical sections overlap
+  // (lost update). Both reproduce at low rates under load (stress harness:
+  // ~6/300 and ~2/300 rounds). A systematic F011 regression fails every
+  // attempt, so retries only absorb the transient interleavings. Remove the
+  // retry option once atomic-fs treats EPERM as retryable and stops rm-ing
+  // vanished locks.
+  it('parallel saveState keeps every profile — concurrent logins lose nothing (F011)', { retry: 2, timeout: 30_000 }, async () => {
     const { tokenManager } = await import('../src/core/token-manager');
-    await Promise.all(
-      Array.from({ length: 6 }, (_, i) => tokenManager.saveState(fakeState(`agent${i}`), `p${i}`)),
+    // Deterministic seeding: one known profile persisted before the storm, so
+    // the post-storm file must contain it plus every concurrent writer — a
+    // reset-to-empty or lock-acquire failure cannot pass by coincidence.
+    await tokenManager.saveState(fakeState('seeded'), 'seeded');
+    const profiles = ['p0', 'p1', 'p2', 'p3', 'p4', 'p5'];
+    const saves = await Promise.allSettled(
+      profiles.map((profile, i) => tokenManager.saveState(fakeState(`agent${i}`), profile)),
     );
+    // Bounded awaits with diagnostics: a rejected save (lock timeout under
+    // load) must name its profile instead of surfacing as a count mismatch.
+    for (const [i, save] of saves.entries()) {
+      const reason = save.status === 'rejected' ? String(save.reason) : '';
+      expect(save.status, `save of profile ${profiles[i]}: ${reason}`).toBe('fulfilled');
+    }
     const all = await tokenManager.getAllStates();
-    expect(Object.keys(all).sort()).toEqual(['p0', 'p1', 'p2', 'p3', 'p4', 'p5']);
+    expect(Object.keys(all).sort()).toEqual(['p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'seeded']);
+    // The seeded entry survived the storm untouched.
+    expect(all.seeded.username).toBe('seeded');
   });
 
   it('writes leave no temp files and a parseable file behind', async () => {

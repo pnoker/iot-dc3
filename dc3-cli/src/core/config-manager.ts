@@ -14,11 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { z, type ZodError, type ZodIssue } from 'zod';
 import { quarantineFile, withLock, writeFileAtomic } from './atomic-fs.js';
+import { ValidationError } from './errors.js';
 
 /**
  * Gateway URL field shared by every profile schema variant. Stricter than a
@@ -61,7 +62,10 @@ export const StoredProfileSchema = ProfileConfigSchema.extend({
 });
 
 /**
- * App-level settings.
+ * App-level settings. Plain (non-strict) z.object on purpose: a config.json
+ * written by an older CLI (e.g. one still carrying the removed inert
+ * `retry_count` knob) loads fine, with unknown settings keys silently
+ * stripped instead of bricking the file.
  */
 export const AppSettingsSchema = z.object({
   // Absent by default so the TTY-aware default (table on TTY, json on pipe) applies;
@@ -69,7 +73,6 @@ export const AppSettingsSchema = z.object({
   output_format: z.enum(['json', 'table', 'yaml']).optional(),
   color: z.boolean().default(true),
   renewal_threshold_hours: z.number().min(0).max(12).default(1),
-  retry_count: z.number().min(0).max(3).default(1),
 });
 
 /**
@@ -340,7 +343,7 @@ export class ConfigManager {
   async setProfileOverride(name: string): Promise<void> {
     const config = await this.load();
     if (!config.profiles[name]) {
-      throw new Error(
+      throw new ValidationError(
         `Profile "${name}" not found. Available: ${Object.keys(config.profiles).join(', ') || '(none)'}`,
       );
     }
@@ -371,13 +374,13 @@ export class ConfigManager {
     const config = await this.load();
     const stored = config.profiles[profileName];
     if (!stored) {
-      throw new Error(
+      throw new ValidationError(
         `Profile "${profileName}" not found. Create it with: dc3 config set gateway <url>`,
       );
     }
     const result = ProfileConfigSchema.safeParse(stored);
     if (!result.success) {
-      throw new Error(
+      throw new ValidationError(
         `Profile "${profileName}" is incomplete (${validationMessage(
           `profiles.${profileName}`,
           result.error,
@@ -389,7 +392,7 @@ export class ConfigManager {
     // bootstrap (config set gateway first, username later), but no
     // authenticated request can be built without one.
     if (!result.data.username || result.data.username.trim() === '') {
-      throw new Error(
+      throw new ValidationError(
         `Profile "${profileName}" has no username. Set it with: dc3 config set auth.username <name>`,
       );
     }
@@ -427,7 +430,9 @@ export class ConfigManager {
       const field = StoredProfileSchema.shape[key];
       const result = field.safeParse(value);
       if (!result.success) {
-        throw new Error(validationMessage(String(key), result.error, value));
+        // Schema violations surface as typed validation failures so the
+        // failure chokepoint reports kind "validation", never INTERNAL.
+        throw new ValidationError(validationMessage(String(key), result.error, value));
       }
     }
     await this.mutate((config) => {
@@ -440,12 +445,12 @@ export class ConfigManager {
 
   /**
    * Switch the active profile.
-   * @param name - resource name
+   * @param name - persisted profile name to make active; must already exist
    */
   async switchProfile(name: string): Promise<void> {
     await this.mutate((config) => {
       if (!config.profiles[name]) {
-        throw new Error(
+        throw new ValidationError(
           `Profile "${name}" not found. Available: ${Object.keys(config.profiles).join(', ')}`,
         );
       }
@@ -454,16 +459,16 @@ export class ConfigManager {
   }
 
   /**
-   * Delete a profile.
-   * @param name - resource name
+   * Delete a profile. The active profile cannot be deleted (switch first).
+   * @param name - persisted profile name to remove; must exist and not be active
    */
   async deleteProfile(name: string): Promise<void> {
     await this.mutate((config) => {
       if (!config.profiles[name]) {
-        throw new Error(`Profile "${name}" not found`);
+        throw new ValidationError(`Profile "${name}" not found`);
       }
       if (config.current_profile === name) {
-        throw new Error(`Cannot delete active profile "${name}". Switch first.`);
+        throw new ValidationError(`Cannot delete active profile "${name}". Switch first.`);
       }
       delete config.profiles[name];
     });
@@ -474,13 +479,13 @@ export class ConfigManager {
    * BEFORE anything is persisted, so the CLI can never again write a config
    * it refuses to read back (out-of-range values exit as validation errors
    * with the file untouched).
-   * @param key - lookup key
-   * @param value - value to set
+   * @param key - app setting to overwrite (e.g. `output_format`, `color`)
+   * @param value - replacement value, validated against the key's schema entry
    */
   async setSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]): Promise<void> {
     const result = AppSettingsSchema.shape[key].safeParse(value);
     if (!result.success) {
-      throw new Error(validationMessage(`settings.${String(key)}`, result.error, value));
+      throw new ValidationError(validationMessage(`settings.${String(key)}`, result.error, value));
     }
     await this.mutate((config) => {
       // Per-key safeParse above guarantees the shape; the union output cannot
@@ -503,6 +508,10 @@ export class ConfigManager {
   async reset(clearers: ResetClearers = {}): Promise<void> {
     await withLock(CONFIG_PATH, async () => {
       await writeConfig(defaultConfig());
+      // The last-good backup belongs to the wiped configuration: keeping it
+      // would leave a slice of the pre-reset state on disk after a reset that
+      // claims to clear every local auth store (report F016).
+      await rm(`${CONFIG_PATH}.bak`, { force: true });
     });
     this.config = defaultConfig();
     this.loadDegraded = 'none';

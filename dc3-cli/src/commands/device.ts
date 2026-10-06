@@ -16,15 +16,17 @@
  */
 import { Command } from 'commander';
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { dc3Client } from '../core/client.js';
 import type { OperationAccepted, OperationView } from '../core/contracts.js';
-import { CliError, TimeoutError, ValidationError } from '../core/errors.js';
+import { ApiError, CliError, TimeoutError, ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
+  getManagerResource,
   parseNonNegativeInteger,
+  requireResourceId,
   updateManagerResource,
 } from '../utils/manager.js';
 
@@ -60,7 +62,7 @@ class OperationWaitTimeout extends TimeoutError {
   constructor(accepted: OperationAccepted, last: OperationView, elapsedMs: number) {
     super(
       `timed out waiting for operation ${accepted.operationId} after ` +
-        `${Math.round(elapsedMs / 100) / 10}s: last status ${last.status}; poll ${accepted.statusUri}`,
+        `${Math.max(0.1, Math.round(elapsedMs / 100) / 10)}s: last status ${last.status}; poll ${accepted.statusUri}`,
     );
     this.operationId = accepted.operationId;
     this.lastStatus = last.status;
@@ -207,6 +209,27 @@ function importReadError(userPath: string, error: unknown): ValidationError {
 }
 
 /**
+ * Map a template output write failure to the same structured validation
+ * shape as {@link importReadError}: the raw errno message embeds the resolved
+ * absolute path, which the CLI must not leak (report F047 class, audit G29).
+ * @param userPath - output path as supplied on the command line
+ * @param error - the error raised by writeFile
+ * @returns the validation error to raise
+ */
+function importTemplateWriteError(userPath: string, error: unknown): ValidationError {
+  const code = (error as { code?: unknown } | null)?.code;
+  const reason =
+    code === 'ENOENT'
+      ? 'path not found'
+      : code === 'EISDIR'
+        ? 'is a directory'
+        : code === 'EACCES' || code === 'EPERM'
+          ? 'is not writable'
+          : 'could not be written';
+  return new ValidationError(`Template output ${reason}: ${userPath}`);
+}
+
+/**
  * Register the `device` command tree on the CLI program.
  * @param program - commander program to attach the command to
  */
@@ -230,9 +253,9 @@ export function registerDeviceCommand(program: Command): void {
         offset: opts.offset,
         limit: opts.limit,
       };
-      if (opts.driverId) body.driverId = opts.driverId;
-      if (opts.profileId) body.profileId = opts.profileId;
-      if (opts.groupId) body.groupId = opts.groupId;
+      if (opts.driverId !== undefined) body.driverId = opts.driverId;
+      if (opts.profileId !== undefined) body.profileId = opts.profileId;
+      if (opts.groupId !== undefined) body.groupId = opts.groupId;
       const result = await dc3Client.post(`${DEVICE_BASE}/list`, body);
       printAndExit(result, format);
     });
@@ -244,7 +267,8 @@ export function registerDeviceCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`${DEVICE_BASE}/get_by_id?id=${encodeURIComponent(id)}`);
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(DEVICE_BASE, id);
       printAndExit(result, format);
     });
 
@@ -267,7 +291,7 @@ export function registerDeviceCommand(program: Command): void {
         profileId: opts.profileId,
       };
       if (opts.description !== undefined) body.remark = opts.description;
-      if (opts.groupId) body.groupId = opts.groupId;
+      if (opts.groupId !== undefined) body.groupId = opts.groupId;
       const result = await dc3Client.post(`${DEVICE_BASE}/add`, body);
       printAndExit(result, format);
     });
@@ -286,8 +310,8 @@ export function registerDeviceCommand(program: Command): void {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(DEVICE_BASE, id, opts.version, {
         ...(opts.name !== undefined ? { deviceName: opts.name } : {}),
-        ...(opts.driverId ? { driverId: opts.driverId } : {}),
-        ...(opts.profileId ? { profileId: opts.profileId } : {}),
+        ...(opts.driverId !== undefined ? { driverId: opts.driverId } : {}),
+        ...(opts.profileId !== undefined ? { profileId: opts.profileId } : {}),
         ...(opts.description !== undefined ? { remark: opts.description } : {}),
       });
       printAndExit(result, format);
@@ -313,6 +337,9 @@ export function registerDeviceCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
+      // The driver id keys the count lookup — reject empty ids before the wire
+      // (audit G13/G27).
+      requireResourceId('--driver-id', opts.driverId);
       const result = await dc3Client.get(
         `/api/v3/manager/device/get_count_by_driver_id?driver_id=${encodeURIComponent(opts.driverId)}`,
       );
@@ -326,6 +353,9 @@ export function registerDeviceCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The id keys the status path — reject empty ids before the wire,
+      // same contract as the manager CRUD paths (audit G13/G27).
+      requireResourceId('/api/v3/data/device/status', id);
       // Single-device status is a GET path param (DeviceStatusController L176),
       // not the POST /list query body used for paginated status listings.
       const result = await dc3Client.get(
@@ -421,37 +451,30 @@ export function registerDeviceCommand(program: Command): void {
     .option('--format <format>', 'Output format (ignored; always saves the binary)')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const outputPath = opts.output || 'device-import-template.xlsx';
-      // Binary XLSX download bypasses the JSON-decoding client pipeline; use
-      // the shared fetch seam directly (same auth headers, same error mapping).
-      const { fetchOrNetworkError, normalizeGateway } = await import('../core/http.js');
-      const { configManager } = await import('../core/config-manager.js');
-      const { tokenManager } = await import('../core/token-manager.js');
-      const profile = await configManager.getActiveProfile();
-      const profileName = await configManager.getActiveProfileName();
-      const state = await tokenManager.getState(profileName);
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (state) {
-        Object.assign(headers, tokenManager.buildHeaders(state));
-      }
-      const res = await fetchOrNetworkError(
-        `${normalizeGateway(profile.gateway)}/api/v3/manager/device/export/import_template`,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({ driverId: opts.driverId, profileId: opts.profileId }),
-        },
+      // The ids shape the template server-side — reject empty ids before the
+      // wire (audit G13/G27).
+      requireResourceId('--driver-id', opts.driverId);
+      requireResourceId('--profile-id', opts.profileId);
+      const outputPath = opts.output !== undefined ? opts.output : 'device-import-template.xlsx';
+      // Binary download through the authenticated client seam (audit G24):
+      // the raw Response keeps the XLSX bytes out of the JSON decoder while
+      // sharing request()'s renewal, 401-retry, and typed error mapping — an
+      // expired token surfaces as AuthError (exit 3), not an API_401 business
+      // failure, and a stored password self-heals before the download.
+      const res = await dc3Client.requestForBytes(
+        'POST',
+        '/api/v3/manager/device/export/import_template',
+        { driverId: opts.driverId, profileId: opts.profileId },
       );
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        printAndExit({ ok: false, message: `Template download failed (${res.status}): ${text.slice(0, 200)}` }, format, 1);
-      }
       const buffer = Buffer.from(await res.arrayBuffer());
       if (buffer.length === 0) {
-        printAndExit({ ok: false, message: 'Template download returned empty body' }, format, 1);
+        throw new ApiError('Template download returned an empty body', undefined, undefined, 'API_BAD_BODY');
       }
-      const { writeFile } = await import('node:fs/promises');
-      await writeFile(outputPath, buffer);
+      try {
+        await writeFile(outputPath, buffer);
+      } catch (error) {
+        throw importTemplateWriteError(outputPath, error);
+      }
       printAndExit({ ok: true, path: outputPath, size: buffer.length }, format);
     });
 }

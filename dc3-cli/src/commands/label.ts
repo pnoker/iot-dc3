@@ -17,7 +17,14 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, updateManagerResource } from '../utils/manager.js';
+import {
+  deleteManagerResource,
+  getManagerResource,
+  parseNonNegativeInteger,
+  updateManagerResource,
+} from '../utils/manager.js';
+
+const LABEL_BASE = '/api/v3/manager/label';
 
 /**
  * Register the `label` command tree on the CLI program.
@@ -47,9 +54,8 @@ export function registerLabelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/manager/label/get_by_id?id=${encodeURIComponent(id)}`,
-      );
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(LABEL_BASE, id);
       printAndExit(result, format);
     });
 
@@ -84,12 +90,7 @@ export function registerLabelCommand(program: Command): void {
       if (opts.name !== undefined) changes.labelName = opts.name;
       if (opts.code !== undefined) changes.labelCode = opts.code;
       if (opts.color !== undefined) changes.labelColor = opts.color;
-      const result = await updateManagerResource(
-        '/api/v3/manager/label',
-        id,
-        opts.version,
-        changes,
-      );
+      const result = await updateManagerResource(LABEL_BASE, id, opts.version, changes);
       printAndExit(result, format);
     });
 
@@ -100,9 +101,8 @@ export function registerLabelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      await dc3Client.del(
-        `/api/v3/manager/label/delete?id=${encodeURIComponent(id)}&version=${opts.version}`,
-      );
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      await deleteManagerResource(LABEL_BASE, id, opts.version);
       printAndExit(undefined, format);
     });
 }

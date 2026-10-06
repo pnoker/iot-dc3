@@ -25,11 +25,13 @@
  * cannot silently drop each other's updates.
  */
 import { execFile } from 'node:child_process';
-import { chmod, mkdir, open, readFile, rename, rm, stat } from 'node:fs/promises';
+import { chmod, mkdir, open, readFile, readdir, rename, rm, stat } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import { userInfo } from 'node:os';
-import { dirname } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { promisify } from 'node:util';
+
+import { TimeoutError } from './errors.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -39,6 +41,8 @@ const LOCK_STALE_AGE_MS = 30_000;
 const LOCK_ACQUIRE_TIMEOUT_MS = 10_000;
 /** Poll interval while waiting for a lock held by another process. */
 const LOCK_POLL_INTERVAL_MS = 25;
+/** Quarantined copies kept per state file before the oldest are pruned. */
+const QUARANTINE_KEEP = 5;
 
 /** Options controlling the final file's permissions in {@link writeFileAtomic}. */
 export interface AtomicWriteOptions {
@@ -98,10 +102,17 @@ export async function writeFileAtomic(
   const tmp = `${path}.tmp-${process.pid}-${randomBytes(6).toString('hex')}`;
   const handle = await open(tmp, 'w');
   try {
-    await handle.writeFile(data, 'utf8');
-    await handle.sync();
-  } finally {
-    await handle.close();
+    try {
+      await handle.writeFile(data, 'utf8');
+      await handle.sync();
+    } finally {
+      await handle.close();
+    }
+  } catch (error) {
+    // The write was killed mid-flight: the target still holds its previous
+    // bytes and the half-written temp file must not linger either.
+    await rm(tmp, { force: true });
+    throw error;
   }
   try {
     if (process.platform !== 'win32') {
@@ -164,6 +175,8 @@ const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout
  * Serialize a critical section across processes using an O_EXCL lockfile next
  * to `path`, with stale recovery: a lock held by a dead process or older than
  * 30s is removed and retried. Use for load-modify-save sections on state files.
+ * Acquisition gives up after 10s with a typed TimeoutError (kind timeout) so a
+ * permanently held lock surfaces as a deadline failure, never a hang.
  * @param path - state file the critical section owns (lock lives at `<path>.lock`)
  * @param fn - critical section; runs exactly once while the lock is held
  * @returns whatever `fn` resolves to
@@ -183,8 +196,11 @@ export async function withLock<T>(path: string, fn: () => Promise<T>): Promise<T
           continue;
         }
         if (Date.now() >= deadline) {
-          throw new Error(
-            `Timed out waiting for the lock on ${lockPath} (held by another dc3 process)`,
+          // Typed taxonomy failure (kind timeout / code TIMEOUT): a plain Error
+          // here would surface at the chokepoint as kind api / code INTERNAL,
+          // misreporting a deadline as an unclassified failure.
+          throw new TimeoutError(
+            `timed out waiting for the lock on ${lockPath} (held by another dc3 process)`,
             { cause: error },
           );
         }
@@ -210,7 +226,10 @@ export async function withLock<T>(path: string, fn: () => Promise<T>): Promise<T
 /**
  * Move a corrupt/unreadable state file aside so later writes can never destroy
  * the bytes: the original path is freed for a fresh write while the corrupt
- * content survives under a timestamped sibling for manual recovery.
+ * content survives under a timestamped sibling for manual recovery. Older
+ * quarantine copies beyond {@link QUARANTINE_KEEP} are pruned so repeated
+ * corruptions cannot accumulate unboundedly; pruning is best-effort and never
+ * fails the quarantine itself.
  * @param path - file to quarantine
  * @returns the quarantine path, or null when the file does not exist
  */
@@ -219,11 +238,44 @@ export async function quarantineFile(path: string): Promise<string | null> {
   const target = `${path}.corrupt-${stamp}-${randomBytes(3).toString('hex')}`;
   try {
     await rename(path, target);
-    return target;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
       return null;
     }
     throw error;
+  }
+  await pruneQuarantineCopies(path);
+  return target;
+}
+
+/**
+ * Delete the oldest `<basename>.corrupt-*` siblings beyond the retention
+ * count. ISO timestamps make lexicographic order chronological. Every failure
+ * (listing or unlinking) only warns: the quarantine already succeeded and the
+ * corrupt bytes are preserved, so a prunable leftover must not break the
+ * recovery path that relies on this function.
+ * @param path - state file whose quarantine siblings are pruned
+ */
+async function pruneQuarantineCopies(path: string): Promise<void> {
+  const dir = dirname(path);
+  const prefix = `${basename(path)}.corrupt-`;
+  let names: string[];
+  try {
+    names = (await readdir(dir)).filter((name) => name.startsWith(prefix));
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.error(`Warning: could not list old quarantine copies in ${dir} (${reason}).`);
+    return;
+  }
+  names.sort();
+  const excess = names.slice(0, Math.max(0, names.length - QUARANTINE_KEEP));
+  for (const name of excess) {
+    const victim = join(dir, name);
+    try {
+      await rm(victim, { force: true });
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      console.error(`Warning: could not prune old quarantine copy ${victim} (${reason}).`);
+    }
   }
 }

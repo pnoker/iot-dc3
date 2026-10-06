@@ -90,7 +90,9 @@ export function registerToolCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await mcpClient.listTools();
-      const rows = (Array.isArray(result.tools) ? result.tools : []).map((t) => ({
+      // The envelope guard in mcp.ts rejects non-RPC bodies, but a well-formed
+      // envelope may still carry a null/absent result; never read into it.
+      const rows = (Array.isArray(result?.tools) ? result.tools : []).map((t) => ({
         name: t.name,
         title: t.title ?? t.description,
         category: t.category ?? '',

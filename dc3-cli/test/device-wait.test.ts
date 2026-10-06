@@ -124,6 +124,26 @@ function buildProgram(): Command {
   return program;
 }
 
+/**
+ * Poll on REAL timers until the process SIGINT listener count settles back to
+ * the expected value. Asserting the exact count on the settlement tick is
+ * load-flaky: the wait removes its listener in a finally block that can land
+ * a scheduler tick after the awaited promise resolves.
+ * @param expected - listener count to wait for
+ * @param deadlineMs - real-millisecond budget before giving up
+ * @returns whether the expected count was observed in time
+ */
+async function waitForSigintListenerCount(expected: number, deadlineMs: number): Promise<boolean> {
+  const startedAt = Date.now();
+  while (process.listenerCount('SIGINT') !== expected) {
+    if (Date.now() - startedAt >= deadlineMs) {
+      return false;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  return true;
+}
+
 function stubAlwaysRunning(expiresAtFromNowMs?: number): void {
   vi.stubGlobal(
     'fetch',
@@ -239,11 +259,18 @@ describe('device import wait loop (F010)', () => {
     );
 
     expect(
-      await advanceUntil(() => process.listenerCount('SIGINT') === baseline + 1, 1_000_000, 100),
+      await advanceUntil(() => process.listenerCount('SIGINT') >= baseline + 1, 1_000_000, 100),
     ).toBe(true);
 
     await driveUntilSettled(execution, 700_000, 1_000);
-    expect(process.listenerCount('SIGINT')).toBe(baseline);
+    // The fake clock has done its job (the wait settled); give removal a
+    // load-tolerant real-time window instead of demanding the exact count on
+    // the settlement tick. A genuine leak exhausts the deadline and fails.
+    vi.useRealTimers();
+    expect(
+      await waitForSigintListenerCount(baseline, 5_000),
+      `SIGINT listener count ${process.listenerCount('SIGINT')} never returned to baseline ${baseline}`,
+    ).toBe(true);
   });
 });
 

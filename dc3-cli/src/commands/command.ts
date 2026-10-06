@@ -20,8 +20,10 @@ import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
+  getManagerResource,
   parseNonNegativeInteger,
   parsePositiveInteger,
+  requireResourceId,
   updateManagerResource,
 } from '../utils/manager.js';
 
@@ -50,8 +52,8 @@ export function registerCommandCommand(program: Command): void {
       const result = await dc3Client.post(`${COMMAND_BASE}/list`, {
         offset: opts.offset,
         limit: opts.limit,
-        ...(opts.deviceId ? { deviceId: opts.deviceId } : {}),
-        ...(opts.profileId ? { profileId: opts.profileId } : {}),
+        ...(opts.deviceId !== undefined ? { deviceId: opts.deviceId } : {}),
+        ...(opts.profileId !== undefined ? { profileId: opts.profileId } : {}),
       });
       printAndExit(result, format);
     });
@@ -62,7 +64,8 @@ export function registerCommandCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`${COMMAND_BASE}/get_by_id?id=${encodeURIComponent(id)}`);
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(COMMAND_BASE, id);
       printAndExit(result, format);
     });
 
@@ -103,9 +106,9 @@ export function registerCommandCommand(program: Command): void {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(COMMAND_BASE, id, opts.version, {
         ...(opts.name !== undefined ? { commandName: opts.name } : {}),
-        ...(opts.profileId ? { profileId: opts.profileId } : {}),
-        ...(opts.type ? { commandTypeFlag: opts.type } : {}),
-        ...(opts.callType ? { callTypeFlag: opts.callType } : {}),
+        ...(opts.profileId !== undefined ? { profileId: opts.profileId } : {}),
+        ...(opts.type !== undefined ? { commandTypeFlag: opts.type } : {}),
+        ...(opts.callType !== undefined ? { callTypeFlag: opts.callType } : {}),
         ...(opts.timeout !== undefined ? { timeout: opts.timeout } : {}),
       });
       printAndExit(result, format);
@@ -162,6 +165,9 @@ export function registerCommandCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The record id keys the lookup — reject empty ids before the wire
+      // (audit G13/G27).
+      requireResourceId('/api/v3/data/command_history', id);
       const result = await dc3Client.get(
         `/api/v3/data/command_history/get_by_record_id?record_id=${encodeURIComponent(id)}`,
       );

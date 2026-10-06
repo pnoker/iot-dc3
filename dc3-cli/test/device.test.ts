@@ -24,12 +24,14 @@ vi.mock('../src/core/token-manager.js', () => ({
 }));
 
 import {Command} from 'commander';
-import {registerDeviceCommand} from '../src/commands/device.js';
+import {registerDeviceCommand, waitForOperation} from '../src/commands/device.js';
+import {registerDriverCommand} from '../src/commands/driver.js';
 
 function buildProgram(): Command {
   const program = new Command();
   program.exitOverride();
   registerDeviceCommand(program);
+  registerDriverCommand(program);
   return program;
 }
 
@@ -151,5 +153,89 @@ describe('device import command', () => {
       process.chdir(previousCwd);
     }
     expect(fetchCalls).toHaveLength(0);
+  });
+});
+
+describe('driver status single-driver endpoint (G25)', () => {
+  beforeEach(() => {
+    fetchCalls.length = 0;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const stubStatus = (body: string, status = 200): void => {
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL, init?: RequestInit) => {
+      fetchCalls.push({url: String(url), init});
+      return new Response(body, {status});
+    }));
+  };
+
+  const statusCalls = () => fetchCalls.filter((call) => call.url.includes('/driver/status/get_by_driver_id'));
+
+  it('resolves one driver from the single-key map, hitting the endpoint exactly once', async () => {
+    stubStatus(JSON.stringify({d42: 'OFFLINE'}));
+
+    const output = await run(['driver', 'status', 'd42', '--format', 'json']);
+
+    expect(JSON.parse(output)).toEqual({id: 'd42', status: 'OFFLINE'});
+    expect(statusCalls()).toHaveLength(1);
+    expect(statusCalls()[0].url).toBe('http://gw.test/api/v3/data/driver/status/get_by_driver_id?driver_id=d42');
+  });
+
+  it('URL-encodes the driver id query parameter', async () => {
+    stubStatus(JSON.stringify({'d & 1': 'ONLINE'}));
+
+    await run(['driver', 'status', 'd & 1', '--format', 'json']);
+
+    expect(statusCalls()[0].url).toBe(
+      'http://gw.test/api/v3/data/driver/status/get_by_driver_id?driver_id=d%20%26%201',
+    );
+  });
+
+  it('rejects a map whose sole key does not echo the requested id (contract guard)', async () => {
+    stubStatus(JSON.stringify({someoneElse: 'ONLINE'}));
+
+    await expect(
+      buildProgram().parseAsync(['driver', 'status', 'd42', '--format', 'json'], {from: 'user'}),
+    ).rejects.toMatchObject({kind: 'validation', message: 'Driver d42 status not found'});
+  });
+
+  it('surfaces a gateway 404 for an unknown driver through the typed api error', async () => {
+    stubStatus(JSON.stringify({detail: 'Driver does not exist'}), 404);
+
+    await expect(
+      buildProgram().parseAsync(['driver', 'status', 'd999', '--format', 'json'], {from: 'user'}),
+    ).rejects.toMatchObject({kind: 'api', statusCode: 404});
+  });
+});
+
+describe('wait deadline elapsed rendering (G17)', () => {
+  const ACCEPTED = {operationId: 'op-1', statusUri: '/api/v3/manager/operations/get_by_id?id=op-1'};
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('a sub-second deadline never renders as "after 0s"', async () => {
+    fetchCalls.length = 0;
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(
+      JSON.stringify({
+        operationId: 'op-1', status: 'RUNNING', progress: 1, result: null, error: null,
+        createdAt: '1970-01-01T00:00:00Z', updatedAt: '1970-01-01T00:00:01Z', expiresAt: null,
+      }),
+      {status: 200},
+    )));
+
+    const failure = await waitForOperation(ACCEPTED, 100, 0).then(
+      () => null,
+      (error: Error) => error,
+    );
+
+    expect(failure).toMatchObject({kind: 'timeout', code: 'TIMEOUT'});
+    const message = (failure as Error).message;
+    expect(message).toMatch(/after 0\.1s/u);
+    expect(message).not.toMatch(/after 0s/u);
   });
 });

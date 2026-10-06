@@ -86,17 +86,54 @@ function extractListEnvelope(data: Record<string, unknown>): ListEnvelope | unde
   return undefined;
 }
 
+/** Column keys whose object cells are entity extension blobs (driverExt, pointExt, ...). */
+const EXT_BLOB_KEY = /ext$/iu;
+
+/** Hard cap on a rendered cell's width so one long blob cannot blow up the table layout. */
+const MAX_CELL_WIDTH = 80;
+
 /**
- * Render one table cell: nested objects and arrays as compact JSON (never
- * `[object Object]`), null as `null`, undefined as an empty cell.
+ * Render an extension blob one level deep: `key=value` pairs inline, null and
+ * undefined members dropped, values that are themselves structured kept as
+ * compact JSON. A raw `{"type":"MQTT","version":null}` cell becomes
+ * `type=MQTT` — readable in a terminal column and free of wire-format noise.
+ * @param value - extension blob to render
+ * @returns the flattened cell text
+ */
+function formatExtBlob(value: Record<string, unknown>): string {
+  const parts: string[] = [];
+  for (const [key, member] of Object.entries(value)) {
+    if (member === null || member === undefined) continue;
+    parts.push(`${key}=${typeof member === 'object' ? (JSON.stringify(member) ?? String(member)) : String(member)}`);
+  }
+  return parts.length > 0 ? parts.join(' ') : '{}';
+}
+
+/**
+ * Render one table cell: extension blobs flattened one level, other nested
+ * objects and arrays as compact JSON (never `[object Object]`), null as
+ * `null`, undefined as an empty cell.
  * @param value - cell value from a row
+ * @param key - column key the value came from (drives ext-blob flattening)
  * @returns the printable cell text
  */
-function cellify(value: unknown): string {
+function cellify(value: unknown, key?: string): string {
   if (value === undefined) return '';
   if (value === null) return 'null';
-  if (typeof value === 'object') return JSON.stringify(value) ?? String(value);
+  if (isRecord(value)) {
+    return key !== undefined && EXT_BLOB_KEY.test(key) ? formatExtBlob(value) : JSON.stringify(value) ?? String(value);
+  }
+  if (Array.isArray(value)) return JSON.stringify(value) ?? String(value);
   return String(value);
+}
+
+/**
+ * Clamp a rendered cell to the column budget with an ellipsis marker.
+ * @param text - fully rendered cell text
+ * @returns the clamped cell text
+ */
+function clampCell(text: string): string {
+  return text.length > MAX_CELL_WIDTH ? `${text.slice(0, MAX_CELL_WIDTH - 1)}…` : text;
 }
 
 /**
@@ -158,6 +195,8 @@ function paginationFooter(rowCount: number, meta: Record<string, unknown>): stri
 
 /**
  * Render rows as an aligned table with an optional trailing footer line.
+ * Only interior columns are padded: the last column is never padded and every
+ * line is trimmed, so no rendered row or header carries trailing whitespace.
  * @param rows - values to render (records spread over their keys, scalars
  * into a single `value` column)
  * @param footer - optional pagination footer appended after the rows
@@ -169,17 +208,20 @@ function formatRowsAsTable(rows: unknown[], footer?: string): string {
   const headers = recordKeys.length > 0 ? recordKeys : ['value'];
   const cells = rows.map((row) =>
     headers.map((header) =>
-      recordKeys.length > 0 && isRecord(row) ? cellify(row[header]) : cellify(row),
+      clampCell(recordKeys.length > 0 && isRecord(row) ? cellify(row[header], header) : cellify(row)),
     ),
   );
   const colWidths = headers.map((header, i) =>
     Math.max(header.length, ...cells.map((row) => row[i].length)),
   );
   const sep = colWidths.map((w) => '-'.repeat(w)).join('-+-');
-  const headerRow = headers.map((header, i) => header.padEnd(colWidths[i])).join(' | ');
-  const dataRows = cells
-    .map((row) => row.map((cell, i) => cell.padEnd(colWidths[i])).join(' | '))
-    .join('\n');
+  const renderRow = (row: string[]): string =>
+    row
+      .map((cell, i) => (i === row.length - 1 ? cell : cell.padEnd(colWidths[i])))
+      .join(' | ')
+      .trimEnd();
+  const headerRow = renderRow(headers);
+  const dataRows = cells.map(renderRow).join('\n');
   const table = `${headerRow}\n${sep}\n${dataRows}`;
   return footer ? `${table}\n${footer}` : table;
 }
@@ -212,9 +254,9 @@ export type OutputFormat = 'json' | 'table' | 'yaml';
 /**
  * Render a payload in the requested output format. The json branch is the
  * agent wire contract and must stay byte-identical.
- * @param data - payload to render or send
- * @param format - output format for the rendered result
- * @returns the transformed value
+ * @param data - command result to render; undefined renders as an empty string
+ * @param format - renderer to apply ('json' output is the byte-stable wire contract)
+ * @returns the rendered document, without a trailing newline
  */
 export function formatOutput(data: unknown, format: OutputFormat = 'json'): string {
   if (data === undefined) return '';
@@ -269,9 +311,9 @@ export function detectFormat(explicit?: string): OutputFormat {
  * Print formatted output and exit. Used at the end of every command.
  * Stays the SUCCESS payload path; failures should throw a typed error from
  * core/errors.ts so they flow through the single failure chokepoint.
- * @param data - payload to render or send
- * @param format - output format for the rendered result
- * @param exitCode - process exit code
+ * @param data - success payload to write to stdout (an empty rendering writes nothing)
+ * @param format - renderer to apply to `data`
+ * @param exitCode - exit code installed on the process (never process.exit)
  */
 export function printAndExit(data: unknown, format: OutputFormat = 'json', exitCode = 0): never {
   const output = formatOutput(data, format);

@@ -74,7 +74,7 @@ function warnDeprecatedAliasInvocation(actionCommand: Command, warned: AliasWarn
   if (warned.has(canonical)) return;
   warned.add(canonical);
   process.stderr.write(
-    `warning: '${usedName}' is a deprecated compat alias of '${actionCommand.name()}' and will be removed in an upcoming release; use '${canonical}'\n`,
+    `Warning: '${usedName}' is a deprecated compat alias of '${actionCommand.name()}' and will be removed in an upcoming release; use '${canonical}'\n`,
   );
 }
 

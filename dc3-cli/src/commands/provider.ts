@@ -19,6 +19,7 @@ import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { ApiError, UsageError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { requireResourceId } from '../utils/manager.js';
 
 const BASE = '/api/v3/agentic/provider';
 const PROVIDER_TYPES = ['OPENAI_COMPATIBLE', 'ANTHROPIC'] as const;
@@ -41,24 +42,23 @@ const PROVIDER_UPDATE_FIELDS = [
 const parseProviderType = (value: string): string => {
   const upper = value.toUpperCase();
   if (!PROVIDER_TYPES.includes(upper as (typeof PROVIDER_TYPES)[number])) {
-    throw new InvalidArgumentError(
-      `option '--type ${value}' is invalid. allowed: ${PROVIDER_TYPES.join(', ')}`,
-    );
+    // commander already renders `option '--type <type>' <message>`; only the
+    // reason belongs here (audit G15).
+    throw new InvalidArgumentError(`allowed: ${PROVIDER_TYPES.join(', ')}`);
   }
   return upper;
 };
 
 /**
  * Validate the connectivity probe level, mirroring --type (report F021).
- * @param value - value to set
- * @returns the transformed value
+ * @param value - raw --level option lexeme; matched case-insensitively
+ * against the allowed levels
+ * @returns the upper-cased level constant (L1, L2, or BOTH)
  */
 const parseProviderLevel = (value: string): string => {
   const upper = value.toUpperCase();
   if (!PROVIDER_LEVELS.includes(upper as (typeof PROVIDER_LEVELS)[number])) {
-    throw new InvalidArgumentError(
-      `option '--level ${value}' is invalid. allowed: ${PROVIDER_LEVELS.join(', ')}`,
-    );
+    throw new InvalidArgumentError(`allowed: ${PROVIDER_LEVELS.join(', ')}`);
   }
   return upper;
 };
@@ -190,6 +190,9 @@ export function registerProviderCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The id keys the delete — reject empty ids before the wire (audit
+      // G13/G27).
+      requireResourceId(`${BASE}/config/delete`, id);
       await dc3Client.del(`${BASE}/config/delete?id=${encodeURIComponent(id)}`);
       printAndExit(undefined, format);
     });
@@ -215,12 +218,12 @@ export function registerProviderCommand(program: Command): void {
         throw new UsageError('Either --id (saved provider) or --base-url (draft) is required');
       }
       const body: Record<string, unknown> = { level: opts.level };
-      if (opts.id) body.id = opts.id;
-      if (opts.baseUrl) body.baseUrl = opts.baseUrl;
+      if (opts.id !== undefined) body.id = opts.id;
+      if (opts.baseUrl !== undefined) body.baseUrl = opts.baseUrl;
       // Draft mode: default to OPENAI_COMPATIBLE when type is not specified
       // (the backend requires an explicit type for draft checks).
-      if (opts.baseUrl) body.providerType = opts.type || 'OPENAI_COMPATIBLE';
-      else if (opts.type) body.providerType = opts.type;
+      if (opts.baseUrl !== undefined) body.providerType = opts.type || 'OPENAI_COMPATIBLE';
+      else if (opts.type !== undefined) body.providerType = opts.type;
       if (opts.apiKey !== undefined) body.apiKey = opts.apiKey;
       if (opts.model !== undefined) body.model = opts.model;
       const result = await dc3Client.post(`${BASE}/check`, body);

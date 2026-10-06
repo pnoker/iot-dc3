@@ -60,4 +60,14 @@ public interface AttachmentService {
      * @return the summary text
      */
     Mono<String> summarize(List<Long> attachmentIds, RequestHeader.PrincipalHeader header);
+
+    /**
+     * Delete one attachment by id, soft-deleting its metadata row and unlinking the
+     * stored file best-effort.
+     *
+     * @param id     primary key of the attachment to delete; must belong to the caller's tenant and user
+     * @param header authenticated caller principal and tenant
+     * @return the number of soft-deleted rows (1 on success)
+     */
+    Mono<Long> delete(Long id, RequestHeader.PrincipalHeader header);
 }

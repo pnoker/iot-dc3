@@ -20,7 +20,7 @@ vi.mock('../src/core/token-manager.js', () => ({
   },
 }));
 
-import { AuthError } from '../src/core/client.js';
+import { ApiError, AuthError } from '../src/core/client.js';
 import { McpClient } from '../src/core/mcp.js';
 
 const oauthState = { token: 'rs256.jwt.value', authType: 'oauth' };
@@ -181,9 +181,15 @@ describe('McpClient SSE and id handling (F022/F040)', () => {
       ),
     );
 
-    await expect(new McpClient().listTools()).rejects.toThrow(
+    // Typed ApiError with a dedicated machine code — the generic
+    // api/INTERNAL classification hid the failure mode (error-kind precision).
+    const error = await new McpClient().listTools().catch((err: unknown) => err);
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).message).toMatch(
       /Unsupported \/mcp response content-type: text\/csv/u,
     );
+    expect((error as ApiError).code).toBe('MCP_UNSUPPORTED_CONTENT_TYPE');
+    expect((error as ApiError).kind).toBe('api');
   });
 
   it('rejects a JSON response whose id does not match the request', async () => {
@@ -220,5 +226,86 @@ describe('McpClient SSE and id handling (F022/F040)', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe('McpClient envelope validation (valid-JSON non-RPC 2xx bodies)', () => {
+  beforeEach(() => {
+    getState.mockResolvedValue(oauthState);
+    vi.unstubAllGlobals();
+  });
+
+  /**
+   * Fetch mock answering 200 application/json with a fixed raw body.
+   * @param body - raw response body text
+   * @returns a fetch stub returning that body
+   */
+  function rawJsonBody(body: string) {
+    return vi.fn().mockResolvedValue(
+      new Response(body, { status: 200, headers: { 'Content-Type': 'application/json' } }),
+    );
+  }
+
+  it.each([
+    ['a health-ping object', '{"health":"ok"}'],
+    ['a bare JSON string', '"ok"'],
+    ['a JSON array', '[1,2]'],
+    ['a JSON null', 'null'],
+  ])('rejects %s 2xx body with typed MCP_BAD_BODY, never a raw TypeError', async (_label, body) => {
+    vi.stubGlobal('fetch', rawJsonBody(body));
+
+    const error = await new McpClient().listTools().catch((err: unknown) => err);
+
+    // Before the envelope guard these bodies dereferenced `payload.error` or
+    // surfaced in commands/tool.ts as `result.tools` on undefined/null.
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).code).toBe('MCP_BAD_BODY');
+    expect((error as ApiError).kind).toBe('api');
+    expect((error as ApiError).message).toMatch(/is not a JSON-RPC envelope/u);
+    expect((error as ApiError).message).toContain(body);
+  });
+
+  it('rejects a single-frame SSE stream whose frame is not an RPC envelope', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response('event: message\ndata: {"health":"ok"}\n\n', {
+          status: 200,
+          headers: { 'Content-Type': 'text/event-stream' },
+        }),
+      ),
+    );
+
+    const error = await new McpClient().listTools().catch((err: unknown) => err);
+
+    expect(error).toBeInstanceOf(ApiError);
+    expect((error as ApiError).code).toBe('MCP_BAD_BODY');
+  });
+
+  it('skips non-object SSE frames instead of treating them as responses', async () => {
+    vi.stubGlobal(
+      'fetch',
+      sseRpc([
+        () => '"keepalive"',
+        (id) => JSON.stringify({ jsonrpc: '2.0', id, result: { tools: [{ name: 'real' }] } }),
+      ]),
+    );
+
+    const result = await new McpClient().listTools();
+
+    expect(result.tools?.map((tool) => tool.name)).toEqual(['real']);
+  });
+
+  it('a well-formed envelope with a null result resolves instead of crashing', async () => {
+    vi.stubGlobal(
+      'fetch',
+      echoJsonRpc((payload) => {
+        payload.result = null;
+      }),
+    );
+
+    // `tools list` renders this as an empty table via its Array.isArray
+    // guard; the contract here is that decoding never throws on it.
+    await expect(new McpClient().listTools()).resolves.toBeNull();
   });
 });

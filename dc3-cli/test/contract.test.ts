@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { join, dirname, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { InvalidArgumentError } from 'commander';
 
 // Mock the config read behind the CLI context so tests never touch ~/.dc3.
 vi.mock('../src/core/config-manager.js', () => ({
@@ -15,7 +16,9 @@ import { detectFormat } from '../src/utils/format.js';
 import { applyGlobalOptions, resetCliContext } from '../src/core/context.js';
 import { configManager } from '../src/core/config-manager.js';
 import { AuthError as ClientAuthError } from '../src/core/client.js';
-import { AuthError, NetworkError, handleFatalError } from '../src/core/errors.js';
+import { AuthError, NetworkError, ValidationError, classifyError, handleFatalError } from '../src/core/errors.js';
+import { buildProgram } from '../src/index.js';
+import type { Command, Option } from 'commander';
 
 const srcDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'src');
 const commandsDir = join(srcDir, 'commands');
@@ -155,6 +158,19 @@ describe('exit-code mapping (top-level fatal handler)', () => {
   });
 });
 
+describe('error-kind precision (residual round)', () => {
+  it('commander invalid-argument values classify as validation, not usage', () => {
+    const failure = classifyError(new InvalidArgumentError('must be a non-empty value'));
+    expect(failure.kind).toBe('validation');
+    expect(failure.exitCode).toBe(1);
+  });
+
+  it('ZodError keeps collapsing to a single-line validation failure', () => {
+    const failure = classifyError(new ValidationError('Invalid value for settings.color: "maybe"'));
+    expect(failure).toMatchObject({ kind: 'validation', code: 'VALIDATION', exitCode: 1 });
+  });
+});
+
 describe('static source scans', () => {
   /**
    * Command groups whose own chain carries no --format: their leaves declare it.
@@ -215,6 +231,23 @@ describe('static source scans', () => {
     return nested.flat();
   }
 
+  it('no src file prints failure payloads — failures must throw through the chokepoint (F015)', async () => {
+    // Full-src walk (not just commands/): a failure printAndExit hidden in
+    // core/ or utils/ would evade a commands-only scan. The file defining
+    // printAndExit is the one legitimate place to mention it.
+    const files = (await collectTsFiles(srcDir)).sort();
+    expect(files.length).toBeGreaterThan(20);
+    for (const file of files) {
+      const rel = relative(srcDir, file).split(sep).join('/');
+      if (rel === 'utils/format.ts') continue;
+      const source = await readFile(file, 'utf8');
+      expect(
+        source.match(/printAndExit\(\s*\{[^)]*ok:\s*false/s),
+        `${rel} must throw a typed error instead of printing a failure payload`,
+      ).toBeNull();
+    }
+  });
+
   it('fetch( appears only inside the shared HTTP seam', async () => {
     expect(await stat(join(srcDir, 'core', 'http.ts'))).toBeTruthy();
     const files = await collectTsFiles(srcDir);
@@ -228,5 +261,81 @@ describe('static source scans', () => {
         `${rel} must use the shared fetch seam (core/http.ts)`,
       ).toBeNull();
     }
+  });
+});
+
+describe('option introspection scan (F021 guard b)', () => {
+  /**
+   * Placeholders that match the numeric pattern but are genuinely string-typed
+   * identifiers on their surface (add here only with a wire-contract reason).
+   * Currently empty: every numeric-looking placeholder in the tree is numeric.
+   */
+  const STRING_TYPED_PLACEHOLDERS = new Set<string>();
+
+  /** Placeholder shapes this scan treats as numeric-valued options. */
+  const NUMERIC_PLACEHOLDER =
+    /\b(?:n|num|count|days|hours|minutes|limit|offset|top[-_]n|timeout|port|version|seconds|ms)\b/iu;
+
+  /**
+   * Walk the real program tree and pair every declared option with the full
+   * invocation path it belongs to (the same registration the bin entry runs).
+   * @returns option entries with their owning command path
+   */
+  function collectOptions(): Array<{ path: string; option: Option }> {
+    const found: Array<{ path: string; option: Option }> = [];
+    const walk = (cmd: Command, prefix: string): void => {
+      const path = prefix ? `${prefix} ${cmd.name()}` : cmd.name();
+      for (const option of cmd.options) {
+        found.push({ path, option });
+      }
+      for (const child of cmd.commands) {
+        if (child.name() === 'help') continue;
+        walk(child, path);
+      }
+    };
+    walk(buildProgram(), '');
+    return found;
+  }
+
+  /**
+   * Extract the value placeholder of an option's flags, e.g. `<n>` from
+   * `--offset <n>` and `[size]` from `--size [size]`.
+   * @param flags - the option's flags string
+   * @returns the placeholder, or undefined for value-less flags
+   */
+  function optionPlaceholder(flags: string): string | undefined {
+    return flags.match(/<([^>]+)>/u)?.[1] ?? flags.match(/\[([^\]]+)\]/u)?.[1];
+  }
+
+  it('the tree walk sees the full numeric option surface (scan sanity control)', () => {
+    const numeric = collectOptions().filter(
+      ({ option }) =>
+        (optionPlaceholder(option.flags) !== undefined &&
+          NUMERIC_PLACEHOLDER.test(optionPlaceholder(option.flags) as string)) ||
+        typeof option.defaultValue === 'number',
+    );
+    expect(numeric.length).toBeGreaterThan(20);
+    expect(
+      numeric.filter(({ option }) => typeof option.defaultValue === 'number').length,
+    ).toBeGreaterThan(5);
+  });
+
+  it('every numeric-valued option carries a parser (a future --foo <n> without one fails here)', () => {
+    const offenders: string[] = [];
+    for (const { path, option } of collectOptions()) {
+      const placeholder = optionPlaceholder(option.flags);
+      const looksNumeric = placeholder !== undefined && NUMERIC_PLACEHOLDER.test(placeholder);
+      const numericDefault = typeof option.defaultValue === 'number';
+      if (!looksNumeric && !numericDefault) continue;
+      if (placeholder !== undefined && STRING_TYPED_PLACEHOLDERS.has(placeholder)) continue;
+      if (option.parseArg === undefined) {
+        offenders.push(`${path} ${option.flags}`);
+      }
+    }
+    expect(
+      offenders,
+      `numeric options without a value parser (their values would reach the wire as strings): ` +
+        offenders.join('; '),
+    ).toEqual([]);
   });
 });

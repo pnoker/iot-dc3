@@ -20,8 +20,10 @@ import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
+  getManagerResource,
   parseNonNegativeInteger,
   parsePositiveInteger,
+  requireResourceId,
   updateManagerResource,
 } from '../utils/manager.js';
 
@@ -38,8 +40,9 @@ const DECIMAL_NUMBER_PATTERN = /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/u;
  * Parse a CLI option as a decimal number for the BigDecimal-backed point
  * fields: the value is validated lexically and sent as a JSON number so the
  * wire type matches the gateway PointVO (report F039).
- * @param value - value to set
- * @returns the transformed value
+ * @param value - raw CLI option lexeme: optional sign, digits, optional
+ * fraction (e.g. 0, 2, 0.5, -1.25)
+ * @returns the finite numeric value to send as a JSON number
  */
 function parseDecimalNumber(value: string): number {
   if (!DECIMAL_NUMBER_PATTERN.test(value)) {
@@ -74,8 +77,8 @@ export function registerPointCommand(program: Command): void {
         offset: opts.offset,
         limit: opts.limit,
       };
-      if (opts.deviceId) body.deviceId = opts.deviceId;
-      if (opts.profileId) body.profileId = opts.profileId;
+      if (opts.deviceId !== undefined) body.deviceId = opts.deviceId;
+      if (opts.profileId !== undefined) body.profileId = opts.profileId;
       const result = await dc3Client.post(`${POINT_BASE}/list`, body);
       printAndExit(result, format);
     });
@@ -87,7 +90,8 @@ export function registerPointCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`${POINT_BASE}/get_by_id?id=${encodeURIComponent(id)}`);
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(POINT_BASE, id);
       printAndExit(result, format);
     });
 
@@ -98,6 +102,9 @@ export function registerPointCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
+      // The point id keys the latest-value lookup — reject empty ids before
+      // the wire (audit G13/G27).
+      requireResourceId('/api/v3/data/point_value/latest', id);
       const result = await dc3Client.post('/api/v3/data/point_value/latest', {
         pointId: id,
         offset: 0,
@@ -116,15 +123,19 @@ export function registerPointCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      if (!opts.deviceId) {
+      if (opts.deviceId === undefined) {
         throw new ValidationError('--device-id is required for history query');
       }
+      // Both ids key the history lookup — reject empty ids before the wire
+      // instead of silently treating them as absent (audit G13/G27, G32).
+      requireResourceId('/api/v3/data/point_value/history', id);
+      requireResourceId('--device-id', opts.deviceId);
       const params = new URLSearchParams({
         device_id: opts.deviceId,
         point_id: id,
         limit: String(opts.limit),
       });
-      if (opts.cursor) params.set('cursor', opts.cursor);
+      if (opts.cursor !== undefined) params.set('cursor', opts.cursor);
       const result = await dc3Client.get(`/api/v3/data/point_value/history?${params}`);
       printAndExit(result, format);
     });
@@ -138,9 +149,13 @@ export function registerPointCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      if (!opts.deviceId) {
+      if (opts.deviceId === undefined) {
         throw new ValidationError('--device-id is required for write operations');
       }
+      // Both ids key the write submission — reject empty ids before the wire
+      // (audit G13/G27, G32).
+      requireResourceId('/api/v3/data/point_command/write', id);
+      requireResourceId('--device-id', opts.deviceId);
       const result = await dc3Client.post('/api/v3/data/point_command/write', {
         deviceId: opts.deviceId,
         pointId: id,
@@ -197,9 +212,9 @@ export function registerPointCommand(program: Command): void {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(POINT_BASE, id, opts.version, {
         ...(opts.name !== undefined ? { pointName: opts.name } : {}),
-        ...(opts.profileId ? { profileId: opts.profileId } : {}),
-        ...(opts.type ? { pointTypeFlag: opts.type } : {}),
-        ...(opts.rw ? { rwFlag: opts.rw } : {}),
+        ...(opts.profileId !== undefined ? { profileId: opts.profileId } : {}),
+        ...(opts.type !== undefined ? { pointTypeFlag: opts.type } : {}),
+        ...(opts.rw !== undefined ? { rwFlag: opts.rw } : {}),
         ...(opts.valueDecimal !== undefined ? { valueDecimal: opts.valueDecimal } : {}),
         ...(opts.baseValue !== undefined ? { baseValue: opts.baseValue } : {}),
         ...(opts.multiple !== undefined ? { multiple: opts.multiple } : {}),

@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, parsePositiveInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, parsePositiveInteger, requireResourceId } from '../utils/manager.js';
 import { readJsonObjectBody } from './analytics.js';
+
+/** Cohort range windows the point-profile backend accepts (audit G31). */
+const POINT_PROFILE_RANGE_KEYS = ['today', '24h', '7d', '30d'] as const;
 
 /**
  * Collector for the repeatable `--query` flag: commander passes the
@@ -32,14 +35,28 @@ import { readJsonObjectBody } from './analytics.js';
 const collectQuery = (value: string, previous: string[] = []): string[] => previous.concat(value);
 
 /**
- * Append the numeric flags and every `--query` occurrence to a read-plane
- * base path through URLSearchParams, so user values are always encoded and
- * can never inject extra gateway parameters (`&`), truncate the query
- * (`#`), or smuggle structure (`=`) — report F017. A malformed `key=value`
- * pair fails fast as a ValidationError before any request is built
- * (report F019).
- * @param base - gateway-relative path without a query string
- * @param opts - command options carrying days/limit/baselineDays/silentMinutes/query
+ * Validate the point-profile cohort range key, mirroring the shared parser
+ * style (audit G31).
+ * @param value - raw --range-key option lexeme; must be one of the cohort
+ * keys verbatim (case-sensitive)
+ * @returns the validated cohort key, unchanged
+ */
+const parsePointProfileRangeKey = (value: string): string => {
+  if (!POINT_PROFILE_RANGE_KEYS.includes(value as (typeof POINT_PROFILE_RANGE_KEYS)[number])) {
+    throw new InvalidArgumentError(`allowed: ${POINT_PROFILE_RANGE_KEYS.join(', ')}`);
+  }
+  return value;
+};
+
+/**
+ * Append the numeric/range flags and every `--query` occurrence to a
+ * read-plane base path through URLSearchParams, so user values are always
+ * encoded and can never inject extra gateway parameters (`&`), truncate the
+ * query (`#`), or smuggle structure (`=`) — report F017. A malformed
+ * `key=value` pair fails fast as a ValidationError before any request is
+ * built (report F019).
+ * @param base - gateway-relative path, with or without an existing query string
+ * @param opts - command options carrying days/limit/baselineDays/silentMinutes/rangeKey/query
  * @returns the path with its encoded query string appended
  */
 const appendQuery = (base: string, opts: Record<string, unknown>): string => {
@@ -48,6 +65,7 @@ const appendQuery = (base: string, opts: Record<string, unknown>): string => {
   if (opts.limit !== undefined) params.set('limit', String(opts.limit));
   if (opts.baselineDays !== undefined) params.set('baseline_days', String(opts.baselineDays));
   if (opts.silentMinutes !== undefined) params.set('silent_minutes', String(opts.silentMinutes));
+  if (opts.rangeKey !== undefined) params.set('range_key', String(opts.rangeKey));
   const queries = Array.isArray(opts.query) ? (opts.query as string[]) : [];
   for (const kv of queries) {
     const eq = kv.indexOf('=');
@@ -57,7 +75,8 @@ const appendQuery = (base: string, opts: Record<string, unknown>): string => {
     params.append(kv.slice(0, eq), kv.slice(eq + 1));
   }
   const qs = params.toString();
-  return qs ? `${base}?${qs}` : base;
+  if (!qs) return base;
+  return base.includes('?') ? `${base}&${qs}` : `${base}?${qs}`;
 };
 
 /**
@@ -92,7 +111,7 @@ export function registerAlertCommand(program: Command): void {
         offset: opts.offset,
         limit: opts.limit,
       };
-      if (opts.source) body.source = opts.source;
+      if (opts.source !== undefined) body.source = opts.source;
       const result = await dc3Client.post('/api/v3/data/dashboard/alert/page', body);
       printAndExit(result, format);
     });
@@ -118,6 +137,9 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
+      // The alert id keys the confirmation — reject empty ids before the wire
+      // (audit G13/G27).
+      requireResourceId('--id', opts.id);
       const result = await dc3Client.post(
         `/api/v3/data/dashboard/alert/confirm?source=${encodeURIComponent(opts.source)}&id=${encodeURIComponent(opts.id)}`,
       );
@@ -133,6 +155,8 @@ export function registerAlertCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
+      // Same empty-id contract as confirm (audit G13/G27).
+      requireResourceId('--id', opts.id);
       const result = await dc3Client.post(
         `/api/v3/data/dashboard/alert/unconfirm?source=${encodeURIComponent(opts.source)}&id=${encodeURIComponent(opts.id)}`,
       );
@@ -278,11 +302,23 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('point-profile <point_id>')
     .description('Alert profile for a single point across its peer cohort')
+    .option('--days <n>', 'Look-back window in days', parsePositiveInteger)
+    .option(
+      '--range-key <key>',
+      'Cohort range window: today, 24h, 7d, or 30d',
+      parsePointProfileRangeKey,
+    )
     .option('--format <format>', 'Output format')
     .action(async (pointId, opts) => {
       const format = detectFormat(opts.format);
+      // The point id keys the profile lookup — reject empty ids before the
+      // wire (audit G13/G27).
+      requireResourceId('/api/v3/data/dashboard/alert/point_profile', pointId);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/point_profile?point_id=${encodeURIComponent(pointId)}`,
+        appendQuery(
+          `/api/v3/data/dashboard/alert/point_profile?point_id=${encodeURIComponent(pointId)}`,
+          opts,
+        ),
       );
       printAndExit(result, format);
     });

@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,7 +75,7 @@ public class EventHistoryController implements BaseController {
     @Operation(
             summary = "Report Device Event",
             description =
-                    "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record ID. Use when a device reports an event that must be appended to the audit trail.",
+                    "Record a device event (alarm, state change, or status transition) reported by a device for the current tenant and return the new record id in the \"id\" field of a JSON object. Use when a device reports an event that must be appended to the audit trail.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -85,9 +86,10 @@ public class EventHistoryController implements BaseController {
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
     @PostMapping("/report")
-    public Mono<String> report(@Validated @RequestBody EventReportVO entityVO) {
+    public Mono<Map<String, String>> report(@Validated @RequestBody EventReportVO entityVO) {
         return getTenantId()
-                .flatMap(tenantId -> eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO)));
+                .flatMap(tenantId -> eventHistoryService.report(tenantId, eventHistoryBuilder.buildBOByVO(entityVO)))
+                .map(recordId -> Map.of("id", recordId));
     }
 
     /**

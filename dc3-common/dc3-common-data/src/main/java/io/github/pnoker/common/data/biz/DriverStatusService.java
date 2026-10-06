@@ -26,6 +26,9 @@ public interface DriverStatusService {
     /** List driver status matching the request. */
     Mono<Map<String, String>> list(FacadeDriverOffsetQuery query);
 
+    /** Get the current status of one driver within the tenant, regardless of pagination position. */
+    Mono<String> get(Long tenantId, Long driverId);
+
     /** Count online devices matching the request. */
     Mono<Long> countOnlineDevices(Long tenantId, Long driverId);
 

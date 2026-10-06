@@ -22,7 +22,7 @@ concurrency:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: dc3-cli
@@ -51,13 +51,33 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Typecheck Tests
+        run: pnpm typecheck:test
+
       - name: Test
         run: pnpm test
+
+      - name: Coverage
+        run: pnpm test:coverage
 
       - name: Build
         run: pnpm build
 
-      - name: Smoke — help output lists command groups
+      - name: Smoke — behavioral dist invocations
         run: |
+          # Help surface: the built artifact lists the command groups.
           node dist/index.js --help | grep -E "auth|device|tools"
           node dist/index.js auth login --help > /dev/null
+          # Bare invocation: help on stdout, exit 0 (report F048).
+          node dist/index.js > bare.out
+          grep -q "Usage: dc3" bare.out
+          # Unknown command: exit 1, one human line on stderr, machine
+          # envelope on stdout (report F015 failure contract).
+          set +e
+          node dist/index.js definitely-not-a-command > unknown.out 2> unknown.err
+          status=$?
+          set -e
+          test "$status" -eq 1
+          test "$(wc -l < unknown.err)" -eq 1
+          grep -q '"ok":false' unknown.out
+          grep -q '"kind":"usage"' unknown.out

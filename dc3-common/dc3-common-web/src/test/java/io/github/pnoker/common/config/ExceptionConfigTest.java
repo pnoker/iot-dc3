@@ -20,37 +20,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.github.pnoker.common.enums.ErrorCode;
 import io.github.pnoker.common.exception.ConflictException;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
+import io.github.pnoker.common.filter.RequestIdWebFilter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
-import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ExceptionConfigTest {
 
     private ExceptionConfig handler;
-    private ServerHttpRequest request;
+    private MockServerWebExchange exchange;
 
     @BeforeEach
     void setUp() {
         handler = new ExceptionConfig();
-        request = MockServerHttpRequest.get("/api/manager/devices").build();
+        exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/api/manager/devices").build());
     }
 
     @Test
     void globalExceptionProducesProblemDetails() {
-        ServerHttpResponse httpResponse = new MockServerHttpResponse();
-        StepVerifier.create(handler.globalException(new RuntimeException("boom"), request, httpResponse))
+        StepVerifier.create(handler.globalException(new RuntimeException("boom"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.status()).isEqualTo(500);
                     assertThat(problem.code()).isEqualTo(ErrorCode.FAILURE.getCode());
@@ -61,89 +61,82 @@ class ExceptionConfigTest {
 
     @Test
     void illegalArgumentProducesOutOfRangeProblemDetails() {
-        ServerHttpResponse response = new MockServerHttpResponse();
         StepVerifier.create(handler.illegalArgumentException(
-                        new IllegalArgumentException("limit must be between 1 and 200"), request, response))
+                        new IllegalArgumentException("limit must be between 1 and 200"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.status()).isEqualTo(422);
                     assertThat(problem.code()).isEqualTo(ErrorCode.OUT_OF_RANGE.getCode());
                     assertThat(problem.detail()).isEqualTo("limit must be between 1 and 200");
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT);
     }
 
     @Test
     void responseStatusExceptionPreservesStatusAndReason() {
-        ServerHttpResponse response = new MockServerHttpResponse();
         ResponseStatusException ex = new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "downstream down");
 
-        StepVerifier.create(handler.responseStatusException(ex, request, response))
+        StepVerifier.create(handler.responseStatusException(ex, exchange))
                 .assertNext(problem -> {
                     assertThat(problem.status()).isEqualTo(503);
                     assertThat(problem.detail()).isEqualTo("downstream down");
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
     }
 
     @Test
     void responseStatusExceptionWithoutReasonFallsBackToStatusToString() {
-        ServerHttpResponse response = new MockServerHttpResponse();
         ResponseStatusException ex = new ResponseStatusException(HttpStatus.NOT_FOUND);
 
-        StepVerifier.create(handler.responseStatusException(ex, request, response))
+        StepVerifier.create(handler.responseStatusException(ex, exchange))
                 .assertNext(problem -> assertThat(problem.detail()).contains("404"))
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void requestExceptionAlignsBodyCodeAndStatusToValidation() {
-        ServerHttpResponse response = new MockServerHttpResponse();
-        StepVerifier.create(handler.businessException(new RequestException("invalid"), request, response))
+        StepVerifier.create(handler.businessException(new RequestException("invalid"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.detail()).isEqualTo("invalid");
                     assertThat(problem.code()).isEqualTo(ErrorCode.VALIDATION.getCode());
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode().value()).isEqualTo(422);
+        assertThat(exchange.getResponse().getStatusCode().value()).isEqualTo(422);
     }
 
     @Test
     void conflictExceptionProducesConflictProblemDetails() {
-        ServerHttpResponse response = new MockServerHttpResponse();
-        StepVerifier.create(handler.businessException(new ConflictException("stale version"), request, response))
+        StepVerifier.create(handler.businessException(new ConflictException("stale version"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.detail()).isEqualTo("stale version");
                     assertThat(problem.code()).isEqualTo(ErrorCode.CONFLICT.getCode());
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
     }
 
     @Test
     void notFoundExceptionAlignsBodyCodeAndStatusToNotFound() {
-        ServerHttpResponse response = new MockServerHttpResponse();
-        StepVerifier.create(handler.businessException(new NotFoundException("not here"), request, response))
+        StepVerifier.create(handler.businessException(new NotFoundException("not here"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.detail()).isEqualTo("not here");
                     assertThat(problem.code()).isEqualTo(ErrorCode.NOT_FOUND.getCode());
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void unAuthorizedExceptionAlignsBodyCodeAndStatusToUnauthorized() {
-        ServerHttpResponse response = new MockServerHttpResponse();
-        StepVerifier.create(handler.businessException(new UnAuthorizedException("nope"), request, response))
+        StepVerifier.create(handler.businessException(new UnAuthorizedException("nope"), exchange))
                 .assertNext(problem -> {
                     assertThat(problem.detail()).isEqualTo("nope");
                     assertThat(problem.code()).isEqualTo(ErrorCode.UNAUTHORIZED.getCode());
                 })
                 .verifyComplete();
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(exchange.getResponse().getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -161,12 +154,34 @@ class ExceptionConfigTest {
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
 
-        ServerHttpResponse response = new MockServerHttpResponse();
-        StepVerifier.create(handler.methodArgumentNotValidException(exception, request, response))
+        StepVerifier.create(handler.methodArgumentNotValidException(exception, exchange))
                 .assertNext(problem -> {
                     assertThat(problem.errors().get("name")).containsExactly("must not be blank");
                     assertThat(problem.errors().get("age")).containsExactly("must be positive");
                 })
+                .verifyComplete();
+    }
+
+    @Test
+    void problemTraceIdCarriesFilterGeneratedIdWhenNoInboundHeaderWasSent() {
+        StepVerifier.create(new RequestIdWebFilter().filter(exchange, chain -> Mono.empty())).verifyComplete();
+        String generated = exchange.getResponse().getHeaders().getFirst(RequestIdConstant.HEADER);
+        assertThat(generated).as("the filter must generate and echo an id when no header was sent").isNotBlank();
+
+        StepVerifier.create(handler.globalException(new RuntimeException("boom"), exchange))
+                .assertNext(problem -> assertThat(problem.traceId()).isEqualTo(generated))
+                .verifyComplete();
+    }
+
+    @Test
+    void problemTraceIdFallsBackToInboundHeaderWithoutTheFilter() {
+        MockServerWebExchange withInboundHeader = MockServerWebExchange.from(
+                MockServerHttpRequest.get("/api/manager/devices")
+                        .header(RequestIdConstant.HEADER, "client-42")
+                        .build());
+
+        StepVerifier.create(handler.businessException(new NotFoundException("not here"), withInboundHeader))
+                .assertNext(problem -> assertThat(problem.traceId()).isEqualTo("client-42"))
                 .verifyComplete();
     }
 }

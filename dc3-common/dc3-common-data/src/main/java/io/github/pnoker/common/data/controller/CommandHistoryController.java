@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.data.controller;
 
+import java.util.Map;
+
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.DataConstant;
 import io.github.pnoker.common.data.biz.CommandHistoryService;
@@ -68,14 +70,14 @@ public class CommandHistoryController implements BaseController {
      * the call in command history.
      *
      * @param entityVO command payload to dispatch to the device (target device, command and parameters)
-     * @return the ID of the newly created command-call history record; use it to poll execution result and response data
+     * @return JSON object carrying the id of the newly created command-call history record; use it to poll execution result and response data
      */
     @PreAuthorize("@perm.can('command_history', 'add')")
     @Operation(
             summary = "Call Command",
             description =
                     "Send a downward control command to a device for the current tenant and "
-                            + "record the call in command history. Returns the new history record ID; use it to poll the execution result and response data.",
+                            + "record the call in command history. Returns the new history record id in the \"id\" field of a JSON object; use it to poll the execution result and response data.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -86,9 +88,10 @@ public class CommandHistoryController implements BaseController {
                                 @ExtensionProperty(name = "openWorld", value = "true")
                             }))
     @PostMapping("/call")
-    public Mono<String> call(@Validated @RequestBody CommandCallVO entityVO) {
+    public Mono<Map<String, String>> call(@Validated @RequestBody CommandCallVO entityVO) {
         return getTenantId()
-                .flatMap(tenantId -> commandHistoryService.call(tenantId, commandHistoryBuilder.buildBOByVO(entityVO)));
+                .flatMap(tenantId -> commandHistoryService.call(tenantId, commandHistoryBuilder.buildBOByVO(entityVO)))
+                .map(recordId -> Map.of("id", recordId));
     }
 
     /**

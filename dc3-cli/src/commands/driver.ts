@@ -16,10 +16,13 @@
  */
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
+  getManagerResource,
   parseNonNegativeInteger,
+  requireResourceId,
   updateManagerResource,
 } from '../utils/manager.js';
 
@@ -53,7 +56,8 @@ export function registerDriverCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`${DRIVER_BASE}/get_by_id?id=${encodeURIComponent(id)}`);
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(DRIVER_BASE, id);
       printAndExit(result, format);
     });
 
@@ -74,7 +78,7 @@ export function registerDriverCommand(program: Command): void {
         serviceName: opts.serviceName,
         serviceHost: opts.serviceHost,
         driverTypeFlag: opts.type,
-        ...(opts.code ? { driverCode: opts.code } : {}),
+        ...(opts.code !== undefined ? { driverCode: opts.code } : {}),
       });
       printAndExit(result, format);
     });
@@ -93,8 +97,8 @@ export function registerDriverCommand(program: Command): void {
       const result = await updateManagerResource(DRIVER_BASE, id, opts.version, {
         ...(opts.name !== undefined ? { driverName: opts.name } : {}),
         ...(opts.serviceName !== undefined ? { serviceName: opts.serviceName } : {}),
-        ...(opts.serviceHost ? { serviceHost: opts.serviceHost } : {}),
-        ...(opts.type ? { driverTypeFlag: opts.type } : {}),
+        ...(opts.serviceHost !== undefined ? { serviceHost: opts.serviceHost } : {}),
+        ...(opts.type !== undefined ? { driverTypeFlag: opts.type } : {}),
       });
       printAndExit(result, format);
     });
@@ -116,16 +120,20 @@ export function registerDriverCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      // The driver status endpoint returns a Map<driverId, status> for all
-      // drivers; extract the requested one. The query record validates
-      // page bounds (limit >= 1), so send explicit pagination.
-      const all = await dc3Client.post<Record<string, string>>(
-        '/api/v3/data/driver/status/list',
-        { offset: 0, limit: 100 },
+      // The id keys the status lookup — reject empty ids before the wire,
+      // same contract as the manager CRUD paths (report F053).
+      requireResourceId('/api/v3/data/driver/status', id);
+      // Single-driver endpoint: returns a single-key JSON map
+      // {driverId: status}, isomorphic to the full status map. A driver the
+      // gateway does not know answers 404 (problem+json) and surfaces as the
+      // typed not-found error via buildError.
+      const record = await dc3Client.get<Record<string, string>>(
+        `/api/v3/data/driver/status/get_by_driver_id?driver_id=${encodeURIComponent(id)}`,
       );
-      const status = all?.[id] ?? all?.[String(id)];
+      const status = record !== null && typeof record === 'object' ? record[id] : undefined;
       if (status === undefined) {
-        printAndExit({ ok: false, message: `Driver ${id} status not found` }, format, 1);
+        // Contract guard: the sole key must echo the requested driver id.
+        throw new ValidationError(`Driver ${id} status not found`);
       }
       printAndExit({ id, status }, format);
     });

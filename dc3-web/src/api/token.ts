@@ -22,16 +22,16 @@ import type {Login} from '@/config/types';
 /**
  * Fetch the generate salt.
  * @param login - login payload with tenant, username and password
- * @returns the generated value
+ * @returns the generated salt payload
  */
-export const generateSalt = (login: Login) => httpPost<string>(`${API_AUTH_BASE}/token/salt`, login);
+export const generateSalt = (login: Login) => httpPost<{salt: string}>(`${API_AUTH_BASE}/token/salt`, login);
 
 /**
  * Fetch the generate token.
  * @param login - login payload with tenant, username and password
- * @returns the generated value
+ * @returns the generated token payload
  */
-export const generateToken = (login: Login) => httpPost(`${API_AUTH_BASE}/token/generate`, login);
+export const generateToken = (login: Login) => httpPost<{token: string}>(`${API_AUTH_BASE}/token/generate`, login);
 
 /**
  * Change the password for the logged-in principal.

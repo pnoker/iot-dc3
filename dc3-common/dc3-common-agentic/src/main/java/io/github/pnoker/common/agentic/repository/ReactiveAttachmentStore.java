@@ -33,4 +33,10 @@ public interface ReactiveAttachmentStore {
 
     /** Load the attachments for the given ids. */
     Flux<AttachmentBO> getByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header);
+
+    /** Load one attachment by id within the caller's tenant and user scope. */
+    Mono<AttachmentBO> getById(Long id, RequestHeader.PrincipalHeader header);
+
+    /** Soft-delete one attachment by id within the caller's tenant and user scope. */
+    Mono<Long> delete(Long id, RequestHeader.PrincipalHeader header);
 }

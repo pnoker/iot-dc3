@@ -35,7 +35,7 @@ dc3 auth login --tenant default --username admin
 
 Create-verb commands are named `add` to mirror the backend CRUD conventions. `create` remains
 available as a deprecated compat alias: invoking it still routes to the same action, prints a
-one-line warning on stderr (`warning: 'create' is a deprecated compat alias of 'add' ... use
+one-line warning on stderr (`Warning: 'create' is a deprecated compat alias of 'add' ... use
 'dc3 device add'`), and help lists it as `add (deprecated alias: create)`. The alias is removed
 after one release.
 
@@ -246,13 +246,15 @@ dc3 alert change-impact [--days <days>] [--query source=device]
 dc3 alert latency
 dc3 alert silent-sources [--baseline-days <days>] [--silent-minutes <minutes>] [--limit <limit>]
 dc3 alert coverage-gap [--limit <limit>]
-dc3 alert point-profile <point_id>
+dc3 alert point-profile <point_id> [--days <days>] [--range-key today]
 dc3 alert bulk-confirm --args '{"items":[{"source":"device","id":789}]}'
 dc3 alert bulk-confirm --args-file payload.json
 ```
 
 `--query` is a true collector: every occurrence is kept and URL-encoded. `--args` / `--args-file`
-are mutually exclusive and exactly one is required; the JSON must be an object.
+are mutually exclusive and exactly one is required; the JSON must be an object. `point-profile`
+honors an explicit `--days` look-back window and a `--range-key` cohort window; `--range-key`
+accepts `today | 24h | 7d | 30d` (the gateway's default is a 30-day window).
 
 ### Dashboard (`dc3 dashboard`)
 
@@ -327,9 +329,11 @@ Streaming, tool calling, vision, and reasoning default to on, off, off, and off 
 ```bash
 dc3 attachment upload <file> --conversation-id <id>
 dc3 attachment list --conversation-id <id>
+dc3 attachment delete <id>
 ```
 
 Upload sends a real multipart/form-data `file` part (the filename rides the part disposition).
+Delete sends `DELETE /attachment/delete?id=<id>` and expects an empty `204 No Content`.
 
 ### Sessions & approvals (`dc3 session`, `dc3 action`)
 
@@ -456,7 +460,8 @@ Discriminate failures via `error.kind` — not via the exit code alone:
 | `api`          | non-2xx gateway response (`code` carries `API_<status>` or `INTERNAL`)               | 1 |
 | `timeout`      | a long-running operation exceeded its deadline                                      | 1 |
 
-Success paths always emit exactly one machine document and exit 0; stderr stays empty.
+Success paths emit at most one machine document (204/empty-body operations print nothing) and
+exit 0; stderr may carry one-line degradation or deprecation warnings, never an `Error: ` line.
 Streaming surfaces (`chat --stream`) suppress the stdout envelope once partial output has been
 written, so a late failure never appends a second document.
 
@@ -480,9 +485,9 @@ Configure your AI tool to connect to the Gateway MCP endpoint. The configuration
   "mcpServers": {
     "dc3": {
       "type": "http",
-      "url": "http://localhost:8000/mcp",
-    },
-  },
+      "url": "http://localhost:8000/mcp"
+    }
+  }
 }
 ```
 

@@ -65,6 +65,40 @@ class DriverStatusServiceImplTest {
     }
 
     @Test
+    void getReturnsSingleDriverStatusWithoutPagination() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.just(driver(7L)));
+        when(stateStore.listStateFlags(100L, EntityTypeEnum.DRIVER, List.of(7L)))
+                .thenReturn(Mono.just(Map.of(7L, (byte) EntityStatusEnum.ONLINE.getIndex())));
+
+        StepVerifier.create(service.get(100L, 7L))
+                .expectNext(EntityStatusEnum.ONLINE.getCode())
+                .verifyComplete();
+    }
+
+    @Test
+    void getDefaultsToOfflineWhenNoStateRowExists() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.just(driver(7L)));
+        when(stateStore.listStateFlags(100L, EntityTypeEnum.DRIVER, List.of(7L))).thenReturn(Mono.just(Map.of()));
+
+        StepVerifier.create(service.get(100L, 7L))
+                .expectNext(EntityStatusEnum.OFFLINE.getCode())
+                .verifyComplete();
+    }
+
+    @Test
+    void getMissingDriverIsNotFound() {
+        DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
+        when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.empty());
+
+        StepVerifier.create(service.get(100L, 7L))
+                .expectErrorSatisfies(error ->
+                        assertThat(error).isInstanceOf(io.github.pnoker.common.exception.NotFoundException.class))
+                .verify();
+    }
+
+    @Test
     void countOnlineDevicesIsTenantScoped() {
         DriverStatusServiceImpl service = new DriverStatusServiceImpl(driverFacade, deviceFacade, stateStore);
         when(driverFacade.getByIdReactive(100L, 7L)).thenReturn(Mono.just(new FacadeDriverBO()));
@@ -94,6 +128,12 @@ class DriverStatusServiceImplTest {
 
     private FacadeDeviceBO device(Long id) {
         FacadeDeviceBO value = new FacadeDeviceBO();
+        value.setId(id);
+        return value;
+    }
+
+    private FacadeDriverBO driver(Long id) {
+        FacadeDriverBO value = new FacadeDriverBO();
         value.setId(id);
         return value;
     }

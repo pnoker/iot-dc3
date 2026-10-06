@@ -22,7 +22,7 @@ vi.mock('../src/core/credential-store.js', () => ({
   resolvePassword: vi.fn(async () => 'dc3dc3dc3'),
 }));
 
-import { Dc3Client, parseTokenResource, parseScalarResource } from '../src/core/client.js';
+import { Dc3Client, parseTokenResource, parseAuthField } from '../src/core/client.js';
 import { decodeJwt } from '../src/utils/jwt.js';
 
 describe('direct auth resources', () => {
@@ -31,9 +31,12 @@ describe('direct auth resources', () => {
     expect(token).toBe('eyJhbGciOi.eyJleHAiOn0.sig');
   });
 
-  it('keeps the resource parseable for expiry bookkeeping', () => {
+  it('rejects payloads without numeric exp/iat — never-expiring guard', () => {
+    // Transport shape (3 parts) and expiry semantics are different layers: the
+    // resource regex accepts the shape, but a payload without numeric exp/iat
+    // must fail expiry bookkeeping loudly instead of minting a NaN session.
     const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.AAA';
-    expect(() => decodeJwt(token)).not.toThrow();
+    expect(() => decodeJwt(token)).toThrow(/exp and iat must be numeric/u);
   });
 
   it('rejects acknowledgement envelopes and cookie-only responses', () => {
@@ -41,10 +44,11 @@ describe('direct auth resources', () => {
     expect(() => parseTokenResource({ok: true, data: 'token'})).toThrow(/invalid resource/);
   });
 
-  it('parses scalar resources from bare text and JSON-encoded strings', () => {
-    expect(parseScalarResource('salt-abc', 'Salt')).toBe('salt-abc');
-    expect(parseScalarResource('"salt-abc"', 'Salt')).toBe('salt-abc');
-    expect(() => parseScalarResource('   ', 'Salt')).toThrow(/invalid resource/);
+  it('extracts auth fields from JSON objects only — bare text is a contract violation', () => {
+    expect(parseAuthField('{"salt":"salt-abc"}', 'salt', 'Salt')).toBe('salt-abc');
+    // Bare text/plain scalals are the retired wire shape: they must be rejected.
+    expect(() => parseAuthField('salt-abc', 'salt', 'Salt')).toThrow(/invalid resource/);
+    expect(() => parseAuthField('{"salt":""}', 'salt', 'Salt')).toThrow(/invalid resource/);
   });
 });
 
@@ -65,10 +69,10 @@ describe('login wire contract', () => {
         const body = init?.body ? (JSON.parse(String(init.body)) as Record<string, unknown>) : {};
         fetchCalls.push({ url: String(url), body });
         if (String(url).endsWith('/token/salt')) {
-          // Real contract: text/plain bare value (Mono<String> on the server).
-          return new Response('salt-abc', { status: 200 });
+          // Real contract: auth endpoints answer with JSON object fields.
+          return new Response(JSON.stringify({ salt: 'salt-abc' }), { status: 200 });
         }
-        return new Response(fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }), { status: 200 });
+        return new Response(JSON.stringify({ token: fakeJwt({ sub: '1', iat: 100, exp: 2_000_000_000 }) }), { status: 200 });
       }),
     );
   });

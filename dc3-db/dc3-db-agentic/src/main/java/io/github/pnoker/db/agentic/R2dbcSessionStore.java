@@ -19,6 +19,7 @@ package io.github.pnoker.db.agentic;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.repository.ReactiveSessionStore;
+import io.github.pnoker.common.agentic.service.impl.AttachmentFileCleaner;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
@@ -29,13 +30,17 @@ import io.github.pnoker.db.core.transaction.PageTransaction;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 import tools.jackson.databind.ObjectMapper;
 
 /** Explicit SQL adapter for agentic sessions. */
@@ -53,6 +58,7 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
     private final PageTransaction pageTransaction;
     private final ObjectMapper objectMapper;
     private final R2dbcDialect dialect;
+    private final AttachmentFileCleaner attachmentFileCleaner;
 
     @Override
     public Mono<SessionBO> touch(String conversationId, SessionExt sessionExt, RequestHeader.PrincipalHeader header) {
@@ -213,8 +219,37 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
                 .fetch()
                 .rowsUpdated()
                 .map(Long::valueOf);
-        return transactionalOperator.transactional(
-                deleteMessages.then(deleteAttachments).then(deleteActions).then(deleteSession));
+        return transactionalOperator
+                .transactional(listAttachmentFilePaths(conversationId, header)
+                        .collectList()
+                        .flatMap(filePaths -> deleteMessages
+                                .then(deleteAttachments)
+                                .then(deleteActions)
+                                .then(deleteSession)
+                                .map(deleted -> Tuples.of(deleted, filePaths))))
+                .flatMap(deletedSession -> unlinkAttachmentFiles(deletedSession).thenReturn(deletedSession.getT1()));
+    }
+
+    /** Read attachment file locations while the rows are still live, so the files can be unlinked after commit. */
+    private Flux<String> listAttachmentFilePaths(String conversationId, RequestHeader.PrincipalHeader header) {
+        return databaseClient
+                .sql("SELECT file_path FROM dc3_agentic.dc3_attachment"
+                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id AND deleted = 0")
+                .bind("conversation_id", conversationId)
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .map((row, metadata) -> row.get("file_path", String.class))
+                .all();
+    }
+
+    /**
+     * Unlink the conversation's stored attachment files after the session delete commits. Runs
+     * strictly after the transaction so file cleanup can never roll the delete back, and is
+     * warn-only so a missing or undeletable file never fails the committed delete.
+     */
+    private Mono<Void> unlinkAttachmentFiles(Tuple2<Long, List<String>> deletedSession) {
+        return attachmentFileCleaner.unlinkAll(deletedSession.getT2());
     }
 
     private Mono<Long> softDeleteChildren(String table, String conversationId, RequestHeader.PrincipalHeader header) {

@@ -20,6 +20,7 @@ import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
+  getManagerResource,
   parseNonNegativeInteger,
   updateManagerResource,
 } from '../utils/manager.js';
@@ -51,7 +52,13 @@ export function registerProfileCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      if (opts.deviceId) {
+      // An explicitly empty device filter is invalid input, not an absent flag
+      // (audit G32): reject it before any request is built instead of sending
+      // `?device_id=` to the gateway.
+      if (opts.deviceId !== undefined && opts.deviceId.trim() === '') {
+        throw new ValidationError('--device-id must be a non-empty value');
+      }
+      if (opts.deviceId !== undefined) {
         // The device filter is a separate GET endpoint without paging: refuse the
         // combination instead of silently ignoring explicit paging flags.
         if (opts.offset !== undefined || opts.limit !== undefined) {
@@ -68,7 +75,7 @@ export function registerProfileCommand(program: Command): void {
         offset: opts.offset ?? 0,
         limit: opts.limit ?? 20,
       };
-      if (opts.type) body.profileTypeFlag = opts.type;
+      if (opts.type !== undefined) body.profileTypeFlag = opts.type;
       const result = await dc3Client.post(`${PROFILE_BASE}/list`, body);
       printAndExit(result, format);
     });
@@ -79,7 +86,8 @@ export function registerProfileCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`${PROFILE_BASE}/get_by_id?id=${encodeURIComponent(id)}`);
+      // Shared manager helper: rejects empty/whitespace ids before any request.
+      const result = await getManagerResource(PROFILE_BASE, id);
       printAndExit(result, format);
     });
 
@@ -93,7 +101,7 @@ export function registerProfileCommand(program: Command): void {
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const body: Record<string, unknown> = { profileName: opts.name };
-      if (opts.type) body.profileTypeFlag = opts.type;
+      if (opts.type !== undefined) body.profileTypeFlag = opts.type;
       const result = await dc3Client.post(`${PROFILE_BASE}/add`, body);
       printAndExit(result, format);
     });
@@ -109,7 +117,7 @@ export function registerProfileCommand(program: Command): void {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(PROFILE_BASE, id, opts.version, {
         ...(opts.name !== undefined ? { profileName: opts.name } : {}),
-        ...(opts.type ? { profileTypeFlag: opts.type } : {}),
+        ...(opts.type !== undefined ? { profileTypeFlag: opts.type } : {}),
       });
       printAndExit(result, format);
     });

@@ -82,8 +82,10 @@ function runChild(
 
     let stdout = '';
     let stderr = '';
-    child.stdout.on('data', (chunk) => (stdout += String(chunk)));
-    child.stderr.on('data', (chunk) => (stderr += String(chunk)));
+    // stdio pipes are always configured for these children; the ChildProcess
+    // type just cannot know that.
+    child.stdout!.on('data', (chunk) => (stdout += String(chunk)));
+    child.stderr!.on('data', (chunk) => (stderr += String(chunk)));
     child.on('error', (error) => {
       clearTimeout(timer);
       reject(error);
@@ -235,6 +237,155 @@ describe('spawn-level command gating (F004) and help surface (F051)', () => {
   }, 60_000);
 });
 
+describe('cross-process login storm (F011 guard ii)', () => {
+  // LAST-RESORT retries (documented): the cross-process locks in
+  // src/core/atomic-fs.ts still have diagnosed contention defects (EPERM on
+  // lock create under release races; a vanished-lock stale path that can
+  // delete a successor's lockfile), so a child login can fail transiently
+  // under heavy parallel load. A systematic F011 regression (no atomic write,
+  // no lock) fails every retry; the retry only absorbs the interleavings.
+  // Remove once atomic-fs tolerates EPERM and stops rm-ing vanished locks.
+  it('N parallel auth login processes keep every profile and credential', { retry: 2, timeout: 60_000 }, async () => {
+    const { createServer } = await import('node:http');
+    const { createDecipheriv } = await import('node:crypto');
+    const now = Math.floor(Date.now() / 1000);
+    const encode = (value: Record<string, unknown>) =>
+      Buffer.from(JSON.stringify(value)).toString('base64url');
+    // Per-username tokens so the final assertion can prove profile pN ended
+    // up holding agentN's ticket, not just "a" ticket.
+    const mint = (username: string) =>
+      `${encode({ alg: 'HS256' })}.${encode({ sub: username, iat: now, exp: now + 7200 })}.sig`;
+
+    const generates = new Map<string, number>();
+    const server = createServer((req, res) => {
+      let body = '';
+      req.on('data', (chunk) => (body += String(chunk)));
+      req.on('end', () => {
+        const parsed = body ? (JSON.parse(body) as Record<string, unknown>) : {};
+        if (req.url?.endsWith('/token/salt')) {
+          res.writeHead(200, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ salt: 'salt-storm' }));
+          return;
+        }
+        if (req.url?.endsWith('/token/generate')) {
+          const username = String(parsed.name);
+          generates.set(username, (generates.get(username) ?? 0) + 1);
+          res.writeHead(200, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ token: mint(username) }));
+          return;
+        }
+        res.writeHead(404);
+        res.end('{}');
+      });
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const address = server.address();
+    if (!address || typeof address === 'string') {
+      throw new Error('mock gateway could not bind');
+    }
+    const gateway = `http://127.0.0.1:${address.port}`;
+
+    const agents = Array.from({ length: 6 }, (_, i) => `agent${i}`);
+    // One shared HOME: all children fight over the SAME config.json,
+    // tokens.json, and credentials.enc through the cross-process locks.
+    const home = await mkdtemp(join(tmpdir(), 'dc3-cli-storm-'));
+    try {
+      await mkdir(join(home, '.dc3'), { recursive: true });
+      await writeFile(
+        join(home, '.dc3', 'config.json'),
+        JSON.stringify({
+          version: 1,
+          current_profile: 'default',
+          settings: {},
+          profiles: Object.fromEntries(
+            agents.map((_, i) => [
+              `storm${i}`,
+              { gateway, tenant: 'default', username: 'seed', credential_store: 'encrypted' },
+            ]),
+          ),
+        }),
+        'utf8',
+      );
+
+      const results = await Promise.all(
+        agents.map((username, i) =>
+          runChild('cli-child.mjs', ['--profile', `storm${i}`, 'auth', 'login', '-t', 'tenantA', '-u', username, '--store', 'encrypted'], {
+            stdin: 'closed',
+            envHome: home,
+            envExtra: { DC3_PASSWORD: `pw-storm-${i}` },
+          }),
+        ),
+      );
+
+      // Every login succeeded on its own; stderr carries the diagnostic when
+      // one did not.
+      for (const result of results) {
+        expect(result.code, result.stderr).toBe(0);
+      }
+      // All logins really hit the gateway (no silent skip).
+      expect([...generates.keys()].sort()).toEqual(agents);
+
+      // tokens.json: exactly N entries, each profile holding its own agent's
+      // ticket — a lost update or a cross-profile clobber fails here.
+      // Per-profile assertion with a full diagnostic dump: if a profile that
+      // exited 0 is missing its entry (silent lost update — seen once under
+      // full-suite CPU saturation), the failure message must carry every
+      // child's code/stdout/stderr and the raw file so the interleaving that
+      // produced it can be located from the log alone.
+      const tokens = JSON.parse(await readFile(join(home, '.dc3', 'tokens.json'), 'utf8'));
+      for (const [i, username] of agents.entries()) {
+        const profile = `storm${i}`;
+        if (!(profile in tokens.states)) {
+          throw new Error(
+            `silent lost update: ${profile} exited 0 but has no tokens.json entry. ` +
+              `children: ${JSON.stringify(
+                results.map((r, j) => ({ profile: `storm${j}`, code: r.code, stdout: r.stdout, stderr: r.stderr })),
+              )} ` +
+              `tokens.json: ${JSON.stringify(tokens)}`,
+          );
+        }
+        expect(tokens.states[profile].username).toBe(username);
+      }
+      expect(Object.keys(tokens.states).sort()).toEqual(
+        agents.map((_, i) => `storm${i}`),
+      );
+      for (const [i, username] of agents.entries()) {
+        const state = tokens.states[`storm${i}`];
+        expect(state.username).toBe(username);
+        expect(state.tenant).toBe('tenantA');
+        const payload = JSON.parse(Buffer.from(state.token.split('.')[1], 'base64url').toString('utf8'));
+        expect(payload.sub).toBe(username);
+      }
+
+      // config.json: the concurrent per-profile config writes lost nothing.
+      const config = JSON.parse(await readFile(join(home, '.dc3', 'config.json'), 'utf8'));
+      expect(Object.keys(config.profiles).sort()).toEqual(
+        agents.map((_, i) => `storm${i}`),
+      );
+
+      // credentials.enc: decrypts with its own key file to exactly the N
+      // username@tenant entries with the right passwords.
+      const encFile = JSON.parse(await readFile(join(home, '.dc3', 'credentials.enc'), 'utf8'));
+      expect(encFile.v).toBe(2);
+      const key = Buffer.from((await readFile(join(home, '.dc3', 'credentials.key'), 'utf8')).trim(), 'hex');
+      const decipher = createDecipheriv('aes-256-gcm', key, Buffer.from(encFile.iv, 'hex'));
+      decipher.setAuthTag(Buffer.from(encFile.tag, 'hex'));
+      const plain = Buffer.concat([
+        decipher.update(Buffer.from(encFile.data, 'hex')),
+        decipher.final(),
+      ]).toString('utf8');
+      const entries = JSON.parse(plain) as Record<string, string>;
+      expect(Object.keys(entries).sort()).toEqual(agents.map((username) => `${username}@tenantA`));
+      for (const [i, username] of agents.entries()) {
+        expect(entries[`${username}@tenantA`]).toBe(`pw-storm-${i}`);
+      }
+    } finally {
+      await rm(home, { recursive: true, force: true });
+      server.close();
+    }
+  });
+});
+
 describe('spawn-level headless login through DC3_PASSWORD (F033)', () => {
   it('auth login --store env logs in against a real gateway with closed stdin', async () => {
     const { createServer } = await import('node:http');
@@ -253,13 +404,13 @@ describe('spawn-level headless login through DC3_PASSWORD (F033)', () => {
           body: body ? (JSON.parse(body) as Record<string, unknown>) : {},
         });
         if (req.url?.endsWith('/token/salt')) {
-          res.writeHead(200, { 'content-type': 'text/plain' });
-          res.end('salt-abc');
+          res.writeHead(200, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ salt: 'salt-abc' }));
           return;
         }
         if (req.url?.endsWith('/token/generate')) {
-          res.writeHead(200, { 'content-type': 'text/plain' });
-          res.end(token);
+          res.writeHead(200, { 'content-type': 'application/json' });
+          res.end(JSON.stringify({ token }));
           return;
         }
         res.writeHead(404);
@@ -300,7 +451,11 @@ describe('spawn-level headless login through DC3_PASSWORD (F033)', () => {
       expect(result.stderr).not.toContain('Password:');
       const payload = JSON.parse(result.stdout);
       expect(payload.ok).toBe(true);
-      expect(payload.password_saved).toBe(true);
+      // The env store never persists: password_saved must be false and the
+      // warning must tell the user DC3_PASSWORD is per-session
+      // (password_saved semantics).
+      expect(payload.password_saved).toBe(false);
+      expect(result.stderr).toMatch(/DC3_PASSWORD/u);
       // The env password traveled on the wire and the state persisted.
       expect(requests).toHaveLength(2);
       expect(requests[1].body).toMatchObject({ name: 'admin', tenant: 'tenantA', password: 'env-pw' });

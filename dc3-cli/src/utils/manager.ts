@@ -16,6 +16,7 @@
  */
 import { InvalidArgumentError } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 
 type ManagerResource = Record<string, unknown>;
 
@@ -30,8 +31,8 @@ const DECIMAL_INTEGER_PATTERN = /^\d+$/u;
  * Parse a CLI option as a non-negative integer written in plain decimal
  * digits; hex, exponent, decimal-point, padded, and empty forms are rejected
  * before the safe-integer range check.
- * @param value - value to set
- * @returns the transformed value
+ * @param value - raw CLI option lexeme to validate as plain decimal digits
+ * @returns the parsed non-negative safe integer
  */
 export function parseNonNegativeInteger(value: string): number {
   if (!DECIMAL_INTEGER_PATTERN.test(value)) {
@@ -48,8 +49,8 @@ export function parseNonNegativeInteger(value: string): number {
  * Parse a CLI option as a positive integer written in plain decimal digits;
  * hex, exponent, decimal-point, padded, and empty forms are rejected before
  * the safe-integer range check.
- * @param value - value to set
- * @returns the transformed value
+ * @param value - raw CLI option lexeme to validate as plain decimal digits
+ * @returns the parsed positive safe integer
  */
 export function parsePositiveInteger(value: string): number {
   if (!DECIMAL_INTEGER_PATTERN.test(value)) {
@@ -65,13 +66,16 @@ export function parsePositiveInteger(value: string): number {
 /**
  * Reject empty or whitespace resource ids before any request is built — an
  * empty id would otherwise travel to the wire as `?id=` (report F053).
+ * Exported so id-keyed command paths that do not go through the manager
+ * helpers can enforce the same contract. Thrown as a business validation
+ * (kind "validation", exit 1), not a commander argv-shape error.
  * @param basePath - manager resource base path, for the error message
  * @param id - resource id to validate
  * @returns the unchanged id
  */
-function requireResourceId(basePath: string, id: string): string {
+export function requireResourceId(basePath: string, id: string): string {
   if (typeof id !== 'string' || id.trim() === '') {
-    throw new InvalidArgumentError(
+    throw new ValidationError(
       `resource id for ${basePath} must be a non-empty value, got ${JSON.stringify(id)}`,
     );
   }
@@ -82,7 +86,7 @@ function requireResourceId(basePath: string, id: string): string {
  * Fetch a manager resource by id.
  * @param basePath - manager resource base path (e.g. device)
  * @param id - resource id to fetch
- * @returns the operation result
+ * @returns the decoded gateway response body for the fetched record
  */
 export async function getManagerResource<T = unknown>(basePath: string, id: string): Promise<T> {
   requireResourceId(basePath, id);
@@ -95,7 +99,7 @@ export async function getManagerResource<T = unknown>(basePath: string, id: stri
  * @param id - resource id to update
  * @param expectedVersion - version for optimistic locking
  * @param changes - fields to merge over the current record
- * @returns the operation result
+ * @returns the decoded gateway response body of the update call
  */
 export async function updateManagerResource<T = unknown>(
   basePath: string,

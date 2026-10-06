@@ -128,6 +128,12 @@ describe('attachment upload multipart wire format (F003)', () => {
           contentType: String(req.headers['content-type'] ?? ''),
           body: Buffer.concat(chunks),
         };
+        // Deletes answer with the pinned contract: 204 and an empty body.
+        if (req.method === 'DELETE') {
+          res.writeHead(204);
+          res.end();
+          return;
+        }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ id: 'att-1', conversationId: 'conv-1' }));
       });
@@ -200,5 +206,25 @@ describe('attachment upload multipart wire format (F003)', () => {
     expect(exitCode).toBe(0);
     expect(captured?.url).toBe('/api/v3/agentic/attachment/list?conversation_id=conv%201');
     expect(JSON.parse(stdout)).toMatchObject({ id: 'att-1' });
+  });
+
+  it('delete sends DELETE to the pinned delete URL and treats 204-empty as success (G12)', async () => {
+    const { stdout, exitCode } = await run([
+      'attachment', 'delete', 'att 1', '--format', 'json',
+    ]);
+
+    expect(exitCode).toBe(0);
+    // 204 with an empty body prints nothing.
+    expect(stdout).toBe('');
+    expect(captured?.method).toBe('DELETE');
+    expect(captured?.url).toBe('/api/v3/agentic/attachment/delete?id=att%201');
+    expect(captured?.body.length).toBe(0);
+  });
+
+  it('delete rejects an empty id before any request (G13/G27)', async () => {
+    await expect(
+      run(['attachment', 'delete', ' ', '--format', 'json']),
+    ).rejects.toMatchObject({ name: 'ValidationError', kind: 'validation', exitCode: 1 });
+    expect(captured).toBeNull();
   });
 });

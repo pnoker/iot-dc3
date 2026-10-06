@@ -5,10 +5,27 @@ import globals from 'globals';
 import jsdoc from 'eslint-plugin-jsdoc';
 
 export default [
+  // Global ignore: a config object whose ONLY key is `ignores` excludes these
+  // paths from the whole run, so `eslint .` (and CI) never lints build output.
+  // Inside a mixed object, `ignores` only narrows that one config object and
+  // later configs (js.configs.recommended) still apply to dist/.
+  {
+    ignores: ['node_modules/**', 'dist/**'],
+  },
   {
     plugins: { jsdoc },
     settings: { jsdoc: { mode: 'typescript' } },
-    ignores: ['node_modules/**', 'dist/**'],
+  },
+  {
+    // Node-run .mjs outside src/test (license-header tooling, this config
+    // file): without node globals here, `eslint .` fails these files on
+    // core no-undef (process/console are Node-provided, not browser).
+    files: ['scripts/**/*.mjs', '*.mjs'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
   },
   js.configs.recommended,
   {
@@ -23,6 +40,9 @@ export default [
     },
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',
+      // TS files: identifier resolution belongs to tsc --noEmit (CI/build gate);
+      // core no-undef cannot see @types/node ambient types (NodeJS, RequestInit).
+      'no-undef': 'off',
       'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
       // JSDoc gate - mirrors backend checkstyle: exported API must be documented.
       // `require.FunctionDeclaration: false` is required: the schema default

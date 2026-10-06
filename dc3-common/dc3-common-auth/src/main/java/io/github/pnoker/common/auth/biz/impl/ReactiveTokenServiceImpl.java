@@ -34,6 +34,7 @@ import io.github.pnoker.common.exception.PasswordChangeRequiredException;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.utils.KeyUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -173,7 +174,22 @@ public class ReactiveTokenServiceImpl implements ReactiveTokenService {
                 })
                 .subscribeOn(ReactiveAuthScheduler.CRYPTO)
                 .onErrorResume(error -> {
-                    log.warn("Token validation failed", error);
+                    // JwtException covers the expected rejections on this hot path (expiry, signature, wrong
+                    // subject/tenant claims): log one INFO line without a stack trace. Stack-trace suppression is
+                    // intentional here; anything else is a surprise and keeps the full WARN stack.
+                    if (error instanceof JwtException) {
+                        log.info(
+                                "Token validation rejected, tenantCode={}, principalId={}, reason={}",
+                                tenantCode(tenant),
+                                credential.getPrincipalId(),
+                                error.getClass().getSimpleName());
+                    } else {
+                        log.warn(
+                                "Token validation failed, tenantCode={}, principalId={}",
+                                tenantCode(tenant),
+                                credential.getPrincipalId(),
+                                error);
+                    }
                     return Mono.just(new TokenValid(false, null));
                 });
     }

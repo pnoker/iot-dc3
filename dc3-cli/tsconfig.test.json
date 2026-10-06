@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "."
+  },
+  // Type gate for the test tree: src stays gated by `pnpm typecheck`
+  // (tsconfig.json), this project adds the test files so a broken import
+  // path, a mistyped mock, or a contract drift in a test file fails CI
+  // before vitest loads it.
+  //
+  // `exclude` is a ratchet, not a pardon: the files listed below predate
+  // this gate and still carry strict-mode errors (mock shapes, loose
+  // address() narrowing, vi.mocked casts). Every other test file — and
+  // every NEW test file — is type-checked. Remove an entry as soon as its
+  // file is made strict-clean; the list must trend to empty.
+  "include": ["src", "test"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test/agentic-manage.test.ts",
+    "test/attachment-upload.test.ts",
+    "test/auth-commands.test.ts",
+    "test/chat-stream.test.ts",
+    "test/client.test.ts",
+    "test/config.test.ts",
+    "test/docs-lint.test.ts",
+    "test/mcp.test.ts",
+    "test/output-format.test.ts",
+    "test/prompt.test.ts",
+    "test/tool-command.test.ts"
+  ]
+}

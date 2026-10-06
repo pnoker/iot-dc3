@@ -153,6 +153,25 @@ describe('credential store chain (F033) and save contract (F005)', () => {
     expect(result).toEqual({ persisted: false, store: 'keychain' });
   });
 
+  it('savePasswordToStore never reports the env store as persisted (password_saved semantics)', async () => {
+    // The env store is "available" while DC3_PASSWORD is set, but it is
+    // process-scoped: nothing reaches persistent storage and the result must
+    // say so — even with the variable present.
+    await writeConfigFile('env');
+    vi.stubEnv('DC3_PASSWORD', 'from-env');
+
+    const { savePasswordToStore } = await import('../src/core/credential-store');
+    const result = await savePasswordToStore('admin@default', 'pw');
+    expect(result).toEqual({ persisted: false, store: 'env' });
+
+    // Without the variable the answer must not change either.
+    vi.unstubAllEnvs();
+    expect(await savePasswordToStore('admin@default', 'pw')).toEqual({
+      persisted: false,
+      store: 'env',
+    });
+  });
+
   it('savePasswordToStore persists and reports the target store', async () => {
     await writeConfigFile('encrypted');
 
@@ -189,6 +208,36 @@ describe('credential store chain (F033) and save contract (F005)', () => {
     const { deletePasswordFromStore } = await import('../src/core/credential-store');
     await expect(deletePasswordFromStore('admin@default')).resolves.toBeUndefined();
     expect(keychainMock.deleted).toEqual(['admin@default']);
+  });
+
+  it('deleting the last stored password removes the AES key with the ciphertext (logout hygiene)', async () => {
+    await writeConfigFile('encrypted');
+    const { EncryptedFileStore } = await import('../src/core/credential-encrypted');
+    await new EncryptedFileStore().savePassword('admin@default', 'pw');
+    expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(true);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(true);
+
+    const { deletePasswordFromStore } = await import('../src/core/credential-store');
+    await deletePasswordFromStore('admin@default');
+
+    // No other profile holds an entry: logout must leave no decryptable slice
+    // — neither the ciphertext nor the key that could decrypt future captures.
+    expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(false);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(false);
+  });
+
+  it('the AES key stays on disk while other entries still need it', async () => {
+    await writeConfigFile('encrypted');
+    const { EncryptedFileStore } = await import('../src/core/credential-encrypted');
+    await new EncryptedFileStore().savePassword('a@t1', 'pw-a');
+    await new EncryptedFileStore().savePassword('b@t2', 'pw-b');
+
+    const { deletePasswordFromStore } = await import('../src/core/credential-store');
+    await deletePasswordFromStore('a@t1');
+
+    expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(true);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(true);
+    expect(await new EncryptedFileStore().getPassword('b@t2')).toBe('pw-b');
   });
 });
 
@@ -244,18 +293,39 @@ describe('config reset clears every local auth store (F016)', () => {
     const encrypted = new (await import('../src/core/credential-encrypted')).EncryptedFileStore();
     await encrypted.savePassword('admin@tenantA', 'pw');
     expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(true);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(true);
 
     const { resetAllLocalState } = await import('../src/core/credential-store');
     await resetAllLocalState();
 
     expect(existsSync(join(home, '.dc3', 'tokens.json'))).toBe(false);
     expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(false);
+    // The AES key goes with the ciphertext: a reset that kept it would leave
+    // a decryptable slice of local auth state behind (F016 residue).
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(false);
     const config = JSON.parse(await readFile(join(home, '.dc3', 'config.json'), 'utf8'));
     expect(config.profiles).toEqual({});
     expect(config.current_profile).toBe('default');
 
     const { tokenManager } = await import('../src/core/token-manager');
     expect(await tokenManager.getAllStates()).toEqual({});
+  });
+
+  it('the encrypted store wipe removes key entries the identifier sources never knew about', async () => {
+    const encrypted = new (await import('../src/core/credential-encrypted')).EncryptedFileStore();
+    await encrypted.savePassword('ghost@tenantB', 'pw');
+    await encrypted.savePassword('lurker@tenantC', 'pw');
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(true);
+
+    const { clearAllStoredCredentials } = await import('../src/core/credential-store');
+    // No identifiers from token states at all: the wholesale store wipe must
+    // still remove every entry AND the AES key.
+    await clearAllStoredCredentials([]);
+
+    expect(await encrypted.getPassword('ghost@tenantB')).toBeNull();
+    expect(await encrypted.getPassword('lurker@tenantC')).toBeNull();
+    expect(existsSync(join(home, '.dc3', 'credentials.enc'))).toBe(false);
+    expect(existsSync(join(home, '.dc3', 'credentials.key'))).toBe(false);
   });
 
   it('reset also scrubs identifiers whose token is already gone (encrypted enumeration)', async () => {
