@@ -86,9 +86,14 @@ export function registerProviderCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const current = await dc3Client.get<Record<string, unknown>>(
-        `${BASE}/config/get_by_id?id=${encodeURIComponent(id)}`,
-      ).catch(() => null);
+      // The provider controller has no get_by_id, so resolve from the list.
+      const providers = await dc3Client.get<Array<Record<string, unknown>>>(`${BASE}/list`);
+      const current = Array.isArray(providers)
+        ? providers.find((p) => String(p.id) === String(id))
+        : null;
+      if (!current) {
+        printAndExit({ ok: false, message: `Provider ${id} not found` }, format, 1);
+      }
       const changes: Record<string, unknown> = {};
       if (opts.name !== undefined) changes.name = opts.name;
       if (opts.baseUrl !== undefined) changes.baseUrl = opts.baseUrl;
@@ -98,7 +103,7 @@ export function registerProviderCommand(program: Command): void {
       if (opts.enable) changes.enableFlag = 'ENABLE';
       if (opts.disable) changes.enableFlag = 'DISABLE';
       const result = await dc3Client.post(`${BASE}/config/update`, {
-        ...(current ?? {}),
+        ...current,
         ...changes,
         id,
       });

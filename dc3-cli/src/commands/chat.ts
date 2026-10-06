@@ -19,6 +19,7 @@ import { dc3Client, AuthError, NetworkError } from '../core/client.js';
 import { configManager } from '../core/config-manager.js';
 import { tokenManager } from '../core/token-manager.js';
 import { fetchOrNetworkError, normalizeGateway } from '../core/http.js';
+import { SilentExit } from '../utils/format.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 /**
@@ -130,7 +131,10 @@ export function registerChatCommand(program: Command): void {
           throw new NetworkError(`Chat stream interrupted: ${(error as Error).message}`);
         }
         process.stdout.write('\n');
-        process.exit(0);
+        // Unwind cleanly instead of process.exit (crashes node on windows
+        // while the SSE reader's handles are still closing).
+        process.exitCode = 0;
+        throw new SilentExit();
       } else {
         const result = await dc3Client.post('/api/v3/agentic/chat/completions', body);
         printAndExit(result, format);
