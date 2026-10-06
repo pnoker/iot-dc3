@@ -31,6 +31,7 @@
     :retry-text="$t('common.retry')"
     :title="$t('pointValue.dashboard.trend.title')"
     body-mode="chart"
+    loading-target="button"
     @refresh="emit('refresh')"
   >
     <template #tools>
