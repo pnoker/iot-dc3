@@ -410,4 +410,48 @@ export function registerDeviceCommand(program: Command): void {
       );
       printAndExit(operation, format, operation.status === 'SUCCEEDED' ? 0 : 1);
     });
+
+  // dc3 device import-template
+  device
+    .command('import-template')
+    .description('Download the XLSX import template for bulk device import')
+    .requiredOption('--driver-id <id>', 'Driver ID to shape the template for')
+    .requiredOption('--profile-id <id>', 'Profile ID to shape the template for')
+    .option('--output <path>', 'Output file path (defaults to device-import-template.xlsx)')
+    .option('--format <format>', 'Output format (ignored; always saves the binary)')
+    .action(async (opts) => {
+      const format = detectFormat(opts.format);
+      const outputPath = opts.output || 'device-import-template.xlsx';
+      // Binary XLSX download bypasses the JSON-decoding client pipeline; use
+      // the shared fetch seam directly (same auth headers, same error mapping).
+      const { fetchOrNetworkError, normalizeGateway } = await import('../core/http.js');
+      const { configManager } = await import('../core/config-manager.js');
+      const { tokenManager } = await import('../core/token-manager.js');
+      const profile = await configManager.getActiveProfile();
+      const profileName = await configManager.getActiveProfileName();
+      const state = await tokenManager.getState(profileName);
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (state) {
+        Object.assign(headers, tokenManager.buildHeaders(state));
+      }
+      const res = await fetchOrNetworkError(
+        `${normalizeGateway(profile.gateway)}/api/v3/manager/device/export/import_template`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({ driverId: opts.driverId, profileId: opts.profileId }),
+        },
+      );
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        printAndExit({ ok: false, message: `Template download failed (${res.status}): ${text.slice(0, 200)}` }, format, 1);
+      }
+      const buffer = Buffer.from(await res.arrayBuffer());
+      if (buffer.length === 0) {
+        printAndExit({ ok: false, message: 'Template download returned empty body' }, format, 1);
+      }
+      const { writeFile } = await import('node:fs/promises');
+      await writeFile(outputPath, buffer);
+      printAndExit({ ok: true, path: outputPath, size: buffer.length }, format);
+    });
 }

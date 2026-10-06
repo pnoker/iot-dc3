@@ -11,7 +11,7 @@
     "mcp",
     "industrial-iot"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "author": "pnoker",
   "type": "module",
   "main": "./dist/index.js",

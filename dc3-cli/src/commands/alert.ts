@@ -273,4 +273,17 @@ export function registerAlertCommand(program: Command): void {
       const result = await dc3Client.post('/api/v3/data/dashboard/alert/bulk_confirm', body);
       printAndExit(result, format);
     });
+
+  // dc3 alert point-profile <point_id>
+  alert
+    .command('point-profile <point_id>')
+    .description('Alert profile for a single point across its peer cohort')
+    .option('--format <format>', 'Output format')
+    .action(async (pointId, opts) => {
+      const format = detectFormat(opts.format);
+      const result = await dc3Client.get(
+        `/api/v3/data/dashboard/alert/point_profile?point_id=${encodeURIComponent(pointId)}`,
+      );
+      printAndExit(result, format);
+    });
 }
