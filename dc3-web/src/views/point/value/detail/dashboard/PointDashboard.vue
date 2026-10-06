@@ -25,61 +25,15 @@
 
 <template>
   <div class="point-dashboard">
-    <!-- Identity banner — the same tone-tile hero anatomy as the device
-         detail page: tile + name + attachment + status chip, with the
-         point id and collect time demoted to a quiet footer. -->
-    <div class="point-dashboard__banner">
-      <div class="point-dashboard__hero">
-        <span class="point-dashboard__tile" aria-hidden="true">
-          <el-icon :size="26"><Cpu/></el-icon>
-        </span>
-        <div class="point-dashboard__title">
-          <span class="point-dashboard__name">{{ pointName || '-' }}</span>
-          <span class="point-dashboard__attach">
-            <button
-              v-if="deviceId"
-              class="point-dashboard__attach-link"
-              :title="deviceName || deviceId"
-              type="button"
-              @click="openDevice"
-            >
-              {{ deviceName || deviceId }}
-            </button>
-            <template v-if="unit"> · {{ unit }}</template>
-          </span>
-        </div>
-        <span v-if="rwFlag" class="point-dashboard__status-chip" :class="rwChipClass">
-          <span class="point-dashboard__status-dot"></span>
-          {{ rwLabel }}
-        </span>
-      </div>
-      <div class="point-dashboard__footer">
-        <button
-          v-if="pointId"
-          class="point-dashboard__code"
-          :title="pointId"
-          type="button"
-          @click="copyPointId"
-        >
-          {{ pointId }}
-        </button>
-        <span class="point-dashboard__live-meta">
-          {{ $t('pointValue.card.collectTime') }} {{ collectTimeLabel }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Stat strip — 6 tiles on a 3-wide grid so every row stays full:
-         2 rows of 3 on desktop, 3 rows of 2 on tablet, 6 stacked on
-         mobile. Six (not five) is what makes the row math close at the
-         3/2/1 column tiers. -->
+    <!-- Stat strip — 6 tiles on a 3-wide grid. The first tile doubles as
+         the identity card: point name as title, device·unit·rw as subtitle. -->
     <div class="point-dashboard__stats">
       <stat-card
-        :icon="OdometerIcon"
+        :icon="Cpu"
         :loading="cardLoading('current')"
         :on-refresh="() => reloadDashboard('current')"
-        :subtitle="unit || '—'"
-        :title="$t('pointValue.dashboard.kpi.current')"
+        :subtitle="identitySubtitle"
+        :title="pointName || $t('pointValue.dashboard.kpi.current')"
         :value="currentValueCard"
         tone="blue"
       />
@@ -191,12 +145,10 @@
 import type {PropType} from 'vue';
 import {computed, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
-import {useRouter} from 'vue-router';
 import {
   Collection as CollectionIcon,
   Cpu,
   DataLine as DataLineIcon,
-  Odometer as OdometerIcon,
   Timer as TimerIcon,
   TrendCharts as TrendChartsIcon,
   Warning as WarningIcon,
@@ -221,7 +173,6 @@ const props = defineProps({
 });
 
 const {t} = useI18n();
-const router = useRouter();
 const rangeHours = ref(24);
 
 const {dashboard, alertProfile, recentAlerts, loadDashboard, loadAlertProfile, loadRecentAlerts} =
@@ -231,6 +182,7 @@ const deviceId = computed(() => String(props.deviceId || ''));
 const pointId = computed(() => String(props.pointId || ''));
 const unit = computed(() => props.unit);
 
+const deviceName = computed(() => String(props.deviceName || ''));
 const stats = computed(() => dashboard.data.value?.stats ?? null);
 const gapCount = computed(() => dashboard.data.value?.gaps?.length ?? 0);
 
@@ -294,35 +246,8 @@ watch(
   {immediate: true}
 );
 
-// ---- banner helpers --------------------------------------------------------
-
 const rwFlag = computed(() => String(props.latest?.rwFlag || '').toUpperCase());
-const isReadOnly = computed(() => ['R', 'READ_ONLY'].includes(rwFlag.value));
-const isWriteOnly = computed(() => ['W', 'WRITE_ONLY'].includes(rwFlag.value));
-const rwChipClass = computed(() =>
-  isWriteOnly.value
-    ? 'point-dashboard__status-chip--default'
-    : isReadOnly.value
-      ? 'point-dashboard__status-chip--warning'
-      : 'point-dashboard__status-chip--success'
-);
 const rwLabel = computed(() => t(rwFlagKey(rwFlag.value)));
-
-const openDevice = () => {
-  if (!deviceId.value) return;
-  router.push({name: 'deviceDetail', query: {id: deviceId.value}}).catch(() => {
-    // handled globally
-  });
-};
-
-const copyPointId = async () => {
-  if (!pointId.value) return;
-  try {
-    await navigator.clipboard.writeText(pointId.value);
-  } catch {
-    // clipboard unavailable — silent
-  }
-};
 
 // ---- stat card values -------------------------------------------------------
 
@@ -340,7 +265,15 @@ const samplesSubtitle = computed(() =>
   stats.value?.truncated ? t('pointValue.dashboard.kpi.samplesTruncated') : ''
 );
 
-const collectTimeLabel = computed(() => String(props.latest?.createTime || '—'));</script>
+// Identity subtitle for the first stat tile: device · unit · rw, replacing
+// the removed standalone banner.
+const identitySubtitle = computed(() => {
+  const parts: string[] = [];
+  if (deviceName.value || deviceId.value) parts.push(deviceName.value || deviceId.value);
+  if (unit.value) parts.push(unit.value);
+  if (rwLabel.value) parts.push(rwLabel.value);
+  return parts.join(' · ') || '—';
+});</script>
 <style lang="scss" scoped>
 .point-dashboard {
   // Identity banner — the point-card header anatomy (tone tile + name +
