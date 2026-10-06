@@ -16,11 +16,11 @@
  */
 import { Command } from 'commander';
 import { dc3Client, AuthError, NetworkError } from '../core/client.js';
+import { ApiError, UsageError, suppressFailureEnvelope } from '../core/errors.js';
 import { configManager } from '../core/config-manager.js';
 import { tokenManager } from '../core/token-manager.js';
-import { fetchOrNetworkError, normalizeGateway } from '../core/http.js';
-import { SilentExit } from '../utils/format.js';
-import { detectFormat, printAndExit } from '../utils/format.js';
+import { fetchOrNetworkError, normalizeGateway, readBodyText } from '../core/http.js';
+import { SilentExit, detectFormat, printAndExit } from '../utils/format.js';
 
 /**
  * Register the `chat` command tree on the CLI program.
@@ -40,14 +40,7 @@ export function registerChatCommand(program: Command): void {
     .action(async (prompt, opts) => {
       const format = detectFormat(opts.format);
       if (!prompt && !opts.conversationId) {
-        printAndExit(
-          {
-            ok: false,
-            message: 'Please provide a prompt or --conversation-id to continue',
-          },
-          format,
-          1,
-        );
+        throw new UsageError('Please provide a prompt or --conversation-id to continue');
       }
 
       const conversationId = opts.conversationId || undefined;
@@ -85,43 +78,63 @@ export function registerChatCommand(program: Command): void {
         );
 
         if (res.status === 401) {
-          throw new AuthError(`Authentication failed (401): ${await res.text()}`);
+          throw new AuthError(`Authentication failed (401): ${await readBodyText(res)}`);
         }
         if (!res.ok) {
-          printAndExit({ ok: false, message: await res.text() }, format, 1);
+          const text = await readBodyText(res);
+          const detail = text.trim() === '' ? '(empty body)' : text.trim();
+          throw new ApiError(`Chat completion failed (${res.status}): ${detail}`, res.status);
         }
 
         // Stream SSE to stdout
         const reader = res.body?.getReader();
         if (!reader) {
-          printAndExit({ ok: false, message: 'No response body' }, format, 1);
+          throw new ApiError('Chat completion returned no response body');
         }
 
         const decoder = new TextDecoder();
         let buffer = '';
+        // [DONE] is the application-layer terminator: once seen, the OUTER
+        // read loop must stop too — breaking only the line loop left the
+        // process lifetime bound to the server closing the connection
+        // (report F023).
+        let finished = false;
+        let streamed = false;
         try {
-          while (true) {
+          while (!finished) {
             const { done, value } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split('\n');
             buffer = lines.pop() || '';
             for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') {
-                  process.stdout.write('\n');
-                  break;
-                }
-                try {
-                  const parsed = JSON.parse(data);
-                  const content = parsed.choices?.[0]?.delta?.content || '';
-                  if (content) {
-                    process.stdout.write(content);
+              // Spring WebFlux ServerSentEvent emits `data:{json}` (no space
+              // after the colon); the SSE spec allows an optional single
+              // leading space, so match both `data: ` and `data:`.
+              const data = line.startsWith('data: ')
+                ? line.slice(6)
+                : line.startsWith('data:')
+                  ? line.slice(5)
+                  : null;
+              if (data === null) continue;
+              if (data === '[DONE]') {
+                finished = true;
+                break;
+              }
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  if (!streamed) {
+                    // stdout now carries streamed content; a later failure
+                    // must not append a JSON envelope onto it.
+                    suppressFailureEnvelope();
+                    streamed = true;
                   }
-                } catch {
-                  // Skip unparseable SSE data
+                  process.stdout.write(content);
                 }
+              } catch {
+                // Skip unparseable SSE data
               }
             }
           }
@@ -131,6 +144,10 @@ export function registerChatCommand(program: Command): void {
           throw new NetworkError(`Chat stream interrupted: ${(error as Error).message}`);
         }
         process.stdout.write('\n');
+        // Release the socket without waiting for the server: gateways that
+        // keep the connection open past [DONE] (keep-alive, session reuse)
+        // must not hold the process hostage (report F023).
+        await reader.cancel();
         // Unwind cleanly instead of process.exit (crashes node on windows
         // while the SSE reader's handles are still closing).
         process.exitCode = 0;
