@@ -740,7 +740,7 @@ onBeforeUnmount(() => {
   // Stat-card strip: 4 across on desktop, 2 on tablet, 1 on mobile.
   &__stats {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--dc3-space-2);
     margin-bottom: var(--dc3-gutter);
 
