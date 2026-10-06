@@ -272,7 +272,20 @@ const onRangeChange = (hours: number) => {
   rangeHours.value = hours;
 };
 
-watch(() => [deviceId.value, pointId.value, rangeHours.value], () => reloadDashboard(null), {immediate: true});
+// Window switch only re-fetches the trend band (the card that hosts the
+// selector); stat tiles keep their values and never flash loading. Device
+// or point changes re-fetch the full board with all sections.
+watch(
+  () => [deviceId.value, pointId.value],
+  () => reloadDashboard(null),
+  {immediate: true}
+);
+watch(
+  () => rangeHours.value,
+  () => {
+    if (deviceId.value && pointId.value) reloadDashboard('trend');
+  }
+);
 watch(
   () => [deviceId.value, pointId.value],
   () => {
@@ -324,7 +337,7 @@ const averageValueCard = computed(() =>
 );
 
 const samplesSubtitle = computed(() =>
-  stats.value ? `${rangeHours.value}h window` : `${rangeHours.value}h window`
+  stats.value?.truncated ? t('pointValue.dashboard.kpi.samplesTruncated') : ''
 );
 
 const collectTimeLabel = computed(() => String(props.latest?.createTime || '—'));</script>
