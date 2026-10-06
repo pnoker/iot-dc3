@@ -92,16 +92,35 @@ export const usePointDashboard = () => {
   const peerItems = ref<PeerSnapshotItem[]>([]);
 
   /**
-   * Load the window-scoped dashboard payload.
+   * Load the window-scoped dashboard payload. When `sections` is provided
+   * (a manual single-card refresh), only those keys of the payload are
+   * applied — keys consumed by other cards keep their old object references
+   * so their chart watchers don't fire and the charts don't re-render.
    * @param deviceId - device id whose point is being queried
    * @param pointId - point id whose dashboard is being queried
    * @param rangeHours - lookback window in hours from 1 through 168
+   * @param sections - payload keys to apply; null/undefined applies everything
    * @returns the resolved dashboard payload
    */
-  const loadDashboard = (deviceId: string, pointId: string, rangeHours: number) =>
+  const loadDashboard = (
+    deviceId: string,
+    pointId: string,
+    rangeHours: number,
+    sections: readonly string[] | null = null
+  ) =>
     dashboard.run(() => getPointValueDashboard(deviceId, pointId, rangeHours), {
       apply: (res) => {
-        dashboardData.value = res ?? null;
+        if (sections && dashboardData.value && res) {
+          const toUpdate = new Set(sections);
+          const merged = {...res} as Record<string, unknown>;
+          const old = dashboardData.value as unknown as Record<string, unknown>;
+          for (const key of Object.keys(old)) {
+            if (!toUpdate.has(key)) merged[key] = old[key];
+          }
+          dashboardData.value = merged as unknown as PointValueDashboard;
+        } else {
+          dashboardData.value = res ?? null;
+        }
       },
     });
 

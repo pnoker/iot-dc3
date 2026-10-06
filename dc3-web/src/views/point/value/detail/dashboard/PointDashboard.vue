@@ -274,12 +274,27 @@ const unit = computed(() => props.unit);
 const stats = computed(() => dashboard.data.value?.stats ?? null);
 const gapCount = computed(() => dashboard.data.value?.gaps?.length ?? 0);
 
-// --- Per-card refresh loading -------------------------------------------------
+// --- Per-card refresh loading + selective data application -------------------
 // The dashboard payload is one API call shared by every window-scoped card.
 // On initial load and window switch, the full-board skeleton is appropriate.
-// On a card's own refresh click, only that card should flash its loading
-// state — not every sibling on the board.
+// On a card's own refresh click: (a) only that card flashes its loading
+// state, and (b) only the payload keys that card consumes are applied —
+// keys consumed by other cards keep their old object references so their
+// chart watchers don't fire and the charts don't re-render.
 const refreshingCard = ref<string | null>(null);
+
+/** Payload keys each card consumes (for selective merge on manual refresh). */
+const CARD_SECTIONS: Record<string, readonly string[]> = {
+  current: ['stats'],
+  average: ['stats'],
+  range: ['stats'],
+  interval: ['stats'],
+  samples: ['stats'],
+  gaps: ['stats', 'gaps'],
+  trend: ['trend'],
+  collection: ['gaps', 'hourlyVolume', 'intervalHistogram'],
+  profile: ['valueHistogram', 'typicalDay'],
+};
 
 /**
  * Whether a given card should show its loading state. When no specific card
@@ -292,13 +307,16 @@ const cardLoading = (cardId: string) =>
   dashboard.loading.value && (!refreshingCard.value || refreshingCard.value === cardId);
 
 /**
- * Reload the dashboard payload, scoped to the card that requested it.
+ * Reload the dashboard payload. For a single-card refresh, only that card's
+ * data sections are applied to the shared ref; for null (initial/window
+// switch), the entire payload replaces the old data.
  * @param cardId - which card's refresh button triggered this (null = full board)
  */
 const reloadDashboard = (cardId: string | null = null) => {
   if (!deviceId.value || !pointId.value) return;
   refreshingCard.value = cardId;
-  void loadDashboard(deviceId.value, pointId.value, rangeHours.value).finally(() => {
+  const sections = cardId ? CARD_SECTIONS[cardId] ?? null : null;
+  void loadDashboard(deviceId.value, pointId.value, rangeHours.value, sections).finally(() => {
     refreshingCard.value = null;
   });
 };
