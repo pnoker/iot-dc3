@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { configManager } from './config-manager.js';
-import { SilentExit, type OutputFormat } from '../utils/format.js';
+import { UsageError } from './errors.js';
+import type { OutputFormat } from '../utils/format.js';
 
 const OUTPUT_FORMATS: readonly OutputFormat[] = ['json', 'table', 'yaml'];
 
@@ -30,30 +31,38 @@ function parseFormat(value: string | undefined): OutputFormat | undefined {
  * Apply the program-level global options (`--profile`, `--format`) once per
  * invocation from the commander `preAction` hook:
  *
- * - `--profile` installs a per-invocation profile override on the config manager
- *   (validated to exist; a missing profile throws, which the top-level handler
- *   maps to exit code 1), so gateway/tenant/token resolution flows through it.
+ * - `--profile` installs a per-invocation profile override on the config
+ *   manager (validated to exist by the manager; a missing profile throws,
+ *   which the top-level handler maps to exit code 1), so gateway/tenant/token
+ *   resolution flows through it. An empty or whitespace-only profile is an
+ *   explicit but invalid value and fails as a usage error instead of silently
+ *   falling back to the default profile (report F053).
  * - `--format` seeds the format-resolution context consulted by
  *   `detectFormat()` as the priority between the command's own `--format`
- *   option and the persisted `settings.output_format`.
+ *   option and the persisted `settings.output_format`. An unsupported value —
+ *   including the empty string — is rejected here rather than silently
+ *   dropped (report F052).
  * @param opts - global program options as parsed by commander
  * @param opts.profile - profile name to use for this invocation only
  * @param opts.format - global output format (json, table, yaml)
+ * @throws UsageError when a supplied option value is explicitly invalid
  */
 export async function applyGlobalOptions(opts: {
   profile?: string;
   format?: string;
 }): Promise<void> {
-  if (opts.profile && opts.profile.trim()) {
-    await configManager.setProfileOverride(opts.profile.trim());
+  if (opts.profile !== undefined) {
+    const profile = opts.profile.trim();
+    if (!profile) {
+      throw new UsageError('--profile must not be empty or whitespace-only');
+    }
+    await configManager.setProfileOverride(profile);
   }
   // Reject unknown --format values here rather than silently dropping them:
   // commander routes --format to the program level even when the subcommand
   // also declares it, so detectFormat never sees the raw invalid string.
-  if (opts.format !== undefined && opts.format !== '' && !OUTPUT_FORMATS.includes(opts.format as OutputFormat)) {
-    process.stderr.write(`error: unknown format '${opts.format}' (expected json, table, or yaml)\n`);
-    process.exitCode = 1;
-    throw new SilentExit();
+  if (opts.format !== undefined && !OUTPUT_FORMATS.includes(opts.format as OutputFormat)) {
+    throw new UsageError(`unknown format '${opts.format}' (expected json, table, or yaml)`);
   }
   const settings = await configManager.getSettings();
   globalFormat = parseFormat(opts.format);

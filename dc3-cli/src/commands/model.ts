@@ -14,19 +14,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import { InvalidArgumentError } from 'commander';
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ApiError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 const BASE = '/api/v3/agentic/model';
 
+/**
+ * Fields a model-config update may carry — the same set the add action sends.
+ * Gateway-only and audit fields (providerName, tenant, last-check telemetry)
+ * are never echoed back in an update body (report F043).
+ */
+const MODEL_UPDATE_FIELDS = [
+  'model',
+  'label',
+  'providerId',
+  'stream',
+  'toolCall',
+  'vision',
+  'reasoning',
+  'temperature',
+  'maxTokens',
+  'defaultFlag',
+  'enableFlag',
+] as const;
+
 const parseTemperature = (value: string): number => {
   const parsed = parseFloat(value);
   if (Number.isNaN(parsed)) {
-    throw new Error(`option '--temperature ${value}' is not a valid number`);
+    throw new InvalidArgumentError(`option '--temperature ${value}' is not a valid number`);
   }
   if (parsed < 0 || parsed > 2) {
-    throw new Error(`option '--temperature ${value}' is out of range (0.0–2.0)`);
+    throw new InvalidArgumentError(`option '--temperature ${value}' is out of range (0.0–2.0)`);
   }
   return parsed;
 };
@@ -34,10 +55,36 @@ const parseTemperature = (value: string): number => {
 const parseMaxTokens = (value: string): number => {
   const parsed = parseInt(value, 10);
   if (Number.isNaN(parsed) || parsed < 1) {
-    throw new Error(`option '--max-tokens ${value}' must be a positive integer`);
+    throw new InvalidArgumentError(`option '--max-tokens ${value}' must be a positive integer`);
   }
   return parsed;
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Unwrap a gateway list response into its rows: a bare array passes through,
+ * the common envelope shapes ({data:[...]}, {items:[...]}) are unwrapped, and
+ * an unrecognizable shape returns undefined so the caller fails with a
+ * distinct shape error instead of misreporting every entry as missing
+ * (report F043).
+ * @param payload - decoded model config list response
+ * @returns the row records, or undefined when the shape is unrecognizable
+ */
+function listRowsOf(payload: unknown): Array<Record<string, unknown>> | undefined {
+  let rows: unknown;
+  if (Array.isArray(payload)) {
+    rows = payload;
+  } else if (isRecord(payload)) {
+    rows = ['data', 'items'].map((key) => payload[key]).find((value) => Array.isArray(value));
+  }
+  if (!Array.isArray(rows)) {
+    return undefined;
+  }
+  return rows.filter(isRecord);
+}
 
 /**
  * Register the `model` command tree on the CLI program.
@@ -127,12 +174,17 @@ export function registerModelCommand(program: Command): void {
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
-      const configs = await dc3Client.get<Array<Record<string, unknown>>>(`${BASE}/config/list`);
-      const current = Array.isArray(configs)
-        ? configs.find((c) => String(c.id) === String(id))
-        : null;
+      const payload = await dc3Client.get(`${BASE}/config/list`);
+      const rows = listRowsOf(payload);
+      if (rows === undefined) {
+        throw new ApiError(
+          `Model config list response has an unrecognized shape (expected an array or a {data:[...]} envelope); ` +
+            `refusing to update model config ${id}`,
+        );
+      }
+      const current = rows.find((c) => String(c.id) === String(id));
       if (!current) {
-        printAndExit({ ok: false, message: `Model config ${id} not found` }, format, 1);
+        throw new ApiError(`Model config ${id} not found`);
       }
       const changes: Record<string, unknown> = {};
       if (opts.model !== undefined) changes.model = opts.model;
@@ -147,11 +199,19 @@ export function registerModelCommand(program: Command): void {
       if (opts.default) changes.defaultFlag = 'DEFAULT';
       if (opts.enable) changes.enableFlag = 'ENABLE';
       if (opts.disable) changes.enableFlag = 'DISABLE';
-      const result = await dc3Client.post(`${BASE}/config/update`, {
-        ...current,
-        ...changes,
-        id,
-      });
+      // Add-time field whitelist: unchanged whitelisted fields keep their
+      // stored values; everything else the list happened to carry (provider
+      // name, connectivity telemetry, audit fields) is never sent back
+      // (report F043).
+      const body: Record<string, unknown> = { id };
+      for (const field of MODEL_UPDATE_FIELDS) {
+        if (changes[field] !== undefined) {
+          body[field] = changes[field];
+        } else if (current[field] !== undefined) {
+          body[field] = current[field];
+        }
+      }
+      const result = await dc3Client.post(`${BASE}/config/update`, body);
       printAndExit(result, format);
     });
 

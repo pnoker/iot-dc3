@@ -14,14 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { readFile, writeFile, unlink } from 'node:fs/promises';
+import { readFile, unlink } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { quarantineFile, withLock, writeFileAtomic } from './atomic-fs.js';
 import { isTokenExpired, tokenTtl } from '../utils/jwt.js';
 
 /**
- * Token state persisted to ~/.dc3/tokens.json (mode 0600).
+ * Token state persisted to ~/.dc3/tokens.json (mode 0600 / restricted ACL).
  * One entry per profile.
+ *
+ * `tenant` and `username` are the AUTHORITATIVE identity of the login that
+ * minted the token: credential lookups during renewal must key the password
+ * store by this state identity (`username@tenant` via
+ * {@link credentialIdentifier}), not by the mutable profile config, so a
+ * post-login `config set tenant` cannot silently orphan the stored password.
  */
 export interface TokenState {
   token: string;
@@ -34,6 +41,12 @@ export interface TokenState {
   authType?: 'login' | 'oauth';
   /** scopes granted to an oauth ticket */
   scope?: string[];
+  /**
+   * Per-profile invalidation counter at save time. Bumped by
+   * {@link TokenManager.clearState} so an in-flight renewal that captured an
+   * older epoch refuses to persist (logout/session-revival guard).
+   */
+  epoch?: number;
 }
 
 /**
@@ -43,7 +56,123 @@ export interface TokenStates {
   [profile: string]: TokenState;
 }
 
+/**
+ * On-disk layout (version 2). `epochs` survives entry deletion: a cleared
+ * profile keeps its (bumped) epoch so a concurrent renewal minted before the
+ * logout can still be detected and discarded. Version 1 files (a flat
+ * profile→state map) are migrated on first write.
+ */
+interface TokenFile {
+  version: 2;
+  epochs: Record<string, number>;
+  states: TokenStates;
+}
+
 const TOKENS_PATH = join(homedir(), '.dc3', 'tokens.json');
+
+/**
+ * Build the credential-store identifier for a token state's identity.
+ * @param state - state (or any object carrying the identity fields) to key
+ * @returns the `username@tenant` identifier used by credential stores
+ */
+export function credentialIdentifier(state: Pick<TokenState, 'username' | 'tenant'>): string {
+  return `${state.username}@${state.tenant}`;
+}
+
+function emptyTokenFile(): TokenFile {
+  return { version: 2, epochs: {}, states: {} };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Loose shape check for a persisted token state entry.
+ * @param value - decoded JSON value to inspect
+ * @returns true when the value looks like a token state
+ */
+function looksLikeTokenState(value: unknown): value is TokenState {
+  return isRecord(value) && typeof value.token === 'string';
+}
+
+/**
+ * Shape check for the version-2 on-disk layout.
+ * @param value - decoded JSON value to inspect
+ * @returns true when the value is a token file
+ */
+function isTokenFile(value: unknown): value is TokenFile {
+  return isRecord(value) && value.version === 2 && isRecord(value.epochs) && isRecord(value.states);
+}
+
+/**
+ * Shape check for the legacy version-1 flat profile→state map.
+ * @param value - decoded JSON value to inspect
+ * @returns true when the value is a legacy token states map
+ */
+function isLegacyTokenStates(value: unknown): value is TokenStates {
+  return isRecord(value) && Object.values(value).every((entry) => looksLikeTokenState(entry));
+}
+
+/**
+ * Read the token file. Missing file → empty state (first run). Unparseable or
+ * unrecognized content → quarantine-and-warn: the corrupt bytes are rotated to
+ * a timestamped sibling (never silently reset in place, never destroyed), a
+ * loud stderr warning names the file and reason, and an empty state is used
+ * for this session. Must be called while holding the tokens lock for sections
+ * that go on to write.
+ * @returns the parsed token file (empty when missing or quarantined)
+ */
+async function readTokenFile(): Promise<TokenFile> {
+  let raw: string;
+  try {
+    raw = await readFile(TOKENS_PATH, 'utf8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return emptyTokenFile();
+    }
+    throw error;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return quarantineTokens('content is not valid JSON');
+  }
+  if (isTokenFile(parsed)) {
+    // Drop entries that do not look like token states instead of failing hard.
+    const states: TokenStates = {};
+    for (const [profile, state] of Object.entries(parsed.states)) {
+      if (looksLikeTokenState(state)) {
+        states[profile] = state;
+      }
+    }
+    return { version: 2, epochs: parsed.epochs, states };
+  }
+  if (isLegacyTokenStates(parsed)) {
+    return { version: 2, epochs: {}, states: parsed };
+  }
+  return quarantineTokens('unrecognized file format');
+}
+
+async function quarantineTokens(reason: string): Promise<TokenFile> {
+  let quarantined: string | null = null;
+  try {
+    quarantined = await quarantineFile(TOKENS_PATH);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Warning: could not quarantine ${TOKENS_PATH} (${message}).`);
+  }
+  console.error(
+    `Warning: ${TOKENS_PATH} could not be read (${reason}); starting from an empty token state.` +
+      (quarantined ? ` The unreadable file was preserved as ${quarantined}.` : ''),
+  );
+  return emptyTokenFile();
+}
+
+async function writeTokenFile(file: TokenFile): Promise<void> {
+  await writeFileAtomic(TOKENS_PATH, JSON.stringify(file, null, 2), { restrictToOwner: true });
+}
 
 /**
  * TokenManager — manages JWT token lifecycle: parse, persist, renew.
@@ -53,65 +182,105 @@ const TOKENS_PATH = join(homedir(), '.dc3', 'tokens.json');
  *
  * Reactive fallback: if we get a 401 anyway (clock skew, server restart),
  * retry once after renewal.
+ *
+ * Persistence: every mutation is a locked read-modify-write of the whole file
+ * through an atomic temp+fsync+rename, so concurrent CLI processes cannot
+ * lose each other's profiles or observe torn writes.
  */
 export class TokenManager {
-  private states: TokenStates = {};
-  private loaded = false;
-
-  async load(): Promise<void> {
-    if (this.loaded) return;
-    try {
-      const raw = await readFile(TOKENS_PATH, 'utf8');
-      this.states = JSON.parse(raw);
-    } catch {
-      this.states = {};
-    }
-    this.loaded = true;
-  }
-
-  private async save(): Promise<void> {
-    await writeFile(TOKENS_PATH, JSON.stringify(this.states, null, 2), {
-      mode: 0o600,
-    });
-  }
-
   /**
    * Get token state for a profile. Returns null if not logged in.
    * @param profile - profile name whose state to read
    * @returns the stored token state, or null when not logged in
    */
   async getState(profile: string): Promise<TokenState | null> {
-    await this.load();
-    return this.states[profile] ?? null;
+    const file = await readTokenFile();
+    return file.states[profile] ? { ...file.states[profile] } : null;
   }
 
   /**
-   * Save or update token state.
+   * Read the current invalidation epoch for a profile. Survives logout: the
+   * epoch keeps counting after the entry is cleared.
+   * @param profile - profile name whose epoch to read
+   * @returns the current epoch (0 when never logged in or cleared file)
+   */
+  async getEpoch(profile: string): Promise<number> {
+    const file = await readTokenFile();
+    return file.epochs[profile] ?? 0;
+  }
+
+  /**
+   * Save or update token state (unconditional; login and OAuth flows).
    * @param state - token state to persist
    * @param profile - profile name to save the state under
    */
   async saveState(state: TokenState, profile: string): Promise<void> {
-    await this.load();
-    this.states[profile] = state;
-    await this.save();
+    await withLock(TOKENS_PATH, async () => {
+      const file = await readTokenFile();
+      const epoch = file.epochs[profile] ?? 0;
+      file.states[profile] = { ...state, epoch };
+      await writeTokenFile(file);
+    });
   }
 
   /**
-   * Clear token state (logout).
+   * Save a token state only when the profile's epoch still equals the epoch
+   * the writer captured before minting the token. This is the renewal guard:
+   * a logout (or any clear) that happened while the token was being generated
+   * bumps the epoch, the save is refused, and the caller must discard the
+   * freshly minted token (cancelling it server-side).
+   * @param state - token state to persist
+   * @param profile - profile name to save the state under
+   * @param expectedEpoch - epoch captured before the token was generated
+   * @returns true when the state was persisted; false when the epoch moved
+   */
+  async saveStateIfEpochUnchanged(
+    state: TokenState,
+    profile: string,
+    expectedEpoch: number,
+  ): Promise<boolean> {
+    return withLock(TOKENS_PATH, async () => {
+      const file = await readTokenFile();
+      if ((file.epochs[profile] ?? 0) !== expectedEpoch) {
+        return false;
+      }
+      file.states[profile] = { ...state, epoch: expectedEpoch };
+      await writeTokenFile(file);
+      return true;
+    });
+  }
+
+  /**
+   * Clear token state for a profile (logout). Bumps the profile's epoch and
+   * removes its entry in ONE atomic write, so a concurrent renewal either
+   * sees the pre-logout state (fine) or the post-logout epoch (its save is
+   * refused). The file itself is kept while other profiles still have state.
    * @param profile - profile name whose state to clear
    */
   async clearState(profile: string): Promise<void> {
-    await this.load();
-    delete this.states[profile];
-    if (Object.keys(this.states).length === 0) {
+    await withLock(TOKENS_PATH, async () => {
+      const file = await readTokenFile();
+      file.epochs[profile] = (file.epochs[profile] ?? 0) + 1;
+      delete file.states[profile];
+      await writeTokenFile(file);
+    });
+  }
+
+  /**
+   * Remove every profile's state and the tokens file itself (config reset).
+   * Contrary to {@link clearState} this unlinks the file: reset also wipes the
+   * profile config, so no renewal can proceed afterwards anyway.
+   */
+  async clearAll(): Promise<void> {
+    await withLock(TOKENS_PATH, async () => {
       try {
         await unlink(TOKENS_PATH);
-      } catch {
-        // Already gone
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+          throw error;
+        }
       }
-    } else {
-      await this.save();
-    }
+    });
   }
 
   /**
@@ -153,8 +322,8 @@ export class TokenManager {
    * @returns all persisted states keyed by profile
    */
   async getAllStates(): Promise<TokenStates> {
-    await this.load();
-    return { ...this.states };
+    const file = await readTokenFile();
+    return { ...file.states };
   }
 
   /**

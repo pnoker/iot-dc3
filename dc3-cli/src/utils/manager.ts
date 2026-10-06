@@ -20,11 +20,23 @@ import { dc3Client } from '../core/client.js';
 type ManagerResource = Record<string, unknown>;
 
 /**
- * Parse a CLI option as a non-negative integer.
+ * Plain decimal integer lexeme. Numeric coercion alone (Number) accepts '',
+ * ' 5', '0x10', '5.0', and '1e2' — the lexical check must come first so a
+ * mistyped empty value can never silently become 0 (report F035).
+ */
+const DECIMAL_INTEGER_PATTERN = /^\d+$/u;
+
+/**
+ * Parse a CLI option as a non-negative integer written in plain decimal
+ * digits; hex, exponent, decimal-point, padded, and empty forms are rejected
+ * before the safe-integer range check.
  * @param value - value to set
  * @returns the transformed value
  */
 export function parseNonNegativeInteger(value: string): number {
+  if (!DECIMAL_INTEGER_PATTERN.test(value)) {
+    throw new InvalidArgumentError('must be a non-negative integer in plain decimal digits (e.g. 0, 5, 100)');
+  }
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
     throw new InvalidArgumentError('must be a non-negative safe integer');
@@ -33,16 +45,48 @@ export function parseNonNegativeInteger(value: string): number {
 }
 
 /**
- * Parse a CLI option as a positive integer.
+ * Parse a CLI option as a positive integer written in plain decimal digits;
+ * hex, exponent, decimal-point, padded, and empty forms are rejected before
+ * the safe-integer range check.
  * @param value - value to set
  * @returns the transformed value
  */
 export function parsePositiveInteger(value: string): number {
+  if (!DECIMAL_INTEGER_PATTERN.test(value)) {
+    throw new InvalidArgumentError('must be a positive integer in plain decimal digits (e.g. 1, 5, 100)');
+  }
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 1) {
     throw new InvalidArgumentError('must be a positive safe integer');
   }
   return parsed;
+}
+
+/**
+ * Reject empty or whitespace resource ids before any request is built — an
+ * empty id would otherwise travel to the wire as `?id=` (report F053).
+ * @param basePath - manager resource base path, for the error message
+ * @param id - resource id to validate
+ * @returns the unchanged id
+ */
+function requireResourceId(basePath: string, id: string): string {
+  if (typeof id !== 'string' || id.trim() === '') {
+    throw new InvalidArgumentError(
+      `resource id for ${basePath} must be a non-empty value, got ${JSON.stringify(id)}`,
+    );
+  }
+  return id;
+}
+
+/**
+ * Fetch a manager resource by id.
+ * @param basePath - manager resource base path (e.g. device)
+ * @param id - resource id to fetch
+ * @returns the operation result
+ */
+export async function getManagerResource<T = unknown>(basePath: string, id: string): Promise<T> {
+  requireResourceId(basePath, id);
+  return dc3Client.get<T>(`${basePath}/get_by_id?id=${encodeURIComponent(id)}`);
 }
 
 /**
@@ -59,6 +103,7 @@ export async function updateManagerResource<T = unknown>(
   expectedVersion: number,
   changes: ManagerResource,
 ): Promise<T> {
+  requireResourceId(basePath, id);
   const current = await dc3Client.get<ManagerResource>(
     `${basePath}/get_by_id?id=${encodeURIComponent(id)}`,
   );
@@ -71,17 +116,21 @@ export async function updateManagerResource<T = unknown>(
 }
 
 /**
- * Delete a manager resource and report the result.
+ * Delete a manager resource. Non-empty 2xx response bodies are returned so
+ * the caller can print them (the gateway may attach warnings or audit info);
+ * 204 and empty bodies resolve to undefined and stay silent (report F038).
  * @param basePath - manager resource base path (e.g. device)
  * @param id - resource id to delete
  * @param expectedVersion - version for optimistic locking
+ * @returns the decoded delete response body, or undefined when empty
  */
-export async function deleteManagerResource(
+export async function deleteManagerResource<T = unknown>(
   basePath: string,
   id: string,
   expectedVersion: number,
-): Promise<void> {
-  await dc3Client.del<void>(
+): Promise<T> {
+  requireResourceId(basePath, id);
+  return dc3Client.del<T>(
     `${basePath}/delete?id=${encodeURIComponent(id)}&version=${expectedVersion}`,
   );
 }

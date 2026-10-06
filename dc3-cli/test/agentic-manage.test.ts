@@ -1,19 +1,3 @@
-/*
- * Copyright 2016-present the IoT DC3 original author or authors.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Command } from 'commander';
 import { registerProviderCommand } from '../src/commands/provider.js';
@@ -21,22 +5,30 @@ import { registerModelCommand } from '../src/commands/model.js';
 
 const fetchCalls: Array<{ url: string; init: RequestInit }> = [];
 
+/**
+ * List responses the mocked client returns; overridable per test so the
+ * update paths can be driven against bare arrays, envelopes, and hostile
+ * shapes (report F043).
+ */
+let providerListResponse: unknown = [
+  { id: '1', name: 'DeepSeek', baseUrl: 'https://api.deepseek.com', providerType: 'OPENAI_COMPATIBLE' },
+];
+let modelConfigListResponse: unknown = [
+  { id: '10', model: 'deepseek-chat', label: 'DeepSeek Chat', providerId: '1', temperature: 0.7, maxTokens: 2048 },
+];
+
 vi.mock('../src/core/client.js', () => ({
   dc3Client: {
     get: vi.fn(async (url: string) => {
       fetchCalls.push({ url, init: { method: 'GET' } });
       if (url.includes('provider/list')) {
-        return [
-          { id: '1', name: 'DeepSeek', baseUrl: 'https://api.deepseek.com', providerType: 'OPENAI_COMPATIBLE' },
-        ];
+        return providerListResponse;
       }
       if (url.includes('model/list')) {
         return [{ model: 'deepseek-chat', label: 'DeepSeek Chat' }];
       }
       if (url.includes('model/config/list')) {
-        return [
-          { id: '10', model: 'deepseek-chat', label: 'DeepSeek Chat', providerId: '1', temperature: 0.7, maxTokens: 2048 },
-        ];
+        return modelConfigListResponse;
       }
       return null;
     }),
@@ -72,8 +64,19 @@ const run = async (args: string[]): Promise<void> => {
   }
 };
 
+const postCalls = () => fetchCalls.filter((call) => call.init.method === 'POST');
+const bodyOf = (call: { init: RequestInit }): Record<string, unknown> =>
+  JSON.parse(String(call.init.body)) as Record<string, unknown>;
+
 beforeEach(() => {
   fetchCalls.length = 0;
+  process.exitCode = 0;
+  providerListResponse = [
+    { id: '1', name: 'DeepSeek', baseUrl: 'https://api.deepseek.com', providerType: 'OPENAI_COMPATIBLE' },
+  ];
+  modelConfigListResponse = [
+    { id: '10', model: 'deepseek-chat', label: 'DeepSeek Chat', providerId: '1', temperature: 0.7, maxTokens: 2048 },
+  ];
 });
 
 afterEach(() => {
@@ -125,21 +128,147 @@ describe('provider command', () => {
     expect(body.id).toBeUndefined();
   });
 
-  it('check without --id or --base-url exits with error', async () => {
-    const program = new Command();
-    registerProviderCommand(program);
-    program.exitOverride();
-    vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never);
-    vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
-    try {
-      await program.parseAsync(['provider', 'check', '--format', 'json'], { from: 'user' });
-      expect.unreachable('should have thrown SilentExit');
-    } catch (error) {
-      expect((error as Error).name).toBe('SilentExit');
-      expect(process.exitCode).toBe(1);
-    } finally {
-      (process.stdout.write as ReturnType<typeof vi.spyOn>).mockRestore();
+  it('check without --id or --base-url fails as a usage error', async () => {
+    await expect(
+      run(['provider', 'check', '--format', 'json']),
+    ).rejects.toMatchObject({
+      name: 'UsageError',
+      message: 'Either --id (saved provider) or --base-url (draft) is required',
+    });
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('check rejects an invalid --level before any request (F021)', async () => {
+    await expect(
+      run(['provider', 'check', '--id', '1', '--level', 'GARBAGE_LEVEL', '--format', 'json']),
+    ).rejects.toThrow(/'--level GARBAGE_LEVEL' is invalid\. allowed: L1, L2, BOTH/u);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('check accepts each documented --level and normalizes case', async () => {
+    await run(['provider', 'check', '--id', '1', '--level', 'L1', '--format', 'json']);
+    await run(['provider', 'check', '--id', '1', '--level', 'l2', '--format', 'json']);
+    expect(JSON.parse(String(fetchCalls[0]!.init.body)).level).toBe('L1');
+    expect(JSON.parse(String(fetchCalls[1]!.init.body)).level).toBe('L2');
+  });
+
+  it('update unwraps a {data:[...]} envelope list before resolving the entry (F043)', async () => {
+    providerListResponse = {
+      ok: true,
+      data: [
+        {
+          id: '5',
+          name: 'Old',
+          baseUrl: 'https://old.example.com',
+          providerType: 'ANTHROPIC',
+          defaultFlag: 'NOT_DEFAULT',
+          enableFlag: 'ENABLE',
+        },
+      ],
+      total: 1,
+    };
+    await run(['provider', 'update', '5', '--name', 'New', '--format', 'json']);
+
+    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    expect(update, 'update POST issued for the envelope-wrapped entry').toBeDefined();
+    expect(bodyOf(update!)).toEqual({
+      id: '5',
+      name: 'New',
+      baseUrl: 'https://old.example.com',
+      providerType: 'ANTHROPIC',
+      defaultFlag: 'NOT_DEFAULT',
+      enableFlag: 'ENABLE',
+    });
+  });
+
+  it('update never re-sends server, audit, or secret-named fields from the list entry (F043)', async () => {
+    providerListResponse = [
+      {
+        id: '5',
+        name: 'Old',
+        baseUrl: 'https://old.example.com',
+        providerType: 'OPENAI_COMPATIBLE',
+        apiKey: 'sk-echoed-secret',
+        defaultFlag: 'NOT_DEFAULT',
+        enableFlag: 'ENABLE',
+        tenantId: 'tenantA',
+        creatorId: 'u1',
+        creatorName: 'ops',
+        createTime: '2026-01-01T00:00:00Z',
+        operatorId: 'u2',
+        operatorName: 'ops2',
+        operateTime: '2026-01-02T00:00:00Z',
+        remark: 'server-side remark',
+        lastCheckStatus: 'UP',
+        lastCheckTime: '2026-01-03T00:00:00Z',
+        lastCheckLatencyMs: 42,
+        lastCheckErrorType: null,
+        lastCheckErrorMessage: null,
+        lastCheckModel: 'gpt',
+      },
+    ];
+    await run(['provider', 'update', '5', '--base-url', 'https://new.example.com', '--format', 'json']);
+
+    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    expect(update).toBeDefined();
+    const body = bodyOf(update!);
+    expect(body).toEqual({
+      id: '5',
+      name: 'Old',
+      baseUrl: 'https://new.example.com',
+      providerType: 'OPENAI_COMPATIBLE',
+      defaultFlag: 'NOT_DEFAULT',
+      enableFlag: 'ENABLE',
+    });
+    // negative guard: none of the server/audit/secret fields may round-trip
+    for (const leaked of [
+      'apiKey',
+      'tenantId',
+      'creatorId',
+      'creatorName',
+      'createTime',
+      'operatorId',
+      'operatorName',
+      'operateTime',
+      'remark',
+      'lastCheckStatus',
+      'lastCheckTime',
+      'lastCheckLatencyMs',
+      'lastCheckErrorType',
+      'lastCheckErrorMessage',
+      'lastCheckModel',
+    ]) {
+      expect(body, `${leaked} must not be re-sent`).not.toHaveProperty(leaked);
     }
+  });
+
+  it('update sends an explicitly provided --api-key', async () => {
+    providerListResponse = [{ id: '5', name: 'Old', baseUrl: 'u', providerType: 'OPENAI_COMPATIBLE' }];
+    await run(['provider', 'update', '5', '--api-key', 'sk-fresh', '--format', 'json']);
+    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    expect(bodyOf(update!).apiKey).toBe('sk-fresh');
+  });
+
+  it('update on an unrecognizable list shape fails with a distinct error, not "not found" (F043)', async () => {
+    providerListResponse = { ok: true, weird: true };
+    await expect(
+      run(['provider', 'update', '5', '--name', 'New', '--format', 'json']),
+    ).rejects.toMatchObject({
+      name: 'ApiError',
+      message: expect.stringMatching(/unrecognized shape/u),
+    });
+    expect(
+      postCalls().filter((call) => call.url.endsWith('/provider/config/update')),
+    ).toHaveLength(0);
+  });
+
+  it('update of a missing id still reports not found without issuing an update', async () => {
+    await expect(
+      run(['provider', 'update', '99', '--name', 'New', '--format', 'json']),
+    ).rejects.toMatchObject({ name: 'ApiError', message: 'Provider 99 not found' });
+    expect(
+      postCalls().filter((call) => call.url.endsWith('/provider/config/update')),
+    ).toHaveLength(0);
   });
 });
 
@@ -178,5 +307,120 @@ describe('model command', () => {
     await run(['model', 'check', '10', '--format', 'json']);
     expect(fetchCalls[0]!.init.method).toBe('POST');
     expect(fetchCalls[0]!.url).toContain('/agentic/model/config/check?id=10');
+  });
+
+  it('update unwraps a {data:[...]} envelope list before resolving the entry (F043)', async () => {
+    modelConfigListResponse = {
+      ok: true,
+      data: [
+        {
+          id: '10',
+          model: 'deepseek-chat',
+          label: 'DeepSeek Chat',
+          providerId: '1',
+          stream: true,
+          toolCall: true,
+          temperature: 0.7,
+          maxTokens: 2048,
+          defaultFlag: 'NOT_DEFAULT',
+          enableFlag: 'ENABLE',
+        },
+      ],
+      total: 1,
+    };
+    await run(['model', 'update', '10', '--label', 'Renamed', '--format', 'json']);
+
+    const update = postCalls().find((call) => call.url.endsWith('/model/config/update'));
+    expect(update, 'update POST issued for the envelope-wrapped entry').toBeDefined();
+    expect(bodyOf(update!)).toEqual({
+      id: '10',
+      model: 'deepseek-chat',
+      label: 'Renamed',
+      providerId: '1',
+      stream: true,
+      toolCall: true,
+      temperature: 0.7,
+      maxTokens: 2048,
+      defaultFlag: 'NOT_DEFAULT',
+      enableFlag: 'ENABLE',
+    });
+  });
+
+  it('update never re-sends server or audit fields from the list entry (F043)', async () => {
+    modelConfigListResponse = [
+      {
+        id: '10',
+        model: 'deepseek-chat',
+        label: 'DeepSeek Chat',
+        providerId: '1',
+        stream: true,
+        toolCall: true,
+        vision: false,
+        reasoning: false,
+        temperature: 0.7,
+        maxTokens: 2048,
+        defaultFlag: 'NOT_DEFAULT',
+        enableFlag: 'ENABLE',
+        providerName: 'DeepSeek',
+        tenantId: 'tenantA',
+        creatorId: 'u1',
+        createTime: '2026-01-01T00:00:00Z',
+        operateTime: '2026-01-02T00:00:00Z',
+        lastCheckStatus: 'UP',
+        lastCheckLatencyMs: 12,
+      },
+    ];
+    await run(['model', 'update', '10', '--no-stream', '--format', 'json']);
+
+    const update = postCalls().find((call) => call.url.endsWith('/model/config/update'));
+    expect(update).toBeDefined();
+    const body = bodyOf(update!);
+    expect(body).toEqual({
+      id: '10',
+      model: 'deepseek-chat',
+      label: 'DeepSeek Chat',
+      providerId: '1',
+      stream: false,
+      toolCall: true,
+      vision: false,
+      reasoning: false,
+      temperature: 0.7,
+      maxTokens: 2048,
+      defaultFlag: 'NOT_DEFAULT',
+      enableFlag: 'ENABLE',
+    });
+    for (const leaked of [
+      'providerName',
+      'tenantId',
+      'creatorId',
+      'createTime',
+      'operateTime',
+      'lastCheckStatus',
+      'lastCheckLatencyMs',
+    ]) {
+      expect(body, `${leaked} must not be re-sent`).not.toHaveProperty(leaked);
+    }
+  });
+
+  it('update on an unrecognizable list shape fails with a distinct error (F043)', async () => {
+    modelConfigListResponse = { ok: true, weird: true };
+    await expect(
+      run(['model', 'update', '10', '--label', 'X', '--format', 'json']),
+    ).rejects.toMatchObject({
+      name: 'ApiError',
+      message: expect.stringMatching(/unrecognized shape/u),
+    });
+    expect(
+      postCalls().filter((call) => call.url.endsWith('/model/config/update')),
+    ).toHaveLength(0);
+  });
+
+  it('update of a missing id still reports not found without issuing an update', async () => {
+    await expect(
+      run(['model', 'update', '77', '--label', 'X', '--format', 'json']),
+    ).rejects.toMatchObject({ name: 'ApiError', message: 'Model config 77 not found' });
+    expect(
+      postCalls().filter((call) => call.url.endsWith('/model/config/update')),
+    ).toHaveLength(0);
   });
 });

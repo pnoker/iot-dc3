@@ -15,13 +15,154 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { configManager } from './config-manager.js';
-import { tokenManager } from './token-manager.js';
-import { resolvePassword } from './credential-store.js';
-import { fetchOrNetworkError, normalizeGateway } from './http.js';
+import { tokenManager, credentialIdentifier } from './token-manager.js';
+import type { TokenState } from './token-manager.js';
+import { resolvePassword, deletePasswordFromStore } from './credential-store.js';
+import { fetchOrNetworkError, normalizeGateway, readBodyText, warnInsecureTransport } from './http.js';
 import { ApiError, AuthError } from './errors.js';
 import { decodeJwt } from '../utils/jwt.js';
 
 export { AuthError, NetworkError, ApiError } from './errors.js';
+
+/** Maximum number of body characters embedded in a non-JSON diagnostic (report F042). */
+const SNIPPET_LENGTH = 120;
+
+/** Identity mismatches already warned about in this process (one warning each, report F016/F037). */
+const warnedIdentityMismatches = new Set<string>();
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function snippetOf(text: string): string {
+  return text.trim().slice(0, SNIPPET_LENGTH) + (text.trim().length > SNIPPET_LENGTH ? '…' : '');
+}
+
+function parseJsonOrUndefined(text: string): unknown {
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Extract the human-readable detail from an error body: the RFC 7807
+ * `detail`/`title` fields when the body is JSON, otherwise the raw text. Never
+ * returns an empty string so error messages never end in a dangling colon
+ * (report F042).
+ * @param text - raw error response body
+ * @returns the detail line for the error message
+ */
+function extractErrorDetail(text: string): string {
+  const trimmed = text.trim();
+  if (trimmed === '') {
+    return '(empty body)';
+  }
+  const json = parseJsonOrUndefined(trimmed);
+  if (isRecord(json)) {
+    const detail = json.detail ?? json.title;
+    if (typeof detail === 'string' && detail.trim() !== '') {
+      return detail;
+    }
+    if (detail !== undefined && detail !== null) {
+      return String(detail);
+    }
+  }
+  return trimmed;
+}
+
+/**
+ * Decode a 2xx response body that was read as text once (report F042): empty
+ * bodies (including 204) resolve to undefined; a non-empty body that is not
+ * valid JSON fails with an ApiError carrying the status, Content-Type, and a
+ * short snippet instead of leaking a raw SyntaxError.
+ * @param status - HTTP status of the response
+ * @param contentType - Content-Type header value, when present
+ * @param text - body text already read exactly once
+ * @returns the decoded JSON value, or undefined for an empty body
+ */
+function decodeResponseBody<T>(status: number, contentType: string | null, text: string): T {
+  if (status === 204 || text.trim() === '') {
+    return undefined as T;
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError(
+      `Gateway returned a non-JSON ${status} response (Content-Type: ${contentType ?? 'unknown'}): ${snippetOf(text)}`,
+      status,
+      text,
+    );
+  }
+}
+
+/**
+ * Warn once per stored session when the active profile identity diverges from
+ * the identity the stored token was issued for (report F016/F037). Requests
+ * keep using the token-state identity; the warning names both so silent
+ * tenant inheritance and orphaned renewal passwords become visible.
+ * @param state - persisted token state for the active profile
+ * @param profile - active profile configuration
+ * @param profile.tenant - tenant name the profile is configured for
+ * @param profile.username - username the profile is configured for
+ * @param profileName - active profile name
+ */
+function warnIdentityMismatch(
+  state: TokenState | null,
+  profile: { tenant: string; username: string },
+  profileName: string,
+): void {
+  if (!state || state.authType === 'oauth') {
+    return;
+  }
+  if (state.tenant === profile.tenant && state.username === profile.username) {
+    return;
+  }
+  const key = `${profileName}:${state.username}@${state.tenant}`;
+  if (warnedIdentityMismatches.has(key)) {
+    return;
+  }
+  warnedIdentityMismatches.add(key);
+  process.stderr.write(
+    `Warning: profile "${profileName}" is configured for ${profile.username}@${profile.tenant}, ` +
+      `but the stored session belongs to ${state.username}@${state.tenant}. Requests use the stored ` +
+      `session identity, and renewal reads the password stored for ${state.username}@${state.tenant}.\n`,
+  );
+}
+
+/**
+ * Cancel a token server-side without touching persisted state. Best effort:
+ * used to revoke freshly minted tokens that must be discarded, so a failure
+ * here must never mask the discard itself.
+ * @param gateway - resolved gateway base URL
+ * @param token - raw token value to revoke
+ * @param salt - salt the token was issued with
+ * @param tenant - tenant the token belongs to
+ * @param username - login the token belongs to
+ */
+async function cancelTokenBestEffort(
+  gateway: string,
+  token: string,
+  salt: string,
+  tenant: string,
+  username: string,
+): Promise<void> {
+  try {
+    await fetchOrNetworkError(`${gateway}/api/v3/auth/token/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Auth-Tenant': tenant,
+        'X-Auth-Login': username,
+        'X-Auth-Token': JSON.stringify({ salt, token }),
+      },
+      body: JSON.stringify({ name: username, tenant }),
+    });
+  } catch {
+    // Best effort — the local discard already happened.
+  }
+}
 
 /**
  * DC3 API client — HTTP wrapper that:
@@ -62,14 +203,19 @@ export class Dc3Client {
     const settings = await configManager.getSettings();
     const thresholdSec = settings.renewal_threshold_hours * 3600;
 
-    // Proactive renewal
+    const state = await tokenManager.getState(profileName);
+    warnIdentityMismatch(state, profile, profileName);
+
+    // Proactive renewal. renewToken derives the password lookup key from the
+    // persisted token-state identity first, falling back to the profile values
+    // (report F037).
     if (await tokenManager.needsRenewal(profileName, thresholdSec)) {
       await this.renewToken(profileName, profile.tenant, profile.username);
     }
 
-    const state = await tokenManager.getState(profileName);
-    const headers = state
-      ? tokenManager.buildHeaders(state)
+    const currentState = await tokenManager.getState(profileName);
+    const headers = currentState
+      ? tokenManager.buildHeaders(currentState)
       : { 'Content-Type': 'application/json' };
     Object.assign(headers, extraHeaders);
     const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
@@ -89,6 +235,7 @@ export class Dc3Client {
       headers,
       body: requestBody,
     });
+    const text = await readBodyText(res);
 
     // 401 fallback — renew and retry once
     if (res.status === 401 && retryOn401) {
@@ -105,26 +252,19 @@ export class Dc3Client {
           headers: newHeaders,
           body: requestBody,
         });
+        const retryText = await readBodyText(retryRes);
         if (!retryRes.ok) {
-          throw await this.buildError(retryRes);
+          throw this.buildError(retryRes.status, retryText);
         }
-        if (retryRes.status === 204) {
-          return undefined as T;
-        }
-        return (await retryRes.json()) as T;
+        return decodeResponseBody<T>(retryRes.status, retryRes.headers.get('content-type'), retryText);
       }
     }
 
     if (!res.ok) {
-      throw await this.buildError(res);
+      throw this.buildError(res.status, text);
     }
 
-    // 204 No Content (for delete operations)
-    if (res.status === 204) {
-      return undefined as T;
-    }
-
-    return (await res.json()) as T;
+    return decodeResponseBody<T>(res.status, res.headers.get('content-type'), text);
   }
 
   // Convenience methods
@@ -136,6 +276,15 @@ export class Dc3Client {
     return this.request<T>('POST', path, body);
   }
 
+  /**
+   * THE path for multipart request bodies (spec item 6): FormData is forwarded
+   * untouched so fetch generates the boundary, and any extra headers travel
+   * with the request. Callers must not pre-set Content-Type on FormData.
+   * @param path - gateway-relative request path
+   * @param body - multipart form payload
+   * @param headers - extra headers merged into the request
+   * @returns the decoded response body
+   */
   async postForm<T = unknown>(
     path: string,
     body: FormData,
@@ -144,32 +293,53 @@ export class Dc3Client {
     return this.request<T>('POST', path, body, true, headers);
   }
 
+  /**
+   * Delete a resource. Non-empty 2xx bodies are returned for the caller to
+   * decide whether to print them; 204 and empty bodies resolve to undefined
+   * (report F038).
+   * @param path - gateway-relative request path
+   * @returns the decoded response body, or undefined when empty
+   */
   async del<T = unknown>(path: string): Promise<T> {
     return this.request<T>('DELETE', path);
   }
 
   /**
-   * Renew the token: salt → generate → persist.
-   * Returns true on success, false if password is unavailable.
+   * Renew the token: salt → generate → persist. The stored password is keyed
+   * by the persisted token-state identity, falling back to the profile values
+   * when no state exists (report F037). Returns true on success, false when
+   * the password is unavailable or the session was logged out concurrently.
    * @param profileName - profile name used for the lookup
-   * @param tenant - tenant name sent with the salt request
-   * @param username - login username
+   * @param fallbackTenant - tenant to use when no token state exists
+   * @param fallbackUsername - username to use when no token state exists
    * @returns true when the token was renewed
    */
-  async renewToken(profileName: string, tenant: string, username: string): Promise<boolean> {
+  async renewToken(
+    profileName: string,
+    fallbackTenant: string,
+    fallbackUsername: string,
+  ): Promise<boolean> {
     const current = await tokenManager.getState(profileName);
     if (current?.authType === 'oauth') {
       // OAuth tickets cannot be silently renewed without the client secret; expiry
       // is short by design — surface a clean auth error instead.
       return false;
     }
-    const password = await resolvePassword(`${username}@${tenant}`);
+    const tenant = current?.tenant || fallbackTenant;
+    const username = current?.username || fallbackUsername;
+    const password = await resolvePassword(credentialIdentifier({ username, tenant }));
     if (!password) {
       return false;
     }
 
     try {
       const gateway = await this.getGateway();
+      warnInsecureTransport(gateway);
+
+      // Capture the invalidation epoch BEFORE minting: a logout that lands
+      // mid-renewal bumps it, and the guarded save below refuses to
+      // resurrect the session (spec item 5).
+      const epoch = await tokenManager.getEpoch(profileName);
 
       // Step 1: Get salt
       const saltRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/salt`, {
@@ -177,8 +347,9 @@ export class Dc3Client {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: username, tenant }),
       });
-      if (!saltRes.ok) throw await this.buildError(saltRes);
-      const salt = parseScalarResource(await saltRes.text(), 'Salt');
+      const saltText = await readBodyText(saltRes);
+      if (!saltRes.ok) throw this.buildError(saltRes.status, saltText);
+      const salt = parseScalarResource(saltText, 'Salt');
 
       // Step 2: Generate token
       const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
@@ -191,12 +362,15 @@ export class Dc3Client {
           password,
         }),
       });
-      if (!tokenRes.ok) throw await this.buildError(tokenRes);
-      const token = parseTokenResource(parseScalarResource(await tokenRes.text(), 'Token'));
+      const tokenText = await readBodyText(tokenRes);
+      if (!tokenRes.ok) throw this.buildError(tokenRes.status, tokenText);
+      const token = parseTokenResource(parseScalarResource(tokenText, 'Token'));
 
-      // Step 3: Parse and persist
+      // Step 3: Parse and persist — guarded by the captured epoch. When a
+      // logout won the race, discard the fresh token and cancel it
+      // server-side instead of resurrecting the session.
       const jwtPayload = decodeJwt(token);
-      await tokenManager.saveState(
+      const persisted = await tokenManager.saveStateIfEpochUnchanged(
         {
           token,
           salt,
@@ -206,7 +380,12 @@ export class Dc3Client {
           expiresAt: jwtPayload.exp,
         },
         profileName,
+        epoch,
       );
+      if (!persisted) {
+        await cancelTokenBestEffort(gateway, token, salt, tenant, username);
+        return false;
+      }
 
       return true;
     } catch {
@@ -235,6 +414,7 @@ export class Dc3Client {
     profileName: string,
   ): Promise<{ token: string; expiresAt: number; scope?: string[] }> {
     const gateway = await this.getGateway();
+    warnInsecureTransport(gateway);
     const form = new URLSearchParams({ grant_type: 'client_credentials' });
     if (scope && scope.trim()) {
       form.set('scope', scope.trim());
@@ -249,14 +429,11 @@ export class Dc3Client {
     });
     if (!res.ok) {
       // The token endpoint may answer non-JSON error bodies — read as text first.
-      const body = await res.text();
-      let detail: string = body;
-      try {
-        const json = JSON.parse(body) as Record<string, unknown>;
-        detail = String(json.error_description ?? json.error ?? body);
-      } catch {
-        // Non-JSON error body; keep the raw text.
-      }
+      const body = await readBodyText(res);
+      const json = parseJsonOrUndefined(body);
+      const detail = isRecord(json)
+        ? (json.error_description ?? json.error ?? extractErrorDetail(body))
+        : extractErrorDetail(body);
       throw new AuthError(`OAuth token request failed (${res.status}): ${detail}`);
     }
     const payload = (await res.json()) as Record<string, unknown>;
@@ -298,6 +475,7 @@ export class Dc3Client {
     profileName: string,
   ): Promise<string> {
     const gateway = await this.getGateway();
+    warnInsecureTransport(gateway);
 
     // Step 1: salt
     const saltRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/salt`, {
@@ -305,8 +483,9 @@ export class Dc3Client {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: username, tenant }),
     });
-    if (!saltRes.ok) throw await this.buildError(saltRes);
-    const salt = parseScalarResource(await saltRes.text(), 'Salt');
+    const saltText = await readBodyText(saltRes);
+    if (!saltRes.ok) throw this.buildError(saltRes.status, saltText);
+    const salt = parseScalarResource(saltText, 'Salt');
 
     // Step 2: generate
     const tokenRes = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/generate`, {
@@ -319,8 +498,9 @@ export class Dc3Client {
         password,
       }),
     });
-    if (!tokenRes.ok) throw await this.buildError(tokenRes);
-    const token = parseTokenResource(parseScalarResource(await tokenRes.text(), 'Token'));
+    const tokenText = await readBodyText(tokenRes);
+    if (!tokenRes.ok) throw this.buildError(tokenRes.status, tokenText);
+    const token = parseTokenResource(parseScalarResource(tokenText, 'Token'));
     const jwtPayload = decodeJwt(token);
     await tokenManager.saveState(
       {
@@ -338,54 +518,78 @@ export class Dc3Client {
   }
 
   /**
-   * Logout: call cancel endpoint + clear local state. Transport and auth
-   * failures propagate (NetworkError → exit 2, AuthError → exit 3) instead of
-   * being swallowed; the "not logged in" case never reaches the network.
+   * Logout with guaranteed local cleanup (spec item 5): clear the persisted
+   * session FIRST (so neither a concurrent renewal nor an unreachable gateway
+   * can leave a usable ticket on disk), then cancel the token remotely, then
+   * delete the stored password. When the remote cancel fails, an explicit
+   * warning names what survived (the gateway-side token, until it expires)
+   * before the original error propagates (NetworkError → exit 2,
+   * AuthError → exit 3).
    * @param profileName - profile name used for the lookup
    */
   async logout(profileName: string): Promise<void> {
     const state = await tokenManager.getState(profileName);
-    if (state) {
-      await this.request(
-        'POST',
-        '/api/v3/auth/token/cancel',
-        {
-          name: state.username,
-          tenant: state.tenant,
-        },
-        false,
-      ); // Don't retry on 401 for logout
+    if (!state) {
+      return;
     }
+    // Local-first: clearState performs the epoch-bump + entry removal as one
+    // atomic write (once the token-manager lands the epoch).
     await tokenManager.clearState(profileName);
+
+    let remoteError: unknown = null;
+    try {
+      const gateway = await this.getGateway();
+      const res = await fetchOrNetworkError(`${gateway}/api/v3/auth/token/cancel`, {
+        method: 'POST',
+        headers: tokenManager.buildHeaders(state),
+        body: JSON.stringify({ name: state.username, tenant: state.tenant }),
+      });
+      if (!res.ok) {
+        const text = await readBodyText(res);
+        throw this.buildError(res.status, text);
+      }
+    } catch (error) {
+      remoteError = error;
+    }
+
+    // Password cleanup is guaranteed regardless of the remote outcome.
+    await deletePasswordFromStore(credentialIdentifier(state));
+
+    if (remoteError !== null) {
+      process.stderr.write(
+        `Warning: the token for ${state.username}@${state.tenant} could not be revoked remotely ` +
+          `${(remoteError as Error).message}. ` +
+          `Local session state and the stored password were removed; the gateway-side token ` +
+          `stays valid until it expires.\n`,
+      );
+      throw remoteError;
+    }
   }
 
-  private async buildError(res: Response): Promise<Error> {
-    let body: string;
-    try {
-      body = await res.text();
-    } catch {
-      body = 'Unable to read response body';
-    }
-    const msg = (() => {
-      try {
-        const json = JSON.parse(body);
-        return json.detail ?? json.title ?? body;
-      } catch {
-        return body;
-      }
-    })();
-
-    switch (res.status) {
+  /**
+   * Build a typed error for a non-2xx response from the already-read body
+   * text: maps 401/403 to AuthError and everything else to ApiError carrying
+   * the status code and the decoded problem payload; empty and non-JSON bodies
+   * degrade to an explicit placeholder instead of a dangling colon or a raw
+   * SyntaxError (report F030/F042).
+   * @param status - HTTP status of the response
+   * @param text - body text already read exactly once
+   * @returns the error to throw
+   */
+  private buildError(status: number, text: string): Error {
+    const detail = extractErrorDetail(text);
+    const problem = parseJsonOrUndefined(text);
+    switch (status) {
       case 401:
-        return new AuthError(`Authentication failed (401): ${msg}`);
+        return new AuthError(`Authentication failed (401): ${detail}`);
       case 403:
-        return new AuthError(`Forbidden (403): ${msg}`);
+        return new AuthError(`Forbidden (403): ${detail}`);
       case 404:
-        return new ApiError(`Not found (404): ${msg}`, 404);
+        return new ApiError(`Not found (404): ${detail}`, 404, problem);
       case 500:
-        return new ApiError(`Server error (500): ${msg}`, 500);
+        return new ApiError(`Server error (500): ${detail}`, 500, problem);
       default:
-        return new ApiError(`HTTP ${res.status}: ${msg}`, res.status);
+        return new ApiError(`HTTP ${status}: ${detail}`, status, problem);
     }
   }
 }

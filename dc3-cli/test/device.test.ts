@@ -83,14 +83,25 @@ describe('device import command', () => {
       '--idempotency-key', 'import-1', '--no-wait', '--format', 'json',
     ]);
     const form = fetchCalls[0].init.body as FormData;
-    const requestPart = form.get('request');
-    const filePart = form.get('file') as Blob & {name?: string};
-    expect(JSON.parse(await (requestPart as Blob).text())).toEqual({driverId: '11', profileId: '12'});
+    const requestPart = form.get('request') as File;
+    const filePart = form.get('file') as File;
+    expect(JSON.parse(await requestPart.text())).toEqual({driverId: '11', profileId: '12'});
+    expect(requestPart.type).toBe('application/json');
+    expect(requestPart.name).toBe('request.json');
     expect(filePart.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     expect(filePart.name).toBe('devices.xlsx');
     expect(fetchCalls[0].init.headers).toEqual({'Idempotency-Key': 'import-1'});
     expect(fetchCalls).toHaveLength(1);
     expect(JSON.parse(output)).toMatchObject({operationId: 'op-1'});
+
+    // Golden wire (F046): serialize with the same machinery fetch uses and pin
+    // the exact part dispositions, so an undici upgrade cannot silently drift
+    // the canonical multipart contract back to filename="blob".
+    const wire = await new Request('http://gw.test/import', {method: 'POST', body: form}).text();
+    expect(wire).toContain('Content-Disposition: form-data; name="request"; filename="request.json"');
+    expect(wire).toContain('Content-Type: application/json\r\n\r\n{"driverId":"11","profileId":"12"}');
+    expect(wire).toContain(`Content-Disposition: form-data; name="file"; filename="devices.xlsx"`);
+    expect(wire).not.toContain('filename="blob"');
   });
 
   it('polls the status URI and returns a terminal operation by default', async () => {
@@ -103,7 +114,42 @@ describe('device import command', () => {
   it('rejects non-XLSX files before making a network request', async () => {
     const invalid = join(directory, 'devices.csv');
     await writeFile(invalid, 'x');
-    await run(['device', 'import', invalid, '--driver-id', '11', '--profile-id', '12']);
+    await expect(buildProgram().parseAsync(
+      ['device', 'import', invalid, '--driver-id', '11', '--profile-id', '12'],
+      {from: 'user'},
+    )).rejects.toMatchObject({kind: 'validation', message: 'Import file must use the .xlsx extension'});
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('rejects an empty import file before making a network request', async () => {
+    const empty = join(directory, 'empty.xlsx');
+    await writeFile(empty, Buffer.alloc(0));
+    await expect(buildProgram().parseAsync(
+      ['device', 'import', empty, '--driver-id', '11', '--profile-id', '12'],
+      {from: 'user'},
+    )).rejects.toMatchObject({kind: 'validation', message: 'Import file must not be empty'});
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('reports a missing import file with the user-supplied path and no absolute-path leak (F047)', async () => {
+    const previousCwd = process.cwd();
+    process.chdir(directory);
+    try {
+      const failure = await buildProgram().parseAsync(
+        ['device', 'import', 'missing.xlsx', '--driver-id', '11', '--profile-id', '12', '--format', 'json'],
+        {from: 'user'},
+      ).then(() => null, (error: Error) => error);
+      // Structured validation failure with the exact user-supplied path: the
+      // raw errno message would have embedded the resolved absolute path.
+      expect(failure).toMatchObject({
+        kind: 'validation',
+        exitCode: 1,
+        message: 'Import file not found: missing.xlsx',
+      });
+      expect((failure as Error).message).not.toContain(tmpdir());
+    } finally {
+      process.chdir(previousCwd);
+    }
     expect(fetchCalls).toHaveLength(0);
   });
 });

@@ -164,6 +164,8 @@ async function encryptAndWriteLocked(
  * bytes survive under a timestamped sibling; the store continues empty so the
  * surviving entries in the quarantine copy stay recoverable (they are never
  * overwritten by a fresh write).
+ * @param reason - human-readable cause of the read failure
+ * @returns an empty entries map for this session
  */
 async function quarantineCredentials(reason: string): Promise<Record<string, string>> {
   let quarantined: string | null = null;
@@ -184,6 +186,7 @@ async function quarantineCredentials(reason: string): Promise<Record<string, str
  * Read the entries map while holding the credentials lock. Legacy files
  * (plaintext `entries` echo + machine-derived key) are migrated in place:
  * re-encrypted under the random key file with the plaintext copy removed.
+ * @returns the decrypted identifier→password map
  */
 async function readEntriesLocked(): Promise<Record<string, string>> {
   return withLock(ENC_PATH, async () => readEntriesUnlocked());

@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { readFileSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { basename } from 'node:path';
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 
 const BASE = '/api/v3/agentic/attachment';
@@ -38,15 +39,17 @@ export function registerAttachmentCommand(program: Command): void {
       const format = detectFormat(opts.format);
       let content: Buffer;
       try {
-        content = readFileSync(file);
+        content = await readFile(file);
       } catch {
-        printAndExit({ ok: false, message: `Cannot read file: ${file}` }, format, 1);
+        throw new ValidationError(`Cannot read file: ${file}`);
       }
       if (content.length === 0) {
-        printAndExit({ ok: false, message: 'Attachment file must not be empty' }, format, 1);
+        throw new ValidationError('Attachment file must not be empty');
       }
       // The backend's AttachmentController expects a multipart/form-data `file`
-      // part (Spring @RequestPart), same grammar as the device XLSX import.
+      // part (Spring @RequestPart, filename read from the part disposition) —
+      // never a JSON-serialized buffer (report F003). postForm lets fetch own
+      // the multipart boundary; the file name rides the disposition.
       const form = new FormData();
       form.append('file', new Blob([content]), basename(file));
       const result = await dc3Client.postForm(

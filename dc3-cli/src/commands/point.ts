@@ -14,16 +14,43 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { Command } from 'commander';
+import { Command, InvalidArgumentError } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
   parseNonNegativeInteger,
+  parsePositiveInteger,
   updateManagerResource,
 } from '../utils/manager.js';
 
 const POINT_BASE = '/api/v3/manager/point';
+
+/**
+ * Plain decimal number lexeme (optional sign, digits, optional fraction).
+ * Numeric coercion alone (Number) accepts '', ' 5', '0x10', and '1e2'; the
+ * lexical check keeps those out before the finite check.
+ */
+const DECIMAL_NUMBER_PATTERN = /^[+-]?(?:\d+(?:\.\d+)?|\.\d+)$/u;
+
+/**
+ * Parse a CLI option as a decimal number for the BigDecimal-backed point
+ * fields: the value is validated lexically and sent as a JSON number so the
+ * wire type matches the gateway PointVO (report F039).
+ * @param value - value to set
+ * @returns the transformed value
+ */
+function parseDecimalNumber(value: string): number {
+  if (!DECIMAL_NUMBER_PATTERN.test(value)) {
+    throw new InvalidArgumentError('must be a plain decimal number (e.g. 0, 2, 0.5, -1.25)');
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    throw new InvalidArgumentError('must be a finite decimal number');
+  }
+  return parsed;
+}
 
 /**
  * Register the `point` command tree on the CLI program.
@@ -83,18 +110,14 @@ export function registerPointCommand(program: Command): void {
   point
     .command('history <id>')
     .description('Read point value history')
-    .option('--limit <n>', 'Number of records per page', '100')
+    .option('--limit <n>', 'Number of records per page', parsePositiveInteger, 100)
     .option('--cursor <cursor>', 'Opaque cursor from the previous page')
     .option('--device-id <id>', 'Device ID (required for history)')
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       if (!opts.deviceId) {
-        printAndExit(
-          { ok: false, message: '--device-id is required for history query' },
-          format,
-          1,
-        );
+        throw new ValidationError('--device-id is required for history query');
       }
       const params = new URLSearchParams({
         device_id: opts.deviceId,
@@ -116,14 +139,7 @@ export function registerPointCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       if (!opts.deviceId) {
-        printAndExit(
-          {
-            ok: false,
-            message: '--device-id is required for write operations',
-          },
-          format,
-          1,
-        );
+        throw new ValidationError('--device-id is required for write operations');
       }
       const result = await dc3Client.post('/api/v3/data/point_command/write', {
         deviceId: opts.deviceId,
@@ -143,8 +159,8 @@ export function registerPointCommand(program: Command): void {
     .option('--type <type>', 'Point type', 'FLOAT')
     .option('--rw <type>', 'Read/write type', 'READ_ONLY')
     .option('--value-decimal <n>', 'Decimal precision', parseNonNegativeInteger, 3)
-    .option('--base-value <value>', 'Base value', '0')
-    .option('--multiple <value>', 'Scale multiplier', '1')
+    .option('--base-value <value>', 'Base value (sent as a JSON number)', parseDecimalNumber, 0)
+    .option('--multiple <value>', 'Scale multiplier (sent as a JSON number)', parseDecimalNumber, 1)
     .option('--unit <unit>', 'Unit')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
@@ -158,7 +174,7 @@ export function registerPointCommand(program: Command): void {
         baseValue: opts.baseValue,
         multiple: opts.multiple,
       };
-      if (opts.unit) body.unit = opts.unit;
+      if (opts.unit !== undefined) body.unit = opts.unit;
       const result = await dc3Client.post(`${POINT_BASE}/add`, body);
       printAndExit(result, format);
     });
@@ -173,14 +189,14 @@ export function registerPointCommand(program: Command): void {
     .option('--type <type>', 'Point type')
     .option('--rw <type>', 'Read/write type')
     .option('--value-decimal <n>', 'Decimal precision', parseNonNegativeInteger)
-    .option('--base-value <value>', 'Base value')
-    .option('--multiple <value>', 'Scale multiplier')
+    .option('--base-value <value>', 'Base value (sent as a JSON number)', parseDecimalNumber)
+    .option('--multiple <value>', 'Scale multiplier (sent as a JSON number)', parseDecimalNumber)
     .option('--unit <unit>', 'New unit')
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(POINT_BASE, id, opts.version, {
-        ...(opts.name ? { pointName: opts.name } : {}),
+        ...(opts.name !== undefined ? { pointName: opts.name } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
         ...(opts.type ? { pointTypeFlag: opts.type } : {}),
         ...(opts.rw ? { rwFlag: opts.rw } : {}),

@@ -111,7 +111,7 @@ export function registerEventCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(EVENT_BASE, id, opts.version, {
-        ...(opts.name ? { eventName: opts.name } : {}),
+        ...(opts.name !== undefined ? { eventName: opts.name } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
         ...(opts.type ? { eventTypeFlag: opts.type } : {}),
         ...(opts.level ? { eventLevelFlag: opts.level } : {}),

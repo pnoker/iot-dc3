@@ -16,8 +16,15 @@
  */
 import { Command, InvalidArgumentError } from 'commander';
 import { configManager } from '../core/config-manager.js';
+import type { ProfileConfig } from '../core/config-manager.js';
+import { resetAllLocalState } from '../core/credential-store.js';
+import { UsageError } from '../core/errors.js';
 import { detectFormat, printAndExit, type OutputFormat } from '../utils/format.js';
 import { parseNonNegativeInteger } from '../utils/manager.js';
+import { confirm } from '../utils/prompt.js';
+
+/** Credential store types accepted by --store and auth.store. */
+const STORE_TYPES = ['keychain', 'encrypted', 'env', 'prompt'] as const;
 
 /**
  * Parse a numeric `config set` value, rejecting invalid input before anything is persisted.
@@ -222,6 +229,72 @@ export function registerConfigCommand(program: Command): void {
   const profileCmd = config.command('profile').description('Manage configuration profiles');
 
   profileCmd
+    .command('create <name>')
+    .description('Create a new profile (omitted fields keep their defaults)')
+    .option('--gateway <url>', 'Gateway base URL (http/https origin)')
+    .option('--tenant <tenant>', 'Tenant code')
+    .option('--username <name>', 'Login username')
+    .option('--store <type>', 'Credential store: keychain, encrypted, env, prompt')
+    .option('--switch', 'Make the new profile the active one')
+    .option('--format <format>', 'Output format')
+    .action(async (name: string, options) => {
+      const format = detectFormat(options.format);
+      const profileName = name.trim();
+      if (!profileName) {
+        throw new UsageError('profile name must not be empty');
+      }
+      const profiles = await configManager.getAllProfiles();
+      if (profiles[profileName]) {
+        throw new UsageError(
+          `Profile "${profileName}" already exists. Available: ${Object.keys(profiles).join(', ') || '(none)'}`,
+        );
+      }
+      const partial: Partial<ProfileConfig> = {};
+      if (options.gateway !== undefined) {
+        const trimmed = options.gateway.trim();
+        if (!trimmed) {
+          throw new UsageError('--gateway must not be empty');
+        }
+        partial.gateway = trimmed;
+      }
+      if (options.tenant !== undefined) {
+        const trimmed = options.tenant.trim();
+        if (!trimmed) {
+          throw new UsageError('--tenant must not be empty');
+        }
+        partial.tenant = trimmed;
+      }
+      if (options.username !== undefined) {
+        const trimmed = options.username.trim();
+        if (!trimmed) {
+          throw new UsageError('--username must not be empty');
+        }
+        partial.username = trimmed;
+      }
+      if (options.store !== undefined) {
+        if (!(STORE_TYPES as readonly string[]).includes(options.store)) {
+          throw new UsageError(
+            `invalid --store '${options.store}' (expected keychain, encrypted, env, or prompt)`,
+          );
+        }
+        partial.credential_store = options.store;
+      }
+      // Per-key validation happens inside setProfile: invalid values fail as
+      // one readable line with nothing persisted (report F007).
+      await configManager.setProfile(profileName, partial);
+      if (options.switch) {
+        await configManager.switchProfile(profileName);
+      }
+      printAndExit(
+        {
+          ok: true,
+          message: `Created profile "${profileName}"${options.switch ? ' (now active)' : ''}`,
+        },
+        format,
+      );
+    });
+
+  profileCmd
     .command('use <name>')
     .description('Switch to a profile')
     .option('--format <format>', 'Output format')
@@ -244,16 +317,31 @@ export function registerConfigCommand(program: Command): void {
   // dc3 config reset
   config
     .command('reset')
-    .description('Reset all configuration')
+    .description('Reset all configuration and local authentication state')
+    .option('--yes', 'Skip the confirmation prompt (non-interactive use)')
     .option('--format <format>', 'Output format')
     .action(async (options) => {
       const format = detectFormat(options.format);
-      const { confirm } = await import('../utils/prompt.js');
-      const ok = await confirm('This will delete all profiles and config. Continue?');
-      if (!ok) {
-        printAndExit({ ok: true, message: 'Cancelled' }, format);
+      if (!options.yes) {
+        // Confirmation needs an answerable stdin: a closed pipe would exit 0
+        // silently and an open-but-silent one would hang (report F004).
+        if (!process.stdin.isTTY) {
+          throw new UsageError(
+            'config reset requires an interactive confirmation; ' +
+              'pass --yes to reset without a prompt',
+          );
+        }
+        const ok = await confirm(
+          'This will delete all profiles, settings, saved tokens, and stored passwords. Continue?',
+        );
+        if (!ok) {
+          printAndExit({ ok: true, message: 'Cancelled' }, format);
+        }
       }
-      await configManager.reset();
-      printAndExit({ ok: true, message: 'Configuration reset' }, format);
+      // Local auth state spans config.json, tokens.json, and the credential
+      // stores — the shared seam wipes all three so a reset can never leave
+      // live tokens or stored passwords behind (report F016).
+      await resetAllLocalState();
+      printAndExit({ ok: true, message: 'Configuration and local auth state reset' }, format);
     });
 }

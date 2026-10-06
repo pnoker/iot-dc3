@@ -14,9 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
+import { parsePositiveInteger } from '../utils/manager.js';
+
+/**
+ * Append a query string built through URLSearchParams, so every flag value is
+ * encoded and can never inject extra gateway parameters (`&`), truncate the
+ * query (`#`), or smuggle structure (`=`) — report F017.
+ * @param base - gateway-relative path without a query string
+ * @param params - query parameters to set, undefined values skipped
+ * @returns the path with its encoded query string appended
+ */
+const withQuery = (base: string, params: Record<string, string | number | undefined>): string => {
+  const qs = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined) qs.set(key, String(value));
+  }
+  const encoded = qs.toString();
+  return encoded ? `${base}?${encoded}` : base;
+};
 
 /**
  * Register the `dashboard` command tree on the CLI program.
@@ -40,13 +58,20 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('timeseries')
     .description('Time series data')
-    .option('--granularity <g>', 'hour, day, week', 'hour')
-    .option('--range-hours <n>', 'Hours to look back', '24')
+    .addOption(
+      new Option('--granularity <g>', 'Time bucket granularity: hour groups by hour-of-day, day by calendar date')
+        .choices(['hour', 'day'])
+        .default('hour'),
+    )
+    .option('--range-hours <n>', 'Hours to look back', parsePositiveInteger, 24)
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { granularity: string; rangeHours: number; format?: string }) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/stats/timeseries?granularity=${opts.granularity}&range_hours=${opts.rangeHours}`,
+        withQuery('/api/v3/data/dashboard/stats/timeseries', {
+          granularity: opts.granularity,
+          range_hours: opts.rangeHours,
+        }),
       );
       printAndExit(result, format);
     });
@@ -55,14 +80,22 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('top')
     .description('Top entities by dimension')
-    .option('--dimension <dim>', 'device, driver, point', 'device')
-    .option('--range-hours <n>', 'Hours to look back', '24')
-    .option('--limit <n>', 'Max results', '10')
+    .addOption(
+      new Option('--dimension <dim>', 'Ranking dimension: device, driver, or point')
+        .choices(['device', 'driver', 'point'])
+        .default('device'),
+    )
+    .option('--range-hours <n>', 'Hours to look back', parsePositiveInteger, 24)
+    .option('--limit <n>', 'Max results', parsePositiveInteger, 10)
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { dimension: string; rangeHours: number; limit: number; format?: string }) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/top?dimension=${opts.dimension}&range_hours=${opts.rangeHours}&limit=${opts.limit}`,
+        withQuery('/api/v3/data/dashboard/top', {
+          dimension: opts.dimension,
+          range_hours: opts.rangeHours,
+          limit: opts.limit,
+        }),
       );
       printAndExit(result, format);
     });
@@ -71,11 +104,17 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('topology')
     .description('System topology')
-    .option('--mode <mode>', 'Topology mode', 'cardinality')
+    .addOption(
+      new Option('--mode <mode>', 'Aggregation mode: cardinality counts per edge, volume weights by samples')
+        .choices(['cardinality', 'volume'])
+        .default('cardinality'),
+    )
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { mode: string; format?: string }) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/data/dashboard/topology?mode=${opts.mode}`);
+      const result = await dc3Client.get(
+        withQuery('/api/v3/data/dashboard/topology', { mode: opts.mode }),
+      );
       printAndExit(result, format);
     });
 
@@ -97,11 +136,13 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('stream')
     .description('Latest point value stream')
-    .option('--limit <n>', 'Maximum number of records', '20')
+    .option('--limit <n>', 'Maximum number of records', parsePositiveInteger, 20)
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { limit: number; format?: string }) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/data/dashboard/stream?limit=${opts.limit}`);
+      const result = await dc3Client.get(
+        withQuery('/api/v3/data/dashboard/stream', { limit: opts.limit }),
+      );
       printAndExit(result, format);
     });
 
@@ -120,12 +161,12 @@ export function registerDashboardCommand(program: Command): void {
   dash
     .command('device-stats')
     .description('Device statistics from manager')
-    .option('--top-n <n>', 'Top N devices', '10')
+    .option('--top-n <n>', 'Top N devices', parsePositiveInteger, 10)
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { topN: number; format?: string }) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/manager/dashboard/device/stats?top_n=${opts.topN}`,
+        withQuery('/api/v3/manager/dashboard/device/stats', { top_n: opts.topN }),
       );
       printAndExit(result, format);
     });

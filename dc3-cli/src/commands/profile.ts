@@ -16,6 +16,7 @@
  */
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
@@ -54,14 +55,8 @@ export function registerProfileCommand(program: Command): void {
         // The device filter is a separate GET endpoint without paging: refuse the
         // combination instead of silently ignoring explicit paging flags.
         if (opts.offset !== undefined || opts.limit !== undefined) {
-          printAndExit(
-            {
-              ok: false,
-              message:
-                '--offset/--limit cannot be combined with --device-id: the device filter endpoint is not paged',
-            },
-            format,
-            1,
+          throw new ValidationError(
+            '--offset/--limit cannot be combined with --device-id: the device filter endpoint is not paged',
           );
         }
         const result = await dc3Client.get(
@@ -113,7 +108,7 @@ export function registerProfileCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(PROFILE_BASE, id, opts.version, {
-        ...(opts.name ? { profileName: opts.name } : {}),
+        ...(opts.name !== undefined ? { profileName: opts.name } : {}),
         ...(opts.type ? { profileTypeFlag: opts.type } : {}),
       });
       printAndExit(result, format);

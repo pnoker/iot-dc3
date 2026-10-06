@@ -155,6 +155,8 @@ type ReadConfigResult = { config: Config; raw: string | null; degraded: LoadDegr
  * schema defaults. This is the defense against the CLI persisting state it
  * cannot read back: a single out-of-range value must never blank the profiles.
  * Returns null when the document is structurally unrecognizable.
+ * @param parsed - JSON-decoded document to salvage
+ * @returns a config with every parseable part kept, or null
  */
 function salvageConfig(parsed: unknown): Config | null {
   if (!isRecord(parsed) || parsed.version !== 1) {
@@ -293,7 +295,7 @@ export class ConfigManager {
    * @param update - mutates the freshly read config in place
    * @returns the persisted config
    */
-  private async mutate(update: (config: Config) => void | Promise<void>): Promise<Config> {
+  private async mutate(update: (_config: Config) => void | Promise<void>): Promise<Config> {
     const next = await withLock(CONFIG_PATH, async () => {
       const fresh = await readConfig();
       await update(fresh.config);

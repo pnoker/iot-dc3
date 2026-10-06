@@ -202,5 +202,92 @@ describe("manager optimistic-lock write commands", () => {
         [testCase.stableField[0]]: testCase.stableField[1],
       });
     });
+
+    it(`${testCase.entity} update sends an explicit empty name instead of dropping it (F018)`, async () => {
+      await run(testCase.register, [
+        testCase.entity,
+        "update",
+        "id A&B",
+        "--version",
+        "3",
+        "--name",
+        "",
+      ]);
+
+      expect(fetchCalls).toHaveLength(2);
+      // Strict equality: an explicitly empty name must reach the wire as ""
+      // (empty-name legality is the gateway's call), never be silently
+      // dropped back to the server-side value.
+      expect(JSON.parse(String(fetchCalls[1].init.body))[testCase.nameField]).toBe("");
+    });
+
+    it(`${testCase.entity} update without --name keeps the server-side name untouched (F018)`, async () => {
+      await run(testCase.register, [testCase.entity, "update", "id A&B", "--version", "3"]);
+
+      expect(fetchCalls).toHaveLength(2);
+      expect(JSON.parse(String(fetchCalls[1].init.body))[testCase.nameField]).toBe("old-name");
+    });
   }
+
+  describe("empty-string option values reach the wire (F018)", () => {
+    it("device update sends an explicit empty description as an empty remark", async () => {
+      await run(registerDeviceCommand, [
+        "device",
+        "update",
+        "1",
+        "--version",
+        "3",
+        "--description",
+        "",
+      ]);
+      expect(JSON.parse(String(fetchCalls[1].init.body)).remark).toBe("");
+    });
+
+    it("device add sends an explicit empty description as an empty remark", async () => {
+      await run(registerDeviceCommand, [
+        "device",
+        "add",
+        "--name",
+        "n",
+        "--driver-id",
+        "d",
+        "--profile-id",
+        "p",
+        "--description",
+        "",
+      ]);
+      expect(fetchCalls).toHaveLength(1);
+      expect(JSON.parse(String(fetchCalls[0].init.body)).remark).toBe("");
+    });
+
+    it("driver update sends an explicit empty service name", async () => {
+      await run(registerDriverCommand, [
+        "driver",
+        "update",
+        "1",
+        "--version",
+        "3",
+        "--service-name",
+        "",
+      ]);
+      expect(JSON.parse(String(fetchCalls[1].init.body)).serviceName).toBe("");
+    });
+
+    it("point update sends explicit empty name and unit", async () => {
+      await run(registerPointCommand, [
+        "point",
+        "update",
+        "1",
+        "--version",
+        "3",
+        "--name",
+        "",
+        "--unit",
+        "",
+      ]);
+      const body = JSON.parse(String(fetchCalls[1].init.body));
+      expect(body.pointName).toBe("");
+      expect(body.unit).toBe("");
+    });
+  });
 });

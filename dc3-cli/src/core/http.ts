@@ -58,3 +58,57 @@ export async function fetchOrNetworkError(
     throw new NetworkError(`Network request failed (${url}): ${(error as Error).message}`);
   }
 }
+
+/**
+ * Read a response body as text, degrading to an empty string when the body
+ * cannot be consumed (aborted mid-body) so callers never crash on a raw
+ * transport error while formatting a diagnostic.
+ * @param res - response whose body to read
+ * @returns the decoded body text, or '' when unreadable
+ */
+export async function readBodyText(res: Response): Promise<string> {
+  try {
+    return await res.text();
+  } catch {
+    return '';
+  }
+}
+
+/** Whether the cleartext-transport warning already fired in this process. */
+let cleartextTransportWarned = false;
+
+/**
+ * Warn once per process when credentials are about to be sent over cleartext
+ * http to a non-loopback gateway (report F055). Loopback gateways are exempt:
+ * the default local development gateway is http by design.
+ * @param gateway - resolved gateway base URL about to receive credentials
+ */
+export function warnInsecureTransport(gateway: string): void {
+  if (cleartextTransportWarned) {
+    return;
+  }
+  let hostname: string;
+  try {
+    const url = new URL(gateway);
+    if (url.protocol !== 'http:') {
+      return;
+    }
+    hostname = url.hostname.replace(/^\[/u, '').replace(/\]$/u, '');
+  } catch {
+    // Not a parseable URL; the request itself will fail with a clear error.
+    return;
+  }
+  const loopback =
+    hostname === 'localhost' ||
+    hostname === '::1' ||
+    hostname === '127.0.0.1' ||
+    /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/u.test(hostname);
+  if (loopback) {
+    return;
+  }
+  cleartextTransportWarned = true;
+  process.stderr.write(
+    `Warning: credentials will be sent in cleartext to the http gateway ${gateway}. ` +
+      `Configure an https gateway for remote deployments.\n`,
+  );
+}

@@ -15,14 +15,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { Command } from 'commander';
-import { dc3Client, AuthError, NetworkError } from '../core/client.js';
+import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, parsePositiveInteger } from '../utils/manager.js';
 
 /**
  * Session & action plane of the agentic center: conversation lifecycle plus the
  * high-risk tool-call approval loop (docs/design/token-unification-mcp-first-cli.md
  * Q2 — CLI TTY confirmation channel). All routes live under /api/v3/agentic.
+ *
+ * Destructive operations (session delete, action confirm/reject) are gated by
+ * the TTY confirmation channel; `--yes` skips the prompt for scripts, CI, and
+ * non-interactive agents, and a declined confirmation exits before any request
+ * is built (report F045).
  * @param program - commander program to attach the command to
  */
 export function registerSessionCommand(program: Command): void {
@@ -90,9 +95,17 @@ export function registerSessionCommand(program: Command): void {
   session
     .command('delete <conversation_id>')
     .description('Delete a conversation with its message history')
+    .option('--yes', 'Skip the confirmation prompt (scripts, CI, non-interactive agents)')
     .option('--format <format>', 'Output format')
-    .action(async (id: string, opts) => {
+    .action(async (id: string, opts: { yes?: boolean; format?: string }) => {
       const format = detectFormat(opts.format);
+      if (!opts.yes) {
+        const { confirm } = await import('../utils/prompt.js');
+        const ok = await confirm(`Delete conversation "${id}" with its message history?`);
+        if (!ok) {
+          printAndExit({ ok: true, message: 'Cancelled' }, format);
+        }
+      }
       const result = await dc3Client.request(
         'DELETE',
         `/api/v3/agentic/session/delete?conversation_id=${encodeURIComponent(id)}`,
@@ -114,24 +127,24 @@ export function registerActionCommand(program: Command): void {
     action
       .command(`${sub} <action_id>`)
       .description(description)
+      .option('--yes', 'Skip the confirmation prompt (scripts, CI, non-interactive agents)')
       .option('--format <format>', 'Output format')
-      .action(async (actionId: string, opts) => {
+      .action(async (actionId: string, opts: { yes?: boolean; format?: string }) => {
         const format = detectFormat(opts.format);
-        try {
-          const result = await dc3Client.request(
-            'POST',
-            `/api/v3/agentic/action/${sub}?action_id=${encodeURIComponent(actionId)}`,
+        if (!opts.yes) {
+          const { confirm } = await import('../utils/prompt.js');
+          const ok = await confirm(
+            `${sub === 'confirm' ? 'Approve' : 'Reject'} pending action "${actionId}"?`,
           );
-          printAndExit(result, format);
-        } catch (err) {
-          if (err instanceof AuthError) {
-            printAndExit({ ok: false, message: err.message }, format, 3);
+          if (!ok) {
+            printAndExit({ ok: true, message: 'Cancelled' }, format);
           }
-          if (err instanceof NetworkError) {
-            printAndExit({ ok: false, message: err.message }, format, 2);
-          }
-          throw err;
         }
+        const result = await dc3Client.request(
+          'POST',
+          `/api/v3/agentic/action/${sub}?action_id=${encodeURIComponent(actionId)}`,
+        );
+        printAndExit(result, format);
       });
   };
 
@@ -140,26 +153,16 @@ export function registerActionCommand(program: Command): void {
     .command('pending')
     .description('List tool calls awaiting approval for one conversation')
     .requiredOption('--conversation-id <id>', 'Conversation identifier')
-    .option('--offset <number>', 'Zero-based result offset', (value) => Number.parseInt(value, 10))
-    .option('--limit <number>', 'Maximum results to return', (value) => Number.parseInt(value, 10))
+    .option('--offset <n>', 'Zero-based result offset', parseNonNegativeInteger)
+    .option('--limit <n>', 'Maximum results to return', parsePositiveInteger)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      try {
-        const params = new URLSearchParams({ conversation_id: opts.conversationId });
-        if (opts.offset !== undefined) params.set('offset', String(opts.offset));
-        if (opts.limit !== undefined) params.set('limit', String(opts.limit));
-        const result = await dc3Client.get(`/api/v3/agentic/action/pending?${params.toString()}`);
-        printAndExit(result, format);
-      } catch (err) {
-        if (err instanceof AuthError) {
-          printAndExit({ ok: false, message: err.message }, format, 3);
-        }
-        if (err instanceof NetworkError) {
-          printAndExit({ ok: false, message: err.message }, format, 2);
-        }
-        throw err;
-      }
+      const params = new URLSearchParams({ conversation_id: opts.conversationId });
+      if (opts.offset !== undefined) params.set('offset', String(opts.offset));
+      if (opts.limit !== undefined) params.set('limit', String(opts.limit));
+      const result = await dc3Client.get(`/api/v3/agentic/action/pending?${params.toString()}`);
+      printAndExit(result, format);
     });
 
   act('confirm', 'Approve a pending tool call');

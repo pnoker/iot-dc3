@@ -16,8 +16,49 @@
  */
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger } from '../utils/manager.js';
+import { parseNonNegativeInteger, parsePositiveInteger } from '../utils/manager.js';
+import { readJsonObjectBody } from './analytics.js';
+
+/**
+ * Collector for the repeatable `--query` flag: commander passes the
+ * accumulated array as `previous`, so every occurrence appends instead of
+ * the default last-write-wins (report F019).
+ * @param value - one `key=value` occurrence
+ * @param previous - values collected so far
+ * @returns the accumulated list
+ */
+const collectQuery = (value: string, previous: string[] = []): string[] => previous.concat(value);
+
+/**
+ * Append the numeric flags and every `--query` occurrence to a read-plane
+ * base path through URLSearchParams, so user values are always encoded and
+ * can never inject extra gateway parameters (`&`), truncate the query
+ * (`#`), or smuggle structure (`=`) — report F017. A malformed `key=value`
+ * pair fails fast as a ValidationError before any request is built
+ * (report F019).
+ * @param base - gateway-relative path without a query string
+ * @param opts - command options carrying days/limit/baselineDays/silentMinutes/query
+ * @returns the path with its encoded query string appended
+ */
+const appendQuery = (base: string, opts: Record<string, unknown>): string => {
+  const params = new URLSearchParams();
+  if (opts.days !== undefined) params.set('days', String(opts.days));
+  if (opts.limit !== undefined) params.set('limit', String(opts.limit));
+  if (opts.baselineDays !== undefined) params.set('baseline_days', String(opts.baselineDays));
+  if (opts.silentMinutes !== undefined) params.set('silent_minutes', String(opts.silentMinutes));
+  const queries = Array.isArray(opts.query) ? (opts.query as string[]) : [];
+  for (const kv of queries) {
+    const eq = kv.indexOf('=');
+    if (eq <= 0) {
+      throw new ValidationError(`--query expects <key>=<value>, got: ${JSON.stringify(kv)}`);
+    }
+    params.append(kv.slice(0, eq), kv.slice(eq + 1));
+  }
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
+};
 
 /**
  * Register the `alert` command tree on the CLI program.
@@ -60,11 +101,11 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('latest')
     .description('Latest alerts')
-    .option('--limit <n>', 'Maximum number of alerts', '10')
+    .option('--limit <n>', 'Maximum number of alerts', parsePositiveInteger, 10)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/data/dashboard/alert/latest?limit=${opts.limit}`);
+      const result = await dc3Client.get(appendQuery('/api/v3/data/dashboard/alert/latest', opts));
       printAndExit(result, format);
     });
 
@@ -102,11 +143,11 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('trend')
     .description('Alert trend over time')
-    .option('--days <n>', 'Number of days', '30')
+    .option('--days <n>', 'Number of days', parsePositiveInteger, 30)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/data/dashboard/alert/trend?days=${opts.days}`);
+      const result = await dc3Client.get(appendQuery('/api/v3/data/dashboard/alert/trend', opts));
       printAndExit(result, format);
     });
 
@@ -114,13 +155,13 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('top-sources')
     .description('Top alert sources')
-    .option('--days <n>', 'Number of days', '30')
-    .option('--limit <n>', 'Max results', '10')
+    .option('--days <n>', 'Number of days', parsePositiveInteger, 30)
+    .option('--limit <n>', 'Max results', parsePositiveInteger, 10)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/top_sources?days=${opts.days}&limit=${opts.limit}`,
+        appendQuery('/api/v3/data/dashboard/alert/top_sources', opts),
       );
       printAndExit(result, format);
     });
@@ -129,46 +170,25 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('type-distribution')
     .description('Alert type distribution')
-    .option('--days <n>', 'Number of days', '30')
+    .option('--days <n>', 'Number of days', parsePositiveInteger, 30)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
       const result = await dc3Client.get(
-        `/api/v3/data/dashboard/alert/type_distribution?days=${opts.days}`,
+        appendQuery('/api/v3/data/dashboard/alert/type_distribution', opts),
       );
       printAndExit(result, format);
     });
 
   // ---- Deep-analysis surface (added 2026-08): generic day/limit + kv passthrough ----
 
-  const appendQuery = (base: string, opts: Record<string, unknown>): string => {
-    const qs: string[] = [];
-    if (opts.days !== undefined) qs.push(`days=${opts.days}`);
-    if (opts.limit !== undefined) qs.push(`limit=${opts.limit}`);
-    if (opts.baselineDays !== undefined) qs.push(`baseline_days=${opts.baselineDays}`);
-    if (opts.silentMinutes !== undefined) qs.push(`silent_minutes=${opts.silentMinutes}`);
-    // --query may arrive as one string or several values depending on usage.
-    const kvs: string[] = Array.isArray(opts.query)
-      ? (opts.query as string[])
-      : typeof opts.query === 'string' && opts.query
-        ? [opts.query]
-        : [];
-    for (const kv of kvs) {
-      const eq = kv.indexOf('=');
-      if (eq > 0) {
-        qs.push(`${encodeURIComponent(kv.slice(0, eq))}=${encodeURIComponent(kv.slice(eq + 1))}`);
-      }
-    }
-    return qs.length ? `${base}?${qs.join('&')}` : base;
-  };
-
   const addGetAnalysis = (name: string, sub: string, description: string): void => {
     alert
       .command(name)
       .description(description)
-      .option('--days <n>', 'Look-back window in days')
-      .option('--limit <n>', 'Maximum rows to return')
-      .option('--query <k=v>', 'Extra server query param (repeatable)')
+      .option('--days <n>', 'Look-back window in days', parsePositiveInteger)
+      .option('--limit <n>', 'Maximum rows to return', parsePositiveInteger)
+      .option('--query <k=v>', 'Extra server query param (repeatable)', collectQuery, [] as string[])
       .option('--format <format>', 'Output format')
       .action(async (opts) => {
         const format = detectFormat(opts.format);
@@ -191,7 +211,8 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('change-impact')
     .description('Change-impact analysis before/after config changes')
-    .option('--days <n>', 'Look-back window in days')
+    .option('--days <n>', 'Look-back window in days', parsePositiveInteger)
+    .option('--query <k=v>', 'Extra server query param (repeatable)', collectQuery, [] as string[])
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
@@ -214,9 +235,9 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('silent-sources')
     .description('Data sources silent beyond a threshold')
-    .option('--baseline-days <n>', 'Baseline window in days')
-    .option('--silent-minutes <n>', 'Silence threshold in minutes')
-    .option('--limit <n>', 'Maximum rows to return', '50')
+    .option('--baseline-days <n>', 'Baseline window in days', parsePositiveInteger)
+    .option('--silent-minutes <n>', 'Silence threshold in minutes', parsePositiveInteger)
+    .option('--limit <n>', 'Maximum rows to return', parsePositiveInteger, 50)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
@@ -229,28 +250,26 @@ export function registerAlertCommand(program: Command): void {
   alert
     .command('coverage-gap')
     .description('Collection coverage gaps for points and devices')
-    .option('--limit <n>', 'Maximum rows to return', '100')
+    .option('--limit <n>', 'Maximum rows to return', parsePositiveInteger, 100)
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(`/api/v3/data/dashboard/coverage/gap?limit=${opts.limit}`);
+      const result = await dc3Client.get(appendQuery('/api/v3/data/dashboard/coverage/gap', opts));
       printAndExit(result, format);
     });
 
   alert
     .command('bulk-confirm')
     .description('Confirm many alerts at once')
-    .requiredOption('--args <json>', 'Body as JSON, e.g. {"items":[{"source":"device","id":789}]}')
+    .option('--args <json>', 'Body as a JSON object, e.g. {"items":[{"source":"device","id":789}]}')
+    .option(
+      '--args-file <path>',
+      "Body read from a JSON file ('-' reads stdin); use for payloads beyond the argv size limit",
+    )
     .option('--format <format>', 'Output format')
-    .action(async (opts) => {
+    .action(async (opts: { args?: string; argsFile?: string; format?: string }) => {
       const format = detectFormat(opts.format);
-      let body: unknown;
-      try {
-        body = JSON.parse(opts.args);
-      } catch {
-        printAndExit({ ok: false, message: '--args is not valid JSON' }, format, 1);
-        return;
-      }
+      const body = await readJsonObjectBody(opts.args, opts.argsFile);
       const result = await dc3Client.post('/api/v3/data/dashboard/alert/bulk_confirm', body);
       printAndExit(result, format);
     });

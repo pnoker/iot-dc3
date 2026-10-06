@@ -16,6 +16,7 @@
  */
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
+import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
 import {
   deleteManagerResource,
@@ -101,7 +102,7 @@ export function registerCommandCommand(program: Command): void {
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);
       const result = await updateManagerResource(COMMAND_BASE, id, opts.version, {
-        ...(opts.name ? { commandName: opts.name } : {}),
+        ...(opts.name !== undefined ? { commandName: opts.name } : {}),
         ...(opts.profileId ? { profileId: opts.profileId } : {}),
         ...(opts.type ? { commandTypeFlag: opts.type } : {}),
         ...(opts.callType ? { callTypeFlag: opts.callType } : {}),
@@ -127,16 +128,24 @@ export function registerCommandCommand(program: Command): void {
     .description('Execute a command on a device')
     .requiredOption('--device-id <id>', 'Device ID')
     .requiredOption('--command-id <id>', 'Command ID')
-    .option('--params <json>', 'Command parameters as JSON string', '{}')
+    .option('--params <json>', 'Command parameters as a JSON object string', '{}')
     .option('--format <format>', 'Output format')
     .action(async (opts) => {
       const format = detectFormat(opts.format);
-      let params: Record<string, unknown>;
+      let params: unknown;
       try {
         params = JSON.parse(opts.params);
       } catch {
-        printAndExit({ ok: false, message: 'Invalid JSON in --params' }, format, 1);
-        return;
+        // Typed validation failure instead of a hand-rolled {ok:false} print:
+        // escapes to the single failure chokepoint (stderr line + stdout
+        // envelope + exit 1) like every other validation (report F009).
+        throw new ValidationError('Invalid JSON in --params');
+      }
+      // The gateway contract is a map of parameter names to values; reject
+      // every other JSON shape before the wire instead of letting the server
+      // answer an obscure 400 (report F034).
+      if (typeof params !== 'object' || params === null || Array.isArray(params)) {
+        throw new ValidationError('--params must be a JSON object');
       }
       const result = await dc3Client.post('/api/v3/data/command_history/call', {
         deviceId: opts.deviceId,
