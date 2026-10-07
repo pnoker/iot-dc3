@@ -537,6 +537,12 @@ public class AgenticConstant {
         public static final String SYSTEM_HEALTH_UNAVAILABLE = "System health snapshot is unavailable.";
 
         /**
+         * Tool message when insight tools (alerts, dashboard stats, analytics) are unavailable
+         * in the deployment mode.
+         */
+        public static final String INSIGHT_UNAVAILABLE = "Insight tools are not available in this deployment mode.";
+
+        /**
          * Generic tool request failure message.
          */
         public static final String REQUEST_FAILED = "Request failed";

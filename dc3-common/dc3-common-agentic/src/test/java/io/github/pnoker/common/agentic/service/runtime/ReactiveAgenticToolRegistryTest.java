@@ -24,6 +24,8 @@ import io.github.pnoker.common.agentic.tools.CommandTool;
 import io.github.pnoker.common.agentic.tools.DeviceTool;
 import io.github.pnoker.common.agentic.tools.DriverTool;
 import io.github.pnoker.common.agentic.tools.EventTool;
+import io.github.pnoker.common.agentic.tools.HistoryTool;
+import io.github.pnoker.common.agentic.tools.InsightTool;
 import io.github.pnoker.common.agentic.tools.PointTool;
 import io.github.pnoker.common.agentic.tools.PointValueTool;
 import io.github.pnoker.common.agentic.tools.ProfileTool;
@@ -44,6 +46,8 @@ class ReactiveAgenticToolRegistryTest {
                 mock(EventTool.class),
                 mock(DeviceTool.class),
                 mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
                 new ObjectMapper());
         var tools = registry.tools();
         assertThat(tools.keySet()).doesNotHaveDuplicates();
@@ -57,6 +61,96 @@ class ReactiveAgenticToolRegistryTest {
     }
 
     @Test
+    void registryExposesTheExactToolSurfaceSoNoToolGoesOrphan() {
+        var registry = new ReactiveAgenticToolRegistry(
+                mock(PointValueTool.class),
+                mock(PointTool.class),
+                mock(ProfileTool.class),
+                mock(CommandTool.class),
+                mock(EventTool.class),
+                mock(DeviceTool.class),
+                mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
+                new ObjectMapper());
+        assertThat(registry.tools().keySet())
+                .containsExactlyInAnyOrder(
+                        // point value read/write
+                        "writePointValue",
+                        "readPointValue",
+                        "getLatestPointValue",
+                        "getPointValueHistory",
+                        // point lookup/search
+                        "lookupPointById",
+                        "lookupPointsByIds",
+                        "searchPoints",
+                        "listPointsByDevice",
+                        "listPointsByProfile",
+                        // profile lookup/search
+                        "lookupProfileById",
+                        "lookupProfilesByIds",
+                        "searchProfiles",
+                        "listProfilesByDeviceId",
+                        // command lookup/search
+                        "lookupCommandById",
+                        "lookupCommandsByIds",
+                        "searchCommands",
+                        "listCommandsByDeviceId",
+                        "listCommandsByProfileId",
+                        // event lookup/search
+                        "lookupEventById",
+                        "lookupEventsByIds",
+                        "searchEvents",
+                        "listEventsByDeviceId",
+                        "listEventsByProfileId",
+                        // device lookup/search
+                        "lookupDeviceById",
+                        "lookupDevicesByIds",
+                        "searchDevices",
+                        "listDevicesByDriverId",
+                        "listDevicesByProfileId",
+                        "getDeviceLatestPointValues",
+                        // driver lookup/search
+                        "lookupDriverById",
+                        "lookupDriversByIds",
+                        "searchDrivers",
+                        // insight: alert analytics
+                        "getAlertStats",
+                        "getLatestAlerts",
+                        "pageAlerts",
+                        "getAlertTrend",
+                        "getAlertTopSources",
+                        "getAlertTypeDistribution",
+                        "getAlertAgingBacklog",
+                        "getAlertMtta",
+                        // insight: dashboard stats
+                        "getTodayStats",
+                        "getStatsTimeseries",
+                        "getTopEntities",
+                        "getLatestValueStream",
+                        "getLatencyHistogram",
+                        "getHourlyActivity",
+                        "getProtocolHealth",
+                        // insight: analytics agent surface
+                        "analyticsQueryLatest",
+                        "analyticsQueryHistory",
+                        "analyticsComputeStats",
+                        "analyticsComparePeriods",
+                        "analyticsRankEntities",
+                        "analyticsTrendAnalysis",
+                        "analyticsThresholdReport",
+                        "analyticsCorrelate",
+                        "analyticsDataQualityReport",
+                        // insight: point command closed loop
+                        "getPointCommandStatus",
+                        // command/event history traceability
+                        "lookupCommandHistoryByRecordId",
+                        "searchCommandHistories",
+                        "lookupEventHistoryByRecordId",
+                        "searchEventHistories");
+    }
+
+    @Test
     void malformedArgumentsBecomeStructuredErrors() {
         var registry = new ReactiveAgenticToolRegistry(
                 mock(PointValueTool.class),
@@ -66,6 +160,8 @@ class ReactiveAgenticToolRegistryTest {
                 mock(EventTool.class),
                 mock(DeviceTool.class),
                 mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
                 new ObjectMapper());
         StepVerifier.create(registry.tools().get("searchDevices").call("{", new ToolContext(Map.of())))
                 .assertNext(result -> {

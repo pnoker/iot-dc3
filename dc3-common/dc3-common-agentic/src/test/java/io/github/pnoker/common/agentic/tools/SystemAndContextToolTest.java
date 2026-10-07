@@ -18,6 +18,10 @@ package io.github.pnoker.common.agentic.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
@@ -25,8 +29,10 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.UnAuthorizedException;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
+import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -101,6 +107,91 @@ class SystemAndContextToolTest {
                     assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE);
                     assertThat(result.data()).isNull();
                 })
+                .verifyComplete();
+    }
+
+    @Test
+    void deviceStatusesNormalizeIdsAndReturnMap() {
+        when(statusHealthFacade.listDeviceStatusesByIdsReactive(eq(11L), anyCollection()))
+                .thenReturn(Mono.just(Map.of(1L, "ONLINE", 2L, "OFFLINE")));
+
+        StepVerifier.create(new SystemTool(Optional.of(statusHealthFacade))
+                        .getDeviceStatuses(java.util.Arrays.asList(1L, 2L, null, -5L, 2L), toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.data()).containsEntry(1L, "ONLINE").containsEntry(2L, "OFFLINE");
+                })
+                .verifyComplete();
+        verify(statusHealthFacade).listDeviceStatusesByIdsReactive(eq(11L), eq(List.of(1L, 2L)));
+    }
+
+    @Test
+    void deviceStatusesRejectEmptyIds() {
+        StepVerifier.create(new SystemTool(Optional.of(statusHealthFacade)).getDeviceStatuses(List.of(), toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT);
+                })
+                .verifyComplete();
+        verifyNoInteractions(statusHealthFacade);
+    }
+
+    @Test
+    void deviceStatusesByProfileRejectInvalidProfileId() {
+        StepVerifier.create(
+                        new SystemTool(Optional.of(statusHealthFacade)).getDeviceStatusesByProfile(0L, toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isFalse();
+                    assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_INVALID_ARGUMENT);
+                })
+                .verifyComplete();
+        verifyNoInteractions(statusHealthFacade);
+    }
+
+    @Test
+    void driverStatusesReturnMapAndReportEmptyState() {
+        when(statusHealthFacade.listDriverStatusesByIdsReactive(eq(11L), anyCollection()))
+                .thenReturn(Mono.just(Map.of()));
+
+        StepVerifier.create(
+                        new SystemTool(Optional.of(statusHealthFacade)).getDriverStatuses(List.of(7L), toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_EMPTY);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void driverDeviceStatusSummaryReturnsStructuredCounts() {
+        FacadeDriverDeviceStatusSummaryBO summary = new FacadeDriverDeviceStatusSummaryBO(7L, 30, 25, 5);
+        when(statusHealthFacade.getDriverDeviceStatusSummaryReactive(11L, 7L)).thenReturn(Mono.just(summary));
+
+        StepVerifier.create(
+                        new SystemTool(Optional.of(statusHealthFacade)).getDriverDeviceStatusSummary(7L, toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.success()).isTrue();
+                    assertThat(result.data().getTotal()).isEqualTo(30);
+                    assertThat(result.data().getOnline()).isEqualTo(25);
+                    assertThat(result.data().getOffline()).isEqualTo(5);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void statusToolsDoNotFabricateWhenFacadeIsUnavailable() {
+        SystemTool tool = new SystemTool(Optional.empty());
+        StepVerifier.create(tool.getDeviceStatuses(List.of(1L), toolContext()))
+                .assertNext(result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE))
+                .verifyComplete();
+        StepVerifier.create(tool.getDeviceStatusesByProfile(2L, toolContext()))
+                .assertNext(result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE))
+                .verifyComplete();
+        StepVerifier.create(tool.getDriverStatuses(List.of(3L), toolContext()))
+                .assertNext(result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE))
+                .verifyComplete();
+        StepVerifier.create(tool.getDriverDeviceStatusSummary(4L, toolContext()))
+                .assertNext(result -> assertThat(result.code()).isEqualTo(AgenticConstant.ToolResult.CODE_UNAVAILABLE))
                 .verifyComplete();
     }
 
