@@ -5,7 +5,7 @@
 | **Status**     | Analysis / proposal — for reference, not a committed roadmap                                                                                                       |
 | **Date**       | 2026-08-18                                                                                                                                                         |
 | **Scope**      | 跨项目对比（DG-IoT ↔ IoT DC3），提炼可借鉴点，并澄清双方物模型差异                                                                                                 |
-| **Related**    | [comparison-supos-free.md](./comparison-supos-free.md)、[storage-abstraction.md](./design/storage-abstraction.md)、[mq-abstraction.md](./design/mq-abstraction.md) |
+| **Related**    | [comparison-supos-free.md](./comparison-supos-free.md) |
 | **Discussion** | 开放评审，未进入实施排期                                                                                                                                           |
 
 > 说明：本文中 **DG-IoT**（`dgiot/dgiot`，gitee: `dgiiot/dgiot`）为国内首款轻量级开源工业物联网平台。
@@ -71,7 +71,7 @@
 ### 2.7 数据通道 / 转发
 
 - DG-IoT 的“数据通道”抽象很实用：MQTT/Kafka/HTTP/WebSocket 多通道转发 + MES/WMS/ERP/ESB 多源接入。
-- DC3 有数据桥接驱动 + `mq-abstraction.md`（Proposed），方向一致但 **缺“通道”这一层编排抽象**。
+- DC3 有数据桥接驱动 + 已落地的 MQ 端口抽象（dc3-common-mq，四适配器受 TCK 门禁），方向一致但 **缺“通道”这一层编排抽象**。
 
 ### 2.8 部署与交付
 
@@ -147,7 +147,7 @@ Device = Driver(协议) + Profile(物模型)   ← 设备是「协议接入」�
 
 | 优先级 | 借鉴点                      | DG-IoT 做法                                               | DC3 现状 → 落地建议                                                                                |
 |--------|-----------------------------|-----------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| P0     | **数据通道抽象**            | MQTT/Kafka/HTTP/WS 多通道转发 + MES/WMS/ERP/ESB 多源接入  | 数据桥接驱动 + `mq-abstraction.md`(Proposed) → 在 MQ 端口之上加一层「通道」编排，落地 Kafka 适配器 |
+| P0     | **数据通道抽象**            | MQTT/Kafka/HTTP/WS 多通道转发 + MES/WMS/ERP/ESB 多源接入  | 数据桥接驱动 + 已落地的 MQ 端口抽象 → 在 MQ 端口之上加一层「通道」编排，落地 Kafka 适配器 |
 | P0     | **规则引擎/数据处理增强**   | 160+ 函数、清洗/标准化/实时流                             | 仅告警规则 → 扩展规则引擎支持数据清洗/转换/转发，复用 `dc3-common-data`                            |
 | P1     | **组态页面低代码**          | 数据通道→组态全流程低代码                                 | home 写死 → 可配置 widget 看板 + 组态/大屏                                                         |
 | P1     | **物模型贯通**              | 物模型一次建模，贯通规则/通道/组态                        | Profile 独立 → 打通「模型→规则→通道→看板」链路，落成 `profileShareFlag` 模板市场                   |

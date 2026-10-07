@@ -6,7 +6,7 @@
 | **日期**       | 2026-08-18                                                                                                                                      |
 | **范围**       | MCP 运行时平面：`mcp_runtime.proto`、`McpRuntimeFacade`、`McpGatewayController`，auth 侧的 `OAuthMcpRuntimeServiceImpl` + `McpRuntimeServer`    |
 | **目标**       | 每个 MCP 方法一次内聚的 gateway→auth 往返；响应式、非阻塞；真实 input schema；异步审计                                                          |
-| **相关**       | [`mq-abstraction.md`](./mq-abstraction.md) —— 异步审计通道（若采用）所用的 broker port                                                          |
+| **相关**       | dc3-common-mq 的 broker port（已落地）—— 异步审计通道（若采用）所用                                                          |
 | **讨论**       | 实施启动前开放评审                                                                                                                              |
 
 ## 1. 摘要

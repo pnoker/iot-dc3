@@ -5,7 +5,7 @@
 | **Status**     | Analysis / proposal — for reference, not a committed roadmap                                               |
 | **Date**       | 2026-08-18                                                                                                 |
 | **Scope**      | 跨项目对比（supOS-Free ↔ IoT DC3），提炼可借鉴点并落地建议                                                 |
-| **Related**    | [storage-abstraction.md](./design/storage-abstraction.md)、[mq-abstraction.md](./design/mq-abstraction.md) |
+| **Related**    | — |
 | **Discussion** | 开放评审，未进入实施排期                                                                                   |
 
 > 说明：本文中 “superos-free” 即 **supOS-Free**（蓝卓数字科技/中控体系的“工厂操作系统”免费版）。
@@ -79,7 +79,7 @@
 #### 3.1 多模态 / 可插拔存储
 
 - **supOS 做法**：关系 + 时序（TDengine/TimescaleDB）+ 非结构化 + 文件多模态底座。
-- **DC3 现状**：[storage-abstraction.md](./design/storage-abstraction.md) 已设计 `dc3.db.type` 关系方言 +
+- **DC3 现状**：已落地的存储抽象（`dc3.db.type` 关系方言，flag day 收敛 PostgreSQL）+
   `dc3.repository.type` 时序端口（目标 PostgreSQL/MySQL + TimescaleDB/TDengine/InfluxDB/IoTDB），状态为 Proposed — not yet
   implemented。
 - **落地建议**：优先实现 **TDengine 时序适配器**（supOS 主打，国内工业客户常点名），并把 `RepositoryService`
@@ -95,7 +95,7 @@
 #### 3.3 可插拔消息总线
 
 - **supOS 做法**：EMQX（MQTT）+ Kafka（数据总线）+ Node-RED（边缘计算）。
-- **DC3 现状**：[mq-abstraction.md](./design/mq-abstraction.md) 已设计 `dc3-common-mq` 端口 + 每 broker 一个适配器（RabbitMQ
+- **DC3 现状**：已落地的 `dc3-common-mq` 端口 + 每 broker 一个适配器（RabbitMQ
   默认，目标 Kafka/RocketMQ/Pulsar），同样 Proposed。
 - **落地建议**：先落地 **Kafka 适配器**——工业客户常要求 Kafka 对接大数据平台，是 DC3 在“数据总线”上对标 supOS 的关键一环。
 
