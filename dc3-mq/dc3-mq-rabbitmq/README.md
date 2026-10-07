@@ -47,4 +47,3 @@ No module-specific tests; behaviour is verified by `RabbitMqContractIT` in `dc3-
 
 - `dc3-mq` — broker-neutral port family
 - `dc3-mq-tck` — contract suite
-- `docs/mq-brokers.md` — broker selection guide

@@ -18,7 +18,7 @@ package io.github.pnoker.common.constant.mq;
 
 /**
  * Logical messaging destinations. Business code references these only; physical
- * exchange/queue/topic names are adapter internals (see docs/design/mq-abstraction.md).
+ * exchange/queue/topic names are adapter internals (adapter internals by design).
  *
  * @author pnoker
  * @since 2026.8.19

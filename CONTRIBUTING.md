@@ -32,8 +32,8 @@ source dc3/env/dev.env.sh
 ```
 
 The root Makefile is the project-level command entry point. The Web application
-and TypeScript CLI retain independent pnpm packages and lockfiles. See
-[`docs/development.md`](docs/development.md) for the full command table:
+and TypeScript CLI retain independent pnpm packages and lockfiles. The
+frequently used commands:
 
 ```bash
 make install-node   # install dc3-web and dc3-cli dependencies

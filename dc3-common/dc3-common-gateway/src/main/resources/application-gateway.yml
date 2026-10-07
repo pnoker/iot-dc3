@@ -119,7 +119,7 @@ dc3:
         dc3-center-agentic: ${GATEWAY_ROUTE_AGENTIC_URI:http://${CENTER_AGENTIC_HOST:dc3-center-agentic}:8600}/agentic
 
   # OAuth RS256 ticket verification on Authentic-filtered routes (Phase 1 of
-  # docs/design/token-unification-mcp-first-cli.md). Keep enabled=false until the
+  # the token-unification design, retired from docs/; see git history). Keep enabled=false until the
   # auth center's issuer/jwks values are production-stable; when disabled the
   # gateway accepts only classic login tickets and behaviour is unchanged.
   # issuer/audience must match dc3.common.oauth in the auth center configuration.

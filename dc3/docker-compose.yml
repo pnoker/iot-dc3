@@ -23,9 +23,9 @@ x-logging: &default-logging
 
 x-app-runtime-env: &app-runtime-env
   NODE_ENV: test
-  # Internal async-plane broker selection (docs/mq-brokers.md); rabbitmq is the default
+  # Internal async-plane broker selection; rabbitmq is the default
   DC3_MQ_TYPE: "${DC3_MQ_TYPE:-rabbitmq}"
-  # Relational dialect selection (docs/db-dialects.md); postgres is the default
+  # Relational dialect selection; postgres is the default
   # Non-rabbitmq adapter connection settings (only used when DC3_MQ_TYPE matches)
   DC3_MQ_KAFKA_BOOTSTRAP: "${DC3_MQ_KAFKA_BOOTSTRAP:-kafka:9092}"
   DC3_MQ_PULSAR_URL: "${DC3_MQ_PULSAR_URL:-pulsar://pulsar:6650}"

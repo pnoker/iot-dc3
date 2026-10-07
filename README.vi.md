@@ -142,7 +142,7 @@ Kiến trúc microservice phân tán dựa trên **Spring Boot 4 + Spring Cloud 
 
 ### 📊 Engine dữ liệu thời gian thực
 
-- **Thu thập dữ liệu** - Driver thu thập telemetry thiết bị và truyền bất đồng bộ qua message broker nội bộ — chọn theo từng triển khai: RabbitMQ (mặc định), Kafka, Pulsar hoặc bất kỳ MQTT 5 broker nào ([hướng dẫn broker](docs/mq-brokers.md))
+- **Thu thập dữ liệu** - Driver thu thập telemetry thiết bị và truyền bất đồng bộ qua message broker nội bộ — chọn theo từng triển khai: RabbitMQ (mặc định), Kafka, Pulsar hoặc bất kỳ MQTT 5 broker nào
 - **Lưu trữ chuỗi thời gian** - Truy vấn hiệu quả dữ liệu thời gian thực và dữ liệu lịch sử
 - **Rule engine** - Cấu hình rule cảnh báo linh hoạt, hỗ trợ cảnh báo nhiều cấp và thông báo
 - **Truy vết sự kiện** - Lịch sử đầy đủ của lệnh và sự kiện
@@ -181,7 +181,7 @@ Nếu cần registry Alibaba Cloud cho Trung Quốc đại lục, dùng `make up
 ## 🛠️ Công nghệ sử dụng
 
 IoT DC3 được xây dựng trên Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, message broker cắm được
-(RabbitMQ, Kafka, Pulsar hoặc MQTT 5 — [hướng dẫn chọn](docs/mq-brokers.md)), gRPC, Vue 3, TypeScript và Vite.
+(RabbitMQ, Kafka, Pulsar hoặc MQTT 5), gRPC, Vue 3, TypeScript và Vite.
 
 Xem [Technology Stack](https://docs.dc3.site/en/development/technology-stack) để biết chi tiết từng thành phần và vị trí
 sử dụng.

@@ -134,7 +134,7 @@ API 全链路。边界清晰，易于规模化扩展与多团队协作。
 
 ### 📊 实时数据引擎
 
-- **数据采集** — 驱动层实时采集设备遥测数据，通过内部消息队列异步传输——可按部署插拔选择：RabbitMQ（默认）、Kafka、Pulsar 或任意 MQTT 5 broker（[消息队列选型指南](docs/mq-brokers.md)）
+- **数据采集** — 驱动层实时采集设备遥测数据，通过内部消息队列异步传输——可按部署插拔选择：RabbitMQ（默认）、Kafka、Pulsar 或任意 MQTT 5 broker
 - **时序存储** — 支持实时与历史数据的高效查询
 - **规则引擎** — 灵活的告警规则配置，支持多级告警与通知
 - **事件溯源** — 完整的命令与事件历史记录
@@ -169,7 +169,7 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技术栈
 
-IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、可插拔消息队列（RabbitMQ、Kafka、Pulsar 或 MQTT 5——[选型指南](docs/mq-brokers.md)）、gRPC、Vue 3、TypeScript 与 Vite 构建。
+IoT DC3 基于 Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、可插拔消息队列（RabbitMQ、Kafka、Pulsar 或 MQTT 5）、gRPC、Vue 3、TypeScript 与 Vite 构建。
 
 完整组件说明与适用位置请看 [技术栈](https://docs.dc3.site/zh/development/technology-stack)。
 

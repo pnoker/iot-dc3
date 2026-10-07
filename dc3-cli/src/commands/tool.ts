@@ -23,7 +23,7 @@ import { detectFormat, printAndExit } from '../utils/format.js';
 /**
  * Tool-catalog commands: the CLI's live view of the platform MCP tool catalog.
  *
- * First step of the Phase-3 direction (docs/design/token-unification-mcp-first-cli.md
+ * First step of the Phase-3 direction (the token-unification design (retired docs; see git history)
  * §4): commands start reading the machine-readable catalog instead of hard-coded paths.
  * @param program - commander program to attach the command to
  */

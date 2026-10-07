@@ -74,7 +74,7 @@ Report what was verified and what was not verified before handing off public-beh
 ## Commands
 
 Prefer a root `Makefile` target when one exists. `make help` lists every target, including generated Compose shortcuts
-such as `make up-db` and `make config-dev`; a full command table also lives in `docs/development.md`. Frequently used:
+such as `make up-db` and `make config-dev` (`make help` lists them all). Frequently used:
 
 ```bash
 make check        # complete non-mutating quality gate

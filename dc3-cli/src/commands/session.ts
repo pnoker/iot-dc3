@@ -21,7 +21,7 @@ import { parseNonNegativeInteger, parsePositiveInteger, requireResourceId } from
 
 /**
  * Session & action plane of the agentic center: conversation lifecycle plus the
- * high-risk tool-call approval loop (docs/design/token-unification-mcp-first-cli.md
+ * high-risk tool-call approval loop (the token-unification design (retired docs; see git history)
  * Q2 — CLI TTY confirmation channel). All routes live under /api/v3/agentic.
  *
  * Destructive operations (session delete, action confirm/reject) are gated by

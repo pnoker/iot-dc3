@@ -33,4 +33,3 @@ mvn -s .mvn/settings.xml -f dc3-db/pom.xml test
 python3 dc3/bin/schema_fingerprint.py --check
 ```
 
-Dialect conventions and migration notes live in docs/db-dialects.md.

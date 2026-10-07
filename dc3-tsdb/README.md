@@ -21,4 +21,3 @@ mvn -s .mvn/settings.xml -q -f dc3-tsdb/pom.xml -DskipTests compile
 mvn -s .mvn/settings.xml -f dc3-tsdb/pom.xml test
 ```
 
-The reactive boundary and migration gates are documented in `docs/design/relational-r2dbc.md`.

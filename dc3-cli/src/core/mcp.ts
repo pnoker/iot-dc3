@@ -23,7 +23,7 @@ import { fetchOrNetworkError, normalizeGateway, readBodyText } from './http.js';
  * Thin MCP JSON-RPC client over the gateway's POST /mcp endpoint.
  *
  * Second transport of the dual-transport CLI design
- * (docs/design/token-unification-mcp-first-cli.md §4 Option B): the same OAuth ticket
+ * (token-unification Phase 4, Option B): the same OAuth ticket
  * stored by `dc3 auth login --oauth` is presented as Bearer here, while REST commands
  * keep their own transport. Requires an oauth-type login — classic login tickets are
  * not introspectable at this endpoint.

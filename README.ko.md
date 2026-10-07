@@ -136,7 +136,7 @@ IoT DC3는 산업 자동화, IoT 통신, 데이터 브리징, 기본 통신, 시
 
 ### 📊 실시간 데이터 엔진
 
-- **데이터 수집** — 드라이버 계층이 디바이스 원격 측정 데이터를 수집하고 내부 메시지 브로커를 통해 비동기로 전송합니다. 배포별 선택 가능: RabbitMQ(기본), Kafka, Pulsar 또는 모든 MQTT 5 브로커([브로커 가이드](docs/mq-brokers.md))
+- **데이터 수집** — 드라이버 계층이 디바이스 원격 측정 데이터를 수집하고 내부 메시지 브로커를 통해 비동기로 전송합니다. 배포별 선택 가능: RabbitMQ(기본), Kafka, Pulsar 또는 모든 MQTT 5 브로커
 - **시계열 저장** — 실시간 및 이력 데이터의 효율적인 쿼리
 - **규칙 엔진** — 유연한 알람 규칙, 다중 수준 알람 및 알림 지원
 - **이벤트 추적** — 전체 명령 및 이벤트 이력
@@ -171,7 +171,7 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 기술 스택
 
-IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, 플러그 가능한 메시지 브로커(RabbitMQ, Kafka, Pulsar 또는 MQTT 5 — [선택 가이드](docs/mq-brokers.md)), gRPC, Vue 3, TypeScript, Vite
+IoT DC3는 Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, 플러그 가능한 메시지 브로커(RabbitMQ, Kafka, Pulsar 또는 MQTT 5), gRPC, Vue 3, TypeScript, Vite
 기반으로 구축되었습니다.
 
 구성 요소 세부 정보와 사용 위치는 [기술 스택](https://docs.dc3.site/en/development/technology-stack)을 참조하세요.

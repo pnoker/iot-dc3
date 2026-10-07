@@ -92,7 +92,7 @@ async function readArgsFile(path: string): Promise<string> {
 
 /**
  * Analytics command group — the nine coarse-grained statistical reads the backend
- * exposes for agents (docs/design/tsdb-abstraction.md S19 surface): each op posts a
+ * exposes for agents (the S19 agent surface): each op posts a
  * single JSON body and returns one self-contained conclusion.
  * @param program - commander program to attach the command to
  */

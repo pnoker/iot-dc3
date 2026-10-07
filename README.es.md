@@ -151,7 +151,7 @@ Arquitectura de microservicios distribuida basada en **Spring Boot 4 + Spring Cl
 
 - **Recopilación de datos** — los controladores recopilan telemetría de dispositivos y la envían de forma asíncrona a
   través del broker de mensajes interno — seleccionable por implementación: RabbitMQ (predeterminado), Kafka, Pulsar o
-  cualquier broker MQTT 5 ([guía de brokers](docs/mq-brokers.md))
+  cualquier broker MQTT 5
 - **Almacenamiento de series temporales** — consultas eficientes para datos en tiempo real e históricos
 - **Motor de reglas** — reglas de alarma flexibles con alarmas multinivel y notificaciones
 - **Trazabilidad de eventos** — historial completo de comandos y eventos
@@ -191,7 +191,7 @@ Use `make up-db-cn` si prefiere el registro de Alibaba Cloud en China continenta
 ## 🛠️ Stack tecnológico
 
 IoT DC3 está construido sobre Java 21, Spring Boot 4, Spring Cloud 2025, Spring AI 2, PostgreSQL, un broker de mensajes
-conectable (RabbitMQ, Kafka, Pulsar o MQTT 5 — [guía de selección](docs/mq-brokers.md)), gRPC, Vue 3, TypeScript y Vite.
+conectable (RabbitMQ, Kafka, Pulsar o MQTT 5), gRPC, Vue 3, TypeScript y Vite.
 
 Consulte [Stack tecnológico](https://docs.dc3.site/en/development/technology-stack) para obtener detalles de los
 componentes y dónde se utiliza cada tecnología.

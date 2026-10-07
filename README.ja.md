@@ -137,7 +137,7 @@ Agentic Center は **Spring AI** ベースで構築され、プラットフォ�
 
 ### 📊 リアルタイムデータエンジン
 
-- **データ収集** - ドライバー層がデバイステレメトリを収集し、内部メッセージブローカーで非同期転送します。デプロイごとに選択可能：RabbitMQ（デフォルト）、Kafka、Pulsar、任意の MQTT 5 ブローカー（[ブローカーガイド](docs/mq-brokers.md)）
+- **データ収集** - ドライバー層がデバイステレメトリを収集し、内部メッセージブローカーで非同期転送します。デプロイごとに選択可能：RabbitMQ（デフォルト）、Kafka、Pulsar、任意の MQTT 5 ブローカー
 - **時系列ストレージ** - リアルタイムデータと履歴データを効率的にクエリできます
 - **ルールエンジン** - 柔軟なアラームルール、多段階アラーム、通知をサポートします
 - **イベント追跡** - コマンドとイベントの履歴を保持します
@@ -175,7 +175,7 @@ mvn -s .mvn/settings.xml clean package
 
 ## 🛠️ 技術スタック
 
-IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、プラグ可能なメッセージブローカー（RabbitMQ、Kafka、Pulsar または MQTT 5 — [選定ガイド](docs/mq-brokers.md)）、gRPC、Vue 3、TypeScript、Vite
+IoT DC3 は Java 21、Spring Boot 4、Spring Cloud 2025、Spring AI 2、PostgreSQL、プラグ可能なメッセージブローカー（RabbitMQ、Kafka、Pulsar または MQTT 5）、gRPC、Vue 3、TypeScript、Vite
 を基盤に構築されています。
 
 各コンポーネントの役割と詳細は [Technology Stack](https://docs.dc3.site/en/development/technology-stack) を参照してください。

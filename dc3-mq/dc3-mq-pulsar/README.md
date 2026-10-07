@@ -31,4 +31,3 @@ No module-specific tests; behaviour is verified by `PulsarContractIT` in `dc3-mq
 
 - `dc3-mq` — broker-neutral port family
 - `dc3-mq-tck` — contract suite
-- `docs/mq-brokers.md` — broker selection guide
