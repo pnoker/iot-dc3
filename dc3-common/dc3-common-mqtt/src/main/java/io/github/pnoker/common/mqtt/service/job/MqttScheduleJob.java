@@ -29,9 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.scheduling.quartz.QuartzJobBean;
-import org.springframework.stereotype.Component;
 
 /**
  * MQTT Schedule Job
@@ -39,14 +37,18 @@ import org.springframework.stereotype.Component;
  * Quartz job for processing MQTT messages in batch mode. Manages message counting, speed
  * calculation, and batch processing of MQTT messages with thread-safe operations.
  * </p>
+ * <p>
+ * Not a component-scanned bean: it is registered by {@code MqttConfig} as an
+ * auto-configuration {@code @Bean} guarded by {@code @ConditionalOnBean} so the
+ * condition is evaluated only after consumer bean definitions (the driver's
+ * {@link MqttReceiveService} implementation) have been registered.
+ * </p>
  *
  * @author pnoker
  * @since 2016.10.1
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
-@ConditionalOnBean(MqttReceiveService.class)
 @DisallowConcurrentExecution
 public class MqttScheduleJob extends QuartzJobBean {
 

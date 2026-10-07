@@ -17,10 +17,13 @@
 package io.github.pnoker.common.config;
 
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import io.github.pnoker.common.mqtt.handler.MqttReceiveHandler;
 import io.github.pnoker.common.mqtt.service.MqttReceiveService;
+import io.github.pnoker.common.mqtt.service.job.MqttScheduleJob;
 import io.github.pnoker.common.utils.MqttUtil;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -120,6 +123,47 @@ public class MqttConfig {
                 mqttProperties.getClient() + "_in",
                 prefixedTopics.size());
         return adapter;
+    }
+
+    /**
+     * MQTT receive handler bean configuration
+     *
+     * @param mqttReceiveService consumer-provided receive service
+     * @param virtualThreadExecutor shared virtual thread executor
+     * @return MqttReceiveHandler bound to the consumer's receive logic
+     */
+    @Bean
+    @ConditionalOnBean(MqttReceiveService.class)
+    public MqttReceiveHandler mqttReceiveHandler(
+            MqttReceiveService mqttReceiveService, ExecutorService virtualThreadExecutor) {
+        return new MqttReceiveHandler(mqttProperties, mqttReceiveService, virtualThreadExecutor);
+    }
+
+    /**
+     * MQTT inbound message handler bean configuration
+     *
+     * @param mqttReceiveHandler MQTT receive handler
+     * @return Configured MessageHandler subscribed to the inbound MQTT channel
+     */
+    @Bean
+    @ConditionalOnBean(MqttReceiveService.class)
+    @ServiceActivator(inputChannel = "mqttInboundChannel")
+    public MessageHandler mqttInboundReceive(MqttReceiveHandler mqttReceiveHandler) {
+        return mqttReceiveHandler.mqttInboundReceive();
+    }
+
+    /**
+     * MQTT batch schedule job bean configuration
+     *
+     * @param mqttReceiveService consumer-provided receive service
+     * @param virtualThreadExecutor shared virtual thread executor
+     * @return MqttScheduleJob draining the batch buffer to the consumer's receive logic
+     */
+    @Bean
+    @ConditionalOnBean(MqttReceiveService.class)
+    public MqttScheduleJob mqttScheduleJob(
+            MqttReceiveService mqttReceiveService, ExecutorService virtualThreadExecutor) {
+        return new MqttScheduleJob(mqttProperties, mqttReceiveService, virtualThreadExecutor);
     }
 
     /**

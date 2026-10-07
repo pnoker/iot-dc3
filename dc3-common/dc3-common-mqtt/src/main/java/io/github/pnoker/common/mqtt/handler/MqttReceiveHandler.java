@@ -25,11 +25,7 @@ import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.stereotype.Component;
 
 /**
  * MQTT Receive Handler
@@ -38,14 +34,18 @@ import org.springframework.stereotype.Component;
  * reception, routing, and batch processing based on message speed and configuration
  * settings.
  * </p>
+ * <p>
+ * Not a component-scanned bean: it is registered by {@code MqttConfig} as an
+ * auto-configuration {@code @Bean} guarded by {@code @ConditionalOnBean} so the
+ * condition is evaluated only after consumer bean definitions (the driver's
+ * {@link MqttReceiveService} implementation) have been registered.
+ * </p>
  *
  * @author pnoker
  * @since 2016.10.1
  */
 @Slf4j
-@Component
 @RequiredArgsConstructor
-@ConditionalOnBean(MqttReceiveService.class)
 public class MqttReceiveHandler {
 
     private final MqttProperties mqttProperties;
@@ -55,7 +55,7 @@ public class MqttReceiveHandler {
     private final ExecutorService virtualThreadExecutor;
 
     /**
-     * Configure MQTT inbound message handler bean
+     * Build the MQTT inbound message handler
      * <p>
      * Receives data from MQTT; subscribed topics are defined in application.yml under
      * mqtt.receive-topics + (plus): matches exactly one word # (hash): matches multiple
@@ -63,8 +63,6 @@ public class MqttReceiveHandler {
      *
      * @return Configured MessageHandler for MQTT inbound processing
      */
-    @Bean
-    @ServiceActivator(inputChannel = "mqttInboundChannel")
     public MessageHandler mqttInboundReceive() {
         return message -> {
             try {
