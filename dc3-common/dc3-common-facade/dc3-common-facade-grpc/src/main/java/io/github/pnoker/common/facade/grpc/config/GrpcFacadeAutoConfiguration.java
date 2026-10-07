@@ -20,6 +20,9 @@ import io.github.pnoker.common.facade.grpc.CommandGrpcFacade;
 import io.github.pnoker.common.facade.grpc.DeviceGrpcFacade;
 import io.github.pnoker.common.facade.grpc.DriverGrpcFacade;
 import io.github.pnoker.common.facade.grpc.EventGrpcFacade;
+import io.github.pnoker.common.facade.grpc.CommandHistoryGrpcFacade;
+import io.github.pnoker.common.facade.grpc.EventHistoryGrpcFacade;
+import io.github.pnoker.common.facade.grpc.InsightGrpcFacade;
 import io.github.pnoker.common.facade.grpc.GrpcFacadeSupport;
 import io.github.pnoker.common.facade.grpc.LocalCredentialGrpcFacade;
 import io.github.pnoker.common.facade.grpc.McpRuntimeGrpcFacade;
@@ -139,6 +142,9 @@ public class GrpcFacadeAutoConfiguration {
                                 PointValueGrpcFacade.class,
                                 PointCommandGrpcFacade.class,
                                 StatusHealthGrpcFacade.class,
+                                InsightGrpcFacade.class,
+                                CommandHistoryGrpcFacade.class,
+                                EventHistoryGrpcFacade.class,
                                 FacadeGrpcPointValueBuilder.class,
                             }))
     static class DataGrpcFacadeConfiguration {}

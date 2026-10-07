@@ -1,0 +1,54 @@
+/*
+ * Copyright 2016-present the IoT DC3 original author or authors.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+syntax = "proto3";
+
+package api.common.data;
+
+import "api/common/entity.proto";
+
+option java_package = "io.github.pnoker.api.center.data";
+option java_outer_classname = "InsightProto";
+option objc_class_prefix = "Data";
+option java_multiple_files = true;
+
+// Service interface defining a single generalized read channel for agent-facing
+// insight operations (alert analytics, dashboard stats, analytics queries and
+// point command status lookups). Requests and responses carry a JSON payload so
+// the contract stays stable while operations evolve on both ends.
+service InsightApi {
+  // Invoke one insight operation by name with a JSON request payload
+  rpc Invoke (GrpcInsightCall) returns (GrpcInsightResult);
+}
+
+// Tenant-scoped insight invocation.
+message GrpcInsightCall {
+  // Tenant ID
+  int64 tenant_id = 1;
+
+  // Operation name, one of the canonical insight operations
+  string operation = 2;
+
+  // JSON-encoded request payload for the operation
+  string request_json = 3;
+}
+
+// JSON-encoded insight response.
+message GrpcInsightResult {
+  // JSON-encoded response payload produced by the operation
+  string response_json = 1;
+}

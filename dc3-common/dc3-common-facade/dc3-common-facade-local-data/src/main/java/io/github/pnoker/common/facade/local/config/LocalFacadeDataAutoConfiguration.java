@@ -16,6 +16,9 @@
  */
 package io.github.pnoker.common.facade.local.config;
 
+import io.github.pnoker.common.facade.local.CommandHistoryLocalFacade;
+import io.github.pnoker.common.facade.local.EventHistoryLocalFacade;
+import io.github.pnoker.common.facade.local.InsightLocalFacade;
 import io.github.pnoker.common.facade.local.PointCommandLocalFacade;
 import io.github.pnoker.common.facade.local.PointValueLocalFacade;
 import io.github.pnoker.common.facade.local.StatusHealthLocalFacade;
@@ -49,6 +52,9 @@ import org.springframework.context.annotation.FilterType;
                             PointValueLocalFacade.class,
                             PointCommandLocalFacade.class,
                             StatusHealthLocalFacade.class,
+                            InsightLocalFacade.class,
+                            CommandHistoryLocalFacade.class,
+                            EventHistoryLocalFacade.class,
                             FacadePointValueBuilder.class,
                         }))
 public class LocalFacadeDataAutoConfiguration {

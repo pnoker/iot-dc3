@@ -23,6 +23,9 @@ import io.github.pnoker.api.center.auth.ResourceRegistryApiGrpc;
 import io.github.pnoker.api.center.auth.TenantApiGrpc;
 import io.github.pnoker.api.center.auth.TokenApiGrpc;
 import io.github.pnoker.api.center.auth.UserApiGrpc;
+import io.github.pnoker.api.center.data.CommandHistoryApiGrpc;
+import io.github.pnoker.api.center.data.EventHistoryApiGrpc;
+import io.github.pnoker.api.center.data.InsightApiGrpc;
 import io.github.pnoker.api.center.data.PointValueApiGrpc;
 import io.github.pnoker.api.center.data.StatusHealthApiGrpc;
 import io.github.pnoker.api.center.manager.CommandApiGrpc;
@@ -154,6 +157,24 @@ public class GrpcStubConfig {
         @Bean
         public StatusHealthApiGrpc.StatusHealthApiStub statusHealthApiStub(GrpcChannelFactory channels) {
             return StatusHealthApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
+        }
+
+        /** Create the shared stub for the Insight API. */
+        @Bean
+        public InsightApiGrpc.InsightApiStub insightApiStub(GrpcChannelFactory channels) {
+            return InsightApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
+        }
+
+        /** Create the shared stub for the CommandHistory API. */
+        @Bean
+        public CommandHistoryApiGrpc.CommandHistoryApiStub commandHistoryApiStub(GrpcChannelFactory channels) {
+            return CommandHistoryApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
+        }
+
+        /** Create the shared stub for the EventHistory API. */
+        @Bean
+        public EventHistoryApiGrpc.EventHistoryApiStub eventHistoryApiStub(GrpcChannelFactory channels) {
+            return EventHistoryApiGrpc.newStub(channels.createChannel(DataConstant.SERVICE_NAME));
         }
     }
 }
