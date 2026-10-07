@@ -48,6 +48,22 @@ CONFIG_TARGETS: list[tuple[str, re.Pattern[str]]] = [
         "dc3/docker-compose-dev.yml",
         re.compile(r'(DC3_SCHEMA_FINGERPRINT:\s*"\$\{DC3_SCHEMA_FINGERPRINT:-)([0-9a-fA-F]{64})(\}")'),
     ),
+    (
+        "dc3/docker-compose-native.yml",
+        re.compile(r'(DC3_SCHEMA_FINGERPRINT:\s*"\$\{DC3_SCHEMA_FINGERPRINT:-)([0-9a-fA-F]{64})(\}")'),
+    ),
+    (
+        "dc3/docker-compose-scale.yml",
+        re.compile(r'(DC3_SCHEMA_FINGERPRINT:\s*"\$\{DC3_SCHEMA_FINGERPRINT:-)([0-9a-fA-F]{64})(\}")'),
+    ),
+    (
+        "dc3/docker-compose-single.yml",
+        re.compile(r'(DC3_SCHEMA_FINGERPRINT:\s*"\$\{DC3_SCHEMA_FINGERPRINT:-)([0-9a-fA-F]{64})(\}")'),
+    ),
+    (
+        "dc3/docker-compose-swarm.yml",
+        re.compile(r'(DC3_SCHEMA_FINGERPRINT:\s*"\$\{DC3_SCHEMA_FINGERPRINT:-)([0-9a-fA-F]{64})(\}")'),
+    ),
 ]
 
 
