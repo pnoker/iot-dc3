@@ -18,13 +18,6 @@
 spring:
   env: dev
   group: ${user.name}
-  rabbitmq:
-    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
-    host: ${RABBITMQ_HOST:dc3-rabbitmq}
-    port: ${RABBITMQ_PORT:35672}
-    username: ${RABBITMQ_USERNAME:dc3}
-    password: ${RABBITMQ_PASSWORD:}
-
 logging:
   level:
     io.github.pnoker: DEBUG

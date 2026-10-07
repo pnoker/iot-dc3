@@ -25,7 +25,7 @@ SHELL := /bin/bash
 	check validate-quality validate-web-quality validate-cli-quality validate-cli-format \
 	changelog openapi tag validate-annotations validate-logging validate-permissions validate-scripts validate-python \
 	validate-postgres-init validate-schema-fingerprint sync-schema-fingerprint validate-r2dbc-migration \
-	validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage \
+	validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage validate-driver-config \
 	validate-documentation validate-javadoc validate-format-java validate-checkstyle validate-java-quality \
 	stack-deploy stack-rm stack-ps k8s-apply k8s-delete helm-install helm-uninstall \
 	release-backfill release-backfill-apply release-backfill-refresh
@@ -128,6 +128,7 @@ help:
 	@printf '  %-24s %s\n' 'make validate-schema-fingerprint' 'Verify canonical clean-DDL fingerprints for PostgreSQL'
 	@printf '  %-24s %s\n' 'make sync-schema-fingerprint' 'Rewrite embedded and distributed PostgreSQL fingerprints to the canonical value'
 	@printf '  %-24s %s\n' 'make validate-r2dbc-migration' 'Fail when legacy relation persistence remains outside the JDBC allow-list'
+	@printf '  %-24s %s\n' 'make validate-driver-config' 'Fail when driver broker yml drifts from the dc3-mq-rabbitmq SDK base'
 	@printf '  %-24s %s\n' 'make validate-documentation' 'Validate documentation against executable project metadata'
 	@printf '  %-24s %s\n' 'make validate-javadoc' 'Validate public Java API documentation and references'
 	@printf '  %-24s %s\n' 'make format-java' 'Format Java source and add canonical copyright headers'
@@ -218,7 +219,7 @@ validate-permissions:
 validate-python:
 	$(PYTHON) -m py_compile dc3/bin/*.py
 
-validate-scripts: validate-python validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage
+validate-scripts: validate-python validate-secrets validate-compose-vars validate-todo-ownership validate-driver-coverage validate-driver-config
 	$(NODE) --check dc3/bin/dev.mjs
 	bash -n dc3/bin/*.sh
 
@@ -245,6 +246,9 @@ validate-todo-ownership:
 
 validate-driver-coverage:
 	$(PYTHON) dc3/bin/check_driver_adversarial_coverage.py
+
+validate-driver-config:
+	$(PYTHON) dc3/bin/check_driver_config.py
 
 validate-documentation:
 	$(PYTHON) dc3/bin/check_documentation.py

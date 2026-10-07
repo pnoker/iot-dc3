@@ -65,6 +65,7 @@ Run checks proportionate to the change:
 - Secrets in VOs: `make validate-secrets` (secret-named fields must be Jackson write-only and `@ToString.Exclude`).
 - TODO markers: `make validate-todo-ownership` (main-source TODO/FIXME/XXX/HACK must carry a `TODO(<ref>)` tracker reference; design notes are prose, not markers).
 - Driver test coverage: `make validate-driver-coverage` (every `dc3-driver-*` module must carry a `*DriverAdversarialTest` extending the shared adversarial contract in `dc3-common-test`).
+- Driver broker configuration: `make validate-driver-config` (RabbitMQ connection placeholders live only in the `dc3-mq-rabbitmq` SDK `application-rabbitmq.yml`; driver/center modules inherit them and must not redeclare `spring.rabbitmq`).
 - YAML: parse after accounting for Maven placeholders such as `@project.artifactId@`.
 - Agent/docs changes: validate referenced paths, targets, scripts, test selectors, and links; `make validate-documentation`.
 - Documentation or public Javadoc changes: run `make validate-documentation` and `make validate-javadoc`.

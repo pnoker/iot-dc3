@@ -20,11 +20,25 @@
 # that is: if the following properties are configured in application-[dev|test|pre|pro].yml,
 # the property values configured in application.yml will be the main ones.
 #
+# This file is the SINGLE SOURCE OF TRUTH for the broker connection placeholders:
+# it ships inside the dc3-mq-rabbitmq jar, so every service embedding the adapter
+# (drivers, manager, data) inherits the connection defaults without copying them
+# into per-module application-[dev|test|pre|pro].yml files. Values come from the
+# RABBITMQ_* environment variables (docker-compose x-app-runtime-env, dc3/env/dev.env
+# for IDE runs). A plain application.yml must NOT be used as the carrier: a jar's
+# application.yml is fully shadowed by the application's own application.yml, while
+# this uniquely named profile file is always resolved from the jar classpath.
+#
 # publisher confirms and returns are required by the adapter's sendAsync /
 # sendConfirmed contracts; without correlated confirms the CorrelationData
 # futures never complete.
 spring:
   rabbitmq:
+    virtual-host: ${RABBITMQ_VIRTUAL_HOST:dc3}
+    host: ${RABBITMQ_HOST:dc3-rabbitmq}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:dc3}
+    password: ${RABBITMQ_PASSWORD:}
     publisher-confirm-type: correlated
     publisher-returns: true
     ssl:
