@@ -18,13 +18,18 @@ package io.github.pnoker.driver.coap.client;
 
 import io.github.pnoker.driver.coap.entity.CoapResult;
 import io.github.pnoker.driver.coap.entity.property.CoapProperties;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.californium.core.CoapClient;
+import org.eclipse.californium.core.CoapResponse;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.config.CoapConfig;
+import org.eclipse.californium.core.network.CoapEndpoint;
+import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.elements.config.Configuration;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
@@ -67,12 +72,8 @@ public class CoapClientManager implements DisposableBean {
         synchronized (client) {
             client.setURI(uri + path);
             try {
-                Configuration config = client.getEndpoint().getConfig();
-                config.set(CoapConfig.EXCHANGE_LIFETIME, coapProperties.getClientTimeout(), TimeUnit.MILLISECONDS);
-                config.set(CoapConfig.ACK_TIMEOUT, coapProperties.getClientAckTimeout(), TimeUnit.MILLISECONDS);
-                config.set(CoapConfig.MAX_RETRANSMIT, coapProperties.getClientMaxRetransmit());
-
-                org.eclipse.californium.core.CoapResponse response = client.get();
+                requireEndpoint(client, uri);
+                CoapResponse response = client.get();
                 if (response == null) {
                     log.warn("CoAP GET timed out, uri={}, path={}", uri, path);
                     return null;
@@ -98,8 +99,8 @@ public class CoapClientManager implements DisposableBean {
         synchronized (client) {
             client.setURI(uri + path);
             try {
-                org.eclipse.californium.core.CoapResponse response =
-                        client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
+                requireEndpoint(client, uri);
+                CoapResponse response = client.put(payload, MediaTypeRegistry.APPLICATION_JSON);
                 if (response == null) {
                     log.warn("CoAP PUT timed out, uri={}, path={}", uri, path);
                     return null;
@@ -135,11 +136,53 @@ public class CoapClientManager implements DisposableBean {
 
     private CoapClient createClient(String uri) {
         CoapClient client = new CoapClient(uri);
+        client.setEndpoint(createStartedEndpoint(uri));
         log.debug("CoAP client created, uri={}", uri);
         return client;
     }
 
-    private CoapResult toResult(org.eclipse.californium.core.CoapResponse response) {
+    /**
+     * Build a UDP client endpoint on an ephemeral local port and start it before use.
+     * <p>
+     * A {@link CoapClient} without a started endpoint cannot send or receive datagrams, so the
+     * retransmission and timing values from {@link CoapProperties} are applied once here. The
+     * standalone {@link Configuration} must be passed to the builder: without it the builder falls
+     * back to {@link Configuration#getStandard()}, which reads or writes a Californium3.properties
+     * file in the working directory. The endpoint is started explicitly because
+     * {@link CoapClient#setEndpoint} swallows start failures, which would leave a silent dead
+     * endpoint.
+     *
+     * @param uri device URI the endpoint serves, used for failure reporting
+     * @return a started {@link CoapEndpoint}
+     * @throws IllegalStateException if the endpoint cannot bind or start
+     */
+    private CoapEndpoint createStartedEndpoint(String uri) {
+        Configuration config = new Configuration();
+        config.set(CoapConfig.EXCHANGE_LIFETIME, coapProperties.getClientTimeout(), TimeUnit.MILLISECONDS);
+        config.set(CoapConfig.ACK_TIMEOUT, coapProperties.getClientAckTimeout(), TimeUnit.MILLISECONDS);
+        config.set(CoapConfig.MAX_RETRANSMIT, coapProperties.getClientMaxRetransmit());
+
+        CoapEndpoint.Builder builder = new CoapEndpoint.Builder();
+        builder.setInetSocketAddress(new InetSocketAddress(0));
+        builder.setConfiguration(config);
+        CoapEndpoint endpoint = builder.build();
+        try {
+            endpoint.start();
+        } catch (IOException e) {
+            endpoint.destroy();
+            throw new IllegalStateException("Unable to start CoAP client endpoint, uri=" + uri, e);
+        }
+        return endpoint;
+    }
+
+    private void requireEndpoint(CoapClient client, String uri) {
+        Endpoint endpoint = client.getEndpoint();
+        if (endpoint == null) {
+            throw new IllegalStateException("CoAP client has no endpoint attached, uri=" + uri);
+        }
+    }
+
+    private CoapResult toResult(CoapResponse response) {
         return CoapResult.builder()
                 .statusCode(response.getCode().value)
                 .payload(response.getResponseText())
