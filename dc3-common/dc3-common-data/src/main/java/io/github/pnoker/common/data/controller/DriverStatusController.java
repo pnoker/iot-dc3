@@ -57,16 +57,16 @@ public class DriverStatusController implements BaseController {
     private final DriverStatusService driverStatusService;
 
     /**
-     * Query the current ONLINE/OFFLINE status of each driver instance for the tenant.
+     * Query the current online/offline status of each driver instance for the tenant.
      *
      * @param query   optional driver filter and pagination; a default empty query is used when null
-     * @return a map of driver id to current ONLINE/OFFLINE status for the matching drivers
+     * @return a map of driver id to current online/offline status for the matching drivers
      */
     @PreAuthorize("@perm.can('driver_status', 'list')")
     @Operation(
             summary = "List Driver Status",
             description =
-                    "Return the current ONLINE/OFFLINE status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.",
+                    "Return the current online/offline status of each driver instance for the current tenant, keyed by driver id. Page through driver and pagination filters; results are tenant-scoped.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -82,16 +82,16 @@ public class DriverStatusController implements BaseController {
     }
 
     /**
-     * Query the current ONLINE/OFFLINE status of one driver instance for the tenant.
+     * Query the current online/offline status of one driver instance for the tenant.
      *
      * @param driverId identifier of the driver whose status is queried; must belong to the current tenant
-     * @return single-key JSON object mapping the driver id to its current ONLINE/OFFLINE status, isomorphic to the status map endpoint
+     * @return single-key JSON object mapping the driver id to its current online/offline status, isomorphic to the status map endpoint
      */
     @PreAuthorize("@perm.can('driver_status', 'get')")
     @Operation(
             summary = "Get Driver Status by Driver",
             description =
-                    "Return the current ONLINE/OFFLINE status of one driver instance for the current tenant as a single-key JSON object mapping the driver id to its status, isomorphic to the driver status map."
+                    "Return the current online/offline status of one driver instance for the current tenant as a single-key JSON object mapping the driver id to its status, isomorphic to the driver status map."
                             + " Use when a single driver's status is needed without paging through the driver status map.",
             extensions =
                     @Extension(
