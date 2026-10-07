@@ -92,11 +92,12 @@ class Api:
         self.tenant = tenant
         self.user = user
         self.cookie = ""
-        salt = self.anonymous("POST", "/auth/token/salt", {"tenant": tenant, "name": user})
+        salt_body = self.anonymous("POST", "/auth/token/salt", {"tenant": tenant, "name": user})
+        salt = json.loads(salt_body)["salt"]
         headers = self.anonymous(
             "POST",
             "/auth/token/generate",
-            {"tenant": tenant, "name": user, "salt": str(salt).strip().strip('"'), "password": password},
+            {"tenant": tenant, "name": user, "salt": salt, "password": password},
             want_headers=True,
         )
         # Header names arrive lower-cased from some server paths — match
