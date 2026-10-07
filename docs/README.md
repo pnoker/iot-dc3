@@ -11,13 +11,9 @@
 | 选型指南 | [tsdb-stores.md](./tsdb-stores.md) 时序存储选型 | 有效 |
 | 选型指南 | [mq-brokers.md](./mq-brokers.md) 消息中间件选型 | 有效 |
 | 开发工具 | [development.md](./development.md) Make 开发、启动与质量命令 | 有效 |
-| 设计/架构 | [design/relational-r2dbc.md](./design/relational-r2dbc.md) R2DBC 关系访问层 | 已落地，待全量实库/拓扑验收 |
-| 质量/测试 | [r2dbc-migration-test-handoff.md](./r2dbc-migration-test-handoff.md) R2DBC 全平台测试交接 | 待执行，发布硬门禁 |
 | 设计/架构 | [design/mcp-runtime-overhaul.md](./design/mcp-runtime-overhaul.md) MCP 运行时重构 | 提案,未实施 |
 | 设计/架构 | [design/dc3-client-sdk.md](./design/dc3-client-sdk.md) 客户端 SDK | 提案(phase 0 已落地) |
 | 设计/架构 | [design/frontend-three-terminal-ux.md](./design/frontend-three-terminal-ux.md) 前端三终端 UX ADR | ADR |
-| 分析对比 | [comparison-dgiot.md](./comparison-dgiot.md) DG-IoT 对比借鉴 | 开放评审,未排期 |
-| 分析对比 | [comparison-supos-free.md](./comparison-supos-free.md) supOS-Free 对比借鉴 | 开放评审,未排期 |
 
 ---
 
@@ -61,12 +57,6 @@
 - **读什么**:数据格式、租户/事务不变量、offset/cursor 分页、Flux 取消和发布门禁。
 - **注意**:分页和响应信封是一次性硬切换，不保留旧 `R<T>`、页码字段或兼容别名。
 
-#### 4.1 [R2DBC flag-day 全平台测试交接](./r2dbc-migration-test-handoff.md)
-
-- **一句话**:用 Podman 对 Auth、Manager、Data、Agentic、single/distributed、Gateway、Web、CLI 和 PostgreSQL/TimescaleDB 做连续白盒、黑盒与故障交叉验收。
-- **读什么**:当前已证实与未证实边界、已知阻断问题、全 Store 实库矩阵、数据库组合、分页/流式协议和发布硬门禁。
-- **注意**:当前单元/TCK 基线不能替代本文要求的全链路证据；任一必测项失败、跳过或无证据都阻断发布。
-
 ### 5. [MCP 运行时全面重构:内聚的授权契约](./design/mcp-runtime-overhaul.md) *提案*
 
 - **一句话**:现状一次 `tools/call` 要三次网关→auth 冗余往返且有正确性缺口;目标一次内聚往返、响应式非阻塞、真实 input schema、异步审计。
@@ -88,14 +78,6 @@
 
 ## 三、分析与对比(参考性,未进实施排期)
 
-### 8. [DG-IoT 与 IoT DC3 对比借鉴](./comparison-dgiot.md)
-
-- **一句话**:跨项目对比提炼可借鉴点,并澄清双方物模型差异;开放评审中,**不是承诺路线图**。
-
-### 9. [supOS-Free 与 IoT DC3 对比借鉴](./comparison-supos-free.md)
-
-- **一句话**:同上,对标 supOS-Free;结论与 storage/mq 抽象设计互相印证。
-
 ---
 
 ## 按任务找文档(推荐阅读路径)
@@ -104,7 +86,7 @@
 |------------|----------|
 | 部署 / 换库 / 换 broker | [db-dialects](./db-dialects.md) → [tsdb-stores](./tsdb-stores.md) → [mq-brokers](./mq-brokers.md) |
 | 理解存储层现状与演进 | [db-dialects](./db-dialects.md) → [relational-r2dbc](./design/relational-r2dbc.md) → [tsdb-stores](./tsdb-stores.md) |
-| 验收全平台 R2DBC 迁移 | [relational-r2dbc 全文](./design/relational-r2dbc.md) → [r2dbc-migration-test-handoff](./r2dbc-migration-test-handoff.md) → 根目录 AGENTS.md |
+| 验收全平台 R2DBC 迁移 | [relational-r2dbc 全文](./design/relational-r2dbc.md) → issue #259(验收门禁) → 根目录 AGENTS.md |
 | 前端 / 客户端开发 | [frontend-three-terminal-ux](./design/frontend-three-terminal-ux.md) → [dc3-client-sdk](./design/dc3-client-sdk.md) |
 | MCP / AI 集成 | [mcp-runtime-overhaul](./design/mcp-runtime-overhaul.md) → [relational-r2dbc §5 D13](./design/relational-r2dbc.md)(OAuth/MCP 聚合拆分) |
-| 了解项目定位 / 竞品差异 | [comparison-dgiot](./comparison-dgiot.md) → [comparison-supos-free](./comparison-supos-free.md)(物模型能力缺口见 issue #258) |
+| 了解项目定位 / 竞品差异 | issue #260(竞品借鉴候选) · issue #258(物模型能力缺口) |
