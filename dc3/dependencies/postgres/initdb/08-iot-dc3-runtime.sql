@@ -277,5 +277,5 @@ COMMENT ON COLUMN dc3_point_value_ingest_outbox.last_error IS 'Last processing e
 -- canonical authority and distribution points live in dc3/bin/schema_fingerprint.py.
 INSERT INTO dc3_schema_fingerprint
     (fingerprint_version, ddl_hash, schema_contract, id_format, time_format, json_format)
-VALUES (2, 'c8ff34a0c7534ae479137f4ff95b1c41caa8b666b448870de419933d679fbb85', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
+VALUES (2, '0d9ad80328ef1a6ba91e53cf0c6db25812b8bd236e280939f967beee687d5108', 'r2dbc-flag-day-v1', 'uuidv7-bigint', 'utc-micros', 'canonical-v1')
 ON CONFLICT (fingerprint_version) DO NOTHING;
