@@ -18,6 +18,7 @@ package io.github.pnoker.driver.service.impl;
 
 import com.fazecast.jSerialComm.SerialPort;
 import com.serotonin.modbus4j.serial.SerialPortWrapper;
+import io.github.pnoker.common.exception.ConnectorException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,13 @@ public class JSerialCommWrapper implements SerialPortWrapper {
 
     @Override
     public void open() throws Exception {
-        serialPort = SerialPort.getCommPort(portName);
+        try {
+            serialPort = SerialPort.getCommPort(portName);
+        } catch (RuntimeException error) {
+            // Linux jSerialComm throws on invalid port descriptors instead of
+            // returning an unopenable port object; surface it as a driver failure.
+            throw new ConnectorException("Failed to resolve serial port: {}", portName, error);
+        }
         serialPort.setComPortParameters(baudRate, dataBits, stopBits, parity);
         serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 2000, 0);
         if (!serialPort.openPort()) {

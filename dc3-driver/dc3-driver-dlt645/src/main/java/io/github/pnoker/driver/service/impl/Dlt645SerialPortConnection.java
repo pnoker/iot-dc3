@@ -59,7 +59,13 @@ public class Dlt645SerialPortConnection {
      * Open and configure the serial port.
      */
     public void open() {
-        serialPort = SerialPort.getCommPort(portName);
+        try {
+            serialPort = SerialPort.getCommPort(portName);
+        } catch (RuntimeException error) {
+            // Linux jSerialComm throws on invalid port descriptors instead of
+            // returning an unopenable port object; surface it as a driver failure.
+            throw new ConnectorException("Failed to resolve serial port: {}", portName, error);
+        }
         serialPort.setBaudRate(baudRate);
         serialPort.setNumDataBits(dataBits);
         serialPort.setNumStopBits(stopBits);
