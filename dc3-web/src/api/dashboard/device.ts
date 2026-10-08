@@ -46,8 +46,8 @@ export const deviceTimeseries = (
   params: TimeRangeParams & {granularity?: Granularity} = {},
 ) =>
   httpGet<DeviceTimeseriesPoint[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/stats/timeseries`,
-    {params: timeRangeParams(params)},
+    `${API_DATA_BASE}/dashboard/device/stats/timeseries`,
+    {params: {...timeRangeParams(params), device_id: deviceId}},
   );
 
 /**
@@ -58,8 +58,8 @@ export const deviceTimeseries = (
  */
 export const deviceLatency = (deviceId: string, params: TimeRangeParams = {}) =>
   httpGet<DeviceLatencyBucket[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/stats/latency`,
-    {params: timeRangeParams(params)},
+    `${API_DATA_BASE}/dashboard/device/stats/latency`,
+    {params: {...timeRangeParams(params), device_id: deviceId}},
   );
 
 /**
@@ -70,8 +70,8 @@ export const deviceLatency = (deviceId: string, params: TimeRangeParams = {}) =>
  */
 export const deviceActivity = (deviceId: string, params: TimeRangeParams = {}) =>
   httpGet<DeviceActivityCell[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/stats/activity`,
-    {params: timeRangeParams(params)},
+    `${API_DATA_BASE}/dashboard/device/stats/activity`,
+    {params: {...timeRangeParams(params), device_id: deviceId}},
   );
 
 /**
@@ -83,8 +83,8 @@ export const deviceActivity = (deviceId: string, params: TimeRangeParams = {}) =
  */
 export const deviceQuality = (deviceId: string, params: {rangeHours?: number} = {}) =>
   httpGet<DeviceQuality>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/stats/quality`,
-    {params: timeRangeParams(params)},
+    `${API_DATA_BASE}/dashboard/device/stats/quality`,
+    {params: {...timeRangeParams(params), device_id: deviceId}},
   );
 
 /**
@@ -95,8 +95,8 @@ export const deviceQuality = (deviceId: string, params: {rangeHours?: number} = 
  */
 export const deviceStream = (deviceId: string, limit = 20) =>
   httpGet<DeviceStreamRow[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/stream`,
-    {params: {limit}},
+    `${API_DATA_BASE}/dashboard/device/stream`,
+    {params: {limit, device_id: deviceId}},
   );
 
 /**
@@ -112,8 +112,8 @@ export const deviceTopPoints = (
   params: {rangeHours?: number; limit?: number} = {},
 ) =>
   httpGet<DeviceTopPoint[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/top/points`,
-    {params: timeRangeParams(params)},
+    `${API_DATA_BASE}/dashboard/device/top/points`,
+    {params: {...timeRangeParams(params), device_id: deviceId}},
   );
 
 /**
@@ -122,9 +122,9 @@ export const deviceTopPoints = (
  * @returns the device coverage gap response
  */
 export const deviceCoverageGap = (deviceId: string) =>
-  httpGet<DeviceCoverageGap>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/coverage/gap`,
-  );
+  httpGet<DeviceCoverageGap>(`${API_DATA_BASE}/dashboard/device/coverage/gap`, {
+    params: {device_id: deviceId},
+  });
 
 /**
  * Fetch the device silent sources.
@@ -140,9 +140,10 @@ export const deviceSilentSources = (
   params: {baselineDays?: number; silentMinutes?: number; limit?: number} = {},
 ) =>
   httpGet<DeviceSilentSource[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/silent/sources`,
+    `${API_DATA_BASE}/dashboard/device/silent/sources`,
     {
       params: {
+        device_id: deviceId,
         ...(params.baselineDays !== undefined ? {baseline_days: params.baselineDays} : {}),
         ...(params.silentMinutes !== undefined ? {silent_minutes: params.silentMinutes} : {}),
         ...(params.limit !== undefined ? {limit: params.limit} : {}),
@@ -158,8 +159,8 @@ export const deviceSilentSources = (
  */
 export const deviceAlertTrend = (deviceId: string, days = 30) =>
   httpGet<DeviceAlertTrendPoint[]>(
-    `${API_DATA_BASE}/dashboard/device/${deviceId}/alert/trend`,
-    {params: {days}},
+    `${API_DATA_BASE}/dashboard/device/alert/trend`,
+    {params: {days, device_id: deviceId}},
   );
 
 /**

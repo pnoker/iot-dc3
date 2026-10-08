@@ -29,16 +29,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -624,10 +623,9 @@ public class DashboardController implements BaseController {
     @PreAuthorize("@perm.can('dashboard', 'list')")
     @Operation(
             summary = "Get Point Alarm Profile",
-            description =
-                    "Return the alarm profile of one point for the current tenant: alarm-type distribution "
-                            + "and daily alarm counts inside the rolling window. Use to render the alarm panel "
-                            + "of the point data dashboard.",
+            description = "Return the alarm profile of one point for the current tenant: alarm-type distribution "
+                    + "and daily alarm counts inside the rolling window. Use to render the alarm panel "
+                    + "of the point data dashboard.",
             extensions =
                     @Extension(
                             name = "x-dc3-ai",
@@ -1100,10 +1098,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/stats/timeseries")
+    @GetMapping("/device/stats/timeseries")
     public Mono<List<TimeseriesPointVO>> deviceTimeseries(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(
                             description =
@@ -1150,10 +1148,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/stats/latency")
+    @GetMapping("/device/stats/latency")
     public Mono<List<LatencyBucketVO>> deviceLatencyHistogram(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(
                             description = "Rolling time window length in hours; used only when range_key is omitted",
@@ -1193,10 +1191,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/stats/activity")
+    @GetMapping("/device/stats/activity")
     public Mono<List<ActivityCellVO>> deviceHourlyActivity(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(
                             description =
@@ -1236,10 +1234,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/stats/quality")
+    @GetMapping("/device/stats/quality")
     public Mono<DeviceQualityVO> deviceQuality(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(description = "Rolling time window length in hours", example = "24")
                     @RequestParam(value = "range_hours", defaultValue = "24")
@@ -1268,10 +1266,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/stream")
+    @GetMapping("/device/stream")
     public Mono<List<LatestPointValueVO>> deviceStream(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(description = "Maximum number of recent readings to return, newest first", example = "20")
                     @RequestParam(value = "limit", defaultValue = "20")
@@ -1303,10 +1301,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/top/points")
+    @GetMapping("/device/top/points")
     public Mono<List<TopEntityVO>> deviceTopPoints(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(
                             description = "Rolling time window length in hours; used only when range_key is omitted",
@@ -1347,10 +1345,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/coverage/gap")
+    @GetMapping("/device/coverage/gap")
     public Mono<CoverageGapVO> deviceCoverageGap(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId) {
         return getTenantId().flatMap(tenantId -> dashboardService.deviceCoverageGap(tenantId, deviceId));
     }
@@ -1379,10 +1377,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/silent/sources")
+    @GetMapping("/device/silent/sources")
     public Mono<List<SilentSourceVO>> deviceSilentSources(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(
                             description =
@@ -1427,10 +1425,10 @@ public class DashboardController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/device/{deviceId}/alert/trend")
+    @GetMapping("/device/alert/trend")
     public Mono<List<AlertTrendVO>> deviceAlertTrend(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId,
             @Parameter(description = "Rolling day range for the trend; one point per day is returned", example = "30")
                     @RequestParam(value = "days", defaultValue = "30")

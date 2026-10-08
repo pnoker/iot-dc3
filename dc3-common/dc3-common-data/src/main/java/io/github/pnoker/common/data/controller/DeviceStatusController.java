@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -173,10 +172,10 @@ public class DeviceStatusController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/{deviceId}")
+    @GetMapping("/get_by_device_id")
     public Mono<DeviceStatusDetailVO> deviceStatusDetail(
             @Parameter(description = "Identifier of the device; must belong to the current tenant", example = "1024")
-                    @PathVariable
+                    @RequestParam(value = "device_id")
                     Long deviceId) {
         return getTenantId().flatMap(tenantId -> deviceStatusService.detail(tenantId, deviceId));
     }
