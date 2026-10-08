@@ -42,12 +42,12 @@
         <dependency>
             <groupId>org.eclipse.leshan</groupId>
             <artifactId>leshan-server-cf</artifactId>
-            <version>2.0.0-M14</version>
+            <version>2.0.0-M15</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.leshan</groupId>
             <artifactId>leshan-core</artifactId>
-            <version>2.0.0-M14</version>
+            <version>2.0.0-M15</version>
         </dependency>
 
         <!-- Test -->
