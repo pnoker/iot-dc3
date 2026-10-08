@@ -61,6 +61,27 @@ class ReactiveAgenticToolRegistryTest {
     }
 
     @Test
+    void everyToolInputSchemaIsParseableJson() {
+        var registry = new ReactiveAgenticToolRegistry(
+                mock(PointValueTool.class),
+                mock(PointTool.class),
+                mock(ProfileTool.class),
+                mock(CommandTool.class),
+                mock(EventTool.class),
+                mock(DeviceTool.class),
+                mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
+                new ObjectMapper());
+        registry.tools().forEach((name, tool) -> {
+            String schema = tool.definition().inputSchema();
+            org.assertj.core.api.Assertions.assertThatCode(() -> new ObjectMapper().readTree(schema))
+                    .as("tool %s must expose a parseable JSON schema, got: %s", name, schema)
+                    .doesNotThrowAnyException();
+        });
+    }
+
+    @Test
     void registryExposesTheExactToolSurfaceSoNoToolGoesOrphan() {
         var registry = new ReactiveAgenticToolRegistry(
                 mock(PointValueTool.class),

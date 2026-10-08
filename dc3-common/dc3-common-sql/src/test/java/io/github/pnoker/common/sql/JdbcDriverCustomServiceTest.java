@@ -293,7 +293,7 @@ class JdbcDriverCustomServiceTest {
     void deviceHealthUsesConnectionValidity() throws Exception {
         service.connectMap.put(1L, dataSource);
         when(dataSource.getConnection()).thenReturn(connection);
-        when(connection.isValid(5)).thenReturn(true);
+        when(connection.isValid(anyInt())).thenReturn(true);
 
         assertThat(service.health(driverConfig(), device(1L)).getStatus()).isEqualTo(EntityStatusEnum.ONLINE);
     }
