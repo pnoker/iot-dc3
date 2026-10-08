@@ -19,13 +19,21 @@ package io.github.pnoker.common.config;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import io.github.pnoker.common.mqtt.entity.MqttMessage;
 import io.github.pnoker.common.mqtt.entity.property.MqttProperties;
+import io.github.pnoker.common.mqtt.handler.MqttReceiveHandler;
+import io.github.pnoker.common.mqtt.service.MqttReceiveService;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.endpoint.EventDrivenConsumer;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
+import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.messaging.MessageChannel;
 
 class MqttConfigTest {
@@ -59,8 +67,30 @@ class MqttConfigTest {
     }
 
     @Test
+    void inboundEndpointSubscribesTheReceiveHandlerToTheProvidedChannel() {
+        DirectChannel inboundChannel = config.mqttInboundChannel();
+        MqttReceiveHandler receiveHandler = new MqttReceiveHandler(properties, noopReceiveService(), testExecutor());
+
+        EventDrivenConsumer endpoint = config.mqttInboundReceive(receiveHandler, inboundChannel);
+
+        assertThat(endpoint.getInputChannel()).isSameAs(inboundChannel);
+        assertThat(endpoint.getHandler()).isNotNull();
+    }
+
+    @Test
+    void outboundEndpointSubscribesTheHandlerToTheOutboundChannel() {
+        MqttPahoMessageHandler handler = config.mqttOutboundHandler(new DefaultMqttPahoClientFactory());
+        DirectChannel outboundChannel = config.mqttOutboundChannel();
+
+        EventDrivenConsumer endpoint = config.mqttOutbound(handler, outboundChannel);
+
+        assertThat(endpoint.getInputChannel()).isSameAs(outboundChannel);
+        assertThat(endpoint.getHandler()).isSameAs(handler);
+    }
+
+    @Test
     void outboundDoesNotMutateDefaultSendTopic() {
-        config.mqttOutbound(new DefaultMqttPahoClientFactory());
+        config.mqttOutboundHandler(new DefaultMqttPahoClientFactory());
 
         assertThat(properties.getDefaultSendTopic().getName()).isEqualTo("command");
         assertThat(properties.getDefaultSendTopic().getQos()).isEqualTo(1);
@@ -73,5 +103,24 @@ class MqttConfigTest {
         assertThatThrownBy(() -> config.mqttInbound(new DefaultMqttPahoClientFactory(), config.mqttInboundChannel()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("MQTT receive topics must be configured");
+    }
+
+    private ExecutorService testExecutor() {
+        return Executors.newSingleThreadExecutor();
+    }
+
+    private MqttReceiveService noopReceiveService() {
+        return new MqttReceiveService() {
+
+            @Override
+            public void receiveValue(MqttMessage mqttMessage) {
+                // no-op: wiring test only
+            }
+
+            @Override
+            public void receiveValues(List<MqttMessage> mqttMessageList) {
+                // no-op: wiring test only
+            }
+        };
     }
 }

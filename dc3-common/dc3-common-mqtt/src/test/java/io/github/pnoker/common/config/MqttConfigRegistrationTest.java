@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.endpoint.EventDrivenConsumer;
 
 /**
  * Registration tests for the MQTT auto-configuration receive side.
@@ -40,6 +41,10 @@ import org.springframework.context.annotation.Configuration;
  * after the handler package was not yet visible, and the inbound channel ended up with a
  * producer but no subscriber ("Dispatcher has no subscribers for channel ...
  * mqttInboundChannel").
+ * </p>
+ * <p>
+ * Bean existence alone does not prove the channel is subscribed; the message-flow level
+ * is guarded by {@link MqttInboundFlowTest}.
  * </p>
  *
  * @author pnoker
@@ -78,6 +83,7 @@ class MqttConfigRegistrationTest {
                     assertThat(context).hasBean("mqttReceiveHandler");
                     assertThat(context.getBean("mqttReceiveHandler")).isInstanceOf(MqttReceiveHandler.class);
                     assertThat(context).hasBean("mqttInboundReceive");
+                    assertThat(context.getBean("mqttInboundReceive")).isInstanceOf(EventDrivenConsumer.class);
                     assertThat(context).hasBean("mqttScheduleJob");
                     assertThat(context).hasBean("mqttInbound");
                 });
@@ -91,7 +97,8 @@ class MqttConfigRegistrationTest {
             assertThat(context).doesNotHaveBean("mqttInboundReceive");
             assertThat(context).doesNotHaveBean("mqttScheduleJob");
             assertThat(context).doesNotHaveBean("mqttInbound");
-            assertThat(context).hasBean("mqttOutbound");
+            assertThat(context).hasBean("mqttOutboundHandler");
+            assertThat(context.getBean("mqttOutbound")).isInstanceOf(EventDrivenConsumer.class);
         });
     }
 

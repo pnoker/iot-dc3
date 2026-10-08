@@ -31,22 +31,34 @@ import org.apache.commons.lang3.Strings;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.integration.core.MessageProducer;
+import org.springframework.integration.endpoint.EventDrivenConsumer;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHandler;
+import org.springframework.messaging.SubscribableChannel;
 
 /**
  * MQTT Configuration Class
  * <p>
  * Configuration class for MQTT integration in IoT DC3 platform. Configures MQTT client
  * factory, inbound/outbound channels, message handlers, and topic subscriptions.
+ * </p>
+ * <p>
+ * Channel endpoints are wired explicitly with {@link EventDrivenConsumer} beans instead of
+ * {@code @ServiceActivator} annotations (or {@code IntegrationFlow} beans): both
+ * annotation-driven and DSL endpoint registration are performed by Spring Integration
+ * infrastructure that is only registered through {@code @EnableIntegration}, and consumers
+ * of this module do not have that infrastructure on their classpath. An annotated handler
+ * bean is then a silent no-op: the handler exists but never subscribes, and every inbound
+ * message fails with "Dispatcher has no subscribers" on its channel. An
+ * {@link EventDrivenConsumer} is a plain {@code SmartLifecycle} bean, so the core container
+ * itself starts it and performs the channel subscription; it is also the exact endpoint
+ * type the annotation machinery would build for a {@link DirectChannel} input.
  * </p>
  *
  * @author pnoker
@@ -65,7 +77,7 @@ public class MqttConfig {
      * @return DirectChannel for inbound MQTT messages
      */
     @Bean
-    public MessageChannel mqttInboundChannel() {
+    public DirectChannel mqttInboundChannel() {
         return new DirectChannel();
     }
 
@@ -75,7 +87,7 @@ public class MqttConfig {
      * @return DirectChannel for outbound MQTT messages
      */
     @Bean
-    public MessageChannel mqttOutboundChannel() {
+    public DirectChannel mqttOutboundChannel() {
         return new DirectChannel();
     }
 
@@ -140,16 +152,22 @@ public class MqttConfig {
     }
 
     /**
-     * MQTT inbound message handler bean configuration
+     * MQTT inbound endpoint bean configuration
+     * <p>
+     * Explicitly subscribes the receive handler to the inbound channel. On context start
+     * the container starts this endpoint and {@link EventDrivenConsumer#doStart()} performs
+     * the subscription, so the wiring does not depend on any annotation-driven endpoint
+     * infrastructure being present.
      *
      * @param mqttReceiveHandler MQTT receive handler
-     * @return Configured MessageHandler subscribed to the inbound MQTT channel
+     * @param mqttInboundChannel inbound channel the MQTT adapter delivers to
+     * @return EventDrivenConsumer subscribed to the inbound MQTT channel
      */
     @Bean
     @ConditionalOnBean(MqttReceiveService.class)
-    @ServiceActivator(inputChannel = "mqttInboundChannel")
-    public MessageHandler mqttInboundReceive(MqttReceiveHandler mqttReceiveHandler) {
-        return mqttReceiveHandler.mqttInboundReceive();
+    public EventDrivenConsumer mqttInboundReceive(
+            MqttReceiveHandler mqttReceiveHandler, SubscribableChannel mqttInboundChannel) {
+        return new EventDrivenConsumer(mqttInboundChannel, mqttReceiveHandler.mqttInboundReceive());
     }
 
     /**
@@ -170,11 +188,10 @@ public class MqttConfig {
      * MQTT outbound message handler bean configuration
      *
      * @param mqttClientFactory MQTT client factory
-     * @return Configured MessageHandler for MQTT outbound processing
+     * @return Configured MqttPahoMessageHandler for MQTT outbound processing
      */
     @Bean
-    @ServiceActivator(inputChannel = "mqttOutboundChannel")
-    public MessageHandler mqttOutbound(MqttPahoClientFactory mqttClientFactory) {
+    public MqttPahoMessageHandler mqttOutboundHandler(MqttPahoClientFactory mqttClientFactory) {
         MqttProperties.Topic defaultSendTopic = mqttProperties.getDefaultSendTopic();
         MqttProperties.Topic prefixedDefaultSendTopic =
                 new MqttProperties.Topic(prefixedTopicName(defaultSendTopic.getName()), defaultSendTopic.getQos());
@@ -188,6 +205,23 @@ public class MqttConfig {
                 mqttProperties.getClient() + "_out",
                 prefixedDefaultSendTopic.getQos());
         return messageHandler;
+    }
+
+    /**
+     * MQTT outbound endpoint bean configuration
+     * <p>
+     * Explicitly subscribes the outbound handler to the outbound channel, symmetric to the
+     * inbound endpoint. Starting the endpoint also starts the handler, which opens the
+     * publisher connection to the broker on demand.
+     *
+     * @param mqttOutboundHandler MQTT outbound message handler
+     * @param mqttOutboundChannel outbound channel publishers send to
+     * @return EventDrivenConsumer subscribed to the outbound MQTT channel
+     */
+    @Bean
+    public EventDrivenConsumer mqttOutbound(
+            MqttPahoMessageHandler mqttOutboundHandler, SubscribableChannel mqttOutboundChannel) {
+        return new EventDrivenConsumer(mqttOutboundChannel, mqttOutboundHandler);
     }
 
     private String prefixedTopicName(String topicName) {
