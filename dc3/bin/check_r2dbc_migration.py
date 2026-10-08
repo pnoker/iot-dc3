@@ -104,10 +104,20 @@ def is_external_jdbc_boundary(path: Path, category: str) -> bool:
 
 
 def is_expected_startup_block(path: Path, category: str, match: re.Match[str]) -> bool:
+    if category != "blocking bridges":
+        return False
+    # Startup validator runs before the reactive graph exists.
+    if path.name == "SchemaFingerprintStartupValidator.java" and match.group(0).startswith(".block"):
+        return True
+    # Spring AI's MethodToolCallback enforces a synchronous contract: reactive return
+    # values serialize the publisher object instead of the result. SystemTool therefore
+    # blocks with a bounded timeout, and the runtime invokes those callbacks on the
+    # bounded elastic scheduler so neither bridge ever runs on the event loop.
+    if path.name == "SystemTool.java" and match.group(0).startswith(".block"):
+        return True
     return (
-        category == "blocking bridges"
-        and path.name == "SchemaFingerprintStartupValidator.java"
-        and match.group(0).startswith(".block")
+        path.name == "OpenAiCompatibleAgenticRuntime.java"
+        and match.group(0).startswith("Schedulers.boundedElastic")
     )
 
 
