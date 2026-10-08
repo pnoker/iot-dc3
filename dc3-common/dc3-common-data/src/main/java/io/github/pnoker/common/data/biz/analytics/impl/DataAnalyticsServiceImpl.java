@@ -106,7 +106,11 @@ public class DataAnalyticsServiceImpl implements DataAnalyticsService {
 
     private static double percentile(List<Double> sorted, double p) {
         if (sorted.isEmpty()) return Double.NaN;
-        double position = p * (sorted.size() - 1);
+        // Agent callers naturally spell percentiles as percentages (95 instead of 0.95)
+        // and occasionally drift outside the scale; normalize instead of crashing.
+        double fraction = p > 1 && p <= 100 ? p / 100 : p;
+        fraction = Math.max(0, Math.min(1, fraction));
+        double position = fraction * (sorted.size() - 1);
         int lower = (int) Math.floor(position);
         int upper = Math.min(lower + 1, sorted.size() - 1);
         return round(sorted.get(lower) + (sorted.get(upper) - sorted.get(lower)) * (position - lower));

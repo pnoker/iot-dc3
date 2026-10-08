@@ -117,6 +117,34 @@ class DataAnalyticsServiceImplTest {
     }
 
     @Test
+    void computeStatsAcceptsPercentileValuesSpelledAsPercentages() {
+        when(tsdbStore.history(eq(TsdbModel.SeriesFilter.of(SERIES)), any(), isNull(), any(Integer.class), any()))
+                .thenReturn(
+                        Mono.just(new TsdbModel.CursorPage<>(List.of(sample(1, 1), sample(3, 2), sample(5, 3)), null)));
+        AnalyticsModel.StatsResponse response = service.computeStats(
+                        TENANT,
+                        new AnalyticsModel.ComputeStatsRequest(
+                                List.of(new AnalyticsModel.SeriesSelector(10L, 20L, null, null)), null, List.of(95.0)))
+                .block();
+        assertThat(response.stats().get("boiler-1/temp").percentiles().get(95.0))
+                .isEqualTo(4.8d);
+    }
+
+    @Test
+    void computeStatsRejectsPercentilesOutsideThePercentageScale() {
+        when(tsdbStore.history(eq(TsdbModel.SeriesFilter.of(SERIES)), any(), isNull(), any(Integer.class), any()))
+                .thenReturn(
+                        Mono.just(new TsdbModel.CursorPage<>(List.of(sample(1, 1), sample(3, 2), sample(5, 3)), null)));
+        AnalyticsModel.StatsResponse response = service.computeStats(
+                        TENANT,
+                        new AnalyticsModel.ComputeStatsRequest(
+                                List.of(new AnalyticsModel.SeriesSelector(10L, 20L, null, null)), null, List.of(1.5)))
+                .block();
+        // 1.5 falls on the percentage scale (1.5%) instead of crashing with out-of-bounds
+        assertThat(response.stats().get("boiler-1/temp").percentiles().get(1.5)).isEqualTo(1.06d);
+    }
+
+    @Test
     void computeStatsIsReactiveAndCalculatesPercentiles() {
         when(tsdbStore.history(eq(TsdbModel.SeriesFilter.of(SERIES)), any(), isNull(), any(Integer.class), any()))
                 .thenReturn(
