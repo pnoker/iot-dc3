@@ -14,6 +14,7 @@ types use `io.github.pnoker.api.center.data`; proto sources live under `src/main
 | `StatusHealthApi`   | `DeviceStatusesByIds`, `DeviceStatusesByProfileId`       | query device status snapshots                      |
 | `StatusHealthApi`   | `DriverStatusesByIds`, `DriverDeviceStatusSummary`       | query driver status snapshots and device summaries |
 | `StatusHealthApi`   | `SystemHealth`                                           | query the platform health snapshot                 |
+| `InsightApi`        | `Invoke`                                                 | agent-facing insight channel: JSON-payload reads   |
 
 Single-result RPCs use `GetXxx`; collection/page results use `ListXxx` or an explicitly named status aggregation. Do not
 reintroduce legacy `SelectXxx` names.
