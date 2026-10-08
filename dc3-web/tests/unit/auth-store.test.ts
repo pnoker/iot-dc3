@@ -66,7 +66,7 @@ describe('auth store', () => {
     setActivePinia(createPinia());
     vi.clearAllMocks();
 
-    tokenMocks.generateSalt.mockResolvedValue('salt-abc');
+    tokenMocks.generateSalt.mockResolvedValue({salt: 'salt-abc'});
     tokenMocks.generateToken.mockResolvedValue('token-xyz');
     tokenMocks.cancelToken.mockResolvedValue(true);
   });

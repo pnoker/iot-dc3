@@ -170,9 +170,9 @@ describe('mock adapter', () => {
   it('mocks the token endpoints so login works end-to-end', async () => {
     const login = {tenant: 'default', name: 'dc3', password: 'dc3dc3dc3'};
     const salt = await call({url: 'api/v3/auth/token/salt', method: 'post', data: login});
-    expect(salt).toBe('mock-salt');
+    expect(salt).toMatchObject({salt: 'mock-salt'});
     const token = await call({url: 'api/v3/auth/token/generate', method: 'post', data: login});
-    expect(token).toBe('ok');
+    expect(token).toMatchObject({token: 'mock-token'});
 
     await expect(
       call({url: 'api/v3/auth/token/generate', method: 'post', data: {...login, password: 'incorrect'}}),

@@ -1763,9 +1763,10 @@ exports[`API wrapper contracts > device > updateDevice maps to its transport con
 exports[`API wrapper contracts > deviceDashboard > deviceActivity maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/stats/activity",
+    "api/v3/data/dashboard/device/stats/activity",
     {
       "params": {
+        "device_id": "1001",
         "range_key": "7d",
       },
     },
@@ -1791,10 +1792,11 @@ exports[`API wrapper contracts > deviceDashboard > deviceAlertPage maps to its t
 exports[`API wrapper contracts > deviceDashboard > deviceAlertTrend maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/alert/trend",
+    "api/v3/data/dashboard/device/alert/trend",
     {
       "params": {
         "days": 30,
+        "device_id": "1001",
       },
     },
   ],
@@ -1805,7 +1807,12 @@ exports[`API wrapper contracts > deviceDashboard > deviceAlertTrend maps to its 
 exports[`API wrapper contracts > deviceDashboard > deviceCoverageGap maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/coverage/gap",
+    "api/v3/data/dashboard/device/coverage/gap",
+    {
+      "params": {
+        "device_id": "1001",
+      },
+    },
   ],
   "transport": "httpGet",
 }
@@ -1814,9 +1821,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceCoverageGap maps to its
 exports[`API wrapper contracts > deviceDashboard > deviceLatency maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/stats/latency",
+    "api/v3/data/dashboard/device/stats/latency",
     {
       "params": {
+        "device_id": "1001",
         "range_key": "24h",
       },
     },
@@ -1828,9 +1836,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceLatency maps to its tra
 exports[`API wrapper contracts > deviceDashboard > deviceQuality maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/stats/quality",
+    "api/v3/data/dashboard/device/stats/quality",
     {
       "params": {
+        "device_id": "1001",
         "range_hours": 24,
       },
     },
@@ -1842,9 +1851,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceQuality maps to its tra
 exports[`API wrapper contracts > deviceDashboard > deviceSilentSources maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/silent/sources",
+    "api/v3/data/dashboard/device/silent/sources",
     {
       "params": {
+        "device_id": "1001",
         "limit": 10,
       },
     },
@@ -1865,9 +1875,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceStatusDetail maps to it
 exports[`API wrapper contracts > deviceDashboard > deviceStream maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/stream",
+    "api/v3/data/dashboard/device/stream",
     {
       "params": {
+        "device_id": "1001",
         "limit": 20,
       },
     },
@@ -1879,9 +1890,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceStream maps to its tran
 exports[`API wrapper contracts > deviceDashboard > deviceTimeseries maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/stats/timeseries",
+    "api/v3/data/dashboard/device/stats/timeseries",
     {
       "params": {
+        "device_id": "1001",
         "range_key": "24h",
       },
     },
@@ -1893,9 +1905,10 @@ exports[`API wrapper contracts > deviceDashboard > deviceTimeseries maps to its 
 exports[`API wrapper contracts > deviceDashboard > deviceTopPoints maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/data/dashboard/device/1001/top/points",
+    "api/v3/data/dashboard/device/top/points",
     {
       "params": {
+        "device_id": "1001",
         "limit": 10,
         "range_hours": 24,
       },
