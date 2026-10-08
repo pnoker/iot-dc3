@@ -23,6 +23,7 @@ import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import io.github.pnoker.common.facade.entity.bo.FacadeDriverDeviceStatusSummaryBO;
 import io.github.pnoker.common.facade.entity.bo.FacadeSystemHealthBO;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,10 +33,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 /**
  * System-health tool exposed to the LLM via Spring AI @Tool.
+ *
+ * <p>Methods are deliberately synchronous: Spring AI's MethodToolCallback serializes the
+ * declared return value as-is, so returning a Mono would serialize the publisher object
+ * instead of its result. The agentic runtime invokes these callbacks off the event loop,
+ * making the bounded block below safe.</p>
  *
  * @author pnoker
  * @since 2016.10.1
@@ -44,6 +49,8 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class SystemTool {
+
+    private static final Duration CALL_TIMEOUT = Duration.ofSeconds(10);
 
     private final Optional<StatusHealthFacade> statusHealthFacade;
 
@@ -57,18 +64,17 @@ public class SystemTool {
             description =
                     "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
     @AgenticToolMetadata(domain = "system", title = "Get system health")
-    public Mono<AgenticToolResult<FacadeSystemHealthBO>> getSystemHealth(ToolContext toolContext) {
+    public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        return facade.systemHealthReactive(tenantId)
-                .map(health -> Objects.isNull(health)
-                        ? AgenticToolResult.<FacadeSystemHealthBO>unavailable(
-                                AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
-                        : AgenticToolResult.ok("System health loaded", health));
+        FacadeSystemHealthBO health = facade.systemHealthReactive(tenantId).block(CALL_TIMEOUT);
+        return Objects.isNull(health)
+                ? AgenticToolResult.unavailable(AgenticConstant.ToolMessage.SYSTEM_HEALTH_UNAVAILABLE)
+                : AgenticToolResult.ok("System health loaded", health);
     }
 
     /**
@@ -80,7 +86,7 @@ public class SystemTool {
      */
     @Tool(description = "Get the online/offline status of devices by their IDs.")
     @AgenticToolMetadata(domain = "system", title = "Get device statuses by IDs")
-    public Mono<AgenticToolResult<Map<Long, String>>> getDeviceStatuses(List<Long> deviceIds, ToolContext toolContext) {
+    public AgenticToolResult<Map<Long, String>> getDeviceStatuses(List<Long> deviceIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDeviceStatuses", tenantId);
         List<Long> ids = deviceIds == null
@@ -91,17 +97,17 @@ public class SystemTool {
                         .distinct()
                         .toList();
         if (ids.isEmpty()) {
-            return Mono.just(AgenticToolResult.invalid("No valid device IDs provided."));
+            return AgenticToolResult.invalid("No valid device IDs provided.");
         }
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        return facade.listDeviceStatusesByIdsReactive(tenantId, ids)
-                .map(statuses -> statuses == null || statuses.isEmpty()
-                        ? AgenticToolResult.<Map<Long, String>>empty(
-                                "No device statuses found for IDs: " + ids, Map.of())
-                        : AgenticToolResult.ok("Device statuses loaded", statuses));
+        Map<Long, String> statuses =
+                facade.listDeviceStatusesByIdsReactive(tenantId, ids).block(CALL_TIMEOUT);
+        return statuses == null || statuses.isEmpty()
+                ? AgenticToolResult.empty("No device statuses found for IDs: " + ids, Map.of())
+                : AgenticToolResult.ok("Device statuses loaded", statuses);
     }
 
     /**
@@ -113,22 +119,21 @@ public class SystemTool {
      */
     @Tool(description = "Get the online/offline status of all devices under a profile.")
     @AgenticToolMetadata(domain = "system", title = "Get device statuses by profile")
-    public Mono<AgenticToolResult<Map<Long, String>>> getDeviceStatusesByProfile(
-            Long profileId, ToolContext toolContext) {
+    public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfile(Long profileId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDeviceStatusesByProfile", tenantId);
         if (profileId == null || profileId <= 0) {
-            return Mono.just(AgenticToolResult.invalid("Profile ID must be positive."));
+            return AgenticToolResult.invalid("Profile ID must be positive.");
         }
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        return facade.listDeviceStatusesByProfileIdReactive(tenantId, profileId)
-                .map(statuses -> statuses == null || statuses.isEmpty()
-                        ? AgenticToolResult.<Map<Long, String>>empty(
-                                "No device statuses found for profile ID: " + profileId, Map.of())
-                        : AgenticToolResult.ok("Device statuses loaded", statuses));
+        Map<Long, String> statuses = facade.listDeviceStatusesByProfileIdReactive(tenantId, profileId)
+                .block(CALL_TIMEOUT);
+        return statuses == null || statuses.isEmpty()
+                ? AgenticToolResult.empty("No device statuses found for profile ID: " + profileId, Map.of())
+                : AgenticToolResult.ok("Device statuses loaded", statuses);
     }
 
     /**
@@ -140,7 +145,7 @@ public class SystemTool {
      */
     @Tool(description = "Get the online/offline status of drivers by their IDs.")
     @AgenticToolMetadata(domain = "system", title = "Get driver statuses by IDs")
-    public Mono<AgenticToolResult<Map<Long, String>>> getDriverStatuses(List<Long> driverIds, ToolContext toolContext) {
+    public AgenticToolResult<Map<Long, String>> getDriverStatuses(List<Long> driverIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDriverStatuses", tenantId);
         List<Long> ids = driverIds == null
@@ -151,17 +156,17 @@ public class SystemTool {
                         .distinct()
                         .toList();
         if (ids.isEmpty()) {
-            return Mono.just(AgenticToolResult.invalid("No valid driver IDs provided."));
+            return AgenticToolResult.invalid("No valid driver IDs provided.");
         }
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        return facade.listDriverStatusesByIdsReactive(tenantId, ids)
-                .map(statuses -> statuses == null || statuses.isEmpty()
-                        ? AgenticToolResult.<Map<Long, String>>empty(
-                                "No driver statuses found for IDs: " + ids, Map.of())
-                        : AgenticToolResult.ok("Driver statuses loaded", statuses));
+        Map<Long, String> statuses =
+                facade.listDriverStatusesByIdsReactive(tenantId, ids).block(CALL_TIMEOUT);
+        return statuses == null || statuses.isEmpty()
+                ? AgenticToolResult.empty("No driver statuses found for IDs: " + ids, Map.of())
+                : AgenticToolResult.ok("Driver statuses loaded", statuses);
     }
 
     /**
@@ -173,21 +178,21 @@ public class SystemTool {
      */
     @Tool(description = "Get the online/offline device status summary for one driver: totals per status.")
     @AgenticToolMetadata(domain = "system", title = "Get driver device status summary")
-    public Mono<AgenticToolResult<FacadeDriverDeviceStatusSummaryBO>> getDriverDeviceStatusSummary(
+    public AgenticToolResult<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummary(
             Long driverId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDriverDeviceStatusSummary", tenantId);
         if (driverId == null || driverId <= 0) {
-            return Mono.just(AgenticToolResult.invalid("Driver ID must be positive."));
+            return AgenticToolResult.invalid("Driver ID must be positive.");
         }
         StatusHealthFacade facade = statusHealthFacade.orElse(null);
         if (Objects.isNull(facade)) {
-            return Mono.just(AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE));
+            return AgenticToolResult.unavailable(AgenticConstant.ToolMessage.STATUS_HEALTH_UNAVAILABLE);
         }
-        return facade.getDriverDeviceStatusSummaryReactive(tenantId, driverId)
-                .map(summary -> Objects.isNull(summary)
-                        ? AgenticToolResult.<FacadeDriverDeviceStatusSummaryBO>notFound(
-                                "No device status summary found for driver ID: " + driverId)
-                        : AgenticToolResult.ok("Driver device status summary loaded", summary));
+        FacadeDriverDeviceStatusSummaryBO summary =
+                facade.getDriverDeviceStatusSummaryReactive(tenantId, driverId).block(CALL_TIMEOUT);
+        return Objects.isNull(summary)
+                ? AgenticToolResult.notFound("No device status summary found for driver ID: " + driverId)
+                : AgenticToolResult.ok("Driver device status summary loaded", summary);
     }
 }

@@ -458,8 +458,11 @@ public class OpenAiCompatibleAgenticRuntime {
                         return Mono.error(
                                 new IllegalStateException("No tool callback found for tool: " + toolCall.name()));
                     }
+                    // @Tool callbacks may block (bounded) while bridging to their facade calls,
+                    // so run them off the event loop on the bounded elastic scheduler.
                     return Mono.fromSupplier(() ->
                                     callback.call(StringUtils.defaultIfBlank(toolCall.arguments(), "{}"), toolContext))
+                            .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic())
                             .map(result -> toolMessage(toolCall.id(), result));
                 }));
     }
