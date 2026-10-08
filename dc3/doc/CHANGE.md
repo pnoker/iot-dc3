@@ -1,5 +1,158 @@
 # ✨ What's Changed
 
+### 📌 2026.10.9
+
+_Generated on 2026-10-09._
+
+#### Summary
+- Generated from `v2026.9.22` to `HEAD`.
+- Included 122 commits across 9 categories: Security 2, Features 24, Bug Fixes 59, Refactoring 7, Documentation 10, Build 6, CI 1, Tests 9, Chores 4.
+- Most active scopes: web(46), cli(17), data(9), agentic(7), driver(6), compose(5).
+- Highlights: auth: exclude the client secret from tostring; cli: pin esbuild to the patched 0.28 line; agentic: complete the tool surface with status insight and history tools; data: add the agent-facing insight channel with history facades; cli: adopt the remaining guardian tests and auth store fix.
+
+#### Security
+- **auth**: exclude the client secret from tostring (`024ef0e57`)
+- **cli**: pin esbuild to the patched 0.28 line (`fe206cb99`)
+
+#### Features
+- **agentic**: complete the tool surface with status insight and history tools (`c64a292f9`)
+- **data**: add the agent-facing insight channel with history facades (`812d5e97c`)
+- **cli**: adopt the remaining guardian tests and auth store fix (`b58820411`)
+- **cli**: add alert point-profile and device import-template commands (`12bde52e0`)
+- **cli**: adopt the core hardening and guardian test suite (`97c5bd58e`)
+- **cli**: complete crud, fix bugs, add provider model and attachment commands (`8444e0190`)
+- **web**: scenario-driven agentic dialogue mock engine (`c55596d92`)
+- **agentic**: throttle in-flight requests and tune transport retries (`8c46a68f7`)
+- **agentic**: add provider and model connectivity probes (`b6f97e9e7`)
+- **driver**: implement the ethernet-ip cip unconnected messaging stack (`231bb70bc`)
+- **web**: overhaul the agent assistant workbench (`ac343b638`)
+- **data**: add native reflection hints for rule value records (`c0f9d54e1`)
+- **web**: align the point value detail with the device detail language (`3773d67cc`)
+- **web**: add the point data-dashboard (位号看板) to the value detail page (`fca77bd6a`)
+- **driver**: wire the virtual driver into the single topology + onboarding script (`be4068e08`)
+- **data**: add the point data-dashboard analytics (位号看板) (`6d4592990`)
+- **web**: restyle the device detail banner as a tone-tile 名片 (`98cabd86a`)
+- **web**: merge device info into the dashboard identity banner (`58e3006c5`)
+- **web**: device detail dashboard (仪表盘 tab) (`7b8142501`)
+- **data**: device-scoped dashboard aggregation endpoints (`ead590854`)
+- **web**: give the point-value card a tone-tinted value panel (`20d2732f8`)
+- **web**: tone-tile account avatar and a richer user dropdown (`f9ab92767`)
+- **compose**: add the web service to the single-topology stack (`973202871`)
+- **gateway**: single-center topology routes with a runtime env switch (`1d28d7f7f`)
+
+#### Bug Fixes
+- **agentic**: make system tools synchronous so spring ai serializes results (`da5d74811`)
+- **data**: normalize agent-supplied percentiles instead of crashing (`fa0cf971a`)
+- **mq**: wire the mqtt endpoints explicitly, not through dead annotations (`a2f51fa81`)
+- **coap**: attach a started endpoint to every pooled coap client (`ef6f2a5d6`)
+- **mq**: register the mqtt receive beans from the auto-configuration (`0e5f2bf88`)
+- **compose**: sync the schema fingerprint across all six stacks (`e834dde9c`)
+- **mq**: single-source rabbitmq connection config in the sdk carrier (`cb7980a04`)
+- **bin**: parse the json salt contract in onboard_virtual (`78f0edeba`)
+- **nginx**: add spa history fallback to the web location (`fe57a03c4`)
+- **db**: generate attachment ids and resync the schema fingerprint (`234b93ce5`)
+- **web**: use a 3-column stat grid on the device dashboard (`09eba4b03`)
+- **web**: decouple the trend window selector from the stat tiles (`f820394df`)
+- **web**: restore the point dashboard style section lost in the peer removal (`cadd02847`)
+- **web**: apply only the refreshed card's data sections to the dashboard (`7c17e53c2`)
+- **web**: spin only the trend refresh button without covering the chart (`a163a4de9`)
+- **web**: replace rangeY with area for the trend band fill (`bb0ba230a`)
+- **web**: scope point dashboard refresh to the clicked card (`de0cf6c53`)
+- **cli**: point dashboard topology at the manager route (`b2ce0ab69`)
+- **cli**: use the correct device and driver status endpoints (`f793b64a8`)
+- **cli**: match the sse data prefix without the optional space (`1a97b9c7d`)
+- **cli**: root-cause attachment protocol, config bootstrap, and core type errors (`5deea71fa`)
+- **cli**: resolve provider update from list and unwind stream cleanly (`338357430`)
+- **cli**: harden error exits, validate inputs, and reject bad formats (`2df494c15`)
+- **nginx**: raise api rate limits to absorb dashboard page bursts (`ec456f342`)
+- **web**: rotate the assistant glyph on hover to match the settings gear (`bb9f5fb80`)
+- **web**: animate the assistant glyph on hover instead of the chip (`14df47f0f`)
+- **web**: use the dual-sparkle ai glyph with shimmer and glow depth (`c48b56ee8`)
+- **web**: replace the assistant spark with an aurora orb (`278c62911`)
+- **web**: clean session param on close and match the icon chip grammar (`3c7b855fa`)
+- **web**: refine the assistant icon as a claude-style glass chip spark (`72ef51fed`)
+- **web**: restyle the assistant entry as a brand-gradient sparkle (`ff66f1f35`)
+- **web**: give the utilities divider the shared 8px shoulder (`6eb2f299a`)
+- **web**: unify header icon rhythm with one divider grammar (`84ea04a7e`)
+- **web**: merge the docked assistant header rule with the platform line (`3ad5ff099`)
+- **web**: align assistant spacing with the platform and widen the canvas (`90f3b1982`)
+- **web**: repair local dev api proxy and nginx upstream resolution (`b67f32edc`)
+- **web**: aggregate failure toasts instead of one per request (`60ca75efd`)
+- **web**: dock the assistant panel full height beside the header (`563870183`)
+- **agentic**: isolate connectivity check cache by probe level (`b9caff12c`)
+- **gate**: flag cjk only inside code comments (`e9953809d`)
+- **web**: align dashboard api naming and harden the auth session (`bc1850108`)
+- **cli**: enforce the output contract, exit codes, and timeouts (`2b9c188b8`)
+- **driver**: fail safe on null events and early lifecycle (`9f90695ca`)
+- **driver**: honor configured attributes in protocol paths (`828387756`)
+- **sql**: bound hikari bring-up and prevalidate health probes (`97ecd2f8b`)
+- **db**: finish the databaseinstant migration and pom hygiene (`5968660e2`)
+- **test**: keep the e2e proxy alive when clients disconnect (`d8fbfc8e7`)
+- **web**: move focus into the assistant panel when it opens (`d63f9ec2e`)
+- **web**: read rail collapsed state from props in focusSearch (`68e817490`)
+- **agentic**: persist provider api keys and row timestamps (`78ca463af`)
+- **web**: balance detail dashboards and restore footer bands (`d638c1f91`)
+- **web**: fit g2 charts to their live container size (`a50da5b0f`)
+- **db**: round-trip history timestamps and full alarm ids (`8cc5ab013`)
+- **web**: drop the stale active=detail from device navigation (`81a2067fb`)
+- **db**: make the outbox claim transaction-free (`c7cb0b01d`)
+- **data**: stop the ingest replay job from deadlocking the R2DBC pool (`cd170336d`)
+- **deploy**: close the gaps found in the helm/k8s deployment review (`016befbd9`)
+- **compose**: align the runtime env anchor across all stack files (`6273b5044`)
+- **compose**: complete the single-topology compose with the full driver family (`db69d8b7d`)
+
+#### Refactoring
+- **web**: merge the device identity banner into the stat tile grid (`af508d7ce`)
+- **web**: merge the point identity banner into the stat tile grid (`aeed97b8e`)
+- **web**: remove the peer snapshot card from the point dashboard (`285a494f1`)
+- **mq**: single-source the rabbit lease queue configuration (`b56372c47`)
+- **web**: drop the device-info tab compatibility shim (`b645569a6`)
+- **web**: drop the nested value panel on the point-value card (`647f7543d`)
+- **web**: restyle the point-value hero as a dark display panel (`0ef6a7f97`)
+
+#### Documentation
+- remove the docs directory (`cfa2ee75d`)
+- retire executed handoffs, fixed tech-debt audit, and open-review comparisons (`3a78079a7`)
+- retire three landed design proposals (`a2a01e915`)
+- retire two one-shot review handoffs (`0a6033b81`)
+- **cli**: remove the one-shot campaign report (`0de4d941c`)
+- **cli**: record the restack full-test epilogue (`e6b658be2`)
+- **data**: match driver status casing to serialized values (`245638d94`)
+- **cli**: sync readme with new commands and fix documentation drift (`e1edbbcdc`)
+- record ai assistant tech debt audit and fixes (`b7e3360cf`)
+- refresh contributing flow and driver maturity tables (`3f405eb60`)
+
+#### Build
+- **cli**: bump three dev dependency versions (`3699d3dda`)
+- **web**: bump eleven npm dependency versions (`5396a8fd2`)
+- **deps**: bump eight managed dependency versions (`d8e079bd0`)
+- centralize the jaxb api version and drop the dead enforcer (`d76468645`)
+- **compose**: require explicit credentials and persist agentic data (`385c4ac9a`)
+- make image builds reproducible from clean checkouts (`e38b02dce`)
+
+#### CI
+- resolve maven settings and extract the mockito pin (`a10496876`)
+
+#### Tests
+- lock tool schemas and insight routes plus fix a stale stub (`2914b09e2`)
+- **cli**: cover provider model group and label write paths (`56fffbbed`)
+- **driver**: reorder zigbee health tests to satisfy the quality gate (`c90cbaf8f`)
+- **gate**: add secrets, compose, todo, and driver coverage gates (`fa230d185`)
+- **driver**: add the shared adversarial contract harness (`6bdc9f34d`)
+- **agentic**: cover the provider api key contract (`f84696dc5`)
+- **web**: pin stream races, capacity budgets and layout invariants (`fd31d5c55`)
+- **web**: raise assistant suite coverage across unit, panel and e2e (`f52cf8adb`)
+- **web**: cover the agentic card family and interaction behaviors (`33c94adb3`)
+
+#### Chores
+- **data**: reflow dashboard vo schema comments (`35fb1454c`)
+- **bin**: onboard the virtual driver chain idempotently (`b98f443ac`)
+- **data**: satisfy checkstyle and spotless on dashboard service (`44549f352`)
+- **version**: align deployment manifests and web metadata with 2026.9.22 (`8ccf60dda`)
+
+<details>
+<summary>📝 Historical Version Description, Click to Expand</summary>
+
 ### 📌 2026.9.22
 
 _Generated on 2026-09-22._
@@ -243,9 +396,6 @@ _Generated on 2026-09-22._
 
 #### Other Changes
 - Revert "feat(web): add cli onboarding card to mcp service page" (`df42cb9e4`)
-
-<details>
-<summary>📝 Historical Version Description, Click to Expand</summary>
 
 ### 📌 2026.8.19
 
