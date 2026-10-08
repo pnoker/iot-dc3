@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 
 import {createElButtonStub} from '../setup/stubs/element-plus';
 import {createPinia, setActivePinia} from 'pinia';
@@ -101,12 +101,12 @@ describe('AgenticSessionsRail behaviors', () => {
     const search = wrapper.find('.agentic-sessions__search');
     expect(search.exists()).toBe(true);
     await search.setValue('能耗');
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.findAll('.agentic-sessions__item')).toHaveLength(1);
     expect(wrapper.text()).toContain('能耗分析');
 
     await search.setValue('no-such-conversation');
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.findAll('.agentic-sessions__item')).toHaveLength(0);
     expect(wrapper.text()).toMatch(/无匹配|No matching/);
   });
@@ -125,7 +125,7 @@ describe('AgenticSessionsRail behaviors', () => {
       .find((b) => b.text().includes('保存') || b.text().toLowerCase().includes('save'));
     expect(saveBtn?.text() ?? '').toMatch(/保存|[Ss]ave/);
     await saveBtn!.trigger('click');
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.emitted('rename')![0]).toEqual(['c1', 'Renamed!']);
 
     await cmd('archive', 1);

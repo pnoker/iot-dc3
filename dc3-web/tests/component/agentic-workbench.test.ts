@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import {createPinia, setActivePinia} from 'pinia';
 import {defineComponent, h} from 'vue';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -154,7 +154,7 @@ describe('AgenticAssistant workbench mode', () => {
 
     const store = useAgenticStore();
     store.workbenchExpanded = false;
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.find('.agentic-panel').exists()).toBe(true);
     expect(wrapper.find('.agentic-sessions').exists()).toBe(false);
     expect(wrapper.find('.agentic-context').exists()).toBe(false);
@@ -171,7 +171,7 @@ describe('AgenticAssistant workbench mode', () => {
     const wrapper = mountWorkbench();
 
     // Defaults to the last assistant message.
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.find('.agentic-context').exists()).toBe(true);
     expect(wrapper.find('.agentic-context').text()).toContain('deviceStatusList');
     expect(wrapper.find('.agentic-context').text()).not.toContain('searchDevices');
@@ -179,7 +179,7 @@ describe('AgenticAssistant workbench mode', () => {
     // Selecting an earlier message retargets the panel.
     const items = wrapper.findAll('.agentic-message');
     await items[1].trigger('click');
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.find('.agentic-context').text()).toContain('searchDevices');
   });
 
@@ -190,7 +190,7 @@ describe('AgenticAssistant workbench mode', () => {
     expect(wrapper.find('.agentic-sessions').classes()).not.toContain('is-collapsed');
     const appStore = useAppStore();
     appStore.toggleAgenticRailCollapsed();
-    await wrapper.vm.$nextTick();
+    await flushPromises();
     expect(wrapper.find('.agentic-sessions').classes()).toContain('is-collapsed');
   });
 
