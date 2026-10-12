@@ -53,13 +53,14 @@ function mountSkeleton(props: Record<string, unknown> = {}) {
 }
 
 describe('SkeletonCard', () => {
-  it('renders the 12-card placeholder grid with footer buttons by default', () => {
+  it('renders one placeholder card with footer buttons by default', () => {
     const wrapper = mountSkeleton({loading: true});
 
-    // 12 cards — verified via the icon placeholder count.
-    expect(wrapper.findAll('.skeleton-card-icon')).toHaveLength(12);
-    // footer=true (default) → 5 button placeholders per card × 12 = 60.
-    expect(wrapper.findAll('[data-variant="button"]')).toHaveLength(60);
+    // One card per instance — the wall's v-for owns the count (page size),
+    // so the loading wall previews exactly the incoming fill at any size.
+    expect(wrapper.findAll('.skeleton-card-icon')).toHaveLength(1);
+    // footer=true (default) → 5 button placeholders.
+    expect(wrapper.findAll('[data-variant="button"]')).toHaveLength(5);
   });
 
   it('omits the footer buttons when footer=false', () => {

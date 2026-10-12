@@ -96,12 +96,16 @@ async function testPagination(page, watch, pageDef, result) {
     await assertClean(`${pageDef.name} previous page`, watch, mark);
   }
 
-  const sizeSelect = page.locator('.el-pagination .el-select:visible').first();
+  // Wall-managed card lists expose the adaptive size select beside the
+  // pager; table lists keep the built-in one inside it. Pick the 24 option
+  // by its number so the sweep is locale-proof (labels differ between the
+  // built-in "{size}/page" and the adaptive "{n} 条/页").
+  const sizeSelect = page.locator('.tool-card-footer-page .el-select:visible').first();
   if (await sizeSelect.count()) {
     const mark = markWatch(watch);
     await sizeSelect.click();
     await delay(300);
-    const option = page.locator('.el-select-dropdown:visible .el-select-dropdown__item', {hasText: '24/page'}).last();
+    const option = page.locator('.el-select-dropdown:visible .el-select-dropdown__item', {hasText: /\b24\b/}).last();
     if (await option.count()) {
       await option.click();
       await waitPage(page);

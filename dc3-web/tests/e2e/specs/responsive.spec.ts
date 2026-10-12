@@ -394,3 +394,90 @@ test.describe("three-terminal gate", () => {
     );
   });
 });
+
+test.describe("card wall paging fills complete rows (A5)", () => {
+  // Band-edge sweep: the wall's column count steps every ~388px of content
+  // width, so these viewports land on 3/4/5/7 columns. The wall-managed
+  // page size must be a whole-row multiple of the measured column count at
+  // each step — otherwise the last row shows empty slots again. Drives its
+  // own viewport ladder, so it runs once (desktop project) instead of
+  // repeating per terminal project.
+  const BAND_WIDTHS = [1366, 1920, 2200, 2880];
+  // `test:e2e:responsive` boots the in-app mock adapter (src/mock) — its
+  // requests never reach the network, so the wire-level contract can only
+  // be asserted against a real backend.
+  const WIRE_VISIBLE = process.env.E2E_SERVER_MODE !== "mock";
+
+  const measureWall = (page: Page) =>
+    page.locator(".entity-card-wall").evaluate((element) => {
+      const tracks = getComputedStyle(element).gridTemplateColumns;
+      const cols = tracks.trim().split(/\s+/).filter(Boolean).length;
+      const cards = element.querySelectorAll(":scope > .things-card").length;
+      const ghosts = element.querySelectorAll(
+        ":scope > .entity-card-wall__ghost",
+      ).length;
+      return { cols, cards, ghosts };
+    });
+
+  for (const width of BAND_WIDTHS) {
+    test(`driver wall at ${width}px requests whole-row pages`, async ({
+      page,
+    }, testInfo) => {
+      // Early-return rather than test.skip: ai-guardrails forbids committed
+      // .skip markers (same idiom as the mobile-only tests above).
+      if (testInfo.project.name !== "chromium-desktop") {
+        return;
+      }
+
+      await page.setViewportSize({ width, height: 900 });
+      await login(page);
+      await page.goto("/#/driver", { waitUntil: "domcontentloaded" });
+      await waitForAppSettled(page);
+
+      // Start counting only after the home dashboard's background probes
+      // (limit: 1 stats fetches) have drained — reload mounts the wall page
+      // fresh and its list request is the only one in flight.
+      const listLimits: number[] = [];
+      if (WIRE_VISIBLE) {
+        page.on("request", (request) => {
+          if (request.method() === "POST" && /\/driver\/list/.test(request.url())) {
+            try {
+              const body = request.postDataJSON() as { limit?: number } | null;
+              if (body && typeof body.limit === "number") {
+                listLimits.push(body.limit);
+              }
+            } catch {
+              // non-JSON bodies are not list payloads
+            }
+          }
+        });
+      }
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await waitForAppSettled(page);
+
+      const wall = page.locator(".entity-card-wall");
+      await expect(wall).toBeVisible();
+      const metrics = await measureWall(page);
+
+      expect(metrics.cols).toBeGreaterThan(0);
+      // Wall identity (every mode): data plus ghost slots always close the
+      // last row — the page size snapped to whole rows and the ghosts did
+      // the rest. Catches a wrong ghost count, not just a small one.
+      if (metrics.cards > 0) {
+        expect(
+          (metrics.cards + metrics.ghosts) % metrics.cols,
+          `wall must end on a complete row at ${width}px`,
+        ).toBe(0);
+      }
+
+      if (WIRE_VISIBLE) {
+        // First-paint contract: exactly one correctly-sized list request —
+        // no 12-then-reflow double fetch.
+        expect(listLimits).toHaveLength(1);
+        expect(listLimits[0]).toBeGreaterThan(0);
+        // The whole-row promise: a full page can never end ragged.
+        expect(listLimits[0] % metrics.cols).toBe(0);
+      }
+    });
+  }
+});

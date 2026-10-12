@@ -27,6 +27,7 @@
       @show-add="showAdd"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
     ></profile-tool>
 
     <el-alert
@@ -43,9 +44,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="true" :loading="true"/>
       </template>
       <template v-else>
         <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('profile.empty')"/>
@@ -60,6 +61,7 @@
           @enable-thing="enableThing"
           @delete-thing="deleteThing"
         ></profile-card>
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
 
@@ -78,6 +80,7 @@ import {isNull} from '@/utils/validationUtil';
 import type {ProfileRecord} from '@/config/types/manager';
 
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import CardWallGhosts from '@/components/card/wall/CardWallGhosts.vue';
 import ProfileAddForm from '@/views/profile/add/ProfileAddForm.vue';
 import ProfileCard from '@/views/profile/card/ProfileCard.vue';
 import ProfileTool from '@/views/profile/tool/ProfileTool.vue';
@@ -97,6 +100,7 @@ const props = withDefaults(
 
 const profileAddFormRef = ref<DialogInstance | null>(null);
 const actionBusy = reactive(new Set<string>());
+const wallRef = ref<HTMLElement | null>(null);
 let disposed = false;
 
 const {
@@ -106,11 +110,30 @@ const {
   sort,
   sizeChange,
   currentChange,
+  bindWall,
+  enableAuto,
+  setManual,
+  ghostCount,
 } = usePagedList<ProfileRecord>({
-  pageSize: 12,
+  autoPageSize: true,
   sortColumn: 'createTime',
   request: (query) => listProfile(query),
 });
+
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, reactiveData.page.size));
+const isRefreshing = computed(() => reactiveData.loading && reactiveData.listData.length > 0);
+
+const onSizeMode = (value: 'auto' | number) => {
+  if (value === 'auto') {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
 
 const baseProfileQuery = computed(() => {
   const q: Record<string, unknown> = {};

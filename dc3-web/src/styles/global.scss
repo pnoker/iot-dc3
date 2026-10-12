@@ -146,14 +146,98 @@ body {
 // sinking back to the cramped 280px slivers). Columns therefore step
 // continuously (1→2→3→4→…) as the viewport widens instead of snapping
 // rungs. min(380px, 100%) keeps the floor from overflowing phones.
+//
+// The runtime column count is READ from this rule, never re-derived in JS:
+// useCardWallPageSize resolves gridTemplateColumns and snaps the list page
+// size to whole-row multiples. Keep the auto-fill minmax shape — a restyle
+// to fixed columns silently desyncs that measurement; the shape is pinned
+// by tests/guardrails/card-wall-contract.test.ts.
 .entity-card-wall {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   gap: var(--dc3-gutter);
+  // Anchor for the refresh indicator below; no layout effect on the grid.
+  position: relative;
 
   // Status blocks (empty / load-failed) span the whole wall, not one cell.
   > .el-empty {
     grid-column: 1 / -1;
+  }
+
+  // Ghost slots (CardWallGhosts): decorative end-of-row fillers so a wall
+  // never shows an accidental hole — the dataset's true tail (last page,
+  // small result sets) ends on a full row of honest content + ghost
+  // outlines. Same card shape, never interactive, hidden from AT.
+  > .entity-card-wall__ghost {
+    border: 1px dashed var(--el-border-color);
+    border-radius: var(--dc3-radius-lg);
+    background: var(--el-fill-color-lighter);
+    min-height: 96px;
+    pointer-events: none;
+  }
+
+  // Cards and ghosts fade in when a page of data lands. Keyed v-for reuses
+  // nodes across refreshes (no re-animation), so this only ever plays on
+  // real page transitions; durations collapse to 0ms under reduced motion.
+  > .things-card,
+  > .entity-card-wall__ghost {
+    animation: entity-card-wall-in var(--dc3-duration-base) var(--dc3-ease-emphasized) both;
+  }
+
+  // Stale-while-revalidate feedback: while a refresh keeps the current
+  // cards on screen, a slim activity line reports it — no skeleton flash,
+  // no silent button click. Decorative only: never hit-tests, and the
+  // sweep collapses to a static line under reduced motion.
+  &.is-refreshing::before {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 2px;
+    border-radius: var(--dc3-radius-full);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--el-color-primary) 40%,
+      var(--el-color-primary) 60%,
+      transparent
+    );
+    background-size: 200% 100%;
+    animation: entity-card-wall-refresh-sweep 1.2s linear infinite;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+}
+
+@keyframes entity-card-wall-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes entity-card-wall-refresh-sweep {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+// The activity line must read as motion feedback, but never move pixels
+// for motion-sensitive users.
+@media (prefers-reduced-motion: reduce) {
+  .entity-card-wall.is-refreshing::before {
+    animation: none;
+    background: var(--el-color-primary);
+    opacity: 0.35;
   }
 }
 

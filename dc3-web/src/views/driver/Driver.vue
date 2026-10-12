@@ -25,6 +25,7 @@
       @sort="sort"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
     >
     </driver-tool>
 
@@ -55,9 +56,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="true" :loading="true"/>
       </template>
       <template v-else>
         <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('driver.empty')"/>
@@ -70,13 +71,14 @@
           :status-table="statusTable"
           @delete="onDelete"
         />
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {onBeforeUnmount, reactive, ref, watch} from 'vue';
+import {computed, onBeforeUnmount, reactive, ref, watch} from 'vue';
 
 import {deleteDriver, listDriver, listDriverStatus} from '@/api/driver';
 import {usePagedList} from '@/composables/usePagedList';
@@ -84,9 +86,12 @@ import {usePagedList} from '@/composables/usePagedList';
 import type {DriverRecord} from '@/config/types/manager';
 import {successMessage} from '@/utils/notificationUtil';
 
+import CardWallGhosts from '@/components/card/wall/CardWallGhosts.vue';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
 import DriverCard from './card/DriverCard.vue';
 import DriverTool from './tool/DriverTool.vue';
+
+const wallRef = ref<HTMLElement | null>(null);
 
 const {
   state: reactiveData,
@@ -95,11 +100,30 @@ const {
   sort,
   sizeChange,
   currentChange,
+  bindWall,
+  enableAuto,
+  setManual,
+  ghostCount,
 } = usePagedList<DriverRecord>({
-  pageSize: 12,
+  autoPageSize: true,
   sortColumn: 'createTime',
   request: (query) => listDriver(query),
 });
+
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, reactiveData.page.size));
+const isRefreshing = computed(() => reactiveData.loading && reactiveData.listData.length > 0);
+
+const onSizeMode = (value: 'auto' | number) => {
+  if (value === 'auto') {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
 
 const statusTable = reactive<Record<string, string>>({});
 let statusSequence = 0;
@@ -149,6 +173,8 @@ const loadStatus = (sequence = statusSequence) => {
   })
     .then((res) => {
       if (sequence !== statusSequence || requestId !== statusRequestId) return;
+      // Swap atomically on arrival — badges stay visible under a refresh.
+      for (const key of Object.keys(statusTable)) delete statusTable[key];
       Object.assign(statusTable, (res || {}) as Record<string, string>);
     })
     .catch((error) => {
@@ -168,7 +194,6 @@ watch(
   () => reactiveData.listData,
   () => {
     const sequence = ++statusSequence;
-    for (const key of Object.keys(statusTable)) delete statusTable[key];
     statusError.value = null;
     void loadStatus(sequence);
   }

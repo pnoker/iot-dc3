@@ -28,6 +28,7 @@
     @search="onSearch"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
+    @page-size-mode="$emit('page-size-mode', $event)"
     @cursor-previous="$emit('cursor-previous')"
     @cursor-next="$emit('cursor-next')"
   >
@@ -150,7 +151,16 @@ defineProps({
   cursorNext: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(['search', 'reset', 'refresh', 'size-change', 'current-change', 'cursor-previous', 'cursor-next']);
+const emit = defineEmits([
+  'search',
+  'reset',
+  'refresh',
+  'size-change',
+  'current-change',
+  'page-size-mode',
+  'cursor-previous',
+  'cursor-next',
+]);
 
 const formData = reactive<Record<string, any>>({enableFlag: '', rangeKey: ''});
 const deviceDictionaries = ref<Dictionary[]>([]);

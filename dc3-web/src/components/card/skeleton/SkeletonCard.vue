@@ -15,45 +15,45 @@
   - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -->
 
+<!--
+  One loading placeholder card per instance — the card wall's v-for owns the
+  count (page size), so the loading wall previews exactly the incoming fill
+  at any size. Geometry mirrors .things-card: the wall grid stretches both
+  identically, so loading→content swaps never shift the layout.
+-->
 <template>
-  <el-skeleton :loading="props.loading" :throttle="{leading: 500}" animated>
+  <el-skeleton :loading="props.loading" :throttle="{leading: 500}" animated class="skeleton-card">
     <template #template>
-      <el-row>
-        <el-col v-for="data in 12" :key="data" :lg="6" :md="8" :sm="12" :xl="4" :xs="24">
-          <div class="skeleton-card">
-            <el-card class="skeleton-card__body" shadow="hover">
-              <div class="skeleton-card__container">
-                <div class="skeleton-card__header">
-                  <el-skeleton-item class="skeleton-card-icon" variant="image"/>
-                  <el-skeleton-item class="skeleton-card-name" variant="text"/>
-                </div>
-                <div class="skeleton-card__body">
-                  <div class="skeleton-card-content">
-                    <ul>
-                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
-                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
-                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
-                      <el-skeleton-item class="skeleton-card-text" variant="text"/>
-                    </ul>
-                  </div>
-                  <div class="skeleton-card-content">
-                    <el-skeleton-item class="skeleton-card-description" variant="text"/>
-                  </div>
-                </div>
-                <div v-if="props.footer" class="skeleton-card__footer">
-                  <div class="skeleton-card-operation">
-                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
-                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
-                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
-                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
-                    <el-skeleton-item class="skeleton-card-button" variant="button"/>
-                  </div>
-                </div>
-              </div>
-            </el-card>
+      <el-card class="skeleton-card__body" shadow="hover">
+        <div class="skeleton-card__container">
+          <div class="skeleton-card__header">
+            <el-skeleton-item class="skeleton-card-icon" variant="image"/>
+            <el-skeleton-item class="skeleton-card-name" variant="text"/>
           </div>
-        </el-col>
-      </el-row>
+          <div class="skeleton-card__body">
+            <div class="skeleton-card-content">
+              <ul>
+                <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                <el-skeleton-item class="skeleton-card-text" variant="text"/>
+                <el-skeleton-item class="skeleton-card-text" variant="text"/>
+              </ul>
+            </div>
+            <div class="skeleton-card-content">
+              <el-skeleton-item class="skeleton-card-description" variant="text"/>
+            </div>
+          </div>
+          <div v-if="props.footer" class="skeleton-card__footer">
+            <div class="skeleton-card-operation">
+              <el-skeleton-item class="skeleton-card-button" variant="button"/>
+              <el-skeleton-item class="skeleton-card-button" variant="button"/>
+              <el-skeleton-item class="skeleton-card-button" variant="button"/>
+              <el-skeleton-item class="skeleton-card-button" variant="button"/>
+              <el-skeleton-item class="skeleton-card-button" variant="button"/>
+            </div>
+          </div>
+        </div>
+      </el-card>
     </template>
     <template #default>
       <slot/>
@@ -85,6 +85,13 @@ const props = defineProps({
   // Mirrors .things-card (margin-free): the wall's gutter + row-gap own
   // all spacing, so loading→content swaps keep identical geometry.
   margin: 0;
+  // The el-skeleton root is the wall grid item; its card body fills the
+  // stretched cell so placeholder rows match real card rows exactly.
+  height: 100%;
+
+  :deep(.el-card) {
+    height: 100%;
+  }
 }
 
 .skeleton-card__container {

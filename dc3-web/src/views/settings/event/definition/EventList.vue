@@ -31,6 +31,7 @@
       @next-handle="nextHandle"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
     />
 
     <el-alert
@@ -47,9 +48,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="canManage" :loading="true"></skeleton-card>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="canManage" :loading="true"></skeleton-card>
       </template>
       <template v-else-if="hasData">
         <el-empty :description="$t('eventDefinition.empty')"/>
@@ -70,6 +71,7 @@
           @edit-thing="openEdit"
           @enable-thing="enableThing"
         ></event-card>
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
 
@@ -140,6 +142,7 @@ import {eventLevelLabel, eventTypeLabel} from '@/utils/thingModelFormatUtil';
 import {isNull} from '@/utils/validationUtil';
 import type {EventForm, EventParamRecord, EventRecord} from '@/config/types';
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import CardWallGhosts from '@/components/card/wall/CardWallGhosts.vue';
 import EnableTag from '@/components/tag/EnableTag.vue';
 import EventCard from './card/EventCard.vue';
 import EventTool from './tool/EventTool.vue';
@@ -173,6 +176,8 @@ const withFixedQuery = (params: Record<string, unknown> = {}) => {
   return q;
 };
 
+const wallRef = ref<HTMLElement | null>(null);
+
 const {
   state,
   load,
@@ -181,10 +186,30 @@ const {
   sort,
   sizeChange,
   currentChange,
+  bindWall,
+  enableAuto,
+  setManual,
+  ghostCount,
 } = usePagedList<EventRecord, Record<string, unknown>>({
+  autoPageSize: true,
   sortColumn: 'createTime',
   request: (query) => listEvent(withFixedQuery(query)),
 });
+
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, state.page.size));
+const isRefreshing = computed(() => state.loading && state.listData.length > 0);
+
+const onSizeMode = (value: 'auto' | number) => {
+  if (value === 'auto') {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
 
 const reactiveData = state as typeof state & {
   detailVisible: boolean;

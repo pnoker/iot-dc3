@@ -81,6 +81,11 @@ export default {
     // Cursor-paged views (point value history) walk pages, not wizard steps.
     nextPage: 'Next page',
     prevPage: 'Previous page',
+    // Wall-managed card lists: adaptive page size select (A5).
+    pageSize: 'Page size',
+    pageSizeAuto: 'Auto',
+    pageSizeAutoWithCount: 'Auto ({n} / page)',
+    perPage: '{n} / page',
     import: 'Import',
     count: '{count}',
     description: 'Description',

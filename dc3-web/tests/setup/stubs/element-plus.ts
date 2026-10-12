@@ -52,11 +52,11 @@ export const createElButtonStub = () =>
 export const createElPaginationStub = () =>
   defineComponent({
     name: 'ElPagination',
-    props: ['currentPage', 'pageSize', 'pageSizes', 'total'],
+    props: ['currentPage', 'pageSize', 'pageSizes', 'total', 'layout'],
     emits: ['size-change', 'current-change'],
     setup(props, {emit}) {
       return () =>
-        h('div', {class: 'el-pagination-stub'}, [
+        h('div', {class: 'el-pagination-stub', 'data-layout': props.layout}, [
           h('span', `${props.currentPage}/${props.pageSize}/${props.total}`),
           h('button', {type: 'button', onClick: () => emit('size-change', 24)}, 'size'),
           h('button', {type: 'button', onClick: () => emit('current-change', 3)}, 'page'),

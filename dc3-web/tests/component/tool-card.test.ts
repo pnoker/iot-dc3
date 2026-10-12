@@ -16,7 +16,7 @@
  */
 
 import {mount} from '@vue/test-utils';
-import {describe, expect, it} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
 
 import i18n from '@/config/i18n';
 import ToolCard from '@/components/card/tool/ToolCard.vue';
@@ -91,5 +91,143 @@ describe('ToolCard', () => {
 
     expect(wrapper.find('[data-icon="Sort"]').exists()).toBe(false);
     expect(wrapper.find('[data-icon="Refresh"]').exists()).toBe(true);
+  });
+});
+
+// Wall-managed pages (page.sizeAuto boolean) replace the built-in sizes
+// entry with the explicit adaptive/manual select. Table pages omit the
+// flag and must render the classic pager untouched.
+describe('ToolCard wall-managed size mode', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const ElSelectStub = {
+    name: 'ElSelect',
+    props: ['modelValue'],
+    emits: ['change'],
+    template: '<select class="el-select-stub" :data-model="modelValue"><slot /></select>',
+  };
+
+  const ElOptionStub = {
+    name: 'ElOption',
+    props: ['label', 'value'],
+    template: '<option class="el-option-stub" :data-value="value">{{ label }}</option>',
+  };
+
+  const mountManaged = (
+    page: Record<string, unknown>,
+    desktop = true,
+    extraProps: Record<string, unknown> = {},
+  ) => {
+    // useBreakpoint derives from matchMedia: desktop matches the lg/xl
+    // min-width queries, thumb terminals match nothing (xs fallback).
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: desktop && (query.includes('min-width: 1200px') || query.includes('min-width: 1920px')),
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+    const {ElForm} = createElFormStub();
+    return mount(ToolCard, {
+      props: {
+        formModel: {},
+        page,
+        ...extraProps,
+      },
+      global: {
+        plugins: [i18n],
+        stubs: {
+          ...layoutStubs,
+          ElButton: createElButtonStub(),
+          ElForm,
+          ElPagination: createElPaginationStub(),
+          ElSelect: ElSelectStub,
+          ElOption: ElOptionStub,
+        },
+      },
+    });
+  };
+
+  it('renders the adaptive select with the computed size label and emits page-size-mode', async () => {
+    const wrapper = mountManaged({current: 1, size: 10, total: 12, sizeAuto: true});
+
+    // Built-in sizes entry is gone; the adaptive select owns size choice.
+    expect(wrapper.find('.el-pagination-stub').attributes('data-layout')).not.toContain('sizes');
+    const select = wrapper.find('.el-select-stub');
+    expect(select.attributes('data-model')).toBe('auto');
+    const options = wrapper.findAll('.el-option-stub');
+    expect(options[0].attributes('data-value')).toBe('auto');
+    expect(options[0].text()).toContain('10');
+    expect(options.map((o) => o.attributes('data-value'))).toContain('24');
+    // The auto-derived density is pinnable without hunting for a preset.
+    expect(options.map((o) => o.attributes('data-value'))).toContain('10');
+
+    const selectVm = wrapper.findComponent({name: 'ElSelect'});
+    selectVm.vm.$emit('change', 'auto');
+    await Promise.resolve();
+    expect(wrapper.emitted('page-size-mode')).toEqual([['auto']]);
+
+    selectVm.vm.$emit('change', 24);
+    await Promise.resolve();
+    expect(wrapper.emitted('page-size-mode')).toEqual([['auto'], [24]]);
+  });
+
+  it('shows the picked numeric size in manual mode', () => {
+    const wrapper = mountManaged({current: 1, size: 24, total: 48, sizeAuto: false});
+
+    const select = wrapper.find('.el-select-stub');
+    expect(select.attributes('data-model')).toBe('24');
+    const autoOption = wrapper.findAll('.el-option-stub')[0];
+    expect(autoOption.text()).toBe('Auto');
+  });
+
+  it('keeps the classic pager byte-identical for unmanaged table pages', () => {
+    const wrapper = mountManaged({current: 1, size: 12, total: 36});
+
+    expect(wrapper.find('.el-select-stub').exists()).toBe(false);
+    expect(wrapper.find('.el-pagination-stub').attributes('data-layout')).toContain('sizes');
+  });
+
+  it('hides the size control on thumb terminals even when managed', () => {
+    const wrapper = mountManaged({current: 1, size: 10, total: 12, sizeAuto: true}, false);
+
+    expect(wrapper.find('.el-select-stub').exists()).toBe(false);
+    expect(wrapper.find('.el-pagination-stub').attributes('data-layout')).toBe('prev, pager, next');
+  });
+
+  it('keeps the size control beside the cursor prev/next buttons', () => {
+    const wrapper = mountManaged(
+      {current: 1, size: 10, total: 12, sizeAuto: true},
+      true,
+      {cursorMode: true, cursorNext: true},
+    );
+
+    // Size choice is orthogonal to cursor paging: the wall-managed select
+    // sits beside prev/next so the cursor wall is not the only one without
+    // an adaptive/manual control.
+    expect(wrapper.find('.el-select-stub').exists()).toBe(true);
+    expect(wrapper.find('.el-select-stub').attributes('data-model')).toBe('auto');
+    expect(wrapper.find('.el-pagination-stub').exists()).toBe(false);
+    // The cursor buttons must actually render too — an if/else chain in the
+    // footer drops history paging on desktop while this test stays green.
+    const labels = wrapper.findAll('button').map((button) => button.text());
+    expect(labels).toEqual(expect.arrayContaining(['Previous page', 'Next page']));
+  });
+
+  it('still pages with the cursor buttons when the select is hidden on thumb terminals', () => {
+    const wrapper = mountManaged(
+      {current: 1, size: 10, total: 12, sizeAuto: true},
+      false,
+      {cursorMode: true, cursorNext: true},
+    );
+
+    expect(wrapper.find('.el-select-stub').exists()).toBe(false);
+    const labels = wrapper.findAll('button').map((button) => button.text());
+    expect(labels).toEqual(expect.arrayContaining(['Previous page', 'Next page']));
   });
 });

@@ -25,6 +25,7 @@
     @sort="$emit('sort')"
     @size-change="$emit('size-change', $event)"
     @current-change="$emit('current-change', $event)"
+    @page-size-mode="$emit('page-size-mode', $event)"
   >
     <template #filters>
       <el-form-item :label="$t('device.tool.deviceName')" prop="deviceName">
@@ -114,6 +115,7 @@ const emit = defineEmits([
   'sort',
   'size-change',
   'current-change',
+  'page-size-mode',
 ]);
 
 const formData = reactive<Record<string, any>>({enableFlag: ''});

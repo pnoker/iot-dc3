@@ -31,6 +31,7 @@
       @open-add="openAdd"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
     />
 
     <el-alert
@@ -60,9 +61,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="true" :loading="true"/>
       </template>
       <template v-else>
         <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('point.empty')"/>
@@ -80,6 +81,7 @@
           @edit="openEdit"
           @enable="onEnable"
         />
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
 
@@ -152,6 +154,7 @@ import { pointTypeKey, rwFlagKey } from "@/utils/pointFormatUtil";
 import type { PointRecord } from "@/config/types/manager";
 
 import SkeletonCard from "@/components/card/skeleton/SkeletonCard.vue";
+import CardWallGhosts from "@/components/card/wall/CardWallGhosts.vue";
 import PointEditForm from "./add/PointEditForm.vue";
 import PointCard from "./card/PointCard.vue";
 import PointTool from "./tool/PointTool.vue";
@@ -186,6 +189,7 @@ const emit = defineEmits<{
 }>();
 
 const editRef = ref<EditFormInstance | null>(null);
+const wallRef = ref<HTMLElement | null>(null);
 
 const {
   state,
@@ -194,11 +198,30 @@ const {
   sort,
   sizeChange,
   currentChange,
+  bindWall,
+  enableAuto,
+  setManual,
+  ghostCount,
 } = usePagedList<PointRecord>({
-  pageSize: 12,
+  autoPageSize: true,
   sortColumn: "createTime",
   request: (query) => listPoint(query),
 });
+
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, state.page.size));
+const isRefreshing = computed(() => state.loading && state.listData.length > 0);
+
+const onSizeMode = (value: "auto" | number) => {
+  if (value === "auto") {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
 
 const reactiveData = state as typeof state & {
   detailVisible: boolean;
@@ -337,8 +360,9 @@ const nextHandle = () => emit("next-handle");
 watch(
   () => reactiveData.listData,
   (points) => {
+    // Profile names swap on arrival (stale-while-revalidate) — cards never
+    // blank their owner label under a refresh.
     const sequence = ++profileLookupSequence;
-    reactiveData.profileTable = {};
     reactiveData.profileLookupError = null;
     void loadProfileLookup(points, sequence);
   },

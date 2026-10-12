@@ -38,4 +38,89 @@ describe('Driver list view', () => {
     await flushPromises();
     expect(driverMocks.listDriver).toHaveBeenCalledTimes(1);
   });
+
+  it('previews the incoming fill with skeletons and keeps cards under refresh (SWR)', async () => {
+    const Driver = (await import('@/views/driver/Driver.vue')).default;
+    const DriverToolStub = {name: 'DriverTool', template: '<div />'};
+
+    // First paint: the list request stays pending so the loading wall is
+    // observable — skeletons must match the requested page size exactly.
+    let resolveFirst!: (value: unknown) => void;
+    driverMocks.listDriver.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveFirst = resolve)),
+    );
+    driverMocks.listDriverStatus.mockImplementation(() => Promise.resolve({}));
+
+    const wrapper = await mountListPage({
+      component: Driver,
+      stubs: {
+        DriverTool: DriverToolStub,
+        DriverCard: {template: '<div class="driver-card-stub" />'},
+      },
+    });
+    await flushPromises();
+    expect(wrapper.findAll('.skeleton-card-stub')).toHaveLength(12);
+    expect(wrapper.find('.entity-card-wall').classes()).not.toContain('is-refreshing');
+
+    resolveFirst({items: [{id: 'd-1', driverName: 'Modbus'}], total: 1});
+    await flushPromises();
+    expect(wrapper.findAll('.skeleton-card-stub')).toHaveLength(0);
+    expect(wrapper.findAll('.driver-card-stub')).toHaveLength(1);
+
+    // Refresh: stale-while-revalidate keeps the current cards on screen
+    // under the wall's activity line — no skeleton flash, no blank wall.
+    let resolveSecond!: (value: unknown) => void;
+    driverMocks.listDriver.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveSecond = resolve)),
+    );
+    wrapper.findComponent({name: 'DriverTool'}).vm.$emit('refresh');
+    await flushPromises();
+
+    expect(wrapper.findAll('.skeleton-card-stub')).toHaveLength(0);
+    expect(wrapper.findAll('.driver-card-stub')).toHaveLength(1);
+    expect(wrapper.find('.entity-card-wall').classes()).toContain('is-refreshing');
+
+    resolveSecond({items: [{id: 'd-1', driverName: 'Modbus'}], total: 1});
+    await flushPromises();
+    expect(wrapper.find('.entity-card-wall').classes()).not.toContain('is-refreshing');
+  });
+
+  it('swaps status badges atomically instead of blanking them on refresh', async () => {
+    const Driver = (await import('@/views/driver/Driver.vue')).default;
+    driverMocks.listDriver.mockImplementation(() =>
+      Promise.resolve({items: [{id: 'd-1', driverName: 'Modbus'}], total: 1}),
+    );
+    driverMocks.listDriverStatus.mockImplementationOnce(() => Promise.resolve({'d-1': 'ONLINE'}));
+
+    const wrapper = await mountListPage({
+      component: Driver,
+      stubs: {
+        DriverTool: {name: 'DriverTool', template: '<div />'},
+        DriverCard: {
+          props: ['statusTable'],
+          // Render the badge VALUE, not the key count — only the value pins
+          // the swap half of the contract (a dropped response would leave
+          // the count unchanged and stay green).
+          template: '<div class="status-stub">{{ (statusTable || {})["d-1"] }}</div>',
+        },
+      },
+    });
+    await flushPromises();
+    expect(wrapper.find('.status-stub').text()).toBe('ONLINE');
+
+    // The second status fetch stays pending while the list has refilled —
+    // the visible badges must hold their last known values meanwhile.
+    let resolveStatus!: (value: unknown) => void;
+    driverMocks.listDriverStatus.mockImplementationOnce(
+      () => new Promise((resolve) => (resolveStatus = resolve)),
+    );
+    wrapper.findComponent({name: 'DriverTool'}).vm.$emit('refresh');
+    await flushPromises();
+    expect(wrapper.find('.status-stub').text()).toBe('ONLINE');
+
+    // Arrival swaps the value atomically — stale ONLINE must not stick.
+    resolveStatus({'d-1': 'OFFLINE'});
+    await flushPromises();
+    expect(wrapper.find('.status-stub').text()).toBe('OFFLINE');
+  });
 });

@@ -81,6 +81,11 @@ export default {
     // Cursor-paged views (point value history) walk pages, not wizard steps.
     nextPage: '下一页',
     prevPage: '上一页',
+    // Wall-managed card lists: adaptive page size select (A5).
+    pageSize: '每页条数',
+    pageSizeAuto: '自适应',
+    pageSizeAutoWithCount: '自适应（{n} 条/页）',
+    perPage: '{n} 条/页',
     import: '导入',
     count: '{count} 个',
     description: '描述',

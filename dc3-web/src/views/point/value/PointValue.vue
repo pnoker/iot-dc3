@@ -28,6 +28,7 @@
       @search="search"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
       @cursor-previous="cursorPrevious"
       @cursor-next="cursorNext"
     ></point-value-tool>
@@ -83,9 +84,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"></skeleton-card>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="true" :loading="true"></skeleton-card>
       </template>
       <template v-else-if="hasData">
         <el-empty
@@ -107,6 +108,7 @@
           @detail-thing="openDetail"
           @write-thing="openWrite"
         ></point-value-card>
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
 
@@ -121,6 +123,8 @@ import {listDeviceByIds} from '@/api/device';
 import router from '@/config/router';
 
 import skeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import CardWallGhosts from '@/components/card/wall/CardWallGhosts.vue';
+import {useCardWallAuto} from '@/composables/useCardWallPageSize';
 import pointValueTool from './tool/PointValueTool.vue';
 import pointValueCard from './card/PointValueCard.vue';
 import pointValueEditForm from './edit/PointValueEditForm.vue';
@@ -164,6 +168,8 @@ const reactiveData = reactive({
     hasNext: false,
     size: 12,
     current: 1,
+    // Wall-managed paging (ToolCard renders the adaptive size select from it).
+    sizeAuto: true,
   },
   cursorStack: [undefined] as Array<string | undefined>,
 });
@@ -188,10 +194,67 @@ const hasData = computed(() => {
   return reactiveData.status === 'success' && !reactiveData.loading && reactiveData.listData.length === 0;
 });
 
-const clearLookupTables = () => {
-  reactiveData.deviceTable = {};
-  reactiveData.pointTable = {};
-  reactiveData.unitTable = {};
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, reactiveData.page.size));
+const isRefreshing = computed(() => reactiveData.loading && reactiveData.listData.length > 0);
+
+// Wall-driven page sizing (this page runs its own list machine, so the
+// shared wall manager is wired with bespoke apply logic instead of
+// usePagedList). Cursor tokens are size-bound: a cursor-mode size change
+// always restarts from the first page, mirroring the sizeChange contract.
+const wallRef = ref<HTMLElement | null>(null);
+const {bindWall, enableAuto, setManual, ghostCount, sizeAuto, pending, armBackstop} = useCardWallAuto({
+  gateLoads: true,
+  getCurrentSize: () => reactiveData.page.size,
+  applySize: (size, ctx) => {
+    const oldSize = reactiveData.page.size;
+    if (size === oldSize) return;
+    if (props.embedded === 'device' && ctx.preservePosition) {
+      const absFirst = (reactiveData.page.current - 1) * oldSize;
+      reactiveData.page.size = size;
+      const total = reactiveData.page.total || 0;
+      reactiveData.page.current =
+        total > 0
+          ? Math.min(Math.max(1, Math.ceil(total / size)), Math.floor(absFirst / size) + 1)
+          : 1;
+      void list();
+      return;
+    }
+    reactiveData.page.size = size;
+    reactiveData.page.current = 1;
+    reactiveData.cursorStack = [undefined];
+    void list();
+  },
+  requestLoad: () => {
+    void list();
+  },
+  listLength: () => reactiveData.listData.length,
+});
+
+watch(
+  sizeAuto,
+  (value) => {
+    reactiveData.page.sizeAuto = value;
+  },
+  {immediate: true},
+);
+
+const onSizeMode = (value: 'auto' | number) => {
+  if (value === 'auto') {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
+
+// Refresh keeps the current lookup labels on screen (stale-while-
+// revalidate): only the status flags reset at request start, and each
+// lookup swaps its table atomically on arrival — the same contract as the
+// driver/device/point walls.
+const resetLookupStatus = () => {
   reactiveData.deviceLookupLoading = false;
   reactiveData.deviceLookupError = null;
   reactiveData.pointLookupLoading = false;
@@ -208,9 +271,16 @@ const listQuery = () => {
 };
 
 const list = async () => {
+  // The setup-time call is a no-op until the wall settles a page size —
+  // the manager's first resolution then issues the single correctly-sized
+  // request (no 12-then-reflow double fetch).
+  if (pending.value) {
+    armBackstop();
+    return;
+  }
   const requestId = ++listRequestSequence;
   const generation = ++lookupSequence;
-  clearLookupTables();
+  resetLookupStatus();
   reactiveData.loading = true;
   reactiveData.status = 'loading';
   reactiveData.error = null;

@@ -65,7 +65,33 @@
             @size-change="onSizeChange"
             @current-change="onCurrentChange"
           />
-          <template v-else-if="cursorMode">
+          <!--
+            Wall-managed lists replace the built-in sizes entry with an
+            explicit adaptive/manual select: the current computed size stays
+            legible in auto mode ("自适应（10 条/页）") and one click returns
+            control. The select is orthogonal to paging — cursor-mode walls
+            (point value history) run it beside their prev/next buttons and
+            reset to the first page on a size change. Thumb terminals keep
+            the compact pager with no size control at all — auto keeps them
+            filled without a selector to crowd the footer.
+          -->
+          <el-select
+            v-if="sizeManaged && !isMobile && !isTablet && !hidePagination"
+            :aria-label="t('common.pageSize')"
+            :model-value="sizeModel"
+            class="tool-card-footer-size"
+            popper-class="tool-card-footer-size-popper"
+            size="default"
+            @change="onSizeModeChange"
+          >
+            <el-option :key="'auto'" :label="autoSizeLabel" value="auto"/>
+            <el-option v-for="n in sizeOptions" :key="n" :label="t('common.perPage', {n})" :value="n"/>
+          </el-select>
+          <!-- Independent of the select (not v-else-if): a cursor wall runs
+               the size control BESIDE its prev/next buttons — chaining the
+               two blocks would leave managed history walls with no paging
+               at all on desktop. -->
+          <template v-if="cursorMode">
             <el-button :disabled="!cursorPrevious" @click="emit('cursor-previous')">{{ t('common.prevPage') }}</el-button>
             <el-button :disabled="!cursorNext" type="primary" @click="emit('cursor-next')">{{ t('common.nextPage') }}</el-button>
           </template>
@@ -139,6 +165,7 @@ const emit = defineEmits<{
   (e: 'sort'): void;
   (e: 'size-change', size: number): void;
   (e: 'current-change', current: number): void;
+  (e: 'page-size-mode', value: 'auto' | number): void;
   (e: 'cursor-previous'): void;
   (e: 'cursor-next'): void;
 }>();
@@ -147,12 +174,39 @@ const {t} = useI18n();
 const {isMobile, isTablet} = useBreakpoint();
 const formRef = ref<FormInstance>();
 
+// Wall-managed pages carry a boolean `sizeAuto` on the page contract; table
+// pages omit it and keep the classic built-in sizes untouched.
+const sizeManaged = computed(() => typeof props.page?.sizeAuto === 'boolean');
+const sizeModel = computed(() => (props.page?.sizeAuto ? 'auto' : Number(props.page?.size)));
+const autoSizeLabel = computed(() =>
+  props.page?.sizeAuto
+    ? t('common.pageSizeAutoWithCount', {n: Number(props.page.size)})
+    : t('common.pageSizeAuto'),
+);
+
+// The auto-derived size may sit outside the static option list (10 at five
+// columns) — surface it as a pickable entry so the density auto is showing
+// can be pinned without hunting for the nearest preset.
+const sizeOptions = computed(() => {
+  const base = [...props.pageSizes];
+  const current = Number(props.page?.size);
+  if (sizeManaged.value && Number.isFinite(current) && current > 0 && !base.includes(current)) {
+    base.push(current);
+    base.sort((a, b) => a - b);
+  }
+  return base;
+});
+
 // Pagination degrades to a compact pager on thumb terminals: totals and
 // page-size pickers are desktop affordances (A3).
 // Tablet toolbars do not have enough horizontal room for the desktop total,
 // seven-page pager, and page-size select. Keep the same compact interaction
 // used on phones so every navigation control remains visible and tappable.
-const paginationLayout = computed(() => (isMobile.value || isTablet.value ? 'prev, pager, next' : 'total, prev, pager, next, sizes'));
+// Wall-managed lists trade the built-in sizes entry for the adaptive select.
+const paginationLayout = computed(() => {
+  if (isMobile.value || isTablet.value) return 'prev, pager, next';
+  return sizeManaged.value ? 'total, prev, pager, next' : 'total, prev, pager, next, sizes';
+});
 
 const search = async () => {
   const form = unref(formRef);
@@ -179,6 +233,7 @@ const onRefresh = () => emit('refresh');
 const onSort = () => emit('sort');
 const onSizeChange = (size: number) => emit('size-change', size);
 const onCurrentChange = (current: number) => emit('current-change', current);
+const onSizeModeChange = (value: 'auto' | number) => emit('page-size-mode', value);
 
 defineExpose({search, reset});
 </script>
@@ -304,6 +359,15 @@ defineExpose({search, reset});
         max-width: 100%;
         overflow-x: auto;
         overflow-y: hidden;
+      }
+
+      // Adaptive size select (wall-managed lists): fixed intrinsic width,
+      // never shrinks away — only the pager yields (see divider rule below).
+      // Wide enough for the longest label ("自适应（10 条/页）") without
+      // ellipsis — the count is the point of the label.
+      .tool-card-footer-size {
+        flex-shrink: 0;
+        width: 188px;
       }
 
       // The divider and the round icon tools never shrink away — only the

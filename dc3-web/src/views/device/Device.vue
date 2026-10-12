@@ -28,6 +28,7 @@
       @open-import="openImport"
       @size-change="sizeChange"
       @current-change="currentChange"
+      @page-size-mode="onSizeMode"
     />
 
     <el-alert
@@ -70,9 +71,9 @@
     </el-alert>
 
     <!-- Fluid grid wall — see .entity-card-wall in global.scss. -->
-    <div class="entity-card-wall">
-      <template v-if="reactiveData.loading">
-        <skeleton-card v-for="data in 12" :key="data" :footer="true" :loading="true"/>
+    <div ref="wallRef" :class="['entity-card-wall', {'is-refreshing': isRefreshing}]">
+      <template v-if="reactiveData.loading && reactiveData.listData.length < 1">
+        <skeleton-card v-for="data in skeletonCount" :key="data" :footer="true" :loading="true"/>
       </template>
       <template v-else>
         <el-empty v-if="reactiveData.status === 'success' && reactiveData.listData.length < 1" :description="$t('device.empty')"/>
@@ -89,6 +90,7 @@
           @disable="onDisable"
           @enable="onEnable"
         />
+        <card-wall-ghosts v-if="reactiveData.listData.length > 0" :count="ghostCount"/>
       </template>
     </div>
 
@@ -120,6 +122,7 @@ import type {DeviceRecord} from '@/config/types/manager';
 import type {OperationUiStatus, OperationView} from '@/config/types/operation';
 
 import SkeletonCard from '@/components/card/skeleton/SkeletonCard.vue';
+import CardWallGhosts from '@/components/card/wall/CardWallGhosts.vue';
 import DeviceAddForm from './add/DeviceAddForm.vue';
 import DeviceCard from './card/DeviceCard.vue';
 import DeviceImportForm from './import/DeviceImportForm.vue';
@@ -150,6 +153,8 @@ let disposed = false;
 const deviceAddFormRef = ref<DialogInstance | null>(null);
 const deviceImportFormRef = ref<DialogInstance | null>(null);
 
+const wallRef = ref<HTMLElement | null>(null);
+
 const {
   state,
   load,
@@ -157,8 +162,12 @@ const {
   sort,
   sizeChange,
   currentChange,
+  bindWall,
+  enableAuto,
+  setManual,
+  ghostCount,
 } = usePagedList<DeviceRecord>({
-  pageSize: 12,
+  autoPageSize: true,
   sortColumn: 'createTime',
   request: (query) => listDevice(query),
 });
@@ -178,6 +187,21 @@ reactiveData.statusError = null;
 reactiveData.driverLookupLoading = false;
 reactiveData.driverLookupError = null;
 const actionBusy = reactive(new Set<string>());
+
+// Loading previews exactly the incoming fill; refreshes keep the current
+// cards on screen (stale-while-revalidate) under the wall's activity line.
+const skeletonCount = computed(() => Math.max(1, state.page.size));
+const isRefreshing = computed(() => state.loading && state.listData.length > 0);
+
+const onSizeMode = (value: 'auto' | number) => {
+  if (value === 'auto') {
+    enableAuto();
+    return;
+  }
+  setManual(value);
+};
+
+bindWall(wallRef);
 
 const baseDeviceQuery = computed(() => {
   const q: Record<string, unknown> = {};
@@ -399,9 +423,9 @@ const retryDriverLookup = () => {
 watch(
   () => reactiveData.listData,
   (devices) => {
+    // Lookup tables swap on arrival (stale-while-revalidate) — badges and
+    // driver names never blank out under a refresh.
     const sequence = ++lookupSequence;
-    reactiveData.driverTable = {};
-    reactiveData.statusTable = {};
     reactiveData.statusError = null;
     reactiveData.driverLookupError = null;
     void loadStatus(sequence);

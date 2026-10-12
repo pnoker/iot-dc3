@@ -15,7 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {describe, expect, it, vi} from 'vitest';
+import {afterEach, describe, expect, it, vi} from 'vitest';
+import {nextTick, ref} from 'vue';
 
 import {usePagedList} from '@/composables/usePagedList';
 
@@ -266,4 +267,196 @@ describe('usePagedList', () => {
     expect(state.loading).toBe(false);
   });
 });
-      Promise.resolve({items: sampleRows.slice(0, 2), offset: 0, limit: 2, total: sampleRows.length, hasNext: true})
+
+// Controllable ResizeObserver — the shared test-setup mock never fires, so
+// wall-gated tests drive the first measurement themselves.
+class ControllableResizeObserver {
+  static instances: ControllableResizeObserver[] = [];
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+
+  constructor(private readonly callback: () => void) {
+    ControllableResizeObserver.instances.push(this);
+  }
+
+  trigger() {
+    this.callback();
+  }
+
+  static reset() {
+    ControllableResizeObserver.instances = [];
+  }
+
+  static get last() {
+    return ControllableResizeObserver.instances[ControllableResizeObserver.instances.length - 1];
+  }
+}
+
+const stubWall = (tracks: string, clientWidth = 1200): HTMLElement => {
+  vi.stubGlobal('ResizeObserver', ControllableResizeObserver);
+  vi.stubGlobal('getComputedStyle', () => ({gridTemplateColumns: tracks}));
+  const el = document.createElement('div');
+  Object.defineProperty(el, 'clientWidth', {configurable: true, get: () => clientWidth});
+  return el;
+};
+
+describe('usePagedList wall-managed paging (autoPageSize)', () => {
+  const pageServer = (rows: Row[]) =>
+    vi.fn(async (query: {offset: number; limit: number}) => ({
+      items: rows.slice(query.offset, query.offset + query.limit),
+      offset: query.offset,
+      limit: query.limit,
+      total: rows.length,
+      hasNext: query.offset + query.limit < rows.length,
+    }));
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('gates the setup load until the wall settles, then fires one sized request', async () => {
+    ControllableResizeObserver.reset();
+    const request = pageServer(pagedRows());
+    const {state, load, bindWall} = usePagedList<Row>({autoPageSize: true, request});
+
+    void load(); // setup-time call of the pages — must not request yet
+    expect(request).not.toHaveBeenCalled();
+
+    const wallRef = ref<HTMLElement | null>(null);
+    bindWall(wallRef);
+    wallRef.value = stubWall('1px 1px 1px 1px 1px'); // 5 cols → derived 10
+    await nextTick();
+
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 0, limit: 10}));
+    expect(state.page.size).toBe(10);
+    expect(state.page.sizeAuto).toBe(true);
+  });
+
+  it('preserves the first record of the current page across a size remap', async () => {
+    ControllableResizeObserver.reset();
+    const rows = pagedRows();
+    const request = pageServer(rows);
+    const {state, currentChange, setSize, load} = usePagedList<Row>({request});
+
+    await load();
+    currentChange(2);
+    await Promise.resolve();
+    expect(state.page.current).toBe(2);
+
+    // Page 2 of size 12 starts at absolute row 13; size 10 keeps it on
+    // page 2 (rows 11-20) instead of kicking back to page 1.
+    await setSize(10, {preservePosition: true});
+    expect(state.page.size).toBe(10);
+    expect(state.page.current).toBe(2);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 10, limit: 10}));
+  });
+
+  it('restarts at page 1 for an explicit size pick', async () => {
+    ControllableResizeObserver.reset();
+    const request = pageServer(pagedRows());
+    const {state, currentChange, sizeChange, load} = usePagedList<Row>({request});
+
+    await load();
+    currentChange(2);
+    await Promise.resolve();
+    sizeChange(24);
+    await Promise.resolve();
+    expect(state.page.current).toBe(1);
+    expect(state.page.size).toBe(24);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 0, limit: 24}));
+  });
+
+  it('marks managed lists manual when the user leaves auto mode', async () => {
+    ControllableResizeObserver.reset();
+    const request = pageServer(pagedRows(1));
+    const {state, setManual, enableAuto} = usePagedList<Row>({autoPageSize: true, request});
+
+    expect(state.page.sizeAuto).toBe(true);
+    setManual(24);
+    await Promise.resolve();
+    expect(state.page.sizeAuto).toBe(false);
+    expect(state.page.size).toBe(24);
+
+    enableAuto();
+    await Promise.resolve();
+    expect(state.page.sizeAuto).toBe(true);
+  });
+
+  it('clamps a stale empty page back to the true last page exactly once', async () => {
+    ControllableResizeObserver.reset();
+    const rows = pagedRows();
+    const shrunk = rows.slice(0, 20); // post-delete dataset
+    // Delete-last-record window: page 3 (offset 24) suddenly comes back
+    // empty with a shrunken total — the list must land on the real last
+    // page instead of stranding on a blank wall.
+    const request = vi
+      .fn()
+      .mockImplementationOnce(async (query: {offset: number; limit: number}) => ({
+        items: rows.slice(query.offset, query.offset + query.limit),
+        offset: query.offset,
+        limit: query.limit,
+        total: rows.length,
+        hasNext: false,
+      }))
+      .mockImplementationOnce(async () => ({items: [], offset: 24, limit: 12, total: 20, hasNext: false}))
+      .mockImplementation(async (query: {offset: number; limit: number}) => ({
+        items: shrunk.slice(query.offset, query.offset + query.limit),
+        offset: query.offset,
+        limit: query.limit,
+        total: shrunk.length,
+        hasNext: false,
+      }));
+    const {state, currentChange, load} = usePagedList<Row>({request});
+
+    await load();
+    currentChange(3);
+    // Nested clamp reload — wait for the landed state, not a timer
+    // (ai-guardrails forbids hard-coded setTimeout waits).
+    await vi.waitFor(() => {
+      expect(state.page.current).toBe(2);
+      expect(state.listData).toHaveLength(8);
+    });
+
+    // Clamped to ceil(20/12) = 2 — one corrective reload, never a loop.
+    expect(request.mock.calls.length).toBe(3);
+    expect(request).toHaveBeenLastCalledWith(expect.objectContaining({offset: 12, limit: 12}));
+  });
+
+  it('never reloads for a same-value currentChange', async () => {
+    ControllableResizeObserver.reset();
+    const request = vi.fn(async () => ({items: [], offset: 0, limit: 12, total: 0, hasNext: false}));
+    const {state, load, currentChange} = usePagedList<Row>({request});
+
+    await load();
+    const calls = request.mock.calls.length;
+    currentChange(state.page.current);
+    await Promise.resolve();
+    expect(request.mock.calls.length).toBe(calls);
+  });
+
+  it('keeps the wire shape: offset/limit/sort/query only, limit capped', async () => {
+    ControllableResizeObserver.reset();
+    const request = vi.fn(async (query: Record<string, unknown>) => ({
+      items: [],
+      offset: Number(query.offset ?? 0),
+      limit: Number(query.limit ?? 0),
+      total: 0,
+      hasNext: false,
+    }));
+    // Plain list — the wire contract is identical for wall-managed pages;
+    // gating is covered above, here only the request body shape matters.
+    const {setSize, search} = usePagedList<Row, {keyword?: string}>({request});
+
+    search({keyword: 'Row'});
+    await Promise.resolve();
+    const body = request.mock.calls[request.mock.calls.length - 1][0] as Record<string, unknown>;
+    expect(Object.keys(body).sort()).toEqual(['keyword', 'limit', 'offset', 'sort']);
+    expect(Number(body.limit)).toBeLessThanOrEqual(200);
+
+    await setSize(500, {preservePosition: false});
+    const capped = request.mock.calls[request.mock.calls.length - 1][0] as Record<string, unknown>;
+    expect(capped.limit).toBe(200);
+  });
+});
