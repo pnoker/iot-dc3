@@ -99,7 +99,7 @@ async function testPagination(page, watch, pageDef, result) {
   // Wall-managed card lists expose the adaptive size select beside the
   // pager; table lists keep the built-in one inside it. Pick the 24 option
   // by its number so the sweep is locale-proof (labels differ between the
-  // built-in "{size}/page" and the adaptive "{n} 条/页").
+  // built-in "{size}/page" and the adaptive "{n} / page").
   const sizeSelect = page.locator('.tool-card-footer-page .el-select:visible').first();
   if (await sizeSelect.count()) {
     const mark = markWatch(watch);

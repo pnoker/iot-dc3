@@ -68,7 +68,7 @@
           <!--
             Wall-managed lists replace the built-in sizes entry with an
             explicit adaptive/manual select: the current computed size stays
-            legible in auto mode ("自适应（10 条/页）") and one click returns
+            legible in auto mode ("Auto (10 / page)") and one click returns
             control. The select is orthogonal to paging — cursor-mode walls
             (point value history) run it beside their prev/next buttons and
             reset to the first page on a size change. Thumb terminals keep
@@ -363,7 +363,7 @@ defineExpose({search, reset});
 
       // Adaptive size select (wall-managed lists): fixed intrinsic width,
       // never shrinks away — only the pager yields (see divider rule below).
-      // Wide enough for the longest label ("自适应（10 条/页）") without
+      // Wide enough for the longest label ("Auto (10 / page)") without
       // ellipsis — the count is the point of the label.
       .tool-card-footer-size {
         flex-shrink: 0;
