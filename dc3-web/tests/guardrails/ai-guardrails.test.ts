@@ -27,7 +27,11 @@ function walk(dir: string): string[] {
     const path = join(dir, entry);
     const stat = statSync(path);
     if (stat.isDirectory()) return walk(path);
-    return [path];
+    // Normalize to POSIX separators at the source: the directory filters
+    // below are separator-agnostic regexes, and raw Windows paths would
+    // silently never match them (the guard then passes vacuously on dev
+    // machines while still failing on POSIX CI).
+    return [path.replaceAll('\\', '/')];
   });
 }
 
