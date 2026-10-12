@@ -37,6 +37,24 @@ interface LoginForm {
   password: string;
 }
 
+/**
+ * Resolve the salt from the endpoint's two documented response shapes.
+ *
+ * The platform REST layer answers some calls with a bare body instead of a
+ * JSON envelope (the command-history UUID quirk), and `/token/salt` has
+ * been observed as both `{salt}` and a raw salt string across backend
+ * versions — a version drift here used to brick login before the token
+ * call fired. A pure payload adapter, so it lives with the login flow
+ * rather than the transport wrappers in src/api.
+ *
+ * @param response the raw salt response payload
+ * @returns the salt string, or an empty string when absent
+ */
+const resolveSalt = (response: {salt?: string} | string | null | undefined): string => {
+  if (typeof response === 'string') return response.trim();
+  return (response?.salt ?? '').trim();
+};
+
 /** Pinia store for auth state: tenant/login names plus login, logout, and token refresh flows. */
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -74,7 +92,7 @@ export const useAuthStore = defineStore('auth', () => {
     });
     try {
       const saltRes = await generateSalt({tenant: form.tenant, name: form.name});
-      const salt: string = saltRes.salt;
+      const salt = resolveSalt(saltRes);
       if (!salt) {
         failMessage(i18n.global.t('login.failed'));
         return;

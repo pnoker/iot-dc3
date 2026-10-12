@@ -24,7 +24,7 @@ import type {Login} from '@/config/types';
  * @param login - login payload with tenant, username and password
  * @returns the generated salt payload
  */
-export const generateSalt = (login: Login) => httpPost<{salt: string}>(`${API_AUTH_BASE}/token/salt`, login);
+export const generateSalt = (login: Login) => httpPost<{salt: string} | string>(`${API_AUTH_BASE}/token/salt`, login);
 
 /**
  * Fetch the generate token.

@@ -128,6 +128,43 @@ describe('auth store', () => {
       // No partial credentials should be persisted on failure.
       expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBeUndefined();
     });
+
+    it('accepts a bare salt string response and trims it before the token call', async () => {
+      // Backend versions answer /token/salt with a raw string instead of a
+      // {salt} envelope; the envelope-only read used to brick login on that
+      // shape before generateToken fired.
+      tokenMocks.generateSalt.mockResolvedValue('  raw-salt  ');
+      const store = useAuthStore();
+      await store.login({
+        tenant: TEST_CREDENTIALS.tenant,
+        name: TEST_CREDENTIALS.name,
+        password: TEST_CREDENTIALS.password,
+      });
+
+      expect(tokenMocks.generateToken).toHaveBeenCalledTimes(1);
+      expect(tokenMocks.generateToken.mock.calls[0][0].salt).toBe('raw-salt');
+      expect(routerPush).toHaveBeenCalledWith({name: 'home'});
+    });
+
+    it('rejects salt responses without a usable salt before the token call', async () => {
+      // Every documented empty shape must stop the flow before the token
+      // endpoint — an absent salt must never reach generateToken.
+      for (const shape of [{}, null, undefined, '', '   ']) {
+        vi.clearAllMocks();
+        tokenMocks.generateSalt.mockResolvedValueOnce(shape);
+        const store = useAuthStore();
+        await store.login({
+          tenant: TEST_CREDENTIALS.tenant,
+          name: TEST_CREDENTIALS.name,
+          password: 'x',
+        });
+
+        expect(tokenMocks.generateToken, `shape ${JSON.stringify(shape)}`).not.toHaveBeenCalled();
+        expect(routerPush).not.toHaveBeenCalled();
+        expect(notificationMocks.failMessage).toHaveBeenCalledTimes(1);
+        expect(getStorage(AUTH_HEADERS.AUTHENTICATED, true)).toBeUndefined();
+      }
+    });
   });
 
   describe('logout', () => {
