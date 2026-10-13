@@ -20,10 +20,15 @@
 # A drop-in counterpart of docker-compose-dev.yml: identical service names,
 # container names, network aliases and environment, so the (JVM) driver
 # services and the infra stack keep working unchanged — stop the jar compose,
-# start this one. Images reuse the jar names with a `-native` tag suffix;
-# driver services stay on the JVM and are intentionally absent here.
+# start this one. Images reuse the jar names with a `-native` tag suffix.
 #
-# First build compiles all six native executables (~30-60 min, ~13GB RAM);
+# Drivers join the native line in batches (virtual first; mqtt and
+# modbus-tcp sit behind the `native-drivers` profile because they need an
+# external broker / modbus slave to talk to). dnp3 (Rust FFI), ble
+# (TinyB/JNA) and opc-da (vendored DCOM) stay on the JVM — their native
+# bindings cannot be carried into a native image.
+#
+# First build compiles each native executable (~30-60 min, ~13GB RAM);
 # BuildKit caches ~/.m2 and per-service layers, so subsequent builds only
 # recompile what changed. Infra (postgres, rabbitmq, ...) comes from the
 # regular dependency compose files, not from here.
@@ -261,9 +266,92 @@ services:
         aliases:
           - dc3-center-agentic
 
+  # Pilot batch of native drivers. virtual runs against the local stack by
+  # default; mqtt and modbus-tcp need external peers (broker / modbus slave),
+  # so they only start with `--profile native-drivers`. Container names and
+  # aliases match docker-compose.yml one-for-one, so the JVM and native
+  # variants can never collide and stay freely mixable.
+  driver-virtual:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-virtual-native
+      args:
+        NATIVE_SERVICE: dc3-driver-virtual
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-virtual:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-virtual
+    hostname: dc3-driver-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-virtual/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-virtual
+
+  driver-mqtt:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-mqtt-native
+      args:
+        NATIVE_SERVICE: dc3-driver-mqtt
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mqtt:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mqtt
+    hostname: dc3-driver-mqtt
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mqtt/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mqtt/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mqtt
+
+  driver-modbus-tcp:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-modbus-tcp-native
+      args:
+        NATIVE_SERVICE: dc3-driver-modbus-tcp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-tcp:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-modbus-tcp
+    hostname: dc3-driver-modbus-tcp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-tcp/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-tcp
+
 volumes:
   logs:
   agentic_data:
+  driver_data:
 networks:
   dc3net:
     driver: bridge
