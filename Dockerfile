@@ -163,6 +163,7 @@ LABEL dc3.author.email=pnokers.icloud.com
 
 ARG PROFILE=dev
 ARG NATIVE_SERVICE
+ARG MAVEN_OPTS_EXTRA=""
 ENV MAVEN_OPTS="${MAVEN_OPTS_EXTRA:-}"
 
 WORKDIR /build
