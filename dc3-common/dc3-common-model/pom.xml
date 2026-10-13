@@ -88,6 +88,15 @@
             <artifactId>dc3-db-core</artifactId>
         </dependency>
 
+        <!-- OpenAPI annotations on shared entity models. Annotation-only
+             artifact: this module sits on the driver SDK classpath, and the
+             springdoc starter's RuntimeHintsRegistrar would break driver
+             AOT processing (it unconditionally references spring-web). -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

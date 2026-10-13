@@ -80,6 +80,13 @@
             <artifactId>caffeine</artifactId>
         </dependency>
 
+        <!-- OpenAPI annotations on filter config classes. Annotation-only
+             artifact declared here rather than riding on dc3-common-public. -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+        </dependency>
+
         <!-- DC3 Common Related -->
         <dependency>
             <groupId>io.github.pnoker</groupId>

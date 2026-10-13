@@ -232,6 +232,17 @@
                 <artifactId>swagger-core-jakarta</artifactId>
                 <version>${swagger-core.version}</version>
             </dependency>
+            <!-- Annotation-only swagger artifact for modules that carry @Schema
+                 metadata without the OpenAPI rendering stack: dc3-common-model is
+                 on the driver SDK classpath, and the full springdoc starter drags
+                 SpringDocHints (a RuntimeHintsRegistrar that unconditionally
+                 touches spring-web) into driver AOT processing - which fails with
+                 NoClassDefFoundError because drivers have no spring-web. -->
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-core.version}</version>
+            </dependency>
             <!-- Pin mockito to ${mockito.version} so the resolved jars and the
                  mockito agent path in mockito.javaagent.argLine always agree.
                  Declared before the BOM imports for the same reason as

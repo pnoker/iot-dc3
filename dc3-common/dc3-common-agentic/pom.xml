@@ -77,6 +77,14 @@
             <version>5.0.0</version>
         </dependency>
 
+        <!-- OpenAPI group config (GroupedOpenApi) and entity annotations.
+             Declared here rather than riding on dc3-common-public: this is a
+             center-side module, while public reaches the driver classpath. -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-common</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-r2dbc</artifactId>

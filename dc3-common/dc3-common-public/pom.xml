@@ -139,12 +139,6 @@
             <artifactId>dc3-common-exception</artifactId>
         </dependency>
 
-        <!-- OpenAPI annotations for shared request and response models -->
-        <dependency>
-            <groupId>org.springdoc</groupId>
-            <artifactId>springdoc-openapi-starter-common</artifactId>
-        </dependency>
-
         <!-- Unit test toolkit -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
