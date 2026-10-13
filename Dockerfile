@@ -1128,3 +1128,107 @@ VOLUME /dc3-driver/dc3-driver-coap/dc3/logs
 RUN mkdir -p /dc3-driver/dc3-driver-coap/dc3/data/driver/coap
 VOLUME /dc3-driver/dc3-driver-coap/dc3/data
 ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-knx-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-knx.
+FROM native-runtime-base AS dc3-driver-knx-native
+ENV SERVER_NAME=dc3-driver-knx
+ENV APP_BIN=./dc3-driver-knx
+WORKDIR /dc3-driver/dc3-driver-knx
+RUN mkdir -p /dc3-driver/dc3-driver-knx/dc3/logs/driver/knx
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-knx/target/dc3-driver-knx ./
+VOLUME /dc3-driver/dc3-driver-knx/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-knx/dc3/data/driver/knx
+VOLUME /dc3-driver/dc3-driver-knx/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-bacnet-ip-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-bacnet-ip.
+FROM native-runtime-base AS dc3-driver-bacnet-ip-native
+ENV SERVER_NAME=dc3-driver-bacnet-ip
+ENV APP_BIN=./dc3-driver-bacnet-ip
+WORKDIR /dc3-driver/dc3-driver-bacnet-ip
+RUN mkdir -p /dc3-driver/dc3-driver-bacnet-ip/dc3/logs/driver/bacnet-ip
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-bacnet-ip/target/dc3-driver-bacnet-ip ./
+VOLUME /dc3-driver/dc3-driver-bacnet-ip/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-bacnet-ip/dc3/data/driver/bacnet-ip
+VOLUME /dc3-driver/dc3-driver-bacnet-ip/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-melsec-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-melsec.
+FROM native-runtime-base AS dc3-driver-melsec-native
+ENV SERVER_NAME=dc3-driver-melsec
+ENV APP_BIN=./dc3-driver-melsec
+WORKDIR /dc3-driver/dc3-driver-melsec
+RUN mkdir -p /dc3-driver/dc3-driver-melsec/dc3/logs/driver/melsec
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-melsec/target/dc3-driver-melsec ./
+VOLUME /dc3-driver/dc3-driver-melsec/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-melsec/dc3/data/driver/melsec
+VOLUME /dc3-driver/dc3-driver-melsec/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-plcs7-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-plcs7.
+FROM native-runtime-base AS dc3-driver-plcs7-native
+ENV SERVER_NAME=dc3-driver-plcs7
+ENV APP_BIN=./dc3-driver-plcs7
+WORKDIR /dc3-driver/dc3-driver-plcs7
+RUN mkdir -p /dc3-driver/dc3-driver-plcs7/dc3/logs/driver/plcs7
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-plcs7/target/dc3-driver-plcs7 ./
+VOLUME /dc3-driver/dc3-driver-plcs7/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-plcs7/dc3/data/driver/plcs7
+VOLUME /dc3-driver/dc3-driver-plcs7/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-lorawan-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-lorawan.
+FROM native-runtime-base AS dc3-driver-lorawan-native
+ENV SERVER_NAME=dc3-driver-lorawan
+ENV APP_BIN=./dc3-driver-lorawan
+WORKDIR /dc3-driver/dc3-driver-lorawan
+RUN mkdir -p /dc3-driver/dc3-driver-lorawan/dc3/logs/driver/lorawan
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-lorawan/target/dc3-driver-lorawan ./
+VOLUME /dc3-driver/dc3-driver-lorawan/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-lorawan/dc3/data/driver/lorawan
+VOLUME /dc3-driver/dc3-driver-lorawan/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-opc-ua-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-opc-ua.
+FROM native-runtime-base AS dc3-driver-opc-ua-native
+ENV SERVER_NAME=dc3-driver-opc-ua
+ENV APP_BIN=./dc3-driver-opc-ua
+WORKDIR /dc3-driver/dc3-driver-opc-ua
+RUN mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/logs/driver/opc-ua
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-opc-ua/target/dc3-driver-opc-ua ./
+VOLUME /dc3-driver/dc3-driver-opc-ua/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-opc-ua/dc3/data/driver/opc-ua
+VOLUME /dc3-driver/dc3-driver-opc-ua/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-lwm2m-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-lwm2m.
+FROM native-runtime-base AS dc3-driver-lwm2m-native
+ENV SERVER_NAME=dc3-driver-lwm2m
+ENV APP_BIN=./dc3-driver-lwm2m
+WORKDIR /dc3-driver/dc3-driver-lwm2m
+RUN mkdir -p /dc3-driver/dc3-driver-lwm2m/dc3/logs/driver/lwm2m
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-lwm2m/target/dc3-driver-lwm2m ./
+VOLUME /dc3-driver/dc3-driver-lwm2m/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-lwm2m/dc3/data/driver/lwm2m
+VOLUME /dc3-driver/dc3-driver-lwm2m/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-iec61850-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-iec61850.
+FROM native-runtime-base AS dc3-driver-iec61850-native
+ENV SERVER_NAME=dc3-driver-iec61850
+ENV APP_BIN=./dc3-driver-iec61850
+WORKDIR /dc3-driver/dc3-driver-iec61850
+RUN mkdir -p /dc3-driver/dc3-driver-iec61850/dc3/logs/driver/iec61850
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-iec61850/target/dc3-driver-iec61850 ./
+VOLUME /dc3-driver/dc3-driver-iec61850/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-iec61850/dc3/data/driver/iec61850
+VOLUME /dc3-driver/dc3-driver-iec61850/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
