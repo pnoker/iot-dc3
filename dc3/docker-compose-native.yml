@@ -266,12 +266,14 @@ services:
         aliases:
           - dc3-center-agentic
 
-  # Pilot batch of native drivers. virtual runs against the local stack by
-  # default; mqtt and modbus-tcp need external peers (broker / modbus slave),
-  # so they only start with `--profile native-drivers`. Container names and
-  # aliases match docker-compose.yml one-for-one, so the JVM and native
-  # variants can never collide and stay freely mixable.
-  driver-virtual:
+  # Native driver variants. Service keys, container names, aliases and
+  # volumes match docker-compose.yml one-for-one, so this file works as a
+  # plain overlay (-f docker-compose.yml -f docker-compose-native.yml) that
+  # swaps a driver to its native image, and the JVM and native variants can
+  # never collide. virtual runs against the local stack by default; every
+  # other driver needs an external peer (broker, slave, probe, ...) and only
+  # starts with `--profile native-drivers`.
+  virtual:
     build:
       context: ..
       dockerfile: Dockerfile
@@ -296,7 +298,7 @@ services:
         aliases:
           - dc3-driver-virtual
 
-  driver-mqtt:
+  mqtt:
     profiles: [ "native-drivers" ]
     build:
       context: ..
@@ -322,7 +324,7 @@ services:
         aliases:
           - dc3-driver-mqtt
 
-  driver-modbus-tcp:
+  modbus-tcp:
     profiles: [ "native-drivers" ]
     build:
       context: ..
@@ -347,6 +349,240 @@ services:
       dc3net:
         aliases:
           - dc3-driver-modbus-tcp
+
+  tcp-udp:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-tcp-udp-native
+      args:
+        NATIVE_SERVICE: dc3-driver-tcp-udp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-tcp-udp:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-tcp-udp
+    hostname: dc3-driver-tcp-udp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-tcp-udp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-tcp-udp/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-tcp-udp
+
+  listening-virtual:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-listening-virtual-native
+      args:
+        NATIVE_SERVICE: dc3-driver-listening-virtual
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-listening-virtual:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-listening-virtual
+    hostname: dc3-driver-listening-virtual
+    volumes:
+      - logs:/dc3-driver/dc3-driver-listening-virtual/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-listening-virtual/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-listening-virtual
+
+  can:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-can-native
+      args:
+        NATIVE_SERVICE: dc3-driver-can
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-can:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-can
+    hostname: dc3-driver-can
+    volumes:
+      - logs:/dc3-driver/dc3-driver-can/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-can/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-can
+
+  ethernet-ip:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-ethernet-ip-native
+      args:
+        NATIVE_SERVICE: dc3-driver-ethernet-ip
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-ethernet-ip:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-ethernet-ip
+    hostname: dc3-driver-ethernet-ip
+    volumes:
+      - logs:/dc3-driver/dc3-driver-ethernet-ip/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-ethernet-ip/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-ethernet-ip
+
+  fins:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-fins-native
+      args:
+        NATIVE_SERVICE: dc3-driver-fins
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-fins:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-fins
+    hostname: dc3-driver-fins
+    volumes:
+      - logs:/dc3-driver/dc3-driver-fins/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-fins/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-fins
+
+  http:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-http-native
+      args:
+        NATIVE_SERVICE: dc3-driver-http
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-http:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-http
+    hostname: dc3-driver-http
+    volumes:
+      - logs:/dc3-driver/dc3-driver-http/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-http/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-http
+
+  snmp:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-snmp-native
+      args:
+        NATIVE_SERVICE: dc3-driver-snmp
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-snmp:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-snmp
+    hostname: dc3-driver-snmp
+    volumes:
+      - logs:/dc3-driver/dc3-driver-snmp/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-snmp/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-snmp
+
+  iec104:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-iec104-native
+      args:
+        NATIVE_SERVICE: dc3-driver-iec104
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-iec104:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-iec104
+    hostname: dc3-driver-iec104
+    volumes:
+      - logs:/dc3-driver/dc3-driver-iec104/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-iec104/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-iec104
+
+  coap:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-coap-native
+      args:
+        NATIVE_SERVICE: dc3-driver-coap
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-coap:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-coap
+    hostname: dc3-driver-coap
+    volumes:
+      - logs:/dc3-driver/dc3-driver-coap/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-coap/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-coap
 
 volumes:
   logs:

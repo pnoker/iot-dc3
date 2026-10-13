@@ -316,11 +316,21 @@ jobs:
         service:
           # Pilot batch — virtual (pure Java SDK), mqtt (broker client),
           # modbus-tcp (protocol SDK via the mangoautomation repository).
+          # Batch 1a — pure-Java protocol stacks (no JNI dependencies).
           # Later batches append here; the target name and the
           # NATIVE_SERVICE build arg are the same value by construction.
           - dc3-driver-virtual
           - dc3-driver-mqtt
           - dc3-driver-modbus-tcp
+          - dc3-driver-tcp-udp
+          - dc3-driver-listening-virtual
+          - dc3-driver-can
+          - dc3-driver-ethernet-ip
+          - dc3-driver-fins
+          - dc3-driver-http
+          - dc3-driver-snmp
+          - dc3-driver-iec104
+          - dc3-driver-coap
     env:
       SERVICE: ${{ matrix.service }}
     steps:

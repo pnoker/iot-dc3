@@ -1009,3 +1009,122 @@ RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/data/driver/modbus-tcp
 VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/data
 ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
 
+
+# ---------- dc3-driver-tcp-udp-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-tcp-udp.
+FROM native-runtime-base AS dc3-driver-tcp-udp-native
+ENV SERVER_NAME=dc3-driver-tcp-udp
+ENV APP_BIN=./dc3-driver-tcp-udp
+WORKDIR /dc3-driver/dc3-driver-tcp-udp
+RUN mkdir -p /dc3-driver/dc3-driver-tcp-udp/dc3/logs/driver/tcp-udp
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-tcp-udp/target/dc3-driver-tcp-udp ./
+VOLUME /dc3-driver/dc3-driver-tcp-udp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-tcp-udp/dc3/data/driver/tcp-udp
+VOLUME /dc3-driver/dc3-driver-tcp-udp/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-listening-virtual-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-listening-virtual.
+FROM native-runtime-base AS dc3-driver-listening-virtual-native
+ENV SERVER_NAME=dc3-driver-listening-virtual
+ENV APP_BIN=./dc3-driver-listening-virtual
+WORKDIR /dc3-driver/dc3-driver-listening-virtual
+RUN mkdir -p /dc3-driver/dc3-driver-listening-virtual/dc3/logs/driver/listening-virtual
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-listening-virtual/target/dc3-driver-listening-virtual ./
+EXPOSE ${TCP_PORT}
+EXPOSE ${UDP_PORT}
+VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-listening-virtual/dc3/data/driver/listening-virtual
+VOLUME /dc3-driver/dc3-driver-listening-virtual/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-can-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-can.
+FROM native-runtime-base AS dc3-driver-can-native
+ENV SERVER_NAME=dc3-driver-can
+ENV APP_BIN=./dc3-driver-can
+WORKDIR /dc3-driver/dc3-driver-can
+RUN mkdir -p /dc3-driver/dc3-driver-can/dc3/logs/driver/can
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-can/target/dc3-driver-can ./
+VOLUME /dc3-driver/dc3-driver-can/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-can/dc3/data/driver/can
+VOLUME /dc3-driver/dc3-driver-can/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-ethernet-ip-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-ethernet-ip.
+FROM native-runtime-base AS dc3-driver-ethernet-ip-native
+ENV SERVER_NAME=dc3-driver-ethernet-ip
+ENV APP_BIN=./dc3-driver-ethernet-ip
+WORKDIR /dc3-driver/dc3-driver-ethernet-ip
+RUN mkdir -p /dc3-driver/dc3-driver-ethernet-ip/dc3/logs/driver/ethernet-ip
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-ethernet-ip/target/dc3-driver-ethernet-ip ./
+VOLUME /dc3-driver/dc3-driver-ethernet-ip/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-ethernet-ip/dc3/data/driver/ethernet-ip
+VOLUME /dc3-driver/dc3-driver-ethernet-ip/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-fins-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-fins.
+FROM native-runtime-base AS dc3-driver-fins-native
+ENV SERVER_NAME=dc3-driver-fins
+ENV APP_BIN=./dc3-driver-fins
+WORKDIR /dc3-driver/dc3-driver-fins
+RUN mkdir -p /dc3-driver/dc3-driver-fins/dc3/logs/driver/fins
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-fins/target/dc3-driver-fins ./
+VOLUME /dc3-driver/dc3-driver-fins/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-fins/dc3/data/driver/fins
+VOLUME /dc3-driver/dc3-driver-fins/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-http-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-http.
+FROM native-runtime-base AS dc3-driver-http-native
+ENV SERVER_NAME=dc3-driver-http
+ENV APP_BIN=./dc3-driver-http
+WORKDIR /dc3-driver/dc3-driver-http
+RUN mkdir -p /dc3-driver/dc3-driver-http/dc3/logs/driver/http
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-http/target/dc3-driver-http ./
+VOLUME /dc3-driver/dc3-driver-http/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-http/dc3/data/driver/http
+VOLUME /dc3-driver/dc3-driver-http/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-snmp-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-snmp.
+FROM native-runtime-base AS dc3-driver-snmp-native
+ENV SERVER_NAME=dc3-driver-snmp
+ENV APP_BIN=./dc3-driver-snmp
+WORKDIR /dc3-driver/dc3-driver-snmp
+RUN mkdir -p /dc3-driver/dc3-driver-snmp/dc3/logs/driver/snmp
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-snmp/target/dc3-driver-snmp ./
+VOLUME /dc3-driver/dc3-driver-snmp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-snmp/dc3/data/driver/snmp
+VOLUME /dc3-driver/dc3-driver-snmp/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-iec104-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-iec104.
+FROM native-runtime-base AS dc3-driver-iec104-native
+ENV SERVER_NAME=dc3-driver-iec104
+ENV APP_BIN=./dc3-driver-iec104
+WORKDIR /dc3-driver/dc3-driver-iec104
+RUN mkdir -p /dc3-driver/dc3-driver-iec104/dc3/logs/driver/iec104
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-iec104/target/dc3-driver-iec104 ./
+VOLUME /dc3-driver/dc3-driver-iec104/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-iec104/dc3/data/driver/iec104
+VOLUME /dc3-driver/dc3-driver-iec104/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-coap-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-coap.
+FROM native-runtime-base AS dc3-driver-coap-native
+ENV SERVER_NAME=dc3-driver-coap
+ENV APP_BIN=./dc3-driver-coap
+WORKDIR /dc3-driver/dc3-driver-coap
+RUN mkdir -p /dc3-driver/dc3-driver-coap/dc3/logs/driver/coap
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-coap/target/dc3-driver-coap ./
+VOLUME /dc3-driver/dc3-driver-coap/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-coap/dc3/data/driver/coap
+VOLUME /dc3-driver/dc3-driver-coap/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
