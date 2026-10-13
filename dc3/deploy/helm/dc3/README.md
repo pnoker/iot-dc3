@@ -77,3 +77,13 @@ run them on edge nodes with hostPath / device plugins instead of the default clu
 Since 2026.9 the centers and the gateway also ship GraalVM native images (same image names, `-native` tag suffix, e.g.
 `pnoker/dc3-center-auth:2026.9-native`, amd64 only). Point a service's image tag at the `-native` variant (e.g.
 `--set services.auth.tag=2026.9-native`) for sub-second startup and tighter memory limits.
+
+Drivers join the native line in batches; the pilot batch ships `virtual`, `mqtt` and `modbus-tcp`
+(`--set services.driverVirtual.tag=2026.10-native` and so on). Three drivers stay on the JVM — their native bindings
+cannot be carried into a native image:
+
+| Driver | Reason |
+|--------|--------|
+| `dnp3`   | Rust runtime bound through JNI/FFI |
+| `ble`    | TinyB (BlueZ) native stack bound through JNA |
+| `opc-da` | vendored j-Interop DCOM implementation, reflection-heavy |

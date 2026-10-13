@@ -16,8 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-# Regenerate the GraalVM native-image agent metadata snapshot for the six
-# DC3 native services (dc3-center/* + dc3-gateway).
+# Regenerate the GraalVM native-image agent metadata snapshot for the DC3
+# native services (default: dc3-center/* + dc3-gateway; override the list
+# with DC3_NATIVE_AGENT_SERVICES, space-separated module paths).
 #
 # Each service's repackaged JAR is booted once on a JVM with the
 # native-image-agent attached; the agent records every reflective / resource /
@@ -34,13 +35,20 @@
 # BEFORE it fails would extend coverage (gRPC serving, live queries) — pass
 # SPRING_* env vars to do so.
 #
+# Driver snapshots are DIAGNOSTICS ONLY and are not committed by default:
+# the driver native line is driven by RuntimeHints
+# (DriverNativeRuntimeHints), and 36 snapshots would add ~10MB to the
+# repository. Collect one for a specific driver only when diagnosing a gap
+# RuntimeHints cannot express, and commit the resulting -agent directory
+# only with a stated reason in the commit message.
+#
 # Requires: a Docker daemon hosting the dc3-jdk-native builder image
 # (dc3-docker/dc3/dependencies/jdk-native/graalvm_25) and packaged JARs
 # (mvn -DskipTests -pl <services> -am package).
 set -e
 
 BUILDER_IMAGE="${DC3_JDK_NATIVE_IMAGE:-dc3-jdk-native:25}"
-SERVICES="dc3-gateway dc3-center/dc3-center-auth dc3-center/dc3-center-manager dc3-center/dc3-center-data dc3-center/dc3-center-agentic dc3-center/dc3-center-single"
+SERVICES="${DC3_NATIVE_AGENT_SERVICES:-dc3-gateway dc3-center/dc3-center-auth dc3-center/dc3-center-manager dc3-center/dc3-center-data dc3-center/dc3-center-agentic dc3-center/dc3-center-single}"
 
 for service in ${SERVICES}; do
     name=$(basename "${service}")
