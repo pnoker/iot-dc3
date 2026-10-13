@@ -143,6 +143,47 @@ RUN --mount=type=cache,target=/root/.m2/repository \
 
 
 # -----------------------------------------------------------------------------
+# Stage 1D: driver-native-builder — GraalVM native-image compilation for ONE
+# driver service, selected by the NATIVE_SERVICE build arg (module name under
+# dc3-driver/, e.g. dc3-driver-virtual). Kept as a separate stage from
+# native-builder so the center build's cached layers stay byte-identical: ARG
+# values participate in the BuildKit cache key, and CI fans drivers out as a
+# matrix where every job must compile exactly its own driver and nothing else.
+#
+# Drivers join the native line in batches (see the matrix in docker-ci.yml):
+# dnp3 (Rust FFI), ble (TinyB/JNA) and opc-da (vendored DCOM) stay on the JVM.
+#
+# The target name and the NATIVE_SERVICE arg MUST stay in sync — every
+# dc3-driver-*-native target below pins its matching build arg in the compose
+# file and CI matrix.
+# -----------------------------------------------------------------------------
+FROM ${DC3_JDK_NATIVE_IMAGE} AS driver-native-builder
+LABEL dc3.author=pnoker
+LABEL dc3.author.email=pnokers.icloud.com
+
+ARG PROFILE=dev
+ARG NATIVE_SERVICE
+ENV MAVEN_OPTS="${MAVEN_OPTS_EXTRA:-}"
+
+WORKDIR /build
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+COPY . .
+# Install the selected driver and its upstream (-am): the SDK, api and common
+# modules the driver needs. Same verify-gate skips as native-builder above —
+# ci-backend.yml owns spotless and checkstyle.
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -U -B -e -T 1C -s .mvn/settings-container.xml clean install \
+        -Dmaven.test.skip=true -Dspotless.skip=true -Dcheckstyle.skip=true \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE} \
+        -pl dc3-driver/${NATIVE_SERVICE} -am
+
+RUN --mount=type=cache,target=/root/.m2/repository \
+    mvn -B -e -s .mvn/settings-container.xml -DskipTests \
+        -Daether.syncContext.named.factory=noop -P ${PROFILE},native native:compile -pl dc3-driver/${NATIVE_SERVICE}
+
+
+# -----------------------------------------------------------------------------
 # Stage 2: runtime base — the only place where JRE image, timezone and common
 # environment defaults are declared. Every service target builds on top of it.
 # -----------------------------------------------------------------------------
@@ -836,10 +877,13 @@ CMD ["dc3-driver-redis.jar"]
 
 
 # =============================================================================
-# Native service targets — GraalVM native executables for dc3-center/* and
-# dc3-gateway. Built on native-runtime-base; the executable is COPYed from the
-# native-builder stage. Driver services stay on the JVM: their protocol SDKs
-# are reflection/JNI heavy and are not part of the native set.
+# Native service targets — GraalVM native executables. Centers and the
+# gateway COPY from the native-builder stage (one cached RUN layer per
+# service); driver targets COPY from driver-native-builder, which compiles
+# exactly one driver per build via the NATIVE_SERVICE arg. Drivers join the
+# native line in batches; dnp3 (Rust FFI), ble (TinyB/JNA) and opc-da
+# (vendored DCOM) stay on the JVM — their native bindings cannot be carried
+# into a native image.
 # =============================================================================
 
 
@@ -921,5 +965,46 @@ COPY --from=native-builder /build/dc3-center/dc3-center-single/target/dc3-center
 EXPOSE ${DC3_SINGLE_PORT}
 EXPOSE ${DC3_SINGLE_GRPC_PORT}
 VOLUME /dc3-center/dc3-center-single/dc3/logs
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+
+# ---------- dc3-driver-virtual-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-virtual: the target name and
+# the build arg MUST stay in sync (CI enforces the pairing per matrix entry).
+FROM native-runtime-base AS dc3-driver-virtual-native
+ENV SERVER_NAME=dc3-driver-virtual
+ENV APP_BIN=./dc3-driver-virtual
+WORKDIR /dc3-driver/dc3-driver-virtual
+RUN mkdir -p /dc3-driver/dc3-driver-virtual/dc3/logs/driver/virtual
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-virtual/target/dc3-driver-virtual ./
+VOLUME /dc3-driver/dc3-driver-virtual/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-virtual/dc3/data/driver/virtual
+VOLUME /dc3-driver/dc3-driver-virtual/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-mqtt-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-mqtt.
+FROM native-runtime-base AS dc3-driver-mqtt-native
+ENV SERVER_NAME=dc3-driver-mqtt
+ENV APP_BIN=./dc3-driver-mqtt
+WORKDIR /dc3-driver/dc3-driver-mqtt
+RUN mkdir -p /dc3-driver/dc3-driver-mqtt/dc3/logs/driver/mqtt
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-mqtt/target/dc3-driver-mqtt ./
+VOLUME /dc3-driver/dc3-driver-mqtt/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mqtt/dc3/data/driver/mqtt
+VOLUME /dc3-driver/dc3-driver-mqtt/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-modbus-tcp-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-modbus-tcp.
+FROM native-runtime-base AS dc3-driver-modbus-tcp-native
+ENV SERVER_NAME=dc3-driver-modbus-tcp
+ENV APP_BIN=./dc3-driver-modbus-tcp
+WORKDIR /dc3-driver/dc3-driver-modbus-tcp
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/logs/driver/modbus-tcp
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-modbus-tcp/target/dc3-driver-modbus-tcp ./
+VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-tcp/dc3/data/driver/modbus-tcp
+VOLUME /dc3-driver/dc3-driver-modbus-tcp/dc3/data
 ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
 
