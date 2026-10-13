@@ -245,10 +245,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The native set: dc3-center/* + dc3-gateway. Driver services stay
-          # on the JVM (reflection/JNI heavy protocol SDKs, not part of the
-          # native contract). Images reuse the jar names with a -native tag
-          # suffix on both registries.
+          # The native set: dc3-center/* + dc3-gateway. Drivers build in the
+          # build-native-drivers matrix below; dnp3 (Rust FFI), ble
+          # (TinyB/JNA) and opc-da (vendored DCOM) stay on the JVM — their
+          # native bindings cannot be carried into a native image. Images
+          # reuse the jar names with a -native tag suffix on both registries.
           services=(
             dc3-gateway
             dc3-center-agentic
@@ -289,6 +290,102 @@ jobs:
               "${tag_args[@]}" \
               .
           done
+
+  build-native-drivers:
+    needs:
+      - validate
+      - verify-backend
+    runs-on: ubuntu-latest
+    # One driver per job: the driver-native-builder stage runs `mvn install
+    # -am` for exactly the matrix driver plus one native-image compilation
+    # (~40-70 min uncached; the BuildKit ~/.m2 cache mount is runner-local
+    # and never shared across jobs). A serial loop cannot fit the 360-min
+    # GitHub job cap once more batches join, hence the matrix; the workflow
+    # only fires on v* tags and manual dispatch, so the fan-out cost is
+    # release-scoped. max-parallel keeps runner-pool and gha-cache write
+    # contention bounded.
+    timeout-minutes: 120
+    environment: release
+    permissions:
+      contents: read
+      actions: write   # for GitHub Actions cache (--cache-to type=gha)
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        service:
+          # Pilot batch — virtual (pure Java SDK), mqtt (broker client),
+          # modbus-tcp (protocol SDK via the mangoautomation repository).
+          # Later batches append here; the target name and the
+          # NATIVE_SERVICE build arg are the same value by construction.
+          - dc3-driver-virtual
+          - dc3-driver-mqtt
+          - dc3-driver-modbus-tcp
+    env:
+      SERVICE: ${{ matrix.service }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+
+      # amd64 only, same constraint as build-native: native-image under QEMU
+      # OOMs the 16GB hosted runners.
+
+      - name: Set Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c
+
+      - name: Login Docker Default Registry
+        if: needs.validate.outputs.publish == 'true'
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login Docker Aliyun Registry
+        if: needs.validate.outputs.publish == 'true'
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0
+        with:
+          registry: registry.cn-beijing.aliyuncs.com
+          username: ${{ vars.ALIYUN_DOCKERHUB_USERNAME }}
+          password: ${{ secrets.ALIYUN_DOCKERHUB_TOKEN }}
+
+      - name: Build native driver image
+        env:
+          PUBLISH: ${{ needs.validate.outputs.publish }}
+          SERVICE_VERSION: ${{ needs.validate.outputs.service_version }}
+          SERVICE_SERIES: ${{ needs.validate.outputs.service_series }}
+        run: |
+          set -euo pipefail
+
+          output_args=(--output=type=cacheonly)
+          tag_args=()
+          if [[ "$PUBLISH" == "true" ]]; then
+            output_args=(--push)
+            tag_args=(
+              --tag "$DOCKER_REGISTRY_DEFAULT/$SERVICE:latest-native"
+              --tag "$DOCKER_REGISTRY_DEFAULT/$SERVICE:$SERVICE_SERIES-native"
+              --tag "$DOCKER_REGISTRY_DEFAULT/$SERVICE:$SERVICE_VERSION-native"
+              --tag "$DOCKER_REGISTRY_ALIYUN/$SERVICE:latest-native"
+              --tag "$DOCKER_REGISTRY_ALIYUN/$SERVICE:$SERVICE_SERIES-native"
+              --tag "$DOCKER_REGISTRY_ALIYUN/$SERVICE:$SERVICE_VERSION-native"
+            )
+          fi
+
+          echo "Building $SERVICE-native (publish=$PUBLISH)"
+          # The driver-native-builder stage compiles exactly this driver
+          # (NATIVE_SERVICE); every matrix job pays its own mvn install,
+          # which the per-job timeout budgets for.
+          docker buildx build \
+            --platform linux/amd64 \
+            --provenance=false \
+            --file Dockerfile \
+            --target "$SERVICE-native" \
+            --build-arg PROFILE="$PROFILE" \
+            --build-arg NATIVE_SERVICE="$SERVICE" \
+            --cache-from type=gha,scope=dc3-driver-native-builder \
+            --cache-to type=gha,scope=dc3-driver-native-builder,mode=max \
+            "${output_args[@]}" \
+            "${tag_args[@]}" \
+            .
 
   build-web:
     needs:
@@ -358,6 +455,7 @@ jobs:
     needs:
       - build-backend
       - build-native
+      - build-native-drivers
       - build-web
       - validate
     if: startsWith(github.ref, 'refs/tags/v')
