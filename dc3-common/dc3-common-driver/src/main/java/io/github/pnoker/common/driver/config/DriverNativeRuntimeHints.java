@@ -321,6 +321,18 @@ public class DriverNativeRuntimeHints implements RuntimeHintsRegistrar {
         "io.github.pnoker.common.driver.receiver.rabbit.PointCommandReceiver"
     };
 
+    /**
+     * JDBC dialect drivers of the database driver batch, instantiated
+     * reflectively by DriverManager / HikariCP. String-based references:
+     * each class exists only on its own driver's classpath.
+     */
+    private static final String[] JDBC_DRIVER_CLASSES = {
+        "com.mysql.cj.jdbc.Driver",
+        "org.postgresql.Driver",
+        "com.microsoft.sqlserver.jdbc.SQLServerDriver",
+        "oracle.jdbc.driver.OracleDriver"
+    };
+
     @Override
     public void registerHints(RuntimeHints hints, ClassLoader classLoader) {
         // Driver profile defaults shipped inside this SDK jar; without the
@@ -375,6 +387,15 @@ public class DriverNativeRuntimeHints implements RuntimeHintsRegistrar {
         // Pre-seeded for the JDBC driver batch: DriverManager discovers
         // drivers through this ServiceLoader descriptor.
         hints.resources().registerPattern("META-INF/services/java.sql.Driver");
+
+        // JDBC driver batch (mysql / postgresql / sqlserver / oracle): the
+        // dialect drivers are instantiated reflectively by DriverManager /
+        // HikariCP. String-based TypeReferences - the classes only exist on
+        // the JDBC drivers' classpaths, and hints for absent classes are
+        // ignored by native-image.
+        for (String name : JDBC_DRIVER_CLASSES) {
+            hints.reflection().registerType(TypeReference.of(name), MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);
+        }
 
         for (String name : CAFFEINE_POLICY_CLASSES) {
             hints.reflection()

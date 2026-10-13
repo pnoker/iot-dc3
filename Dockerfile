@@ -1232,3 +1232,81 @@ VOLUME /dc3-driver/dc3-driver-iec61850/dc3/logs
 RUN mkdir -p /dc3-driver/dc3-driver-iec61850/dc3/data/driver/iec61850
 VOLUME /dc3-driver/dc3-driver-iec61850/dc3/data
 ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-mysql-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-mysql.
+FROM native-runtime-base AS dc3-driver-mysql-native
+ENV SERVER_NAME=dc3-driver-mysql
+ENV APP_BIN=./dc3-driver-mysql
+WORKDIR /dc3-driver/dc3-driver-mysql
+RUN mkdir -p /dc3-driver/dc3-driver-mysql/dc3/logs/driver/mysql
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-mysql/target/dc3-driver-mysql ./
+VOLUME /dc3-driver/dc3-driver-mysql/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mysql/dc3/data/driver/mysql
+VOLUME /dc3-driver/dc3-driver-mysql/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-postgresql-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-postgresql.
+FROM native-runtime-base AS dc3-driver-postgresql-native
+ENV SERVER_NAME=dc3-driver-postgresql
+ENV APP_BIN=./dc3-driver-postgresql
+WORKDIR /dc3-driver/dc3-driver-postgresql
+RUN mkdir -p /dc3-driver/dc3-driver-postgresql/dc3/logs/driver/postgresql
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-postgresql/target/dc3-driver-postgresql ./
+VOLUME /dc3-driver/dc3-driver-postgresql/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-postgresql/dc3/data/driver/postgresql
+VOLUME /dc3-driver/dc3-driver-postgresql/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-sqlserver-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-sqlserver.
+FROM native-runtime-base AS dc3-driver-sqlserver-native
+ENV SERVER_NAME=dc3-driver-sqlserver
+ENV APP_BIN=./dc3-driver-sqlserver
+WORKDIR /dc3-driver/dc3-driver-sqlserver
+RUN mkdir -p /dc3-driver/dc3-driver-sqlserver/dc3/logs/driver/sqlserver
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-sqlserver/target/dc3-driver-sqlserver ./
+VOLUME /dc3-driver/dc3-driver-sqlserver/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-sqlserver/dc3/data/driver/sqlserver
+VOLUME /dc3-driver/dc3-driver-sqlserver/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-oracle-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-oracle.
+FROM native-runtime-base AS dc3-driver-oracle-native
+ENV SERVER_NAME=dc3-driver-oracle
+ENV APP_BIN=./dc3-driver-oracle
+WORKDIR /dc3-driver/dc3-driver-oracle
+RUN mkdir -p /dc3-driver/dc3-driver-oracle/dc3/logs/driver/oracle
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-oracle/target/dc3-driver-oracle ./
+VOLUME /dc3-driver/dc3-driver-oracle/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-oracle/dc3/data/driver/oracle
+VOLUME /dc3-driver/dc3-driver-oracle/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-redis-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-redis.
+FROM native-runtime-base AS dc3-driver-redis-native
+ENV SERVER_NAME=dc3-driver-redis
+ENV APP_BIN=./dc3-driver-redis
+WORKDIR /dc3-driver/dc3-driver-redis
+RUN mkdir -p /dc3-driver/dc3-driver-redis/dc3/logs/driver/redis
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-redis/target/dc3-driver-redis ./
+VOLUME /dc3-driver/dc3-driver-redis/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-redis/dc3/data/driver/redis
+VOLUME /dc3-driver/dc3-driver-redis/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-kafka-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-kafka.
+FROM native-runtime-base AS dc3-driver-kafka-native
+ENV SERVER_NAME=dc3-driver-kafka
+ENV APP_BIN=./dc3-driver-kafka
+WORKDIR /dc3-driver/dc3-driver-kafka
+RUN mkdir -p /dc3-driver/dc3-driver-kafka/dc3/logs/driver/kafka
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-kafka/target/dc3-driver-kafka ./
+VOLUME /dc3-driver/dc3-driver-kafka/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-kafka/dc3/data/driver/kafka
+VOLUME /dc3-driver/dc3-driver-kafka/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]

@@ -790,6 +790,161 @@ services:
       dc3net:
         aliases:
           - dc3-driver-iec61850
+  mysql:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-mysql-native
+      args:
+        NATIVE_SERVICE: dc3-driver-mysql
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mysql:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mysql
+    hostname: dc3-driver-mysql
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mysql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mysql/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mysql
+
+  postgresql:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-postgresql-native
+      args:
+        NATIVE_SERVICE: dc3-driver-postgresql
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-postgresql:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-postgresql
+    hostname: dc3-driver-postgresql
+    volumes:
+      - logs:/dc3-driver/dc3-driver-postgresql/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-postgresql/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-postgresql
+
+  sqlserver:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-sqlserver-native
+      args:
+        NATIVE_SERVICE: dc3-driver-sqlserver
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sqlserver:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-sqlserver
+    hostname: dc3-driver-sqlserver
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sqlserver/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sqlserver/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sqlserver
+
+  oracle:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-oracle-native
+      args:
+        NATIVE_SERVICE: dc3-driver-oracle
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-oracle:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-oracle
+    hostname: dc3-driver-oracle
+    volumes:
+      - logs:/dc3-driver/dc3-driver-oracle/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-oracle/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-oracle
+
+  redis:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-redis-native
+      args:
+        NATIVE_SERVICE: dc3-driver-redis
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-redis:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-redis
+    hostname: dc3-driver-redis
+    volumes:
+      - logs:/dc3-driver/dc3-driver-redis/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-redis/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-redis
+
+  kafka:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-kafka-native
+      args:
+        NATIVE_SERVICE: dc3-driver-kafka
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-kafka:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-kafka
+    hostname: dc3-driver-kafka
+    volumes:
+      - logs:/dc3-driver/dc3-driver-kafka/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-kafka/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-kafka
 
 volumes:
   logs:

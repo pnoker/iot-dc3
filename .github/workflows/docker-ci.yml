@@ -319,6 +319,9 @@ jobs:
           # Batch 1a — pure-Java protocol stacks (no JNI dependencies).
           # Batch 1b — pure-Java protocol SDKs (iec61850 GOOSE raw-ethernet
           # paths remain untested on native; validated in TCP mode only).
+          # Batch 2 — database and messaging clients (JDBC dialects, redis,
+          # kafka); JDBC driver constructors registered in
+          # DriverNativeRuntimeHints.
           # Later batches append here; the target name and the
           # NATIVE_SERVICE build arg are the same value by construction.
           - dc3-driver-virtual
@@ -341,6 +344,12 @@ jobs:
           - dc3-driver-opc-ua
           - dc3-driver-lwm2m
           - dc3-driver-iec61850
+          - dc3-driver-mysql
+          - dc3-driver-postgresql
+          - dc3-driver-sqlserver
+          - dc3-driver-oracle
+          - dc3-driver-redis
+          - dc3-driver-kafka
     env:
       SERVICE: ${{ matrix.service }}
     steps:
