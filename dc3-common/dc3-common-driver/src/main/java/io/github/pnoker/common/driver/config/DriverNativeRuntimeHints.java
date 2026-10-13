@@ -388,6 +388,23 @@ public class DriverNativeRuntimeHints implements RuntimeHintsRegistrar {
         // drivers through this ServiceLoader descriptor.
         hints.resources().registerPattern("META-INF/services/java.sql.Driver");
 
+        // jSerialComm serial batch (modbus-rtu / serial / mbus / dlt645 /
+        // dlms / zigbee): the JNI library ships per-platform inside the jar
+        // and jSerialComm carries no native-image configuration of its own,
+        // so both the embedded natives and the JNI surface of SerialPort
+        // must be registered explicitly. String-based references keep
+        // non-serial drivers unaffected.
+        hints.resources().registerPattern("**/libjSerialComm.so");
+        hints.resources().registerPattern("**/jSerialComm.dll");
+        hints.jni()
+                .registerType(
+                        TypeReference.of("com.fazecast.jSerialComm.SerialPort"),
+                        MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS,
+                        MemberCategory.INVOKE_DECLARED_CONSTRUCTORS,
+                        MemberCategory.DECLARED_FIELDS,
+                        MemberCategory.INVOKE_PUBLIC_METHODS,
+                        MemberCategory.INVOKE_DECLARED_METHODS);
+
         // JDBC driver batch (mysql / postgresql / sqlserver / oracle): the
         // dialect drivers are instantiated reflectively by DriverManager /
         // HikariCP. String-based TypeReferences - the classes only exist on

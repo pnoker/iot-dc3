@@ -322,6 +322,9 @@ jobs:
           # Batch 2 — database and messaging clients (JDBC dialects, redis,
           # kafka); JDBC driver constructors registered in
           # DriverNativeRuntimeHints.
+          # Batch 3 — jSerialComm serial family: the JNI library and the
+          # SerialPort JNI surface are registered in DriverNativeRuntimeHints
+          # (jSerialComm ships no native-image config of its own).
           # Later batches append here; the target name and the
           # NATIVE_SERVICE build arg are the same value by construction.
           - dc3-driver-virtual
@@ -350,6 +353,13 @@ jobs:
           - dc3-driver-oracle
           - dc3-driver-redis
           - dc3-driver-kafka
+          - dc3-driver-modbus-rtu
+          - dc3-driver-serial
+          - dc3-driver-mbus
+          - dc3-driver-dlt645
+          - dc3-driver-dlms
+          - dc3-driver-zigbee
+          - dc3-driver-sl651
     env:
       SERVICE: ${{ matrix.service }}
     steps:

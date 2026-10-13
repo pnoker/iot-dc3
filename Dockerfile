@@ -1310,3 +1310,95 @@ VOLUME /dc3-driver/dc3-driver-kafka/dc3/logs
 RUN mkdir -p /dc3-driver/dc3-driver-kafka/dc3/data/driver/kafka
 VOLUME /dc3-driver/dc3-driver-kafka/dc3/data
 ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-modbus-rtu-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-modbus-rtu.
+FROM native-runtime-base AS dc3-driver-modbus-rtu-native
+ENV SERVER_NAME=dc3-driver-modbus-rtu
+ENV APP_BIN=./dc3-driver-modbus-rtu
+WORKDIR /dc3-driver/dc3-driver-modbus-rtu
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-rtu/dc3/logs/driver/modbus-rtu
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-modbus-rtu/target/dc3-driver-modbus-rtu ./
+VOLUME /dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-modbus-rtu/dc3/data/driver/modbus-rtu
+VOLUME /dc3-driver/dc3-driver-modbus-rtu/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-serial-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-serial.
+FROM native-runtime-base AS dc3-driver-serial-native
+ENV SERVER_NAME=dc3-driver-serial
+ENV APP_BIN=./dc3-driver-serial
+WORKDIR /dc3-driver/dc3-driver-serial
+RUN mkdir -p /dc3-driver/dc3-driver-serial/dc3/logs/driver/serial
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-serial/target/dc3-driver-serial ./
+VOLUME /dc3-driver/dc3-driver-serial/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-serial/dc3/data/driver/serial
+VOLUME /dc3-driver/dc3-driver-serial/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-mbus-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-mbus.
+FROM native-runtime-base AS dc3-driver-mbus-native
+ENV SERVER_NAME=dc3-driver-mbus
+ENV APP_BIN=./dc3-driver-mbus
+WORKDIR /dc3-driver/dc3-driver-mbus
+RUN mkdir -p /dc3-driver/dc3-driver-mbus/dc3/logs/driver/mbus
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-mbus/target/dc3-driver-mbus ./
+VOLUME /dc3-driver/dc3-driver-mbus/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-mbus/dc3/data/driver/mbus
+VOLUME /dc3-driver/dc3-driver-mbus/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-dlt645-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-dlt645.
+FROM native-runtime-base AS dc3-driver-dlt645-native
+ENV SERVER_NAME=dc3-driver-dlt645
+ENV APP_BIN=./dc3-driver-dlt645
+WORKDIR /dc3-driver/dc3-driver-dlt645
+RUN mkdir -p /dc3-driver/dc3-driver-dlt645/dc3/logs/driver/dlt645
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-dlt645/target/dc3-driver-dlt645 ./
+VOLUME /dc3-driver/dc3-driver-dlt645/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-dlt645/dc3/data/driver/dlt645
+VOLUME /dc3-driver/dc3-driver-dlt645/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-dlms-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-dlms.
+FROM native-runtime-base AS dc3-driver-dlms-native
+ENV SERVER_NAME=dc3-driver-dlms
+ENV APP_BIN=./dc3-driver-dlms
+WORKDIR /dc3-driver/dc3-driver-dlms
+RUN mkdir -p /dc3-driver/dc3-driver-dlms/dc3/logs/driver/dlms
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-dlms/target/dc3-driver-dlms ./
+VOLUME /dc3-driver/dc3-driver-dlms/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-dlms/dc3/data/driver/dlms
+VOLUME /dc3-driver/dc3-driver-dlms/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-zigbee-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-zigbee.
+FROM native-runtime-base AS dc3-driver-zigbee-native
+ENV SERVER_NAME=dc3-driver-zigbee
+ENV APP_BIN=./dc3-driver-zigbee
+WORKDIR /dc3-driver/dc3-driver-zigbee
+RUN mkdir -p /dc3-driver/dc3-driver-zigbee/dc3/logs/driver/zigbee
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-zigbee/target/dc3-driver-zigbee ./
+VOLUME /dc3-driver/dc3-driver-zigbee/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-zigbee/dc3/data/driver/zigbee
+VOLUME /dc3-driver/dc3-driver-zigbee/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]
+
+# ---------- dc3-driver-sl651-native ----------
+# Requires --build-arg NATIVE_SERVICE=dc3-driver-sl651. The SL651 optional
+# dependency bridge is registered in this module's Sl651NativeRuntimeHints.
+FROM native-runtime-base AS dc3-driver-sl651-native
+ENV SERVER_NAME=dc3-driver-sl651
+ENV APP_BIN=./dc3-driver-sl651
+WORKDIR /dc3-driver/dc3-driver-sl651
+RUN mkdir -p /dc3-driver/dc3-driver-sl651/dc3/logs/driver/sl651
+COPY --from=driver-native-builder /build/dc3-driver/dc3-driver-sl651/target/dc3-driver-sl651 ./
+VOLUME /dc3-driver/dc3-driver-sl651/dc3/logs
+RUN mkdir -p /dc3-driver/dc3-driver-sl651/dc3/data/driver/sl651
+VOLUME /dc3-driver/dc3-driver-sl651/dc3/data
+ENTRYPOINT ["/usr/share/dc3/entrypoint-native.sh"]

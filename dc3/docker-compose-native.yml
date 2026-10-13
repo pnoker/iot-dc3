@@ -945,6 +945,186 @@ services:
       dc3net:
         aliases:
           - dc3-driver-kafka
+  modbus-rtu:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-modbus-rtu-native
+      args:
+        NATIVE_SERVICE: dc3-driver-modbus-rtu
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-modbus-rtu:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-modbus-rtu
+    hostname: dc3-driver-modbus-rtu
+    volumes:
+      - logs:/dc3-driver/dc3-driver-modbus-rtu/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-modbus-rtu/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-modbus-rtu
+
+  serial:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-serial-native
+      args:
+        NATIVE_SERVICE: dc3-driver-serial
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-serial:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-serial
+    hostname: dc3-driver-serial
+    volumes:
+      - logs:/dc3-driver/dc3-driver-serial/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-serial/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-serial
+
+  mbus:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-mbus-native
+      args:
+        NATIVE_SERVICE: dc3-driver-mbus
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-mbus:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-mbus
+    hostname: dc3-driver-mbus
+    volumes:
+      - logs:/dc3-driver/dc3-driver-mbus/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-mbus/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-mbus
+
+  dlt645:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-dlt645-native
+      args:
+        NATIVE_SERVICE: dc3-driver-dlt645
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlt645:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dlt645
+    hostname: dc3-driver-dlt645
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlt645/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlt645/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlt645
+
+  dlms:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-dlms-native
+      args:
+        NATIVE_SERVICE: dc3-driver-dlms
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-dlms:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-dlms
+    hostname: dc3-driver-dlms
+    volumes:
+      - logs:/dc3-driver/dc3-driver-dlms/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-dlms/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-dlms
+
+  zigbee:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-zigbee-native
+      args:
+        NATIVE_SERVICE: dc3-driver-zigbee
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-zigbee:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-zigbee
+    hostname: dc3-driver-zigbee
+    volumes:
+      - logs:/dc3-driver/dc3-driver-zigbee/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-zigbee/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-zigbee
+  sl651:
+    profiles: [ "native-drivers" ]
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: dc3-driver-sl651-native
+      args:
+        NATIVE_SERVICE: dc3-driver-sl651
+    image: ${DC3_IMAGE_REGISTRY:-pnoker}/dc3-driver-sl651:${DC3_IMAGE_TAG:-2026.9}-native
+    restart: always
+    depends_on:
+      manager:
+        condition: service_healthy
+    environment:
+      <<: *app-runtime-env
+    container_name: dc3-driver-sl651
+    hostname: dc3-driver-sl651
+    volumes:
+      - logs:/dc3-driver/dc3-driver-sl651/dc3/logs
+      - driver_data:/dc3-driver/dc3-driver-sl651/dc3/data
+    logging: *default-logging
+    networks:
+      dc3net:
+        aliases:
+          - dc3-driver-sl651
 
 volumes:
   logs:
