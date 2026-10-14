@@ -376,10 +376,10 @@ public class DriverNativeRuntimeHints implements RuntimeHintsRegistrar {
                         MemberCategory.PUBLIC_FIELDS,
                         MemberCategory.DECLARED_FIELDS);
 
-        // The point-value buffer persists through sqlite-jdbc: the JNI
-        // library is extracted from org/sqlite/native at runtime and the
-        // JDBC driver class is instantiated by HikariCP's driver-class
-        // resolution. The reachability metadata repository carries
+        // The point-value buffer persists through the sqlite JDBC driver:
+        // the JNI library is extracted from org/sqlite/native at runtime
+        // and the JDBC driver class is instantiated by HikariCP's
+        // driver-class resolution. The reachability metadata repository carries
         // sqlite-jdbc entries; these are the explicit belt-and-braces.
         hints.resources().registerPattern("org/sqlite/native/**");
         hints.reflection().registerType(TypeReference.of("org.sqlite.JDBC"), MemberCategory.INVOKE_PUBLIC_CONSTRUCTORS);

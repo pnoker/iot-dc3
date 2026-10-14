@@ -226,21 +226,15 @@
             <!-- Pin swagger-core to the version springdoc 3.0.3 requires. Declared
                  before the BOM imports so it takes precedence over the older
                  swagger-core that spring-ai-bom would otherwise contribute, which
-                 breaks OpenAPI generation (Schema.$dynamicRef NoSuchMethodError). -->
+                 breaks OpenAPI generation (Schema.$dynamicRef NoSuchMethodError).
+                 swagger-annotations-jakarta is pinned further down next to the
+                 mockito pins: modules on the driver SDK classpath use the
+                 annotation-only artifact because the full springdoc starter drags
+                 SpringDocHints (which unconditionally references spring-web) into
+                 driver AOT processing. -->
             <dependency>
                 <groupId>io.swagger.core.v3</groupId>
                 <artifactId>swagger-core-jakarta</artifactId>
-                <version>${swagger-core.version}</version>
-            </dependency>
-            <!-- Annotation-only swagger artifact for modules that carry @Schema
-                 metadata without the OpenAPI rendering stack: dc3-common-model is
-                 on the driver SDK classpath, and the full springdoc starter drags
-                 SpringDocHints (a RuntimeHintsRegistrar that unconditionally
-                 touches spring-web) into driver AOT processing - which fails with
-                 NoClassDefFoundError because drivers have no spring-web. -->
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations-jakarta</artifactId>
                 <version>${swagger-core.version}</version>
             </dependency>
             <!-- Pin mockito to ${mockito.version} so the resolved jars and the
