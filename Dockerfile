@@ -212,6 +212,15 @@ LABEL dc3.author=pnoker
 LABEL dc3.author.email=pnokers.icloud.com
 
 ENV PARAMS=''
+# Native binaries cannot re-resolve the spring.profiles.active ${NODE_ENV:dev}
+# placeholder at runtime (the AOT pass freezes the dev profile and its
+# application-dev.yml into the image), so RabbitEnvironmentConfig would read
+# spring.env=dev and prefix every broker entity with the dev_<user> isolation
+# tag, splitting the topology against JVM services. SPRING_ENV feeds the same
+# EnvironmentPostProcessor through the system-environment property source,
+# which outranks profile YAML, so the tag stays empty. Deployments that DO want
+# an isolation tag can override this variable.
+ENV SPRING_ENV=test
 
 
 # =============================================================================
