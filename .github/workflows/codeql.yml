@@ -42,7 +42,7 @@ jobs:
 
       - name: Set up JDK 21
         if: matrix.language == 'java-kotlin'
-        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6
         with:
           distribution: liberica
           java-version: 21
