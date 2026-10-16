@@ -5,7 +5,40 @@
 _Generated on 2026-10-17._
 
 #### Summary
-- No commits found in the selected range.
+- Generated from `v2026.10.9` to `HEAD`.
+- Included 20 commits across 5 categories: Features 9, Bug Fixes 6, Documentation 2, CI 2, Tests 1.
+- Most active scopes: native(15), web(4), release(1).
+- Highlights: native: register the sl651 optional dependency bridge; native: onboard the jserialcomm serial driver batch; native: onboard the database and messaging driver batch; native: onboard the protocol sdk driver batch; native: onboard the pure java protocol driver batch.
+
+#### Features
+- **native**: register the sl651 optional dependency bridge (`b965acd5e`)
+- **native**: onboard the jserialcomm serial driver batch (`9832bd6b4`)
+- **native**: onboard the database and messaging driver batch (`b73e4cfa3`)
+- **native**: onboard the protocol sdk driver batch (`61420025e`)
+- **native**: onboard the pure java protocol driver batch (`691d8a6ad`)
+- **native**: add the pilot drivers to the native compose stack (`498af7f8d`)
+- **native**: build driver native images via an arg-scoped stage (`4eb2515e5`)
+- **native**: seed driver runtime hints for graalvm images (`951d20bd9`)
+- **web**: fit card wall pages to the viewport with ghost rows (`74abe6171`)
+
+#### Bug Fixes
+- **native**: carry agent snapshots for the mqtt and modbus-tcp drivers (`cebb76280`)
+- **native**: default spring env in native runtime so broker topology stays untagged (`8e558e0d7`)
+- **native**: drop the duplicated swagger pin and reword the buffer comment (`3c43e720b`)
+- **native**: carry the virtual driver agent snapshot and declare opts arg (`1dcb57278`)
+- **web**: keep code comments in english for the docs gate (`8381741d6`)
+- **web**: accept both salt response shapes on login (`9dfb86cfb`)
+
+#### Documentation
+- **release**: update generated changelog and bump to 2026.10.10 (`302cef047`)
+- **native**: document the driver batches and jvm exceptions (`bc9144a8b`)
+
+#### CI
+- **native**: move opc-ua off the driver native matrix after the runner oom (`0a0ea4114`)
+- **native**: fan driver native builds out as a matrix (`0664fef7e`)
+
+#### Tests
+- **web**: normalize guardrail walk paths for windows (`013c9414a`)
 
 <details>
 <summary>📝 Historical Version Description, Click to Expand</summary>
