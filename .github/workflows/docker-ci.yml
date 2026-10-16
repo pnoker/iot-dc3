@@ -325,6 +325,12 @@ jobs:
           # Batch 3 — jSerialComm serial family: the JNI library and the
           # SerialPort JNI surface are registered in DriverNativeRuntimeHints
           # (jSerialComm ships no native-image config of its own).
+          # JVM-only alongside dnp3/ble/opc-da: opc-ua (Eclipse Milo +
+          # netty + jaxb universe) exhausts the 16GB runner even at
+          # -J-Xmx10g during the analysis step (verified OOM in the first
+          # v2026.10.10 attempt); it needs a heap property or a larger
+          # runner before rejoining the matrix. Its native image has never
+          # shipped, so this drops nothing users already have.
           # Later batches append here; the target name and the
           # NATIVE_SERVICE build arg are the same value by construction.
           - dc3-driver-virtual
@@ -344,7 +350,6 @@ jobs:
           - dc3-driver-melsec
           - dc3-driver-plcs7
           - dc3-driver-lorawan
-          - dc3-driver-opc-ua
           - dc3-driver-lwm2m
           - dc3-driver-iec61850
           - dc3-driver-mysql
