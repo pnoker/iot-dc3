@@ -45,15 +45,10 @@
             <artifactId>dc3-common-agentic</artifactId>
         </dependency>
 
-        <!-- Store-level unit tests (API-key encryption wiring) -->
+        <!-- Store-level unit tests (key encryption wiring + concurrency scripts) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

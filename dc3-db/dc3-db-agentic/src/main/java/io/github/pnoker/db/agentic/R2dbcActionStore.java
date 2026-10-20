@@ -38,7 +38,14 @@ import reactor.core.publisher.Mono;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-/** Explicit SQL adapter for agentic actions. */
+/**
+ * Explicit SQL adapter for agentic actions.
+ *
+ * <p>Timestamps are stored in {@code TIMESTAMPTZ} columns and bound as {@link Instant} through
+ * {@link R2dbcDialect#bindInstant}, so encoding never depends on the database session timezone.
+ * The {@link ActionBO} wall-clock fields stay UTC-naive; reads normalize through
+ * {@link DatabaseInstant#toLocalDateTimeUtc}.
+ */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, PageTransaction.class})
 @RequiredArgsConstructor
@@ -69,6 +76,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
         if (action.getId() == null) {
             action.setId(UuidV7.nextLong());
         }
+        Instant now = Instant.now();
         String sql = "INSERT INTO " + TABLE
                 + " (id, action_id, conversation_id, action_type, title, description, payload, status, expire_time, "
                 + "tenant_id, user_id, remark, creator_id, creator_name, create_time, operator_id, operator_name, operate_time, deleted) "
@@ -91,14 +99,15 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("remark", valueOrEmpty(action.getRemark()))
                 .bind("creator_id", valueOrZero(action.getCreatorId(), action.getUserId()))
                 .bind("creator_name", valueOrEmpty(action.getCreatorName()))
-                .bind("create_time", utc(action.getCreateTime(), Instant.now()))
+                .bind("create_time", dialect.bindInstant(instant(action.getCreateTime(), now)))
                 .bind("operator_id", valueOrZero(action.getOperatorId(), action.getUserId()))
                 .bind("operator_name", valueOrEmpty(action.getOperatorName()))
-                .bind("operate_time", utc(action.getOperateTime(), Instant.now()));
+                .bind("operate_time", dialect.bindInstant(instant(action.getOperateTime(), now)));
         if (action.getExpireTime() == null) {
-            statement = statement.bindNull("expire_time", LocalDateTime.class);
+            statement = statement.bindNull("expire_time", Instant.class);
         } else {
-            statement = statement.bind("expire_time", action.getExpireTime());
+            statement = statement.bind(
+                    "expire_time", dialect.bindInstant(action.getExpireTime().toInstant(ZoneOffset.UTC)));
         }
         return statement
                 .fetch()
@@ -133,7 +142,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
             return Mono.just(OffsetPage.of(java.util.List.of(), offset, limit, 0));
         }
         new PageRequest(offset, limit);
-        LocalDateTime current = utc(now, Instant.now());
+        Instant current = instant(now, Instant.now());
         String predicate = " FROM " + TABLE
                 + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
                 + " AND status = :status AND deleted = 0"
@@ -145,7 +154,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .bind("status", AgenticActionStatusEnum.PENDING.getIndex())
-                .bind("now", current)
+                .bind("now", dialect.bindInstant(current))
                 .bind("limit", limit)
                 .bind("offset", offset);
         DatabaseClient.GenericExecuteSpec countStatement = databaseClient
@@ -154,7 +163,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .bind("status", AgenticActionStatusEnum.PENDING.getIndex())
-                .bind("now", current);
+                .bind("now", dialect.bindInstant(current));
         Mono<Long> total = countStatement
                 .map((row, metadata) -> {
                     Number value = row.get("total", Number.class);
@@ -174,7 +183,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
         if (nextStatus == null || nextStatus == AgenticActionStatusEnum.PENDING) {
             return Mono.error(new IllegalArgumentException("nextStatus must be a terminal action status"));
         }
-        LocalDateTime current = utc(now, Instant.now());
+        Instant current = instant(now, Instant.now());
         return databaseClient
                 .sql("UPDATE " + TABLE + " SET status = :next_status, operator_id = :operator_id, "
                         + "operator_name = :operator_name, operate_time = :operate_time"
@@ -184,12 +193,12 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("next_status", nextStatus.getIndex())
                 .bind("operator_id", header.getUserId())
                 .bind("operator_name", valueOrEmpty(header.getUserName()))
-                .bind("operate_time", current)
+                .bind("operate_time", dialect.bindInstant(current))
                 .bind("action_id", actionId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .bind("pending_status", AgenticActionStatusEnum.PENDING.getIndex())
-                .bind("now", current)
+                .bind("now", dialect.bindInstant(current))
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1 ? get(actionId, header) : Mono.empty());
@@ -215,7 +224,7 @@ public class R2dbcActionStore implements ReactiveActionStore {
                 .bind("remark", valueOrEmpty(remark))
                 .bind("operator_id", header.getUserId())
                 .bind("operator_name", valueOrEmpty(header.getUserName()))
-                .bind("operate_time", utc(now, Instant.now()))
+                .bind("operate_time", dialect.bindInstant(instant(now, Instant.now())))
                 .bind("action_id", actionId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
@@ -292,11 +301,12 @@ public class R2dbcActionStore implements ReactiveActionStore {
         return value == null ? "" : value;
     }
 
-    private LocalDateTime utc(LocalDateTime value, Instant fallback) {
-        return value == null ? utc(fallback, Instant.now()) : value;
+    /** Interpret a BO wall-clock value as UTC and fall back to the given instant when absent. */
+    private Instant instant(LocalDateTime value, Instant fallback) {
+        return value == null ? fallback : value.toInstant(ZoneOffset.UTC);
     }
 
-    private LocalDateTime utc(Instant value, Instant fallback) {
-        return LocalDateTime.ofInstant(value == null ? fallback : value, ZoneOffset.UTC);
+    private Instant instant(Instant value, Instant fallback) {
+        return value == null ? fallback : value;
     }
 }

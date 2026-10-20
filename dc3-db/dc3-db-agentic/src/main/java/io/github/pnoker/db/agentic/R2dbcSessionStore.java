@@ -19,7 +19,6 @@ package io.github.pnoker.db.agentic;
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
 import io.github.pnoker.common.agentic.repository.ReactiveSessionStore;
-import io.github.pnoker.common.agentic.service.impl.AttachmentFileCleaner;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
@@ -28,22 +27,23 @@ import io.github.pnoker.db.core.page.SortSpec;
 import io.github.pnoker.db.core.time.DatabaseInstant;
 import io.github.pnoker.db.core.transaction.PageTransaction;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 import tools.jackson.databind.ObjectMapper;
 
-/** Explicit SQL adapter for agentic sessions. */
+/**
+ * Explicit SQL adapter for agentic sessions.
+ *
+ * <p>Timestamps are stored in {@code TIMESTAMPTZ} columns and bound as {@link Instant} through
+ * {@link R2dbcDialect#bindInstant}, so encoding never depends on the database session timezone.
+ * The {@link SessionBO} wall-clock fields stay UTC-naive; reads normalize through
+ * {@link DatabaseInstant#toLocalDateTimeUtc}.
+ */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class, PageTransaction.class})
 @RequiredArgsConstructor
@@ -58,22 +58,39 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
     private final PageTransaction pageTransaction;
     private final ObjectMapper objectMapper;
     private final R2dbcDialect dialect;
-    private final AttachmentFileCleaner attachmentFileCleaner;
 
     @Override
     public Mono<SessionBO> touch(String conversationId, SessionExt sessionExt, RequestHeader.PrincipalHeader header) {
+        return touchAttempt(conversationId, sessionExt, header, true);
+    }
+
+    /**
+     * One touch attempt: lock the conversation's row regardless of tombstone state, then update,
+     * revive, or insert. A unique-key violation means a concurrent touch inserted the same
+     * conversation first, so the caller retries the whole decision once instead of surfacing the
+     * raw constraint error.
+     */
+    private Mono<SessionBO> touchAttempt(
+            String conversationId,
+            SessionExt sessionExt,
+            RequestHeader.PrincipalHeader header,
+            boolean retryOnConflict) {
         if (conversationId == null || conversationId.isBlank()) {
             return Mono.error(new IllegalArgumentException("conversationId must not be blank"));
         }
         if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
-        Mono<SessionBO> transaction = lock(conversationId, header)
-                .flatMap(existing -> updateExisting(conversationId, sessionExt, existing, header))
-                .switchIfEmpty(insert(conversationId, serialize(sessionExt), header));
+        Mono<SessionBO> transaction = lockAny(conversationId, header)
+                .flatMap(locked -> locked.deleted()
+                        ? revive(conversationId, sessionExt, locked.session(), header)
+                        : updateRow(conversationId, sessionExt, null, locked.session(), header))
+                .switchIfEmpty(Mono.defer(() -> insert(conversationId, serialize(sessionExt), header)));
         return transactionalOperator
                 .transactional(transaction)
                 .onErrorResume(
                         DataIntegrityViolationException.class,
-                        ignored -> get(conversationId, header).switchIfEmpty(Mono.error(ignored)));
+                        ignored -> retryOnConflict
+                                ? touchAttempt(conversationId, sessionExt, header, false)
+                                : Mono.error(ignored));
     }
 
     @Override
@@ -167,25 +184,11 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
             return Mono.error(new IllegalArgumentException("conversationId must not be blank"));
         }
         if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
-        return get(conversationId, header).flatMap(existing -> {
-            String nextTitle = title == null || title.isBlank() ? existing.getTitle() : title.trim();
-            String nextExt = serialize(merge(existing.getSessionExt(), sessionExt));
-            return databaseClient
-                    .sql("UPDATE " + TABLE + " SET title = :title, session_ext = "
-                            + dialect.jsonWriteExpression(":session_ext") + ","
-                            + " operator_id = :operator_id, operate_time = :operate_time WHERE id = :id"
-                            + " AND tenant_id = :tenant_id AND user_id = :user_id AND deleted = 0")
-                    .bind("title", nextTitle)
-                    .bind("session_ext", nextExt)
-                    .bind("operator_id", header.getUserId())
-                    .bind("operate_time", utcNow())
-                    .bind("id", existing.getId())
-                    .bind("tenant_id", header.getTenantId())
-                    .bind("user_id", header.getUserId())
-                    .fetch()
-                    .rowsUpdated()
-                    .flatMap(rows -> rows == 1 ? get(conversationId, header) : Mono.empty());
-        });
+        // The row lock serializes concurrent updates and the merge reads the locked row, so
+        // concurrent preference changes merge instead of the last writer silently winning.
+        Mono<SessionBO> transaction = lock(conversationId, header)
+                .flatMap(existing -> updateRow(conversationId, sessionExt, title, existing, header));
+        return transactionalOperator.transactional(transaction);
     }
 
     @Override
@@ -194,62 +197,44 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
             return Mono.error(new IllegalArgumentException("conversationId must not be blank"));
         }
         if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
-        Mono<Long> deleteMessages = databaseClient
-                .sql("UPDATE dc3_agentic.dc3_message SET deleted = 1,"
-                        + " operate_time = :operate_time WHERE conversation_id = :conversation_id"
-                        + " AND tenant_id = :tenant_id AND user_id = :user_id AND deleted = 0")
-                .bind("operate_time", utcNow())
+        // Lock the live session row first: attachment saves take the same lock before inserting,
+        // so a concurrent upload either lands before this delete (and is soft-deleted with the
+        // rest) or fails its guard once the session is gone. Children then the session row.
+        Mono<Long> transaction = lockSessionId(conversationId, header)
+                .flatMap(sessionId -> softDeleteChildren("dc3_agentic.dc3_message", conversationId, header)
+                        .then(softDeleteChildren("dc3_agentic.dc3_attachment", conversationId, header))
+                        .then(softDeleteChildren("dc3_agentic.dc3_action", conversationId, header))
+                        .then(deleteSession(conversationId, header)))
+                .defaultIfEmpty(0L);
+        return transactionalOperator.transactional(transaction);
+    }
+
+    /** Lock the live session row and emit its id, or empty when the session is already deleted. */
+    private Mono<Long> lockSessionId(String conversationId, RequestHeader.PrincipalHeader header) {
+        return databaseClient
+                .sql("SELECT id FROM " + TABLE
+                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id AND deleted = 0 FOR UPDATE")
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
-                .fetch()
-                .rowsUpdated()
-                .map(Long::valueOf);
-        Mono<Long> deleteAttachments = softDeleteChildren("dc3_agentic.dc3_attachment", conversationId, header);
-        Mono<Long> deleteActions = softDeleteChildren("dc3_agentic.dc3_action", conversationId, header);
-        Mono<Long> deleteSession = databaseClient
+                .map((row, metadata) -> row.get("id", Long.class))
+                .one();
+    }
+
+    private Mono<Long> deleteSession(String conversationId, RequestHeader.PrincipalHeader header) {
+        return databaseClient
                 .sql("UPDATE " + TABLE + " SET deleted = 1,"
                         + " operator_id = :operator_id, operate_time = :operate_time WHERE conversation_id = :conversation_id"
                         + " AND tenant_id = :tenant_id AND user_id = :user_id AND deleted = 0")
                 .bind("operator_id", header.getUserId())
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .fetch()
                 .rowsUpdated()
                 .map(Long::valueOf);
-        return transactionalOperator
-                .transactional(listAttachmentFilePaths(conversationId, header)
-                        .collectList()
-                        .flatMap(filePaths -> deleteMessages
-                                .then(deleteAttachments)
-                                .then(deleteActions)
-                                .then(deleteSession)
-                                .map(deleted -> Tuples.of(deleted, filePaths))))
-                .flatMap(deletedSession -> unlinkAttachmentFiles(deletedSession).thenReturn(deletedSession.getT1()));
-    }
-
-    /** Read attachment file locations while the rows are still live, so the files can be unlinked after commit. */
-    private Flux<String> listAttachmentFilePaths(String conversationId, RequestHeader.PrincipalHeader header) {
-        return databaseClient
-                .sql("SELECT file_path FROM dc3_agentic.dc3_attachment"
-                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
-                        + " AND user_id = :user_id AND deleted = 0")
-                .bind("conversation_id", conversationId)
-                .bind("tenant_id", header.getTenantId())
-                .bind("user_id", header.getUserId())
-                .map((row, metadata) -> row.get("file_path", String.class))
-                .all();
-    }
-
-    /**
-     * Unlink the conversation's stored attachment files after the session delete commits. Runs
-     * strictly after the transaction so file cleanup can never roll the delete back, and is
-     * warn-only so a missing or undeletable file never fails the committed delete.
-     */
-    private Mono<Void> unlinkAttachmentFiles(Tuple2<Long, List<String>> deletedSession) {
-        return attachmentFileCleaner.unlinkAll(deletedSession.getT2());
     }
 
     private Mono<Long> softDeleteChildren(String table, String conversationId, RequestHeader.PrincipalHeader header) {
@@ -257,7 +242,7 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
                 .sql("UPDATE " + table + " SET deleted = 1, operate_time = :operate_time"
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0")
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
@@ -266,6 +251,7 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
                 .map(Long::valueOf);
     }
 
+    /** Lock the live session row for update; empty when the conversation has no live row. */
     private Mono<SessionBO> lock(String conversationId, RequestHeader.PrincipalHeader header) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE
@@ -278,16 +264,75 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
                 .one();
     }
 
-    private Mono<SessionBO> updateExisting(
-            String conversationId, SessionExt sessionExt, SessionBO existing, RequestHeader.PrincipalHeader header) {
-        String nextJson = serialize(merge(existing.getSessionExt(), sessionExt));
+    /**
+     * Lock the conversation's row regardless of soft-delete state. The natural key is unique
+     * across live and deleted rows (it is the foreign-key target for the child tables), so the
+     * tombstone row is the row that must be locked and revived to reuse the conversation id.
+     */
+    private Mono<LockedSession> lockAny(String conversationId, RequestHeader.PrincipalHeader header) {
         return databaseClient
-                .sql("UPDATE " + TABLE + " SET session_ext = " + dialect.jsonWriteExpression(":session_ext")
-                        + ", operator_id = :operator_id," + " operate_time = :operate_time WHERE id = :id")
-                .bind("session_ext", nextJson)
+                .sql("SELECT " + COLUMNS + " FROM " + TABLE
+                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id LIMIT 1 FOR UPDATE")
+                .bind("conversation_id", conversationId)
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .map((row, metadata) -> new LockedSession(
+                        map(row, metadata), row.get("deleted", Number.class).intValue() != 0))
+                .one();
+    }
+
+    /**
+     * Revive a soft-deleted session row as a brand-new conversation: the tombstone's title,
+     * extension, creator, and creation time are reset, because the deleted conversation's
+     * messages and attachments stay soft-deleted and must never reappear.
+     */
+    private Mono<SessionBO> revive(
+            String conversationId, SessionExt sessionExt, SessionBO tombstone, RequestHeader.PrincipalHeader header) {
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET deleted = 0, title = :title, session_ext = "
+                        + dialect.jsonWriteExpression(":session_ext") + ", creator_id = :creator_id,"
+                        + " creator_name = :creator_name, create_time = :create_time, operator_id = :operator_id,"
+                        + " operate_time = :operate_time WHERE id = :id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id")
+                .bind("title", AgenticConstant.Session.DEFAULT_TITLE)
+                .bind("session_ext", serialize(sessionExt))
+                .bind("creator_id", header.getUserId())
+                .bind("creator_name", header.getUserName() == null ? "" : header.getUserName())
+                .bind("create_time", dialect.bindInstant(Instant.now()))
                 .bind("operator_id", header.getUserId())
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
+                .bind("id", tombstone.getId())
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .fetch()
+                .rowsUpdated()
+                .flatMap(rows -> rows == 1
+                        ? get(conversationId, header)
+                        : Mono.error(new IllegalStateException("session revive affected " + rows + " rows")));
+    }
+
+    /** Merge the incoming extension onto the locked row and persist it with the optional title. */
+    private Mono<SessionBO> updateRow(
+            String conversationId,
+            SessionExt sessionExt,
+            String title,
+            SessionBO existing,
+            RequestHeader.PrincipalHeader header) {
+        String nextTitle = title == null || title.isBlank() ? existing.getTitle() : title.trim();
+        String nextExt = serialize(merge(existing.getSessionExt(), sessionExt));
+        return databaseClient
+                .sql("UPDATE " + TABLE + " SET title = :title, session_ext = "
+                        + dialect.jsonWriteExpression(":session_ext") + ","
+                        + " operator_id = :operator_id, operate_time = :operate_time WHERE id = :id"
+                        + " AND tenant_id = :tenant_id AND user_id = :user_id AND deleted = 0")
+                .bind("title", nextTitle)
+                .bind("session_ext", nextExt)
+                .bind("operator_id", header.getUserId())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("id", existing.getId())
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
@@ -308,8 +353,8 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
                 .bind("user_id", header.getUserId())
                 .bind("creator_id", header.getUserId())
                 .bind("operator_id", header.getUserId())
-                .bind("create_time", utcNow())
-                .bind("operate_time", utcNow())
+                .bind("create_time", dialect.bindInstant(Instant.now()))
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
@@ -376,7 +421,6 @@ public class R2dbcSessionStore implements ReactiveSessionStore {
         return merged;
     }
 
-    private LocalDateTime utcNow() {
-        return LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
-    }
+    /** A session row read under lock together with its soft-delete tombstone flag. */
+    private record LockedSession(SessionBO session, boolean deleted) {}
 }

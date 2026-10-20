@@ -24,8 +24,6 @@ import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
 import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.time.DatabaseInstant;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -35,7 +33,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 
-/** Explicit SQL adapter for the agentic message store. */
+/**
+ * Explicit SQL adapter for the agentic message store.
+ *
+ * <p>Timestamps are stored in {@code TIMESTAMPTZ} columns and bound as {@link Instant} through
+ * {@link R2dbcDialect#bindInstant}, so encoding never depends on the database session timezone.
+ * The {@link MessageBO} wall-clock fields stay UTC-naive; reads normalize through
+ * {@link DatabaseInstant#toLocalDateTimeUtc}.
+ */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class})
 @RequiredArgsConstructor
@@ -131,8 +136,8 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
                 .bind("creator_name", header.getUserName() == null ? "" : header.getUserName())
                 .bind("operator_id", header.getUserId())
                 .bind("operator_name", header.getUserName() == null ? "" : header.getUserName())
-                .bind("create_time", LocalDateTime.ofInstant(now, ZoneOffset.UTC))
-                .bind("operate_time", LocalDateTime.ofInstant(now, ZoneOffset.UTC))
+                .bind("create_time", dialect.bindInstant(now))
+                .bind("operate_time", dialect.bindInstant(now))
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
@@ -202,7 +207,7 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
                 .sql("UPDATE " + TABLE + " SET deleted = 1, operate_time = :operate_time"
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0")
-                .bind("operate_time", LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC))
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())

@@ -18,6 +18,7 @@ package io.github.pnoker.common.agentic.service.impl;
 
 import io.github.pnoker.common.agentic.entity.bo.SessionBO;
 import io.github.pnoker.common.agentic.entity.model.SessionExt;
+import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
 import io.github.pnoker.common.agentic.repository.ReactiveSessionStore;
 import io.github.pnoker.common.agentic.service.SessionService;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -33,6 +34,8 @@ import reactor.core.publisher.Mono;
 public class SessionServiceImpl implements SessionService {
 
     private final ReactiveSessionStore sessionStore;
+    private final ReactiveAttachmentStore attachmentStore;
+    private final AttachmentFileCleaner attachmentFileCleaner;
 
     @Override
     public Mono<SessionBO> touch(String conversationId, RequestHeader.PrincipalHeader header, SessionExt sessionExt) {
@@ -62,6 +65,23 @@ public class SessionServiceImpl implements SessionService {
 
     @Override
     public Mono<Long> delete(String conversationId, RequestHeader.PrincipalHeader header) {
-        return sessionStore.delete(conversationId, header);
+        return sessionStore
+                .delete(conversationId, header)
+                .flatMap(deleted -> deleted > 0
+                        ? unlinkDeletedAttachmentFiles(conversationId, header).thenReturn(deleted)
+                        : Mono.just(deleted));
+    }
+
+    /**
+     * Unlink the stored files of the conversation's soft-deleted attachments after the session
+     * delete commits. Runs strictly after the transaction so file cleanup can never roll the
+     * delete back, and stays best-effort: a missing or undeletable file never fails the committed
+     * delete.
+     */
+    private Mono<Void> unlinkDeletedAttachmentFiles(String conversationId, RequestHeader.PrincipalHeader header) {
+        return attachmentStore
+                .listDeletedFilePaths(conversationId, header)
+                .collectList()
+                .flatMap(attachmentFileCleaner::unlinkAll);
     }
 }

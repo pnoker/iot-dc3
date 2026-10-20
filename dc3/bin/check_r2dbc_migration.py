@@ -115,6 +115,11 @@ def is_expected_startup_block(path: Path, category: str, match: re.Match[str]) -
     # bounded elastic scheduler so neither bridge ever runs on the event loop.
     if path.name == "SystemTool.java" and match.group(0).startswith(".block"):
         return True
+    # Attachment file cleanup deletes files with blocking NIO; the cleaner owns the
+    # bounded-elastic offload for every unlink so callers (session delete, upload
+    # rollback) can never run file deletion on an event loop.
+    if path.name == "AttachmentFileCleaner.java" and match.group(0).startswith("Schedulers.boundedElastic"):
+        return True
     return (
         path.name == "OpenAiCompatibleAgenticRuntime.java"
         and match.group(0).startswith("Schedulers.boundedElastic")
