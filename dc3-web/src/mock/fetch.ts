@@ -285,14 +285,50 @@ const localizedChart = (spec: AgenticVisualizationSpec): AgenticVisualizationSpe
   return {...spec, title: titles[spec.id || ''] || spec.title, dataset};
 };
 
+/**
+ * Slice scenario text into small random-length deltas (1-8 chars) the way a
+ * real tokenizer streams — the old single mega-delta never exercised the
+ * incremental pipeline (delta coalescing, partial CJK runes, streaming
+ * rendering). Slices are UTF-16 code-unit based, so a surrogate pair can
+ * straddle two deltas exactly like real token boundaries; the consumer
+ * concatenates them back losslessly.
+ *
+ * @param text - scenario reply text to tokenize
+ * @returns the reply cut into 1-8 character stream deltas
+ */
+const tokenDeltas = (text: string): string[] => {
+  const deltas: string[] = [];
+  let cursor = 0;
+  while (cursor < text.length) {
+    const size = 1 + Math.floor(Math.random() * 8);
+    deltas.push(text.slice(cursor, cursor + size));
+    cursor += size;
+  }
+  return deltas;
+};
+
+/**
+ * Locale-aware closing line every scripted reply ends with.
+ *
+ * @returns the trailing hint in the current mock locale
+ */
+export const trailingHint = (): string =>
+  currentMockLocale() === 'zh'
+    ? '需要进一步下钻某个设备或时段，告诉我即可。'
+    : 'Tell me if you want to drill into a specific asset or time range.';
+
 const streamChunks = (prompt: string): unknown[] => {
   const s = pickScenario(prompt);
   const chunks: unknown[] = localizedEvents(s).map((e) => ({object: 'agentic.event', ...e}));
-  chunks.push({choices: [{delta: {content: scenarioText(s)}}]});
+  for (const delta of tokenDeltas(scenarioText(s))) chunks.push({choices: [{delta: {content: delta}}]});
   for (const c of s.charts()) chunks.push({object: 'agentic.visualization', visualization: localizedChart(c)});
-  chunks.push({choices: [{delta: {content: currentMockLocale() === 'zh' ? '需要进一步下钻某个设备或时段，告诉我即可。' : 'Tell me if you want to drill into a specific asset or time range.'}}]});
+  for (const delta of tokenDeltas(trailingHint())) chunks.push({choices: [{delta: {content: delta}}]});
   chunks.push({choices: [{finish_reason: 'stop'}]});
   return chunks;
+};
+
+const isContentChunk = (chunk: unknown): chunk is {choices: Array<{delta?: {content?: string}}>} => {
+  return typeof (chunk as {choices?: Array<{delta?: {content?: string}}>}).choices?.[0]?.delta?.content === 'string';
 };
 
 const mockResponse = (prompt: string, stream: boolean): Response => {
@@ -300,7 +336,22 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
   if (stream) {
     const body = new ReadableStream<Uint8Array>({
       start(controller) {
-        for (const chunk of streamChunks(prompt)) controller.enqueue(sse(chunk));
+        let splitOnce = false;
+        for (const chunk of streamChunks(prompt)) {
+          const frame = sse(chunk);
+          // Split the first content frame across two enqueues so every
+          // stream exercises the parser's partial-block path: bytes can
+          // arrive mid-frame, mid-line, even mid-UTF-8-rune — the reader's
+          // streaming TextDecoder reassembles them.
+          if (!splitOnce && isContentChunk(chunk) && frame.length > 2) {
+            const cut = 1 + Math.floor(Math.random() * (frame.length - 2));
+            controller.enqueue(frame.subarray(0, cut));
+            controller.enqueue(frame.subarray(cut));
+            splitOnce = true;
+            continue;
+          }
+          controller.enqueue(frame);
+        }
         controller.enqueue(DONE);
         controller.close();
       },
@@ -333,9 +384,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
   const rows = db.agenticMessages.filter((message) => String(message.conversationId) === request.conversationId);
   const nextIndex = rows.reduce((max, message) => Math.max(max, Number(message.messageIndex ?? -1)), -1) + 1;
   const created = new Date().toISOString();
-  const suffix = currentMockLocale() === 'zh'
-    ? '需要进一步下钻某个设备或时段，告诉我即可。'
-    : 'Tell me if you want to drill into a specific asset or time range.';
+  const suffix = trailingHint();
   db.agenticMessages.push(
     {
       id: `mock-user-${Date.now()}`,

@@ -20,6 +20,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import type {AgenticStreamCallbacks} from '@/config/types';
 import {useAgenticStore} from '@/store';
+import {AGENTIC_DELTA_FLUSH_INTERVAL_MS} from '@/store/modules/agentic';
 
 const apiMocks = vi.hoisted(() => ({
   completeAgenticChatCompletion: vi.fn(),
@@ -108,29 +109,38 @@ describe('stream state machine and send races', () => {
   });
 
   it('locks conversation switching while streaming and keeps deltas on the origin', async () => {
-    const stream = controllableStream();
-    const store = seededStore();
-    store.newSession();
-    const firstConversation = store.activeConversationId;
+    // Deltas coalesce into ~50ms windows before landing in the store; fake
+    // timers let this test observe the buffered text mid-stream exactly like
+    // a rendered frame would.
+    vi.useFakeTimers();
+    try {
+      const stream = controllableStream();
+      const store = seededStore();
+      store.newSession();
+      const firstConversation = store.activeConversationId;
 
-    const send = store.sendMessage('hello');
-    await Promise.resolve();
-    await Promise.resolve();
+      const send = store.sendMessage('hello');
+      await Promise.resolve();
+      await Promise.resolve();
 
-    // switching away mid-stream is refused: the stream owns the conversation
-    store.newSession();
-    expect(store.activeConversationId).toBe(firstConversation);
-    stream.delta('part-1');
-    stream.delta('part-2');
+      // switching away mid-stream is refused: the stream owns the conversation
+      store.newSession();
+      expect(store.activeConversationId).toBe(firstConversation);
+      stream.delta('part-1');
+      stream.delta('part-2');
+      await vi.advanceTimersByTimeAsync(AGENTIC_DELTA_FLUSH_INTERVAL_MS);
 
-    const origin = store.messagesByConversation[firstConversation].find((m) => m.role === 'assistant');
-    expect(origin?.content).toBe('part-1part-2');
+      const origin = store.messagesByConversation[firstConversation].find((m) => m.role === 'assistant');
+      expect(origin?.content).toBe('part-1part-2');
 
-    stream.finish();
-    await send;
-    // once settled, switching opens a fresh conversation again
-    store.newSession();
-    expect(store.activeConversationId).not.toBe(firstConversation);
+      stream.finish();
+      await send;
+      // once settled, switching opens a fresh conversation again
+      store.newSession();
+      expect(store.activeConversationId).not.toBe(firstConversation);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('records a failed finish when the stream errors and clears the streaming state', async () => {

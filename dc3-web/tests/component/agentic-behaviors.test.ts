@@ -90,7 +90,8 @@ describe('AgenticSessionsRail behaviors', () => {
     sessionActionLoading: {},
     disabled: false,
     collapsed: false,
-    truncated: false,
+    hasMore: false,
+    loadingMore: false,
   };
 
   it('filters sessions by title and summary, archived included', async () => {
@@ -142,6 +143,26 @@ describe('AgenticSessionsRail behaviors', () => {
     expect(labels).toContain('Search conversations');
     expect(labels).toContain('New');
   });
+
+  it('offers loading the next session page only while pages remain', async () => {
+    const wrapper = mount(AgenticSessionsRail, {global, props: baseProps});
+    expect(wrapper.find('.agentic-sessions__more').exists()).toBe(false);
+
+    await wrapper.setProps({hasMore: true});
+    const more = wrapper.find('.agentic-sessions__more');
+    expect(more.exists()).toBe(true);
+    expect(more.text()).toMatch(/加载更多|Load more/);
+    await more.find('button').trigger('click');
+    expect(wrapper.emitted('load-more')).toHaveLength(1);
+
+    // While the rail is interaction-locked the control is disabled and the
+    // click is ignored (double-click protection continues in the store).
+    await wrapper.setProps({disabled: true});
+    const lockedButton = wrapper.find('.agentic-sessions__more button');
+    expect(lockedButton.attributes('disabled')).toBeDefined();
+    await lockedButton.trigger('click');
+    expect(wrapper.emitted('load-more')).toHaveLength(1);
+  });
 });
 
 describe('MessageItem behaviors', () => {
@@ -185,6 +206,56 @@ describe('MessageItem behaviors', () => {
     streaming.findAll('button')[0].trigger('click');
     expect(streaming.emitted('copy')).toBeUndefined(); // disabled buttons do not emit
   });
+
+  it('offers regenerating a failed assistant turn and disables it while locked', async () => {
+    const findRetry = (wrapper: ReturnType<typeof mount>) =>
+      wrapper.findAll('button').find((b) => /重新生成|Regenerate/.test(b.attributes('aria-label') || ''));
+
+    // Failed assistant turns carry the regenerate action.
+    const failed = mount(MessageItem, {
+      global,
+      props: {
+        message: message({finishReason: 'error', content: ''}),
+        continued: false,
+        focused: false,
+        liveTraces: [],
+      },
+    });
+    const retry = findRetry(failed);
+    expect(retry).toBeDefined();
+    await retry!.trigger('click');
+    expect(failed.emitted('retry')![0]).toEqual([failed.props('message')]);
+
+    // The button follows the global interaction lock, not just this message.
+    const locked = mount(MessageItem, {
+      global,
+      props: {
+        message: message({finishReason: 'error', content: ''}),
+        continued: false,
+        focused: false,
+        liveTraces: [],
+        disabled: true,
+      },
+    });
+    expect(findRetry(locked)!.attributes('disabled')).toBeDefined();
+
+    // Successful, cancelled and user messages never offer regenerate.
+    const done = mount(MessageItem, {
+      global,
+      props: {message: message({finishReason: 'stop'}), continued: false, focused: false, liveTraces: []},
+    });
+    expect(findRetry(done)).toBeUndefined();
+    const cancelled = mount(MessageItem, {
+      global,
+      props: {message: message({finishReason: 'cancelled'}), continued: false, focused: false, liveTraces: []},
+    });
+    expect(findRetry(cancelled)).toBeUndefined();
+    const user = mount(MessageItem, {
+      global,
+      props: {message: message({role: 'user'}), continued: false, focused: false, liveTraces: []},
+    });
+    expect(findRetry(user)).toBeUndefined();
+  });
 });
 
 describe('AgenticComposer behaviors', () => {
@@ -226,5 +297,30 @@ describe('AgenticComposer behaviors', () => {
     expect(quote.exists()).toBe(true);
     wrapper.findComponent({name: 'QuoteCard'}).vm.$emit('remove');
     expect(wrapper.emitted('update:quotedMessage')![0]).toEqual([undefined]);
+  });
+
+  // H11: IME composition. The Enter that confirms a candidate (Chinese /
+  // Japanese / Korean input) must never submit the draft — users could not
+  // type multi-character candidates at all otherwise.
+  it('does not submit the Enter that confirms an IME composition', async () => {
+    const wrapper = mount(AgenticComposer, {global, props: {draft: '列出设备'}});
+    const input = wrapper.find('.agentic-input');
+
+    await input.trigger('compositionstart');
+    await input.trigger('keydown', {key: 'Enter', isComposing: true});
+    expect(wrapper.emitted('submit')).toBeUndefined();
+
+    // Legacy engines leave isComposing false on the committing keydown and
+    // report keyCode 229 instead — guard both.
+    const legacy = new KeyboardEvent('keydown', {key: 'Enter', bubbles: true, cancelable: true});
+    Object.defineProperty(legacy, 'keyCode', {value: 229});
+    input.element.dispatchEvent(legacy);
+    await flushPromises();
+    expect(wrapper.emitted('submit')).toBeUndefined();
+
+    // Once the composition has ended, Enter submits as usual.
+    await input.trigger('compositionend');
+    await input.trigger('keydown', {key: 'Enter'});
+    expect(wrapper.emitted('submit')).toHaveLength(1);
   });
 });

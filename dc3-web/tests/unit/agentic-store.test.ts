@@ -17,9 +17,14 @@
 
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {createPinia, setActivePinia} from 'pinia';
+import {watch} from 'vue';
 
 import {useAgenticStore} from '@/store';
-import {mergeEphemeralAssistantState} from '@/store/modules/agentic';
+import {
+  AGENTIC_DELTA_FLUSH_INTERVAL_MS,
+  AGENTIC_SESSIONS_PAGE_LIMIT,
+  mergeEphemeralAssistantState,
+} from '@/store/modules/agentic';
 import type {AgenticMessage, AgenticStreamCallbacks} from '@/config/types';
 
 const apiMocks = vi.hoisted(() => ({
@@ -445,6 +450,233 @@ describe('agentic store', () => {
     store.setWorkbenchExpanded(true);
     store.reset();
     expect(store.workbenchExpanded).toBe(false);
+  });
+
+  it('coalesces a 2000-delta stream into store writes bounded by the frame count', async () => {
+    vi.useFakeTimers();
+    try {
+      const frames = 40;
+      const deltasPerFrame = 50; // 2000 deltas total
+      // The mock emits one network "frame" of deltas, then parks on a gate
+      // the test releases — deterministic frame boundaries without any
+      // wall-clock waiting.
+      let releaseNextFrame!: () => void;
+      apiMocks.streamAgenticChatCompletion.mockImplementation(
+        async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
+          for (let frame = 0; frame < frames; frame += 1) {
+            for (let index = 0; index < deltasPerFrame; index += 1) {
+              callbacks.onDelta?.(`delta-${frame}-${index};`);
+            }
+            await new Promise<void>((resolve) => {
+              releaseNextFrame = resolve;
+            });
+          }
+        }
+      );
+
+      const store = useAgenticStore();
+      store.newSession();
+      const conversationId = store.activeConversationId;
+
+      let storeWrites = 0;
+      const stop = watch(
+        () => store.messagesByConversation[conversationId],
+        () => {
+          storeWrites += 1;
+        }
+      );
+
+      const send = store.sendMessage('long stream');
+      await Promise.resolve(); // the mock emits frame 0 and parks
+      for (let frame = 0; frame < frames - 1; frame += 1) {
+        // Let the coalescing window flush frame `frame` ...
+        await vi.advanceTimersByTimeAsync(AGENTIC_DELTA_FLUSH_INTERVAL_MS + 5);
+        // ... then deliver the next frame's deltas.
+        releaseNextFrame();
+        await Promise.resolve(); // the mock emits the next frame and parks
+      }
+      releaseNextFrame(); // the final frame settles the stream
+      await vi.runAllTimersAsync(); // final window + completion flush
+      await send;
+      stop();
+
+      // One write per coalescing window (plus the initial optimistic turn
+      // and the completion write) — not one write per delta.
+      expect(storeWrites).toBeLessThanOrEqual(frames + 4);
+      expect(storeWrites).toBeGreaterThanOrEqual(2);
+
+      const expected = Array.from({length: frames}, (_, frame) =>
+        Array.from({length: deltasPerFrame}, (_, index) => `delta-${frame}-${index};`).join('')
+      ).join('');
+      const assistant = store.messagesByConversation[conversationId].find(
+        (message) => message.role === 'assistant'
+      );
+      expect(assistant?.content).toBe(expected);
+      expect(assistant?.content).toContain(`delta-${frames - 1}-${deltasPerFrame - 1};`);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('keeps buffered deltas invisible until the window flushes, then lands them all', async () => {
+    vi.useFakeTimers();
+    try {
+      const store = useAgenticStore();
+      store.newSession();
+      const conversationId = store.activeConversationId;
+      apiMocks.streamAgenticChatCompletion.mockImplementation(
+        async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
+          callbacks.onDelta?.('within-window-1;');
+          callbacks.onDelta?.('within-window-2;');
+          await vi.advanceTimersByTimeAsync(AGENTIC_DELTA_FLUSH_INTERVAL_MS);
+        }
+      );
+
+      await store.sendMessage('flush boundaries');
+      const assistant = store.messagesByConversation[conversationId].find(
+        (message) => message.role === 'assistant'
+      );
+      expect(assistant?.content).toBe('within-window-1;within-window-2;');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('appends the next session page without flicker and keeps offsets honest', async () => {
+    const page = (prefix: string, size: number) =>
+      Array.from({length: size}, (_, index) => ({conversationId: `${prefix}-${index}`, title: `${prefix} ${index}`}));
+    apiMocks.listAgenticSessions
+      .mockResolvedValueOnce({items: page('first', AGENTIC_SESSIONS_PAGE_LIMIT), hasNext: true})
+      .mockResolvedValueOnce({items: [...page('second', 2), {conversationId: 'first-0', title: 'dup'}], hasNext: false});
+
+    const store = useAgenticStore();
+    await store.loadSessions();
+    expect(store.sessions).toHaveLength(AGENTIC_SESSIONS_PAGE_LIMIT);
+    expect(store.sessionsHasMore).toBe(true);
+
+    // Appending must not replace the rows already on screen (SWR: stable
+    // identities — the first page's objects are kept as-is).
+    const firstPageRow = store.sessions[0];
+    expect(await store.loadMoreSessions()).toBe(true);
+    expect(store.sessions).toHaveLength(AGENTIC_SESSIONS_PAGE_LIMIT + 2); // duplicate deduped
+    expect(store.sessions[0]).toBe(firstPageRow);
+    expect(apiMocks.listAgenticSessions).toHaveBeenLastCalledWith({
+      offset: AGENTIC_SESSIONS_PAGE_LIMIT,
+      limit: AGENTIC_SESSIONS_PAGE_LIMIT,
+    });
+    expect(store.sessionsHasMore).toBe(false);
+    expect(store.sessionsLoadingMore).toBe(false);
+
+    // No pages left: loading more is a no-op, no request goes out.
+    const callsBefore = apiMocks.listAgenticSessions.mock.calls.length;
+    expect(await store.loadMoreSessions()).toBe(false);
+    expect(apiMocks.listAgenticSessions.mock.calls.length).toBe(callsBefore);
+  });
+
+  it('does not count optimistic local sessions toward the next page offset', async () => {
+    apiMocks.listAgenticSessions
+      .mockResolvedValueOnce({items: [{conversationId: 'server-1', title: 'Server 1'}], hasNext: true})
+      .mockResolvedValueOnce({items: [{conversationId: 'server-2', title: 'Server 2'}], hasNext: false});
+
+    const store = useAgenticStore();
+    await store.loadSessions();
+    // A brand-new local conversation (not yet on the server) joins the list.
+    store.newSession();
+    expect(store.sessions).toHaveLength(2);
+
+    await store.loadMoreSessions();
+    // The offset walked the server rows (1), not the local optimistic row.
+    expect(apiMocks.listAgenticSessions).toHaveBeenLastCalledWith({
+      offset: 1,
+      limit: AGENTIC_SESSIONS_PAGE_LIMIT,
+    });
+    expect(store.sessions.map((session) => session.conversationId)).toContain('server-2');
+  });
+
+  it('regenerates a failed turn by replaying its user message with the same attachments', async () => {
+    apiMocks.streamAgenticChatCompletion.mockImplementation(async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
+      callbacks.onFinish?.('stop');
+    });
+
+    const store = useAgenticStore();
+    store.newSession();
+    const conversationId = store.activeConversationId;
+    // Seed a failed turn: user message with attachments, failed assistant reply.
+    store.messagesByConversation[conversationId] = [
+      {id: 'older-user', role: 'user', content: 'earlier question', createTime: '2026-10-01 09:00:00'},
+      {
+        id: 'failed-assistant',
+        role: 'assistant',
+        content: 'partial answer',
+        finishReason: 'error',
+        streaming: false,
+        createTime: '2026-10-01 09:00:01',
+      },
+      {
+        id: 'failed-user',
+        role: 'user',
+        content: 'retry this question',
+        contentExt: {attachments: ['att-1', 'att-2']},
+        createTime: '2026-10-01 09:01:00',
+      },
+      {
+        id: 'failed-assistant-2',
+        role: 'assistant',
+        content: '',
+        finishReason: 'error',
+        streaming: false,
+        createTime: '2026-10-01 09:01:01',
+      },
+    ];
+
+    expect(await store.retryFailedTurn('failed-assistant-2')).toBe(true);
+
+    // The failed turn and its user message were cut; a fresh user message
+    // reappeared with the same content and attachment ids, followed by a new
+    // streaming assistant placeholder that completed.
+    const messages = store.messagesByConversation[conversationId];
+    expect(messages.some((message) => message.id === 'failed-assistant-2')).toBe(false);
+    expect(messages.some((message) => message.id === 'failed-user')).toBe(false);
+    expect(messages.filter((message) => message.content === 'retry this question')).toHaveLength(1);
+    const retriedUser = messages.find((message) => message.content === 'retry this question')!;
+    expect(retriedUser.contentExt?.attachments).toEqual(['att-1', 'att-2']);
+    // The replayed turn keeps the earlier history intact.
+    expect(messages.some((message) => message.id === 'older-user')).toBe(true);
+    expect(messages[messages.length - 1]!.role).toBe('assistant');
+    expect(messages[messages.length - 1]!.streaming).toBe(false);
+
+    const request = apiMocks.streamAgenticChatCompletion.mock.calls.at(-1)![0];
+    expect(request.messages).toEqual([{role: 'user', content: 'retry this question'}]);
+    expect(request.attachments).toEqual(['att-1', 'att-2']);
+  });
+
+  it('refuses regeneration for unknown or non-assistant messages and while streaming', async () => {
+    const store = useAgenticStore();
+    store.newSession();
+    const conversationId = store.activeConversationId;
+    store.messagesByConversation[conversationId] = [
+      {id: 'user-1', role: 'user', content: 'question', createTime: '2026-10-01 09:00:00'},
+      {
+        id: 'assistant-1',
+        role: 'assistant',
+        content: 'answer',
+        finishReason: 'error',
+        streaming: false,
+        createTime: '2026-10-01 09:00:01',
+      },
+    ];
+
+    expect(await store.retryFailedTurn('missing-id')).toBe(false);
+    expect(await store.retryFailedTurn('user-1')).toBe(false);
+    expect(store.messagesByConversation[conversationId]).toHaveLength(2);
+
+    // While another stream owns the store, regeneration is refused outright.
+    apiMocks.streamAgenticChatCompletion.mockImplementation(() => new Promise(() => undefined));
+    const send = store.sendMessage('in flight');
+    await Promise.resolve();
+    expect(await store.retryFailedTurn('assistant-1')).toBe(false);
+    store.stopStreaming();
+    send.catch(() => undefined);
   });
 });
 

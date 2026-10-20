@@ -16,9 +16,12 @@
  */
 
 import {mount} from '@vue/test-utils';
+import DOMPurify from 'dompurify';
+import {marked} from 'marked';
 import {describe, expect, it, vi} from 'vitest';
 
 import MessageStream from '@/components/agentic/MessageStream.vue';
+import RenderedAssistantMessage from '@/components/agentic/RenderedAssistantMessage.vue';
 import i18n from '@/config/i18n';
 import type {AgenticMessage} from '@/config/types';
 
@@ -30,6 +33,9 @@ vi.mock('vue-element-plus-x', () => ({
 const global = {
   plugins: [i18n],
   stubs: {
+    // G2 needs a real canvas; the perf budgets here measure the markdown
+    // pipeline, not chart rendering.
+    ChartBlock: {name: 'ChartBlock', template: '<div class="chart-block-stub" />'},
     ElIcon: true,
     ElScrollbar: {template: '<div><slot /></div>'},
     ElTag: {template: '<span class="el-tag-stub"><slot /></span>'},
@@ -93,5 +99,79 @@ describe('long conversation capacity', () => {
       expect(wrapper.text()).toContain(id.replace('m', 'message '));
     }
     expect(wrapper.findAllComponents({name: 'MessageItem'})).toHaveLength(120);
+  });
+});
+
+describe('streaming render capacity', () => {
+  // M39 regression bound: every streamed delta used to trigger a full
+  // markdown parse + DOMPurify pass + DOM swap. With delta coalescing in
+  // the store (~one flush per frame) and a raw-text live tail, the number
+  // of parses must stay bounded by the frame count — not the token count —
+  // and the final frame must re-parse and re-sanitize the whole message.
+  const markdownFrame = (frame: number) => {
+    return `**第 ${frame} 段**：风机轴承温度持续攀升，超过告警阈值。建议检查润滑与散热。\n\n- 项号 ${frame}：温度 8${frame % 10}.4℃\n- 项号 ${frame + 1}：负载偏高\n\n\`sensor-${frame}\` 读数异常。\n\n`;
+  };
+
+  it('bounds markdown re-parses for a long chart-free stream and re-sanitizes at the end', async () => {
+    const parseSpy = vi.spyOn(marked, 'parse');
+    const sanitizeSpy = vi.spyOn(DOMPurify, 'sanitize');
+    const totalFrames = 40;
+
+    const wrapper = mount(RenderedAssistantMessage, {
+      global,
+      props: {content: '', streaming: true},
+    });
+
+    let streamed = '';
+    for (let frame = 1; frame <= totalFrames; frame += 1) {
+      streamed += markdownFrame(frame);
+      // one coalesced store flush lands per frame
+      await wrapper.setProps({content: streamed});
+    }
+
+    // The live tail renders as raw text and the stream is chart-free, so no
+    // markdown parse happens at all while streaming.
+    expect(parseSpy.mock.calls.length).toBe(0);
+    expect(wrapper.find('.agentic-markdown--raw').text()).toContain(markdownFrame(1).slice(0, 8));
+
+    await wrapper.setProps({content: streamed, streaming: false});
+
+    // The completion pass renders the full formatted body exactly once.
+    expect(parseSpy.mock.calls.length).toBe(1);
+    expect(sanitizeSpy.mock.calls.length).toBe(1);
+    const rendered = wrapper.find('.agentic-markdown');
+    expect(rendered.text()).toContain('第 1 段');
+    expect(rendered.html()).toContain('<strong>第 1 段</strong>');
+    expect(wrapper.find('.agentic-markdown--raw').exists()).toBe(false);
+  });
+
+  it('parses each closed chart-adjacent segment at most once while charts stream in', async () => {
+    const parseSpy = vi.spyOn(marked, 'parse');
+    const chartFence = (index: number) =>
+      '```chart:line\n' +
+      JSON.stringify({title: `trend ${index}`, series: [{name: 'temp', data: [[index, 80], [index + 1, 82]]}]}) +
+      '\n```';
+
+    const wrapper = mount(RenderedAssistantMessage, {global, props: {content: '', streaming: true}});
+
+    // Three chart fences close over the stream; each closure turns the
+    // markdown before it into a closed segment that parses once.
+    let streamed = '';
+    for (let frame = 1; frame <= 30; frame += 1) {
+      streamed += markdownFrame(frame);
+      if (frame % 10 === 0) streamed += `${chartFence(frame / 10)}\n\n`;
+      await wrapper.setProps({content: streamed});
+    }
+
+    // 3 closed segments parse once each — not once per frame that re-renders
+    // them (30 frames would have re-parsed them 30 times each before).
+    expect(parseSpy.mock.calls.length).toBe(3);
+
+    await wrapper.setProps({content: streamed, streaming: false});
+    // The completion pass re-renders every markdown segment once more
+    // (fresh sanitize).
+    expect(parseSpy.mock.calls.length).toBe(6);
+    expect(wrapper.findAll('.agentic-markdown')).toHaveLength(3);
+    expect(wrapper.findAll('.chart-block-stub')).toHaveLength(3);
   });
 });
