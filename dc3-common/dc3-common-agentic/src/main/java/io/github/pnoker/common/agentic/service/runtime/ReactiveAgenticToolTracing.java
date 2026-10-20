@@ -45,6 +45,9 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
         return delegate.domain();
     }
 
+    /** Upper bound for an error message replayed to the model; internals stay in server logs. */
+    private static final int ERROR_MESSAGE_MAX_CHARS = 300;
+
     @Override
     public Mono<?> call(String arguments, ToolContext context) {
         return Mono.defer(() -> {
@@ -53,20 +56,31 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
                     .cast(Object.class)
                     .doOnNext(result -> recordResult(context, result))
                     .doOnError(error -> AgenticToolContextUtil.recordToolError(
-                            context,
-                            name,
-                            error.getMessage() == null
-                                    ? AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED
-                                    : error.getMessage()))
+                            context, name, sanitizeErrorMessage(error)))
                     .onErrorResume(error -> error instanceof CancellationException
                             ? Mono.error(error)
-                            : Mono.just((Object) AgenticToolResult.error(
-                                    error.getMessage() == null
-                                            ? AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED
-                                            : error.getMessage())));
+                            : Mono.just((Object) AgenticToolResult.error(sanitizeErrorMessage(error))));
         });
     }
 
+    /**
+     * Map an internal failure to a stable, bounded message before it is replayed to the
+     * model and persisted: argument errors lose the raw exception text (it can echo
+     * internal class and query details), everything else is capped in length. The full
+     * stack trace remains in the server-side logs.
+     */
+    private static String sanitizeErrorMessage(Throwable error) {
+        if (error instanceof IllegalArgumentException || error instanceof NumberFormatException) {
+            return "Invalid tool arguments";
+        }
+        String message = error.getMessage();
+        if (message == null || message.isBlank()) {
+            return AgenticConstant.ToolResult.MESSAGE_EXECUTION_FAILED;
+        }
+        return message.length() <= ERROR_MESSAGE_MAX_CHARS
+                ? message
+                : message.substring(0, ERROR_MESSAGE_MAX_CHARS) + "...";
+    }
 
     private void recordResult(ToolContext context, Object result) {
         if (result instanceof AgenticToolResult<?> toolResult) {
