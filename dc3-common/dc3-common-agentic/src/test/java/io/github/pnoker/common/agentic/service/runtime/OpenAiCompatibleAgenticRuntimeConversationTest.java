@@ -175,7 +175,9 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                 chatClientFactory,
                 promptBuilder,
                 ToolCallbackProvider.from(callback),
-                new ReactiveAgenticToolRegistry(null, null),
+                new ReactiveAgenticToolRegistry(
+                        null, null, null, null, null, null, null, null, null, null, null, null,
+                        new tools.jackson.databind.ObjectMapper()),
                 new AgenticProperties());
     }
 

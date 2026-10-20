@@ -17,8 +17,12 @@
 package io.github.pnoker.common.agentic.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.agentic.service.runtime.ReactiveAgenticTool;
+import io.github.pnoker.common.agentic.service.runtime.ReactiveAgenticToolCallback;
+import io.github.pnoker.common.agentic.service.runtime.ReactiveAgenticToolRegistry;
 import io.github.pnoker.common.facade.api.StatusHealthFacade;
 import java.util.Map;
 import java.util.Optional;
@@ -28,13 +32,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbackProvider;
-import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import reactor.core.publisher.Mono;
+import tools.jackson.databind.ObjectMapper;
 
 /**
- * Reproduces the Spring AI @Tool bridge behavior for the SystemTool status methods the
- * same way ChatClientConfig assembles it in production.
+ * Reproduces the Spring AI bridge behavior for the SystemTool status methods the same
+ * way ChatClientConfig assembles it in production: the reactive registry wrapped in
+ * {@link ReactiveAgenticToolCallback} bridges.
  */
 @ExtendWith(MockitoExtension.class)
 class SystemToolCallbackBridgeTest {
@@ -42,29 +46,66 @@ class SystemToolCallbackBridgeTest {
     @Mock
     private StatusHealthFacade statusHealthFacade;
 
+    private ReactiveAgenticToolRegistry registryWith(SystemTool systemTool) {
+        return new ReactiveAgenticToolRegistry(
+                mock(PointValueTool.class),
+                mock(PointTool.class),
+                mock(ProfileTool.class),
+                mock(CommandTool.class),
+                mock(EventTool.class),
+                mock(DeviceTool.class),
+                mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
+                mock(TenantTool.class),
+                mock(UserTool.class),
+                systemTool,
+                new ObjectMapper());
+    }
+
     @Test
     void deviceStatusesCallbackReturnsTheStatusMapThroughSpringAi() {
         when(statusHealthFacade.listDeviceStatusesByIdsReactive(
                         org.mockito.ArgumentMatchers.eq(1L), org.mockito.ArgumentMatchers.anyCollection()))
                 .thenReturn(Mono.just(Map.of(8319267248317138751L, "online")));
         SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
-        ToolCallbackProvider provider =
-                MethodToolCallbackProvider.builder().toolObjects(systemTool).build();
+        ReactiveAgenticToolRegistry registry = registryWith(systemTool);
 
-        ToolCallback deviceStatuses = null;
-        ToolCallback systemHealth = null;
-        for (ToolCallback callback : provider.getToolCallbacks()) {
-            String name = callback.getToolDefinition().name();
-            System.out.println("[bridge] callback: " + name);
-            if ("getDeviceStatuses".equals(name)) deviceStatuses = callback;
-            if ("getSystemHealth".equals(name)) systemHealth = callback;
-        }
-        assertThat(deviceStatuses).as("getDeviceStatuses callback must exist").isNotNull();
-        assertThat(systemHealth).as("getSystemHealth callback must exist").isNotNull();
+        ReactiveAgenticTool deviceStatusesTool = registry.tools().get("getDeviceStatuses");
+        ReactiveAgenticTool systemHealthTool = registry.tools().get("getSystemHealth");
+        assertThat(deviceStatusesTool).as("getDeviceStatuses must be registered").isNotNull();
+        assertThat(systemHealthTool).as("getSystemHealth must be registered").isNotNull();
 
+        ToolCallback deviceStatuses = new ReactiveAgenticToolCallback(deviceStatusesTool);
         ToolContext context = new ToolContext(Map.of("dc3.agentic.tenantId", 1L));
         String result = deviceStatuses.call("{\"deviceIds\":[8319267248317138751]}", context);
-        System.out.println("[bridge] getDeviceStatuses raw result: " + result);
         assertThat(result).as("status map must be keyed by device id").contains("8319267248317138751");
+    }
+
+    @Test
+    void oversizedIdListsAreBoundedAndAnnotated() {
+        when(statusHealthFacade.listDeviceStatusesByIdsReactive(
+                        org.mockito.ArgumentMatchers.eq(1L), org.mockito.ArgumentMatchers.anyCollection()))
+                .thenAnswer(invocation -> Mono.just(Map.of(1L, "online")));
+        SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
+        ReactiveAgenticToolRegistry registry = registryWith(systemTool);
+
+        StringBuilder ids = new StringBuilder("[");
+        for (long id = 1; id <= 60; id++) {
+            if (id > 1) {
+                ids.append(',');
+            }
+            ids.append(id);
+        }
+        ids.append(']');
+        String result = registry
+                .tools()
+                .get("getDeviceStatuses")
+                .call("{\"deviceIds\":" + ids + "}", new ToolContext(Map.of("dc3.agentic.tenantId", 1L)))
+                .block(java.time.Duration.ofSeconds(5))
+                .toString();
+        assertThat(result)
+                .as("the result must tell the model the id list was truncated")
+                .contains("first 50 of 60");
     }
 }

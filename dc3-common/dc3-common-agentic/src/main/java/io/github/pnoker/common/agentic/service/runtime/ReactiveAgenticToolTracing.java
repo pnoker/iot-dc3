@@ -41,6 +41,11 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
     }
 
     @Override
+    public String domain() {
+        return delegate.domain();
+    }
+
+    @Override
     public Mono<?> call(String arguments, ToolContext context) {
         return Mono.defer(() -> {
             AgenticToolContextUtil.recordToolInvocation(context, name, delegate.domain(), name);

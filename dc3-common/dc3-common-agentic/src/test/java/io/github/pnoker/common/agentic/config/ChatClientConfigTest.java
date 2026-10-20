@@ -95,18 +95,22 @@ class ChatClientConfigTest {
         ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
         PointTool pointTool = new PointTool(pointFacade);
         PointValueTool pointValueTool = new PointValueTool(pointValueFacade, pointCommandFacade, actionService);
-        reactiveToolRegistry = new ReactiveAgenticToolRegistry(pointValueTool, new ObjectMapper());
         SystemTool systemTool = new SystemTool(Optional.of(statusHealthFacade));
-        provider = config.agenticToolCallbackProvider(
-                tenantTool,
-                userTool,
+        reactiveToolRegistry = new ReactiveAgenticToolRegistry(
+                pointValueTool,
+                pointTool,
+                profileTool,
+                null,
+                null,
                 deviceTool,
                 driverTool,
-                profileTool,
-                pointTool,
-                pointValueTool,
+                null,
+                null,
+                tenantTool,
+                userTool,
                 systemTool,
                 new ObjectMapper());
+        provider = config.agenticToolCallbackProvider(reactiveToolRegistry);
     }
 
     @Test
@@ -115,9 +119,16 @@ class ChatClientConfigTest {
     }
 
     @Test
+    void springAiProviderBridgesTheFullRegistrySurface() {
+        // The Spring AI path must see exactly what the registry holds — no separate
+        // reflective channel, so the tool surface cannot drift between runtimes.
+        assertThat(toolNames()).isEqualTo(reactiveToolRegistry.tools().keySet());
+    }
+
+    @Test
     void reactiveToolRegistryRegistersWritePointValueOnlyOnce() {
-        assertThat(reactiveToolRegistry.tools())
-                .containsOnlyKeys("writePointValue", "readPointValue", "getLatestPointValue", "getPointValueHistory");
+        assertThat(reactiveToolRegistry.tools().keySet())
+                .contains("writePointValue", "readPointValue", "getLatestPointValue", "getPointValueHistory");
         var tool = reactiveToolRegistry.tools().get("writePointValue");
         assertThat(tool.definition().name()).isEqualTo("writePointValue");
         assertThat(tool.definition().inputSchema()).contains("deviceId", "pointId", "value");
@@ -126,8 +137,9 @@ class ChatClientConfigTest {
     @Test
     void reactiveToolRegistryRegistersProfileOffsetTools() {
         ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
-        ReactiveAgenticToolRegistry registry =
-                new ReactiveAgenticToolRegistry(null, null, profileTool, new ObjectMapper());
+        ReactiveAgenticToolRegistry registry = new ReactiveAgenticToolRegistry(
+                null, null, profileTool, null, null, null, null, null, null, null, null, null,
+                new ObjectMapper());
         assertThat(registry.tools())
                 .containsOnlyKeys(
                         "lookupProfileById", "lookupProfilesByIds", "searchProfiles", "listProfilesByDeviceId");

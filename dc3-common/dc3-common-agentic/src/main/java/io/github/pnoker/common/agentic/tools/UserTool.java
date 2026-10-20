@@ -16,17 +16,15 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 /**
- * User-context tools exposed to the LLM via Spring AI @Tool.
+ * User-context tool registered in the ReactiveAgenticToolRegistry.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -41,8 +39,6 @@ public class UserTool {
      * @param toolContext tool context
      * @return get current user profile result
      */
-    @Tool(description = "Get the current user profile. Returns only user ID, username, and nickname.")
-    @AgenticToolMetadata(domain = "user", title = "Read current user profile")
     public AgenticToolResult<CurrentUserProfile> getCurrentUserProfile(ToolContext toolContext) {
         RequestHeader.PrincipalHeader header = AgenticToolContextUtil.requirePrincipalHeader(toolContext);
         Long userId = AgenticToolContextUtil.requireUserId(toolContext);

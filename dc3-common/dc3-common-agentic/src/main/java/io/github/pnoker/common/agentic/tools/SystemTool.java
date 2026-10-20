@@ -16,7 +16,6 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -31,16 +30,15 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 /**
- * System-health tool exposed to the LLM via Spring AI @Tool.
+ * System-health tool registered in the {@code ReactiveAgenticToolRegistry}.
  *
- * <p>Methods are deliberately synchronous: Spring AI's MethodToolCallback serializes the
- * declared return value as-is, so returning a Mono would serialize the publisher object
- * instead of its result. The agentic runtime invokes these callbacks off the event loop,
- * making the bounded block below safe.</p>
+ * <p>Methods are deliberately synchronous and bounded by {@code CALL_TIMEOUT}: the
+ * registry wraps them in reactive lambdas that execute off the event loop (the
+ * OpenAI-compatible loop on SDK callback threads, the Spring AI bridge on bounded
+ * elastic), making the blocking facade waits safe.</p>
  *
  * @author pnoker
  * @since 2016.10.1
@@ -60,10 +58,6 @@ public class SystemTool {
      * @param toolContext tool context
      * @return get system health result
      */
-    @Tool(
-            description =
-                    "Get a system health snapshot: center services, infrastructure, driver fleet, and device fleet.")
-    @AgenticToolMetadata(domain = "system", title = "Get system health")
     public AgenticToolResult<FacadeSystemHealthBO> getSystemHealth(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getSystemHealth", tenantId);
@@ -84,8 +78,6 @@ public class SystemTool {
      * @param toolContext tool context
      * @return device status map result
      */
-    @Tool(description = "Get the online/offline status of devices by their IDs.")
-    @AgenticToolMetadata(domain = "system", title = "Get device statuses by IDs")
     public AgenticToolResult<Map<Long, String>> getDeviceStatuses(List<Long> deviceIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDeviceStatuses", tenantId);
@@ -117,8 +109,6 @@ public class SystemTool {
      * @param toolContext tool context
      * @return device status map result
      */
-    @Tool(description = "Get the online/offline status of all devices under a profile.")
-    @AgenticToolMetadata(domain = "system", title = "Get device statuses by profile")
     public AgenticToolResult<Map<Long, String>> getDeviceStatusesByProfile(Long profileId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDeviceStatusesByProfile", tenantId);
@@ -143,8 +133,6 @@ public class SystemTool {
      * @param toolContext tool context
      * @return driver status map result
      */
-    @Tool(description = "Get the online/offline status of drivers by their IDs.")
-    @AgenticToolMetadata(domain = "system", title = "Get driver statuses by IDs")
     public AgenticToolResult<Map<Long, String>> getDriverStatuses(List<Long> driverIds, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getDriverStatuses", tenantId);
@@ -176,8 +164,6 @@ public class SystemTool {
      * @param toolContext tool context
      * @return driver device status summary result
      */
-    @Tool(description = "Get the online/offline device status summary for one driver: totals per status.")
-    @AgenticToolMetadata(domain = "system", title = "Get driver device status summary")
     public AgenticToolResult<FacadeDriverDeviceStatusSummaryBO> getDriverDeviceStatusSummary(
             Long driverId, ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);

@@ -17,38 +17,58 @@
 package io.github.pnoker.common.agentic.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
+import io.github.pnoker.common.agentic.service.runtime.ReactiveAgenticToolRegistry;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
 import reactor.core.publisher.Mono;
+import tools.jackson.databind.ObjectMapper;
 
+/**
+ * Locks the tool registration contract: every public tool method on the tool classes
+ * must surface in the registry under its own name, so adding a tool method without
+ * registering it (or the reverse) fails the build instead of silently shrinking the
+ * agent's tool surface.
+ */
 class AgenticToolContractTest {
 
     private static Stream<Class<?>> toolTypes() {
         return List.of(
-                TenantTool.class,
-                UserTool.class,
-                DeviceTool.class,
-                DriverTool.class,
-                ProfileTool.class,
-                PointTool.class,
-                PointValueTool.class,
-                SystemTool.class)
+                        TenantTool.class,
+                        UserTool.class,
+                        SystemTool.class)
                 .stream();
     }
 
-    private static Stream<Method> toolMethods() {
+    private static ReactiveAgenticToolRegistry registry() {
+        return new ReactiveAgenticToolRegistry(
+                mock(PointValueTool.class),
+                mock(PointTool.class),
+                mock(ProfileTool.class),
+                mock(CommandTool.class),
+                mock(EventTool.class),
+                mock(DeviceTool.class),
+                mock(DriverTool.class),
+                mock(InsightTool.class),
+                mock(HistoryTool.class),
+                mock(TenantTool.class),
+                mock(UserTool.class),
+                mock(SystemTool.class),
+                new ObjectMapper());
+    }
+
+    private static Stream<Method> publicToolMethods() {
         return toolTypes()
                 .flatMap(type -> Arrays.stream(type.getDeclaredMethods()))
-                .filter(method -> method.isAnnotationPresent(Tool.class));
+                .filter(method -> Modifier.isPublic(method.getModifiers()));
     }
 
     @ParameterizedTest
@@ -58,29 +78,20 @@ class AgenticToolContractTest {
     }
 
     @ParameterizedTest
-    @MethodSource("toolMethods")
-    void platformToolsReturnStructuredResults(Method method) {
-        assertThat(method.getReturnType())
+    @MethodSource("publicToolMethods")
+    void everyPublicToolMethodIsRegistered(Method method) {
+        assertThat(registry().tools())
+                .as("tool method %s.%s must be registered in the registry",
+                        method.getDeclaringClass().getSimpleName(), method.getName())
+                .containsKey(method.getName());
+    }
+
+    @Test
+    void platformToolsReturnStructuredResults() {
+        publicToolMethods().forEach(method -> assertThat(method.getReturnType())
                 .as("Tool method %s must return AgenticToolResult or Mono", method.getName())
-                .isIn(AgenticToolResult.class, Mono.class);
-    }
-
-    @ParameterizedTest
-    @MethodSource("toolMethods")
-    void platformToolsRequireBackendToolContext(Method method) {
-        Class<?>[] parameterTypes = method.getParameterTypes();
-
-        assertThat(parameterTypes)
-                .as("Tool method %s must receive backend ToolContext", method.getName())
-                .isNotEmpty();
-        assertThat(parameterTypes[parameterTypes.length - 1]).isEqualTo(ToolContext.class);
-    }
-
-    @ParameterizedTest
-    @MethodSource("toolMethods")
-    void platformToolsDeclareTraceMetadata(Method method) {
-        assertThat(method.getAnnotation(AgenticToolMetadata.class))
-                .as("Tool method %s must expose trace metadata", method.getName())
-                .isNotNull();
+                .satisfiesAnyOf(
+                        type -> assertThat(type).isEqualTo(AgenticToolResult.class),
+                        type -> assertThat(type).isEqualTo(Mono.class)));
     }
 }

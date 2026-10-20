@@ -16,16 +16,14 @@
  */
 package io.github.pnoker.common.agentic.tools;
 
-import io.github.pnoker.common.agentic.annotation.AgenticToolMetadata;
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
-import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Component;
 
 /**
- * Tenant-context tools exposed to the LLM via Spring AI @Tool.
+ * Tenant-context tool registered in the ReactiveAgenticToolRegistry.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -40,8 +38,6 @@ public class TenantTool {
      * @param toolContext tool context
      * @return get current tenant info result
      */
-    @Tool(description = "Get the current tenant context. Returns only the current tenant ID.")
-    @AgenticToolMetadata(domain = "tenant", title = "Read current tenant context")
     public AgenticToolResult<CurrentTenantContext> getCurrentTenantInfo(ToolContext toolContext) {
         Long tenantId = AgenticToolContextUtil.requireTenantId(toolContext);
         log.debug("Agentic tool invoked, tool={}, tenantId={}", "getCurrentTenantInfo", tenantId);
