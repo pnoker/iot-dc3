@@ -49,9 +49,4 @@ public class AttachmentVO extends BaseVO {
 
     @Schema(description = "File size of the attachment in bytes.", example = "10240")
     private Long size;
-
-    @Schema(
-            description = "Server-side storage path where the attachment file is persisted.",
-            example = "/storage/attachments/2026/report.pdf")
-    private String filePath;
 }

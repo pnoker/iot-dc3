@@ -118,7 +118,7 @@ public class ProviderController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "false"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @PostMapping("/config/add")
+    @PostMapping("/add")
     public Mono<ModelProviderVO> add(@Validated(Add.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
@@ -147,7 +147,7 @@ public class ProviderController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @PostMapping("/config/update")
+    @PostMapping("/update")
     public Mono<ModelProviderVO> update(@Validated(Update.class) @RequestBody ModelProviderVO request) {
         return getPrincipalHeader().flatMap(header -> {
             ModelProviderBO entityBO = modelProviderBuilder.buildBOByVO(request);
@@ -176,7 +176,7 @@ public class ProviderController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @DeleteMapping("/config/delete")
+    @DeleteMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> delete(
             @Parameter(

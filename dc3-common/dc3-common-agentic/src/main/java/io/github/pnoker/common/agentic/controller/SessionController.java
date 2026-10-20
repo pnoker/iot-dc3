@@ -88,7 +88,6 @@ public class SessionController implements BaseController {
                         .map(page -> new OffsetPage<>(
                                 page.items().stream()
                                         .map(sessionBuilder::buildVOByBO)
-                                        .peek(this::sanitizeSession)
                                         .toList(),
                                 page.offset(),
                                 page.limit(),
@@ -120,8 +119,7 @@ public class SessionController implements BaseController {
                 .flatMap(header -> sessionService
                         .get(conversationId, header)
                         .switchIfEmpty(Mono.error(new NotFoundException("Session does not exist")))
-                        .map(sessionBuilder::buildVOByBO)
-                        .doOnNext(this::sanitizeSession));
+                        .map(sessionBuilder::buildVOByBO));
     }
 
     /** Delete the session. */
@@ -175,13 +173,7 @@ public class SessionController implements BaseController {
             return sessionService
                     .update(conversationId, payload.getSessionExt(), payload.getTitle(), header)
                     .switchIfEmpty(Mono.error(new NotFoundException("Session does not exist")))
-                    .map(sessionBuilder::buildVOByBO)
-                    .doOnNext(this::sanitizeSession);
+                    .map(sessionBuilder::buildVOByBO);
         });
-    }
-
-    private void sanitizeSession(SessionVO session) {
-        session.setTenantId(null);
-        session.setUserId(null);
     }
 }

@@ -17,12 +17,13 @@
 package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.builder.ActionBuilder;
+import io.github.pnoker.common.agentic.entity.dto.ConversationPageQueryDTO;
 import io.github.pnoker.common.agentic.entity.vo.ActionVO;
 import io.github.pnoker.common.agentic.service.ActionService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.db.core.page.OffsetPage;
-import io.github.pnoker.db.core.page.PageRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
@@ -32,8 +33,8 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,21 +55,24 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ActionController implements BaseController {
 
+    private static final int DEFAULT_LIMIT = 50;
+    private static final int MAX_LIMIT = 200;
+
     private final ActionBuilder actionBuilder;
 
     private final ActionService actionService;
 
     /**
-     * List agent tool calls awaiting human approval in the given conversation.
+     * Page agent tool calls awaiting human approval in the given conversation.
      *
-     * @param conversationId client-visible id of the conversation whose pending tool calls are listed; scoped to the current tenant and user
+     * @param query page query carrying the conversation id and optional offset/limit (defaults 0/50, limit capped at 200)
      * @return an offset page of pending ActionVO entries with tool name and parameters
      */
-    @PreAuthorize("@perm.can('action', 'get')")
+    @PreAuthorize("@perm.can('action', 'list')")
     @Operation(
             summary = "List Pending Agent Actions",
             description =
-                    "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. "
+                    "Page agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. "
                             + "Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
             extensions =
                     @Extension(
@@ -79,30 +83,24 @@ public class ActionController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/pending")
-    public Mono<OffsetPage<ActionVO>> pending(
-            @Parameter(
-                            description =
-                                    "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.",
-                            example = "conv-20240618-abc123")
-                    @NotBlank
-                    @RequestParam(value = "conversation_id")
-                    String conversationId,
-            @Parameter(description = "Zero-based offset into the pending action collection.", example = "0")
-                    @RequestParam(value = "offset", defaultValue = "0")
-                    long offset,
-            @Parameter(description = "Maximum number of pending actions to return (1-200).", example = "50")
-                    @RequestParam(value = "limit", defaultValue = "50")
-                    int limit) {
-        return getPrincipalHeader().flatMap(header -> {
-            PageRequest pageRequest = new PageRequest(offset, limit);
-            return actionService
-                    .listPending(pageRequest.offset(), pageRequest.limit(), conversationId, header)
-                    .map(page -> {
-                        List<ActionVO> items = actionBuilder.buildVOListByBOList(page.items());
-                        return OffsetPage.of(items, page.offset(), page.limit(), page.total());
-                    });
-        });
+    @PostMapping("/pending")
+    public Mono<OffsetPage<ActionVO>> pending(@RequestBody(required = false) ConversationPageQueryDTO query) {
+        ConversationPageQueryDTO request = query == null ? new ConversationPageQueryDTO() : query;
+        if (request.getConversationId() == null || request.getConversationId().isBlank()) {
+            return Mono.error(new RequestException("conversation_id is required"));
+        }
+        long offset = request.getOffset() == null ? 0L : request.getOffset();
+        int limit = request.getLimit() == null ? DEFAULT_LIMIT : request.getLimit();
+        if (offset < 0 || limit < 1 || limit > MAX_LIMIT) {
+            return Mono.error(new RequestException("offset must be non-negative and limit must be between 1 and 200"));
+        }
+        return getPrincipalHeader()
+                .flatMap(header -> actionService
+                        .listPending(offset, limit, request.getConversationId(), header)
+                        .map(page -> {
+                            List<ActionVO> items = actionBuilder.buildVOListByBOList(page.items());
+                            return OffsetPage.of(items, page.offset(), page.limit(), page.total());
+                        }));
     }
 
     /**
@@ -111,7 +109,7 @@ public class ActionController implements BaseController {
      * @param actionId id of the pending agent tool call to approve; must belong to the current tenant and be in pending state
      * @return the ActionVO with its updated execution status
      */
-    @PreAuthorize("@perm.can('action', 'list')")
+    @PreAuthorize("@perm.can('action', 'update')")
     @Operation(
             summary = "Confirm Agent Action",
             description =
@@ -145,7 +143,7 @@ public class ActionController implements BaseController {
      * @param actionId id of the pending agent tool call to decline; must belong to the current tenant and be in pending state
      * @return the ActionVO with its updated rejected status
      */
-    @PreAuthorize("@perm.can('action', 'list')")
+    @PreAuthorize("@perm.can('action', 'update')")
     @Operation(
             summary = "Reject Agent Action",
             description =

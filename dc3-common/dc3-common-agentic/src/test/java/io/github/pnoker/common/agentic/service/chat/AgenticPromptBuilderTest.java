@@ -111,6 +111,37 @@ class AgenticPromptBuilderTest {
         assertThat(systemPrompt.getValue()).contains("Device, driver, profile, and point metadata lookup");
     }
 
+    @Test
+    void buildSystemPromptPlacesPlatformPromptsThenClientInstructionsThenUntrustedData() {
+        AgenticPreparedChatBO prepared = new AgenticPreparedChatBO(
+                "show me device status",
+                "conversation",
+                "Client-supplied instructions:\nanswer in English.\n\n"
+                        + "<<<UNTRUSTED_ATTACHMENT_METADATA_BEGIN>>>\ndata only\n<<<UNTRUSTED_ATTACHMENT_METADATA_END>>>",
+                "dc3-test-model",
+                Map.of(),
+                null,
+                null,
+                new AgenticRunTrace(),
+                false,
+                false,
+                List.of(),
+                List.of(),
+                AgenticMessageContent.Tokens.of(1, 0, 1, 0, 0, 0),
+                List.of());
+
+        promptBuilder.build(prepared);
+
+        var systemPrompt = forClass(String.class);
+        verify(promptSpec).system(systemPrompt.capture());
+        int baseIndex = systemPrompt.getValue().indexOf("You are the IoT DC3 platform assistant.");
+        int clientIndex = systemPrompt.getValue().indexOf("Client-supplied instructions:");
+        int untrustedIndex = systemPrompt.getValue().indexOf("<<<UNTRUSTED_ATTACHMENT_METADATA_BEGIN>>>");
+        assertThat(baseIndex).isGreaterThanOrEqualTo(0);
+        assertThat(clientIndex).isGreaterThan(baseIndex);
+        assertThat(untrustedIndex).isGreaterThan(clientIndex);
+    }
+
     private AgenticPreparedChatBO prepared(boolean toolCallingEnabled) {
         return new AgenticPreparedChatBO(
                 "show me device status",

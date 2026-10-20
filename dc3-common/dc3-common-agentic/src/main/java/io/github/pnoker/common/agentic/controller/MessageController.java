@@ -17,22 +17,22 @@
 package io.github.pnoker.common.agentic.controller;
 
 import io.github.pnoker.common.agentic.entity.builder.MessageBuilder;
+import io.github.pnoker.common.agentic.entity.dto.ConversationPageQueryDTO;
 import io.github.pnoker.common.agentic.entity.vo.MessageVO;
-import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
+import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.base.BaseController;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.exception.RequestException;
+import io.github.pnoker.db.core.page.OffsetPage;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotBlank;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
@@ -51,21 +51,24 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class MessageController implements BaseController {
 
+    private static final int DEFAULT_LIMIT = 50;
+    private static final int MAX_LIMIT = 200;
+
     private final MessageBuilder messageBuilder;
 
-    private final ReactiveMessageStore messageStore;
+    private final MessageService messageService;
 
     /**
-     * List the ordered message history of one AI chat session.
+     * Page the ordered message history of one AI chat session.
      *
-     * @param conversationId client-visible id of the conversation whose history is retrieved; scoped to the current user and tenant
-     * @return a list of MessageVO turns (user prompts and assistant replies) in chronological order
+     * @param query page query carrying the conversation id and optional offset/limit (defaults 0/50, limit capped at 200)
+     * @return an offset page of MessageVO turns (user prompts and assistant replies) in chronological order
      */
     @PreAuthorize("@perm.can('message', 'list')")
     @Operation(
             summary = "List Session Messages",
             description =
-                    "List the ordered message history of one AI chat session for the current user and tenant. "
+                    "Page the ordered message history of one AI chat session for the current user and tenant. "
                             + "Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.",
             extensions =
                     @Extension(
@@ -76,19 +79,27 @@ public class MessageController implements BaseController {
                                 @ExtensionProperty(name = "idempotent", value = "true"),
                                 @ExtensionProperty(name = "openWorld", value = "false")
                             }))
-    @GetMapping("/list")
-    public Mono<List<MessageVO>> list(
-            @Parameter(
-                            description =
-                                    "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.",
-                            example = "conv-20240101-abc123")
-                    @NotBlank
-                    @RequestParam(value = "conversation_id")
-                    String conversationId) {
+    @PostMapping("/list")
+    public Mono<OffsetPage<MessageVO>> list(@RequestBody(required = false) ConversationPageQueryDTO query) {
+        ConversationPageQueryDTO request = query == null ? new ConversationPageQueryDTO() : query;
+        if (request.getConversationId() == null || request.getConversationId().isBlank()) {
+            return Mono.error(new RequestException("conversation_id is required"));
+        }
+        long offset = request.getOffset() == null ? 0L : request.getOffset();
+        int limit = request.getLimit() == null ? DEFAULT_LIMIT : request.getLimit();
+        if (offset < 0 || limit < 1 || limit > MAX_LIMIT) {
+            return Mono.error(new RequestException("offset must be non-negative and limit must be between 1 and 200"));
+        }
         return getPrincipalHeader()
-                .flatMap(header -> messageStore
-                        .list(conversationId, header)
-                        .map(messageBuilder::buildVOByBO)
-                        .collectList());
+                .flatMap(header -> messageService
+                        .list(offset, limit, request.getConversationId(), header)
+                        .map(page -> new OffsetPage<>(
+                                page.items().stream()
+                                        .map(messageBuilder::buildVOByBO)
+                                        .toList(),
+                                page.offset(),
+                                page.limit(),
+                                page.total(),
+                                page.hasNext())));
     }
 }
