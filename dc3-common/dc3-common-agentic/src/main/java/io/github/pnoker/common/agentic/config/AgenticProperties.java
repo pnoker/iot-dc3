@@ -138,4 +138,138 @@ public class AgenticProperties {
      */
     @Min(value = 1, message = "Check max models must be greater than 0")
     private int checkMaxModels = 100;
+
+    // ===== Agent loop policy =====
+
+    /**
+     * Maximum agent loop rounds (model call + tool executions) per chat turn.
+     * When the loop would exceed this bound the final round is replayed without
+     * tools so the model is forced to produce a textual answer instead of the
+     * turn failing hard, unless {@link #loopForceFinalRound} is disabled.
+     */
+    @Min(value = 1, message = "Loop max rounds must be greater than 0")
+    private int loopMaxRounds = 8;
+
+    /**
+     * Whether the last permitted loop round is replayed without tools to force a
+     * final textual answer. When false, exceeding {@link #loopMaxRounds} fails
+     * the turn (legacy behavior).
+     */
+    private boolean loopForceFinalRound = true;
+
+    // ===== Streaming backpressure policy =====
+
+    /**
+     * Frame budget the stream may buffer ahead of downstream demand before the
+     * provider side is considered stalled. A slow SSE consumer is tolerated up
+     * to this many buffered frames; the turn only fails once the buffer is full
+     * AND demand stays absent for {@link #streamIdleTimeoutSeconds}.
+     */
+    @Min(value = 1, message = "Stream backpressure buffer must be greater than 0")
+    private int streamBackpressureBuffer = 256;
+
+    /**
+     * Grace period in seconds during which a stream may sit with a full
+     * backpressure buffer and zero downstream demand before failing the turn.
+     * Shields long generations from transient consumer stalls (tab background,
+     * slow proxies) without unbounded memory growth.
+     */
+    @Min(value = 1, message = "Stream idle timeout must be greater than 0 seconds")
+    private int streamIdleTimeoutSeconds = 60;
+
+    /**
+     * Interval in seconds between SSE comment heartbeats emitted while a stream
+     * is open, keeping intermediaries from closing idle connections and making
+     * long tool rounds visible to consumers. Zero disables heartbeats.
+     */
+    @Min(value = 0, message = "Stream heartbeat must not be negative")
+    private int streamHeartbeatSeconds = 15;
+
+    // ===== Provider key encryption =====
+
+    /**
+     * Base64-encoded 256-bit master key used for AES-GCM envelope encryption of
+     * provider API keys at rest. When blank, a stable key is derived from the
+     * platform security key so local development keeps working; production must
+     * set an explicit key (environment variable DC3_AGENTIC_MASTER_KEY).
+     */
+    private String securityMasterKey = "";
+
+    // ===== Transport hardening =====
+
+    /**
+     * Maximum seconds a chat request may wait for an in-flight slot before
+     * failing with an UNAVAILABLE problem instead of queueing forever.
+     */
+    @Min(value = 1, message = "Transport acquire timeout must be greater than 0 seconds")
+    private int transportAcquireTimeoutSeconds = 30;
+
+    /**
+     * Upper bound of concurrently in-flight model requests across ALL providers
+     * for paths that have no provider-specific semaphore (fallback model,
+     * uncached model configs). Protects the process when per-provider limits
+     * cannot apply.
+     */
+    @Min(value = 1, message = "Transport global max concurrent requests must be greater than 0")
+    private int transportGlobalMaxConcurrentRequests = 16;
+
+    /**
+     * Whether a tenant without a model configuration silently falls back to the
+     * platform-wide provider. Disabled by default: the fallback bypasses
+     * per-tenant accounting, so it must be an explicit deployment decision.
+     */
+    private boolean transportFallbackEnabled = false;
+
+    /**
+     * Per-tenant chat requests per second limit enforced at the chat entry
+     * point. Zero disables the limiter.
+     */
+    @Min(value = 0, message = "Per-tenant QPS must not be negative")
+    private int transportPerTenantQps = 0;
+
+    /**
+     * Time-to-live in seconds for the in-process provider/model/client caches.
+     * Bound stale entries after out-of-band provider edits in multi-replica
+     * deployments; eviction notices from the local node refresh immediately.
+     */
+    @Min(value = 1, message = "Transport cache TTL must be greater than 0 seconds")
+    private int transportCacheTtlSeconds = 300;
+
+    /**
+     * Upper bound of cached connectivity check results. Draft probes (no
+     * provider id) use a small fixed partition of this budget so they cannot
+     * grow the cache unboundedly.
+     */
+    @Min(value = 1, message = "Check cache maximum size must be greater than 0")
+    private int checkCacheMaximumSize = 256;
+
+    // ===== Attachment hardening =====
+
+    /**
+     * Comma-separated whitelist of attachment file extensions accepted for
+     * upload. Anything outside the list is rejected before any bytes are
+     * written.
+     */
+    private String attachmentAllowedExtensions = "png,jpg,jpeg,gif,webp,csv,txt,json,md,pdf";
+
+    /**
+     * Maximum number of stored attachments per tenant. Uploads beyond the
+     * quota are rejected.
+     */
+    @Min(value = 1, message = "Attachment tenant max count must be greater than 0")
+    private int attachmentTenantMaxCount = 2000;
+
+    /**
+     * Maximum total stored attachment bytes per tenant.
+     */
+    @Min(value = 1, message = "Attachment tenant max bytes must be greater than 0")
+    private long attachmentTenantMaxBytes = 1073741824L;
+
+    /**
+     * Maximum length of an attachment file name accepted into prompts and
+     * storage metadata; longer names are truncated. Part of the untrusted
+     * content delimiting policy.
+     */
+    @Min(value = 16, message = "Attachment name max length must be at least 16")
+    private int attachmentNameMaxLength = 128;
 }
