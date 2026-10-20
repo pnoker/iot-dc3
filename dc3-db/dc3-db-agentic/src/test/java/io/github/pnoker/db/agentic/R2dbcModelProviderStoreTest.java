@@ -27,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.agentic.config.AgenticProperties;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.utils.AgenticKeyCipher;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -82,7 +83,8 @@ class R2dbcModelProviderStoreTest {
         properties.setSecurityMasterKey(MASTER_KEY);
         lenient().when(propertiesProvider.getIfAvailable()).thenReturn(properties);
         keyCipher = new AgenticKeyCipher(properties);
-        store = new R2dbcModelProviderStore(databaseClient, transactionalOperator, propertiesProvider);
+        store = new R2dbcModelProviderStore(
+                databaseClient, transactionalOperator, propertiesProvider, new StandardR2dbcDialect("postgres", "public.dc3_schema_fingerprint"));
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
         header.setPrincipalId(2L);

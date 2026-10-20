@@ -27,7 +27,9 @@ import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
 import io.github.pnoker.common.utils.UuidV7;
+import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.time.DatabaseInstant;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import org.springframework.beans.factory.ObjectProvider;
@@ -56,20 +58,25 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
     private final AgenticKeyCipher keyCipher;
+    private final R2dbcDialect dialect;
 
     /**
      * Store adapter constructor: the cipher resolves its master key from the
      * agentic properties when the module is active, and from the platform
      * environment otherwise (the store must stay constructible when the
      * agentic module is disabled while this adapter remains on the classpath).
+     * Timestamps bind through {@link R2dbcDialect#bindInstant} so encoding never
+     * depends on the database session timezone.
      */
     public R2dbcModelProviderStore(
             DatabaseClient databaseClient,
             TransactionalOperator transactionalOperator,
-            ObjectProvider<AgenticProperties> propertiesProvider) {
+            ObjectProvider<AgenticProperties> propertiesProvider,
+            R2dbcDialect dialect) {
         this.databaseClient = databaseClient;
         this.transactionalOperator = transactionalOperator;
         this.keyCipher = new AgenticKeyCipher(propertiesProvider.getIfAvailable());
+        this.dialect = dialect;
     }
 
     @Override
@@ -122,10 +129,10 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 .bind("remark", value.getRemark())
                 .bind("creator_id", value.getCreatorId())
                 .bind("creator_name", value.getCreatorName())
-                .bind("create_time", utc(value.getCreateTime()))
+                .bind("create_time", dialect.bindInstant(instant(value.getCreateTime())))
                 .bind("operator_id", value.getOperatorId())
                 .bind("operator_name", value.getOperatorName())
-                .bind("operate_time", utc(value.getOperateTime()))
+                .bind("operate_time", dialect.bindInstant(instant(value.getOperateTime())))
                 .fetch()
                 .rowsUpdated()
                 .flatMap(rows -> rows == 1
@@ -159,7 +166,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 .bind("remark", value.getRemark())
                 .bind("operator_id", value.getOperatorId())
                 .bind("operator_name", value.getOperatorName())
-                .bind("operate_time", utc(value.getOperateTime()))
+                .bind("operate_time", dialect.bindInstant(instant(value.getOperateTime())))
                 .bind("id", value.getId())
                 .bind("tenant_id", value.getTenantId())
                 .fetch()
@@ -176,7 +183,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 .sql("UPDATE " + TABLE + " SET deleted = 1, operator_id = :operator_id,"
                         + " operate_time = :operate_time WHERE id = :id AND tenant_id = :tenant_id AND deleted = 0")
                 .bind("operator_id", header.getUserId())
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("id", id)
                 .bind("tenant_id", header.getTenantId())
                 .fetch()
@@ -202,8 +209,8 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 ? spec.bindNull("last_check_status", Byte.class)
                 : spec.bind("last_check_status", profile.status().getIndex());
         spec = profile.time() == null
-                ? spec.bindNull("last_check_time", LocalDateTime.class)
-                : spec.bind("last_check_time", profile.time());
+                ? spec.bindNull("last_check_time", Instant.class)
+                : spec.bind("last_check_time", dialect.bindInstant(profile.time().toInstant(ZoneOffset.UTC)));
         spec = profile.latencyMs() == null
                 ? spec.bindNull("last_check_latency_ms", Integer.class)
                 : spec.bind("last_check_latency_ms", profile.latencyMs());
@@ -232,7 +239,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
         return databaseClient
                 .sql("UPDATE " + TABLE + " SET default_flag = 0, operate_time = :operate_time"
                         + " WHERE tenant_id = :tenant_id AND default_flag = 1 AND deleted = 0 AND id <> :id")
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("tenant_id", tenantId)
                 .bind("id", exceptId)
                 .fetch()
@@ -309,6 +316,10 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
         return value.getEnableFlag() == null
                 ? EnableFlagEnum.ENABLE.getIndex()
                 : value.getEnableFlag().getIndex();
+    }
+
+    private Instant instant(LocalDateTime value) {
+        return value == null ? Instant.now() : value.toInstant(ZoneOffset.UTC);
     }
 
     private LocalDateTime utc(LocalDateTime value) {
