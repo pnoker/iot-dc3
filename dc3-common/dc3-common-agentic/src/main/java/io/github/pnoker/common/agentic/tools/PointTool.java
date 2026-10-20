@@ -56,7 +56,7 @@ public class PointTool {
                 .collectList()
                 .map(values -> values.isEmpty()
                         ? AgenticToolResult.empty("No points found for IDs: " + ids, List.of())
-                        : AgenticToolResult.ok("Points loaded", values));
+                        : AgenticToolResult.ok("Points loaded" + AgenticToolUtil.idTruncationNote(pointIds, ids), values));
     }
 
     /** Search points matching the request. */

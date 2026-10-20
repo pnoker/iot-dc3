@@ -54,6 +54,24 @@ public class AgenticToolUtil {
     }
 
     /**
+     * Truncation note for the result message when {@link #normalizeIds(List)} dropped part
+     * of the requested identifiers (invalid entries, duplicates or the {@code MAX_IDS}
+     * cap). The model must know it did not receive every entity it asked for, otherwise
+     * it treats the partial answer as complete.
+     *
+     * @param requested the raw identifier list from the model
+     * @param normalized the normalized identifier list actually queried
+     * @return empty string when nothing was dropped, otherwise a human-readable note
+     */
+    public static String idTruncationNote(List<Long> requested, List<Long> normalized) {
+        if (Objects.isNull(requested) || Objects.isNull(normalized) || requested.size() <= normalized.size()) {
+            return "";
+        }
+        return " (queried first "
+                + normalized.size() + " of " + requested.size() + " provided ids)";
+    }
+
+    /**
      * Clamp.
      *
      * @param value value

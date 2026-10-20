@@ -56,7 +56,7 @@ public class EventTool {
                 .collectList()
                 .map(values -> values.isEmpty()
                         ? AgenticToolResult.empty("No events found for IDs: " + ids, List.of())
-                        : AgenticToolResult.ok("Events loaded", values));
+                        : AgenticToolResult.ok("Events loaded" + AgenticToolUtil.idTruncationNote(eventIds, ids), values));
     }
 
     /** Search events matching the request. */

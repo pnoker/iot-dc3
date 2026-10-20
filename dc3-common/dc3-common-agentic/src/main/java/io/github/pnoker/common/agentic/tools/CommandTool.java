@@ -61,7 +61,7 @@ public class CommandTool {
                 .collectList()
                 .map(values -> values.isEmpty()
                         ? AgenticToolResult.empty("No commands found for IDs: " + ids, List.of())
-                        : AgenticToolResult.ok("Commands loaded", values));
+                        : AgenticToolResult.ok("Commands loaded" + AgenticToolUtil.idTruncationNote(commandIds, ids), values));
     }
 
     /** Search commands matching the request. */

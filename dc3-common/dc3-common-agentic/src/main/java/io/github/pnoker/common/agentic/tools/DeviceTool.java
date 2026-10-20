@@ -66,7 +66,7 @@ public class DeviceTool {
                 .collectList()
                 .map(values -> values.isEmpty()
                         ? AgenticToolResult.empty("No devices found for IDs: " + ids, List.of())
-                        : AgenticToolResult.ok("Devices loaded", values));
+                        : AgenticToolResult.ok("Devices loaded" + AgenticToolUtil.idTruncationNote(deviceIds, ids), values));
     }
 
     /** Search devices matching the request. */
