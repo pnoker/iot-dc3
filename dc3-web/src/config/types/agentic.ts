@@ -281,7 +281,6 @@ export interface AgenticAttachment {
   fileName: string;
   contentType: string;
   size: number;
-  filePath?: string;
   createTime?: string;
 
   [key: string]: unknown;
@@ -324,11 +323,11 @@ export interface AgenticChatCompletionRequest {
   stream: boolean;
   /**
    * Stable client-generated conversation ID. The backend uses this to replay chat
-   * memory across turns, so callers MUST reuse the same value for follow-up
-   * messages and only generate a fresh UUID when starting a new conversation.
-   * Leaving this empty is rejected by the backend with HTTP 400.
+   * memory across turns, so callers SHOULD reuse the same value for follow-up
+   * messages. When omitted the backend generates a fresh conversation server-side
+   * (OpenAI stateless style); the generated conversation appears in the session list.
    */
-  conversationId: string;
+  conversationId?: string;
   attachments?: string[];
   reasoning?: boolean;
 }

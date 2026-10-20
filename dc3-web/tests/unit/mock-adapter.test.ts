@@ -239,11 +239,11 @@ describe('mock adapter', () => {
     const defaultSession = sessions.items.find((session: any) => session.sessionExt.category === 'health');
     const defaultMessages = await call({
       url: 'api/v3/agentic/message/list',
-      method: 'get',
-      params: {conversation_id: defaultSession.conversationId},
+      method: 'post',
+      data: {conversationId: defaultSession.conversationId, offset: 0, limit: 200},
     });
-    const finalDefaultReply = defaultMessages.at(-1);
-    expect(defaultMessages.length).toBeGreaterThanOrEqual(12);
+    const finalDefaultReply = defaultMessages.items.at(-1);
+    expect(defaultMessages.items.length).toBeGreaterThanOrEqual(12);
     expect(finalDefaultReply.role).toBe('assistant');
     expect(finalDefaultReply.contentExt.tools.length).toBeGreaterThanOrEqual(4);
     expect(finalDefaultReply.contentExt.charts.length).toBeGreaterThanOrEqual(3);
@@ -251,8 +251,8 @@ describe('mock adapter', () => {
 
     const defaultPending = await call({
       url: 'api/v3/agentic/action/pending',
-      method: 'get',
-      params: {conversation_id: defaultSession.conversationId},
+      method: 'post',
+      data: {conversationId: defaultSession.conversationId, offset: 0, limit: 20},
     });
     expect(defaultPending.items).toHaveLength(1);
     expect(defaultPending.items[0].actionType).toBe('WORK_ORDER_CREATE');
@@ -260,11 +260,11 @@ describe('mock adapter', () => {
     const alarmSession = sessions.items.find((session: any) => session.sessionExt.category === 'alarm');
     const messages = await call({
       url: 'api/v3/agentic/message/list',
-      method: 'get',
-      params: {conversation_id: alarmSession.conversationId},
+      method: 'post',
+      data: {conversationId: alarmSession.conversationId, offset: 0, limit: 200},
     });
-    const richReply = messages.find((message: any) => message.role === 'assistant');
-    expect(messages.length).toBeGreaterThanOrEqual(4);
+    const richReply = messages.items.find((message: any) => message.role === 'assistant');
+    expect(messages.items.length).toBeGreaterThanOrEqual(4);
     expect(richReply.content).not.toMatch(/[\u3400-\u9fff]/u);
     expect(richReply.contentExt.tools.length).toBeGreaterThanOrEqual(3);
     expect(richReply.contentExt.traces.length).toBeGreaterThanOrEqual(3);
@@ -274,8 +274,8 @@ describe('mock adapter', () => {
     const commandSession = sessions.items.find((session: any) => session.sessionExt.category === 'command');
     const pending = await call({
       url: 'api/v3/agentic/action/pending',
-      method: 'get',
-      params: {conversation_id: commandSession.conversationId},
+      method: 'post',
+      data: {conversationId: commandSession.conversationId, offset: 0, limit: 20},
     });
     expect(pending.items).toHaveLength(1);
     expect(pending.items[0].title).not.toMatch(/[\u3400-\u9fff]/u);

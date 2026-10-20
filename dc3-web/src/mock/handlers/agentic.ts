@@ -139,7 +139,7 @@ export function registerAgenticHandlers(): void {
   on('get', 'api/v3/agentic/provider/list', (ctx) =>
     responseOf(ctx.config, ok(ctx.db.agenticProviders)),
   );
-  cud('api/v3/agentic/provider/config', 'agenticProviders');
+  cud('api/v3/agentic/provider', 'agenticProviders');
 
   // ── agentic: connectivity checks ──
   on('post', 'api/v3/agentic/provider/check', (ctx) => {
@@ -257,13 +257,13 @@ export function registerAgenticHandlers(): void {
     }
     return responseOf(ctx.config, fail('NOT_FOUND', 'Session not found', 404), 404);
   });
-  on('get', 'api/v3/agentic/message/list', (ctx) => {
-    const id = ctx.params.conversation_id;
+  on('post', 'api/v3/agentic/message/list', (ctx) => {
+    const id = (ctx.body ?? {}).conversationId ?? ctx.params.conversation_id;
     const rows = ctx.db.agenticMessages
       .filter((m) => String(m.conversationId) === String(id))
       .sort((a, b) => Number(a.messageIndex ?? 0) - Number(b.messageIndex ?? 0))
       .map(localizeAgenticRow);
-    return responseOf(ctx.config, ok(rows));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, (row) => String(row.conversationId) === String(id))));
   });
 
   // ── agentic: chat & actions ──
@@ -282,12 +282,12 @@ export function registerAgenticHandlers(): void {
       }),
     ),
   );
-  on('get', 'api/v3/agentic/action/pending', (ctx) => {
+  on('post', 'api/v3/agentic/action/pending', (ctx) => {
+    const conversationId = (ctx.body ?? {}).conversationId ?? ctx.params.conversation_id;
     const rows = ctx.db.agenticActions
-      .filter((action) =>
-        String(action.conversationId) === String(ctx.params.conversation_id) && Number(action.status) === 0)
+      .filter((action) => String(action.conversationId) === String(conversationId) && Number(action.status) === 0)
       .map(localizeAgenticRow);
-    return responseOf(ctx.config, ok(paginate(rows, ctx.params)));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
   });
   on('post', 'api/v3/agentic/action/confirm', (ctx) => {
     const action = ctx.db.agenticActions.find((item) => String(item.actionId) === String(ctx.params.action_id));

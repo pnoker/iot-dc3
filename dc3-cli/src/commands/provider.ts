@@ -129,7 +129,7 @@ export function registerProviderCommand(program: Command): void {
       else body.defaultFlag = 'NOT_DEFAULT';
       if (opts.disable) body.enableFlag = 'DISABLE';
       else body.enableFlag = 'ENABLE';
-      const result = await dc3Client.post(`${BASE}/config/add`, body);
+      const result = await dc3Client.post(`${BASE}/add`, body);
       printAndExit(result, format);
     });
 
@@ -180,7 +180,7 @@ export function registerProviderCommand(program: Command): void {
           body[field] = current[field];
         }
       }
-      const result = await dc3Client.post(`${BASE}/config/update`, body);
+      const result = await dc3Client.post(`${BASE}/update`, body);
       printAndExit(result, format);
     });
 
@@ -192,8 +192,8 @@ export function registerProviderCommand(program: Command): void {
       const format = detectFormat(opts.format);
       // The id keys the delete — reject empty ids before the wire (audit
       // G13/G27).
-      requireResourceId(`${BASE}/config/delete`, id);
-      await dc3Client.del(`${BASE}/config/delete?id=${encodeURIComponent(id)}`);
+      requireResourceId(`${BASE}/delete`, id);
+      await dc3Client.del(`${BASE}/delete?id=${encodeURIComponent(id)}`);
       printAndExit(undefined, format);
     });
 

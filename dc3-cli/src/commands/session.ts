@@ -73,8 +73,9 @@ export function registerSessionCommand(program: Command): void {
     .action(async (id: string, opts) => {
       requireResourceId('session messages <conversation_id>', id);
       const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        `/api/v3/agentic/message/list?conversation_id=${encodeURIComponent(id)}`,
+      const result = await dc3Client.post(
+        `/api/v3/agentic/message/list`,
+        {conversationId: id, offset: 0, limit: 200},
       );
       printAndExit(result, format);
     });
@@ -172,10 +173,12 @@ export function registerActionCommand(program: Command): void {
       // is invalid input, never `?conversation_id=` on the wire.
       requireResourceId('--conversation-id', opts.conversationId);
       const format = detectFormat(opts.format);
-      const params = new URLSearchParams({ conversation_id: opts.conversationId });
-      if (opts.offset !== undefined) params.set('offset', String(opts.offset));
-      if (opts.limit !== undefined) params.set('limit', String(opts.limit));
-      const result = await dc3Client.get(`/api/v3/agentic/action/pending?${params.toString()}`);
+      const body: Record<string, unknown> = {
+        conversationId: opts.conversationId,
+        offset: opts.offset ?? 0,
+        limit: opts.limit ?? 20,
+      };
+      const result = await dc3Client.post(`/api/v3/agentic/action/pending`, body);
       printAndExit(result, format);
     });
 

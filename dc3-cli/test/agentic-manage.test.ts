@@ -98,7 +98,7 @@ describe('provider command', () => {
       '--api-key', 'sk-test',
       '--format', 'json',
     ]);
-    expect(fetchCalls[0]!.url).toBe('/api/v3/agentic/provider/config/add');
+    expect(fetchCalls[0]!.url).toBe('/api/v3/agentic/provider/add');
     const body = JSON.parse(String(fetchCalls[0]!.init.body));
     expect(body).toMatchObject({ name: 'TestProvider', baseUrl: 'https://api.test.com', providerType: 'ANTHROPIC', apiKey: 'sk-test' });
   });
@@ -106,7 +106,7 @@ describe('provider command', () => {
   it('delete sends DELETE to the delete endpoint', async () => {
     await run(['provider', 'delete', '42', '--format', 'json']);
     expect(fetchCalls[0]!.init.method).toBe('DELETE');
-    expect(fetchCalls[0]!.url).toContain('/agentic/provider/config/delete?id=42');
+    expect(fetchCalls[0]!.url).toContain('/agentic/provider/delete?id=42');
   });
 
   it('check with --id posts to the check endpoint', async () => {
@@ -169,7 +169,7 @@ describe('provider command', () => {
     };
     await run(['provider', 'update', '5', '--name', 'New', '--format', 'json']);
 
-    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    const update = postCalls().find((call) => call.url.endsWith('/provider/update'));
     expect(update, 'update POST issued for the envelope-wrapped entry').toBeDefined();
     expect(bodyOf(update!)).toEqual({
       id: '5',
@@ -209,7 +209,7 @@ describe('provider command', () => {
     ];
     await run(['provider', 'update', '5', '--base-url', 'https://new.example.com', '--format', 'json']);
 
-    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    const update = postCalls().find((call) => call.url.endsWith('/provider/update'));
     expect(update).toBeDefined();
     const body = bodyOf(update!);
     expect(body).toEqual({
@@ -245,7 +245,7 @@ describe('provider command', () => {
   it('update sends an explicitly provided --api-key', async () => {
     providerListResponse = [{ id: '5', name: 'Old', baseUrl: 'u', providerType: 'OPENAI_COMPATIBLE' }];
     await run(['provider', 'update', '5', '--api-key', 'sk-fresh', '--format', 'json']);
-    const update = postCalls().find((call) => call.url.endsWith('/provider/config/update'));
+    const update = postCalls().find((call) => call.url.endsWith('/provider/update'));
     expect(bodyOf(update!).apiKey).toBe('sk-fresh');
   });
 
@@ -258,7 +258,7 @@ describe('provider command', () => {
       message: expect.stringMatching(/unrecognized shape/u),
     });
     expect(
-      postCalls().filter((call) => call.url.endsWith('/provider/config/update')),
+      postCalls().filter((call) => call.url.endsWith('/provider/update')),
     ).toHaveLength(0);
   });
 
@@ -267,7 +267,7 @@ describe('provider command', () => {
       run(['provider', 'update', '99', '--name', 'New', '--format', 'json']),
     ).rejects.toMatchObject({ name: 'ApiError', message: 'Provider 99 not found' });
     expect(
-      postCalls().filter((call) => call.url.endsWith('/provider/config/update')),
+      postCalls().filter((call) => call.url.endsWith('/provider/update')),
     ).toHaveLength(0);
   });
 });

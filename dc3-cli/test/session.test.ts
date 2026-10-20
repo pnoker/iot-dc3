@@ -106,7 +106,8 @@ describe('session command group', () => {
     expect(fetchCalls[0].url).toBe(
       'http://gw.test/api/v3/agentic/session/get_by_conversation_id?conversation_id=conv%20A%26B',
     );
-    expect(fetchCalls[1].url).toContain('/agentic/message/list?conversation_id=conv%20A%26B');
+    expect(fetchCalls[1].url).toContain('/agentic/message/list');
+    expect(JSON.parse(String(fetchCalls[1].init.body)).conversationId).toBe('conv A&B');
   });
 
   it('rename posts the update body with conversation_id param', async () => {
@@ -152,9 +153,12 @@ describe('action approval loop', () => {
 
   it('pending scopes by conversation_id', async () => {
     await run(['action', 'pending', '--conversation-id', 'conv-1']);
-    expect(fetchCalls[0].url).toBe(
-      'http://gw.test/api/v3/agentic/action/pending?conversation_id=conv-1',
-    );
+    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/agentic/action/pending');
+    expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({
+      conversationId: 'conv-1',
+      offset: 0,
+      limit: 20,
+    });
   });
 
   it('confirm and reject post action_id as query param when --yes skips the gate', async () => {
@@ -189,17 +193,21 @@ describe('action approval loop', () => {
 
   it('pending forwards offset and limit when supplied', async () => {
     await run(['action', 'pending', '--conversation-id', 'conv-1', '--offset', '10', '--limit', '5']);
-    expect(fetchCalls[0].url).toBe(
-      'http://gw.test/api/v3/agentic/action/pending?conversation_id=conv-1&offset=10&limit=5',
-    );
+    expect(fetchCalls[0].url).toBe('http://gw.test/api/v3/agentic/action/pending');
+    expect(JSON.parse(String(fetchCalls[0].init.body))).toEqual({
+      conversationId: 'conv-1',
+      offset: 10,
+      limit: 5,
+    });
   });
 
   it('pending encodes a hostile conversation_id instead of injecting extra params (F017)', async () => {
     await run(['action', 'pending', '--conversation-id', 'a&b=c#d']);
     const url = new URL(fetchCalls[0].url);
-    expect(url.searchParams.get('conversation_id')).toBe('a&b=c#d');
+    expect(url.searchParams.get('conversation_id')).toBeNull();
     expect(url.searchParams.get('b')).toBeNull();
     expect(url.searchParams.get('c')).toBeNull();
+    expect(JSON.parse(String(fetchCalls[0].init.body)).conversationId).toBe('a&b=c#d');
   });
 
   it.each([
