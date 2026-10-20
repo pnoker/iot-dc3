@@ -38,6 +38,34 @@ public interface ReactiveMessageStore {
     /** Stream messages matching the request. */
     Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header);
 
+    /**
+     * Count the live messages of one conversation for the principal.
+     *
+     * @param conversationId conversation id
+     * @param header request header carrying tenant and user scope
+     * @return the live message count
+     */
+    default Mono<Long> count(String conversationId, RequestHeader.PrincipalHeader header) {
+        return list(conversationId, header).count();
+    }
+
+    /**
+     * Stream one page of the conversation's messages in stable index order.
+     * Implementations are encouraged to push offset/limit down to the database;
+     * the default materializes the full ordered stream and slices in memory.
+     *
+     * @param conversationId conversation id
+     * @param header request header carrying tenant and user scope
+     * @param offset zero-based row offset
+     * @param limit page size, 1..200 enforced by the caller
+     * @return the page rows in message-index order
+     */
+    default Flux<MessageBO> list(
+            String conversationId, RequestHeader.PrincipalHeader header, long offset, int limit) {
+        Flux<MessageBO> window = list(conversationId, header).skip(offset);
+        return limit > 0 ? window.take(limit) : window;
+    }
+
     /** Stream the conversation history newest-first for the principal. */
     Flux<MessageBO> loadHistory(String conversationId, RequestHeader.PrincipalHeader header, int limit);
 

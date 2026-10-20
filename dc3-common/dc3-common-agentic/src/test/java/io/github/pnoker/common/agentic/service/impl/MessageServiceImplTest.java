@@ -32,6 +32,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
@@ -59,7 +60,8 @@ class MessageServiceImplTest {
 
     @Test
     void slicesTheSecondPageWithTotalsAndHasNext() {
-        when(messageStore.list("conv-1", header)).thenReturn(Flux.fromIterable(messages(5)));
+        when(messageStore.count("conv-1", header)).thenReturn(Mono.just(5L));
+        when(messageStore.list("conv-1", header, 2L, 2)).thenReturn(Flux.fromIterable(messages(2)));
 
         StepVerifier.create(service.list(2L, 2, "conv-1", header))
                 .assertNext(page -> {
@@ -74,7 +76,8 @@ class MessageServiceImplTest {
 
     @Test
     void reportsNoNextPageWhenTheSliceReachesTheEnd() {
-        when(messageStore.list("conv-1", header)).thenReturn(Flux.fromIterable(messages(5)));
+        when(messageStore.count("conv-1", header)).thenReturn(Mono.just(5L));
+        when(messageStore.list("conv-1", header, 4L, 2)).thenReturn(Flux.fromIterable(messages(1)));
 
         StepVerifier.create(service.list(4L, 2, "conv-1", header))
                 .assertNext(page -> {
@@ -86,7 +89,8 @@ class MessageServiceImplTest {
 
     @Test
     void returnsEmptyPageBeyondTheEnd() {
-        when(messageStore.list("conv-1", header)).thenReturn(Flux.fromIterable(messages(3)));
+        when(messageStore.count("conv-1", header)).thenReturn(Mono.just(3L));
+        when(messageStore.list("conv-1", header, 100L, 50)).thenReturn(Flux.empty());
 
         StepVerifier.create(service.list(100L, 50, "conv-1", header))
                 .assertNext(page -> {

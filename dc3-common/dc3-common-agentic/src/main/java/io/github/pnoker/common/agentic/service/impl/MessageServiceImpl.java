@@ -22,7 +22,6 @@ import io.github.pnoker.common.agentic.service.MessageService;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.db.core.page.OffsetPage;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -58,12 +57,10 @@ public class MessageServiceImpl implements MessageService {
         if (limit < 1 || limit > 200) {
             return Mono.error(new RequestException("limit must be between 1 and 200"));
         }
-        return messageStore.list(conversationId, header).collectList().map(messages -> slice(messages, offset, limit));
-    }
-
-    private OffsetPage<MessageBO> slice(List<MessageBO> messages, long offset, int limit) {
-        int fromIndex = (int) Math.min(offset, messages.size());
-        int toIndex = Math.min(fromIndex + limit, messages.size());
-        return OffsetPage.of(messages.subList(fromIndex, toIndex), offset, limit, messages.size());
+        return Mono.zip(
+                        messageStore.count(conversationId, header),
+                        messageStore.list(conversationId, header, offset, limit).collectList())
+                .map(tuple -> OffsetPage.of(
+                        tuple.getT2(), offset, limit, tuple.getT1().intValue()));
     }
 }
