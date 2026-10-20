@@ -93,6 +93,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-tracing-bridge-otel</artifactId>
         </dependency>
+        <!-- Reactor-context to MDC bridging for the request id (ThreadLocalAccessor
+             registration), declared explicitly instead of riding on micrometer-tracing -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>

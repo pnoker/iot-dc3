@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
@@ -45,13 +46,17 @@ class ModelProviderServiceImplTest {
     @Mock
     private ChatClientFactory chatClientFactory;
 
+    @Mock
+    private AgenticBaseUrlValidator baseUrlValidator;
+
     private ModelProviderServiceImpl service;
     private RequestHeader.PrincipalHeader header;
 
     @BeforeEach
     void setUp() {
-        service = new ModelProviderServiceImpl(modelProviderStore, chatClientFactory);
+        service = new ModelProviderServiceImpl(modelProviderStore, chatClientFactory, baseUrlValidator);
         lenient().when(modelProviderStore.clearCheckProfile(any(), any())).thenReturn(Mono.just(true));
+        lenient().when(baseUrlValidator.validateReactive(any())).thenReturn(Mono.empty());
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
         header.setPrincipalId(2L);
@@ -92,6 +97,37 @@ class ModelProviderServiceImplTest {
                     assert error.getMessage().contains("base URL");
                 })
                 .verify();
+    }
+
+    @Test
+    void saveRejectsBaseUrlTheValidatorBlocks() {
+        when(baseUrlValidator.validateReactive("https://127.0.0.1:8080/v1"))
+                .thenReturn(Mono.error(new RequestException("Provider base URL is not allowed")));
+        ModelProviderBO bo = new ModelProviderBO();
+        bo.setName("Local");
+        bo.setBaseUrl("https://127.0.0.1:8080/v1");
+
+        StepVerifier.create(service.add(bo, header))
+                .expectError(RequestException.class)
+                .verify();
+
+        verify(modelProviderStore, never()).insert(any(), any());
+    }
+
+    @Test
+    void updateRejectsBaseUrlTheValidatorBlocks() {
+        ModelProviderBO existing = provider(7L);
+        ModelProviderBO updated = provider(7L);
+        updated.setBaseUrl("https://10.0.0.5/v1");
+        when(modelProviderStore.get(7L, header)).thenReturn(Mono.just(existing));
+        when(baseUrlValidator.validateReactive("https://10.0.0.5/v1"))
+                .thenReturn(Mono.error(new RequestException("Provider base URL is not allowed")));
+
+        StepVerifier.create(service.update(updated, header))
+                .expectError(RequestException.class)
+                .verify();
+
+        verify(modelProviderStore, never()).update(any(), any());
     }
 
     @Test

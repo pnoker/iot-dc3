@@ -20,6 +20,7 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.ModelProviderService;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
@@ -42,6 +43,7 @@ public class ModelProviderServiceImpl implements ModelProviderService {
 
     private final ReactiveModelProviderStore modelProviderStore;
     private final ChatClientFactory chatClientFactory;
+    private final AgenticBaseUrlValidator baseUrlValidator;
 
     @Override
     public Mono<List<ModelProviderBO>> list(RequestHeader.PrincipalHeader header) {
@@ -53,7 +55,9 @@ public class ModelProviderServiceImpl implements ModelProviderService {
         return Mono.defer(() -> {
             validate(entityBO);
             ModelProviderBO value = normalize(entityBO, null, header);
-            return modelProviderStore.insert(value, header);
+            return baseUrlValidator
+                    .validateReactive(value.getBaseUrl())
+                    .then(Mono.defer(() -> modelProviderStore.insert(value, header)));
         });
     }
 
@@ -70,15 +74,17 @@ public class ModelProviderServiceImpl implements ModelProviderService {
                     .flatMap(existing -> {
                         ModelProviderBO value = normalize(entityBO, existing, header);
                         boolean connectivityChanged = connectivityChanged(existing, value);
-                        return modelProviderStore
-                                .update(value, header)
-                                .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
-                                .doOnNext(updated -> chatClientFactory.evict(updated.getId()))
-                                .flatMap(updated -> connectivityChanged
-                                        ? modelProviderStore
-                                                .clearCheckProfile(updated.getId(), header)
-                                                .thenReturn(updated)
-                                        : Mono.just(updated));
+                        return baseUrlValidator
+                                .validateReactive(value.getBaseUrl())
+                                .then(Mono.defer(() -> modelProviderStore
+                                        .update(value, header)
+                                        .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
+                                        .doOnNext(updated -> chatClientFactory.evict(updated.getId()))
+                                        .flatMap(updated -> connectivityChanged
+                                                ? modelProviderStore
+                                                        .clearCheckProfile(updated.getId(), header)
+                                                        .thenReturn(updated)
+                                                : Mono.just(updated))));
                     });
         });
     }

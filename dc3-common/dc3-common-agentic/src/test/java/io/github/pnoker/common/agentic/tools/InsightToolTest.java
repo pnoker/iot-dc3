@@ -140,6 +140,49 @@ class InsightToolTest {
     }
 
     @Test
+    void failureMessagesNeverLeakDownstreamDetails() {
+        when(insightFacade.invokeReactive(eq(11L), eq(InsightFacade.Operations.ALERT_STATS), eq("")))
+                .thenReturn(Mono.error(new IllegalArgumentException(
+                        "internal topology hint: data-center-3.r2dbc://10.0.0.9:5432/insight")));
+
+        StepVerifier.create(tool().getAlertStats(toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.message()).contains("(invalid request)");
+                    assertThat(result.message()).doesNotContain("10.0.0.9");
+                    assertThat(result.message()).doesNotContain("data-center-3");
+                    assertThat(result.message()).doesNotContain("r2dbc");
+                    assertThat(result.message().length()).isLessThanOrEqualTo(200);
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void networkFailuresAreClassifiedAsNetwork() {
+        when(insightFacade.invokeReactive(eq(11L), eq(InsightFacade.Operations.ALERT_STATS), eq("")))
+                .thenReturn(Mono.error(new java.io.IOException("connection reset by peer 10.1.2.3:443")));
+
+        StepVerifier.create(tool().getAlertStats(toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.message()).contains("(network)");
+                    assertThat(result.message()).doesNotContain("10.1.2.3");
+                })
+                .verifyComplete();
+    }
+
+    @Test
+    void unknownFailuresAreClassifiedAsUnexpectedWithoutDetailLeakage() {
+        when(insightFacade.invokeReactive(eq(11L), eq(InsightFacade.Operations.ALERT_STATS), eq("")))
+                .thenReturn(Mono.error(new RuntimeException("com.internal.SecretServiceImpl exploded")));
+
+        StepVerifier.create(tool().getAlertStats(toolContext()))
+                .assertNext(result -> {
+                    assertThat(result.message()).contains("(unexpected)");
+                    assertThat(result.message()).doesNotContain("SecretServiceImpl");
+                })
+                .verifyComplete();
+    }
+
+    @Test
     void insightToolsDoNotFabricateWhenFacadeIsUnavailable() {
         InsightTool tool = new InsightTool(Optional.empty(), objectMapper);
         StepVerifier.create(tool.getAlertStats(toolContext()))

@@ -16,6 +16,8 @@
  */
 package io.github.pnoker.common.agentic.service.check.impl;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
@@ -27,6 +29,7 @@ import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.check.AgenticConnectivityCheckService;
 import io.github.pnoker.common.agentic.service.check.AgenticConnectivityChecker;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.ConnectivityCheckLevelEnum;
@@ -34,9 +37,11 @@ import io.github.pnoker.common.enums.ConnectivityErrorTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.HexFormat;
@@ -45,7 +50,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -53,17 +57,30 @@ import reactor.core.publisher.Mono;
 
 /**
  * Connectivity check orchestration. Single-instance semantics: the in-flight
- * merge and the TTL result cache are process-local maps, so a multi-replica
+ * merge and the result caches are process-local, so a multi-replica
  * deployment degrades to each replica probing once (last write wins on the
  * health profile) instead of sharing probes.
+ *
+ * <p>Every probe target — draft or stored — passes the base URL validator
+ * before the server connects to it, and a stored provider may only be probed
+ * against a different base URL when the request carries an explicit API key,
+ * so the stored key is never sent to a host the tenant did not configure.
+ *
+ * <p>Result caches are bounded and TTL-stamped: stored-provider and
+ * model-config results share a partition capped by
+ * {@code dc3.agentic.check-cache-maximum-size}, while draft probes (keys
+ * derived from client-supplied material) occupy a small fixed partition so
+ * they cannot grow the cache unboundedly.
  *
  * @author pnoker
  * @since 2016.10.1
  */
 @Log4j2
 @Service
-@RequiredArgsConstructor
 public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityCheckService {
+
+    /** Fixed capacity of the draft-probe cache partition. */
+    private static final int DRAFT_CACHE_MAXIMUM_SIZE = 32;
 
     private static final ConnectivityLevelResult SKIPPED_L1 =
             new ConnectivityLevelResult(ConnectivityStatusEnum.SKIPPED, 0, null, null, null, null, null);
@@ -74,9 +91,38 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
     private final ReactiveModelConfigStore modelConfigStore;
     private final AgenticProperties properties;
     private final List<AgenticConnectivityChecker> checkers;
+    private final AgenticBaseUrlValidator baseUrlValidator;
+    private final MeterRegistry meterRegistry;
 
     private final ConcurrentHashMap<String, Mono<ConnectivityCheckResult>> inFlightChecks = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, CachedCheck> cachedChecks = new ConcurrentHashMap<>();
+    private final Cache<String, ConnectivityCheckResult> storedResultCache;
+    private final Cache<String, ConnectivityCheckResult> draftResultCache;
+
+    /** Initialize the two bounded result-cache partitions. */
+    public AgenticConnectivityCheckServiceImpl(
+            ReactiveModelProviderStore modelProviderStore,
+            ReactiveModelConfigStore modelConfigStore,
+            AgenticProperties properties,
+            List<AgenticConnectivityChecker> checkers,
+            AgenticBaseUrlValidator baseUrlValidator,
+            MeterRegistry meterRegistry) {
+        this.modelProviderStore = modelProviderStore;
+        this.modelConfigStore = modelConfigStore;
+        this.properties = properties;
+        this.checkers = checkers;
+        this.baseUrlValidator = baseUrlValidator;
+        this.meterRegistry = meterRegistry;
+        this.storedResultCache = Caffeine.newBuilder()
+                .maximumSize(properties.getCheckCacheMaximumSize())
+                .expireAfterWrite(Duration.ofSeconds(properties.getCheckCacheTtlSeconds()))
+                .build();
+        // Draft probes are keyed by client-controlled material, so they get a
+        // small fixed partition and a shorter TTL (half the configured TTL).
+        this.draftResultCache = Caffeine.newBuilder()
+                .maximumSize(Math.min(DRAFT_CACHE_MAXIMUM_SIZE, properties.getCheckCacheMaximumSize()))
+                .expireAfterWrite(Duration.ofSeconds(Math.max(1, properties.getCheckCacheTtlSeconds() / 2)))
+                .build();
+    }
 
     @Override
     public Mono<ConnectivityCheckResult> checkProvider(
@@ -94,7 +140,10 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
                 String key = providerId != null
                         ? header.getTenantId() + ":provider:" + providerId + ":" + level.getCode()
                         : header.getTenantId() + ":draft:" + draftFingerprint(target) + ":" + level.getCode();
+                Cache<String, ConnectivityCheckResult> partition =
+                        providerId != null ? storedResultCache : draftResultCache;
                 return coordinated(
+                        partition,
                         key,
                         () -> runProviderCheck(target, providerId, request.getModel(), includeL1, includeL2, header));
             });
@@ -106,6 +155,7 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
         if (id == null) return Mono.error(new RequestException("Model config ID is required"));
         String key = header.getTenantId() + ":config:" + id;
         return coordinated(
+                storedResultCache,
                 key,
                 () -> modelConfigStore
                         .get(id, header)
@@ -146,15 +196,19 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
                             });
                 })
                 .flatMap(result -> persistProviderProfile(providerId, includeL2, result, header)
-                        .thenReturn(result));
+                        .thenReturn(result))
+                .doOnNext(result -> recordCheckOutcome(providerId != null ? "provider" : "draft", result));
     }
 
     private Mono<ConnectivityCheckResult> runModelCheck(
             Long configId, ModelProviderBO provider, String model, RequestHeader.PrincipalHeader header) {
-        return executeL2(provider, model)
+        return baseUrlValidator
+                .validateReactive(provider.getBaseUrl())
+                .then(executeL2(provider, model))
                 .map(l2 -> assemble(SKIPPED_L1, l2, false, true))
                 .flatMap(
-                        result -> persistConfigProfile(configId, result, header).thenReturn(result));
+                        result -> persistConfigProfile(configId, result, header).thenReturn(result))
+                .doOnNext(result -> recordCheckOutcome("config", result));
     }
 
     private Mono<ModelProviderBO> resolveTarget(ProviderCheckRequestVO request, RequestHeader.PrincipalHeader header) {
@@ -170,12 +224,22 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
             draft.setProviderType(request.getProviderType());
             draft.setBaseUrl(request.getBaseUrl());
             draft.setApiKey(StringUtils.defaultString(request.getApiKey()));
-            return Mono.just(draft);
+            return baseUrlValidator.validateReactive(draft.getBaseUrl()).thenReturn(draft);
         }
         return modelProviderStore
                 .get(providerId, header)
                 .switchIfEmpty(Mono.error(new NotFoundException("Provider does not exist")))
-                .map(existing -> {
+                .flatMap(existing -> {
+                    boolean baseUrlOverridden = StringUtils.isNotBlank(request.getBaseUrl())
+                            && !StringUtils.equals(request.getBaseUrl(), existing.getBaseUrl());
+                    // A probe against a different base URL must bring its own key: the stored
+                    // API key is bound to the host the tenant configured and must never be
+                    // replayed against an arbitrary host named by the request.
+                    if (baseUrlOverridden && request.getApiKey() == null) {
+                        return Mono.error(new RequestException(
+                                "Probing a custom base URL requires an explicit API key; the stored key is only "
+                                        + "sent to the provider's configured base URL"));
+                    }
                     ModelProviderBO effective = new ModelProviderBO();
                     effective.setId(existing.getId());
                     effective.setProviderType(
@@ -186,7 +250,9 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
                                     : existing.getBaseUrl());
                     // Absent key falls back to the stored one; an explicit empty string is a deliberate no-key probe.
                     effective.setApiKey(request.getApiKey() == null ? existing.getApiKey() : request.getApiKey());
-                    return effective;
+                    return baseUrlValidator
+                            .validateReactive(effective.getBaseUrl())
+                            .thenReturn(effective);
                 });
     }
 
@@ -332,21 +398,37 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
         return null;
     }
 
-    private Mono<ConnectivityCheckResult> coordinated(String key, Supplier<Mono<ConnectivityCheckResult>> run) {
-        CachedCheck cached = cachedChecks.get(key);
-        if (cached != null && cached.fresh(ttlMillis())) {
-            return Mono.just(cached.value());
+    /**
+     * Serve the cached result when fresh, otherwise run the probe exactly once
+     * for concurrent callers. The in-flight merge map is capped: once full,
+     * probes run unmerged rather than growing the map without bound.
+     */
+    private Mono<ConnectivityCheckResult> coordinated(
+            Cache<String, ConnectivityCheckResult> partition, String key, Supplier<Mono<ConnectivityCheckResult>> run) {
+        ConnectivityCheckResult cached = partition.getIfPresent(key);
+        if (cached != null) {
+            return Mono.just(cached);
+        }
+        if (inFlightChecks.size() >= properties.getCheckCacheMaximumSize()) {
+            return run.get();
         }
         return inFlightChecks.computeIfAbsent(
                 key,
                 k -> run.get()
-                        .doOnNext(value -> cachedChecks.put(k, new CachedCheck(value)))
+                        .doOnNext(value -> partition.put(k, value))
                         .doFinally(signal -> inFlightChecks.remove(k))
                         .cache());
     }
 
-    private long ttlMillis() {
-        return properties.getCheckCacheTtlSeconds() * 1000L;
+    private void recordCheckOutcome(String kind, ConnectivityCheckResult result) {
+        meterRegistry
+                .counter(
+                        "agentic.check.results",
+                        "kind",
+                        kind,
+                        "result",
+                        result.overall() == ConnectivityStatusEnum.PASS ? "pass" : "fail")
+                .increment();
     }
 
     private Long parseProviderId(ProviderCheckRequestVO request) {
@@ -371,21 +453,5 @@ public class AgenticConnectivityCheckServiceImpl implements AgenticConnectivityC
 
     private LocalDateTime nowUtc() {
         return LocalDateTime.now(ZoneOffset.UTC);
-    }
-
-    /**
-     * TTL-stamped check result. Entries are replaced on new checks; there is
-     * no background eviction, so the map is bounded by the number of distinct
-     * probe targets per process lifetime.
-     */
-    private record CachedCheck(ConnectivityCheckResult value, long cachedAtMillis) {
-
-        private CachedCheck(ConnectivityCheckResult value) {
-            this(value, System.currentTimeMillis());
-        }
-
-        private boolean fresh(long ttlMillis) {
-            return System.currentTimeMillis() - cachedAtMillis < ttlMillis;
-        }
     }
 }

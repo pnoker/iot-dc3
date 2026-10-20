@@ -22,6 +22,8 @@ import com.anthropic.client.AnthropicClient;
 import com.anthropic.client.AnthropicClientAsync;
 import com.anthropic.client.okhttp.AnthropicOkHttpClient;
 import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.openai.client.OpenAIClient;
 import com.openai.client.OpenAIClientAsync;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
@@ -32,13 +34,17 @@ import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
+import io.micrometer.core.instrument.Gauge;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -49,7 +55,9 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
@@ -58,6 +66,12 @@ import reactor.core.scheduler.Schedulers;
  * Resolves tenant-scoped model configuration reactively and caches transport clients.
  * Database access is completed before prompt construction; synchronous cache reads never
  * cross the persistence boundary.
+ *
+ * <p>Every in-process cache entry expires after {@code dc3.agentic.transport-cache-ttl-seconds}
+ * so out-of-band provider edits cannot keep serving stale transports forever. The
+ * platform-wide fallback client is never cached: a cache miss either re-reads the
+ * provider or, when the fallback is explicitly enabled, builds an uncached fallback
+ * client.
  */
 @Slf4j
 @Component
@@ -67,22 +81,22 @@ public class ChatClientFactory {
 
     private record ProviderKey(Long tenantId, Long providerId) {}
 
-    /** In-flight slot lease; {@link #UNBOUNDED} marks the unthrottled fallback path. */
-    public record InFlightLease(Semaphore semaphore) {
-        private static final InFlightLease UNBOUNDED = new InFlightLease(null);
-    }
+    /** In-flight slot lease over the semaphore the request was admitted to. */
+    public record InFlightLease(Semaphore semaphore) {}
 
-    private final Map<ProviderKey, ChatClient> clientCache = new ConcurrentHashMap<>();
-    private final Map<ProviderKey, ModelProviderBO> providerCache = new ConcurrentHashMap<>();
-    private final Map<ConfigKey, ModelConfigBO> configCache = new ConcurrentHashMap<>();
-    private final Map<Long, ModelConfigBO> defaultConfigCache = new ConcurrentHashMap<>();
+    private final Cache<ProviderKey, ChatClient> clientCache;
+    private final Cache<ProviderKey, ModelProviderBO> providerCache;
+    private final Cache<ConfigKey, ModelConfigBO> configCache;
+    private final Cache<Long, ModelConfigBO> defaultConfigCache;
     private final Map<ProviderKey, Semaphore> inFlightSemaphores = new ConcurrentHashMap<>();
+    private final Semaphore globalInFlightSemaphore;
     private final ExecutorService slotExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final Scheduler slotScheduler = Schedulers.fromExecutorService(slotExecutor);
     private final ReactiveModelProviderStore modelProviderStore;
     private final ReactiveModelConfigStore modelConfigStore;
     private final ChatClient.Builder fallbackBuilder;
     private final AgenticProperties properties;
+    private final MeterRegistry meterRegistry;
 
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
@@ -92,11 +106,24 @@ public class ChatClientFactory {
             ReactiveModelProviderStore modelProviderStore,
             ReactiveModelConfigStore modelConfigStore,
             ChatClient.Builder fallbackBuilder,
-            AgenticProperties properties) {
+            AgenticProperties properties,
+            MeterRegistry meterRegistry) {
         this.modelProviderStore = modelProviderStore;
         this.modelConfigStore = modelConfigStore;
         this.fallbackBuilder = fallbackBuilder;
         this.properties = properties;
+        this.meterRegistry = meterRegistry;
+        Duration ttl = Duration.ofSeconds(properties.getTransportCacheTtlSeconds());
+        this.clientCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
+        this.providerCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
+        this.configCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
+        this.defaultConfigCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
+        this.globalInFlightSemaphore = new Semaphore(properties.getTransportGlobalMaxConcurrentRequests());
+        Gauge.builder(
+                        "agentic.transport.global.permits",
+                        globalInFlightSemaphore,
+                        semaphore -> semaphore.availablePermits())
+                .register(meterRegistry);
     }
 
     /** Resolve the effective chat model for the request, falling back to the tenant default and the configured fallback model. */
@@ -105,7 +132,15 @@ public class ChatClientFactory {
         Mono<ModelConfigBO> selected = candidate == null ? Mono.empty() : loadConfig(candidate, header);
         return selected.switchIfEmpty(loadDefaultConfig(header))
                 .flatMap(config -> warmProvider(config, header).thenReturn(config.getModel()))
-                .switchIfEmpty(Mono.fromSupplier(() -> fallbackModel(candidate)));
+                .switchIfEmpty(Mono.defer(() -> {
+                    if (!properties.isTransportFallbackEnabled()) {
+                        return Mono.error(new ResponseStatusException(
+                                HttpStatus.SERVICE_UNAVAILABLE,
+                                "No model configuration exists for this tenant; configure a model provider "
+                                        + "or enable dc3.agentic.transport-fallback-enabled"));
+                    }
+                    return Mono.fromSupplier(() -> fallbackModel(candidate));
+                }));
     }
 
     /** Report whether the resolved model enables tool calling. */
@@ -121,23 +156,19 @@ public class ChatClientFactory {
 
     /** Return the cached ChatClient for the model, or the fallback client when no config is cached. */
     public ChatClient getOrCreate(String model, Long tenantId) {
-        ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
-        if (config == null) config = defaultConfigCache.get(tenantId);
+        ModelConfigBO config = configCache.getIfPresent(new ConfigKey(tenantId, model));
+        if (config == null) config = defaultConfigCache.getIfPresent(tenantId);
         if (config == null) {
-            log.debug(
-                    "Agentic model config cache miss, using fallback ChatClient, tenantId={}, model={}",
-                    tenantId,
-                    sanitize(model));
-            return fallbackBuilder.build();
+            return uncachedFallbackClient(tenantId, model, "model config cache miss");
         }
         return getOrCreateByProvider(tenantId, config.getProviderId());
     }
 
     /** Return the cached model provider backing the model, or null when unresolved. */
     public ModelProviderBO resolveProviderForModel(String model, Long tenantId) {
-        ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
-        if (config == null) config = defaultConfigCache.get(tenantId);
-        return config == null ? null : providerCache.get(new ProviderKey(tenantId, config.getProviderId()));
+        ModelConfigBO config = configCache.getIfPresent(new ConfigKey(tenantId, model));
+        if (config == null) config = defaultConfigCache.getIfPresent(tenantId);
+        return config == null ? null : providerCache.getIfPresent(new ProviderKey(tenantId, config.getProviderId()));
     }
 
     /** Return the provider type backing the model, or null when unresolved. */
@@ -148,8 +179,8 @@ public class ChatClientFactory {
 
     /** Report whether the cached model config enables tool calling. */
     public boolean supportsToolCall(String model, Long tenantId) {
-        ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
-        if (config == null) config = defaultConfigCache.get(tenantId);
+        ModelConfigBO config = configCache.getIfPresent(new ConfigKey(tenantId, model));
+        if (config == null) config = defaultConfigCache.getIfPresent(tenantId);
         if (config != null) return Boolean.TRUE.equals(config.getToolCall());
         return StringUtils.isNotBlank(fallbackModel)
                 && Strings.CS.equals(model, fallbackModel)
@@ -158,14 +189,18 @@ public class ChatClientFactory {
 
     /** Drop cached configs, providers and clients owned by the provider. */
     public void evict(Long providerId) {
-        providerCache.keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
-        clientCache.entrySet().removeIf(entry -> {
+        providerCache.asMap().keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
+        clientCache.asMap().entrySet().removeIf(entry -> {
             boolean remove = Objects.equals(entry.getKey().providerId(), providerId);
             if (remove) log.info("Agentic ChatClient cache evicted, providerId={}", providerId);
             return remove;
         });
-        configCache.entrySet().removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
+        configCache
+                .asMap()
+                .entrySet()
+                .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
         defaultConfigCache
+                .asMap()
                 .entrySet()
                 .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
         inFlightSemaphores.keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
@@ -173,21 +208,27 @@ public class ChatClientFactory {
 
     /**
      * Acquire one in-flight model-request slot for the resolved provider, parking on
-     * a virtual-thread scheduler while all slots are taken. Returns
-     * {@link InFlightLease#UNBOUNDED} when no provider config is cached — the
-     * fallback ChatClient path has no provider to throttle against.
+     * a virtual-thread scheduler while all slots are taken. Requests whose model has
+     * no cached provider config are admitted against the global semaphore instead of
+     * running unthrottled. Waiting longer than
+     * {@code dc3.agentic.transport-acquire-timeout-seconds} fails fast with an
+     * UNAVAILABLE problem instead of queueing forever.
      */
     public Mono<InFlightLease> acquireInFlightSlot(String model, Long tenantId) {
-        return Mono.fromSupplier(() -> {
+        return Mono.fromCallable(() -> {
                     Semaphore semaphore = resolveInFlightSemaphore(model, tenantId);
-                    if (semaphore == null) {
-                        return InFlightLease.UNBOUNDED;
-                    }
-                    try {
-                        semaphore.acquire();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        throw new IllegalStateException("Interrupted while waiting for an agentic model slot", e);
+                    boolean acquired =
+                            semaphore.tryAcquire(properties.getTransportAcquireTimeoutSeconds(), TimeUnit.SECONDS);
+                    if (!acquired) {
+                        meterRegistry
+                                .counter(
+                                        "agentic.transport.acquire.timeout",
+                                        "scope",
+                                        semaphore == globalInFlightSemaphore ? "global" : "provider")
+                                .increment();
+                        throw new ResponseStatusException(
+                                HttpStatus.SERVICE_UNAVAILABLE,
+                                "Timed out waiting for a free model request slot; retry shortly");
                     }
                     return new InFlightLease(semaphore);
                 })
@@ -202,19 +243,28 @@ public class ChatClientFactory {
     }
 
     private Semaphore resolveInFlightSemaphore(String model, Long tenantId) {
-        if (tenantId == null) {
-            return null;
+        if (tenantId != null) {
+            ModelConfigBO config = configCache.getIfPresent(new ConfigKey(tenantId, model));
+            if (config == null) {
+                config = defaultConfigCache.getIfPresent(tenantId);
+            }
+            if (config != null) {
+                ProviderKey key = new ProviderKey(tenantId, config.getProviderId());
+                Semaphore semaphore = inFlightSemaphores.get(key);
+                if (semaphore == null) {
+                    semaphore = inFlightSemaphores.computeIfAbsent(key, ignored -> {
+                        Semaphore created = new Semaphore(properties.getTransportMaxConcurrentRequests());
+                        Gauge.builder("agentic.transport.provider.permits", created, value -> value.availablePermits())
+                                .tag("tenant", String.valueOf(key.tenantId()))
+                                .tag("provider", String.valueOf(key.providerId()))
+                                .register(meterRegistry);
+                        return created;
+                    });
+                }
+                return semaphore;
+            }
         }
-        ModelConfigBO config = configCache.get(new ConfigKey(tenantId, model));
-        if (config == null) {
-            config = defaultConfigCache.get(tenantId);
-        }
-        if (config == null) {
-            return null;
-        }
-        ProviderKey key = new ProviderKey(tenantId, config.getProviderId());
-        return inFlightSemaphores.computeIfAbsent(
-                key, ignored -> new Semaphore(properties.getTransportMaxConcurrentRequests()));
+        return globalInFlightSemaphore;
     }
 
     /** Build a provider-specific chat options builder, or null when nothing is set. */
@@ -230,20 +280,20 @@ public class ChatClientFactory {
 
     private Mono<ModelConfigBO> loadConfig(String model, RequestHeader.PrincipalHeader header) {
         ConfigKey key = new ConfigKey(header.getTenantId(), model);
-        ModelConfigBO cached = configCache.get(key);
+        ModelConfigBO cached = configCache.getIfPresent(key);
         if (cached != null) return Mono.just(cached);
         return modelConfigStore.getByModel(model, header).doOnNext(this::cacheConfig);
     }
 
     private Mono<ModelConfigBO> loadDefaultConfig(RequestHeader.PrincipalHeader header) {
-        ModelConfigBO cached = defaultConfigCache.get(header.getTenantId());
+        ModelConfigBO cached = defaultConfigCache.getIfPresent(header.getTenantId());
         if (cached != null) return Mono.just(cached);
         return modelConfigStore.getDefault(header).doOnNext(this::cacheConfig);
     }
 
     private Mono<ModelProviderBO> warmProvider(ModelConfigBO config, RequestHeader.PrincipalHeader header) {
         ProviderKey key = new ProviderKey(header.getTenantId(), config.getProviderId());
-        ModelProviderBO cached = providerCache.get(key);
+        ModelProviderBO cached = providerCache.getIfPresent(key);
         if (cached != null) return Mono.just(cached);
         return modelProviderStore
                 .get(config.getProviderId(), header)
@@ -271,28 +321,50 @@ public class ChatClientFactory {
         return candidate;
     }
 
+    /**
+     * Resolve the fallback path on a cache miss: the fallback client is built fresh
+     * (never cached) and only when the deployment explicitly enabled it; otherwise
+     * the request fails with a clear UNAVAILABLE problem instead of silently using
+     * the platform-wide key.
+     */
+    private ChatClient uncachedFallbackClient(Long tenantId, String model, String reason) {
+        if (!properties.isTransportFallbackEnabled()) {
+            throw new ResponseStatusException(
+                    HttpStatus.SERVICE_UNAVAILABLE,
+                    "No usable model configuration for this tenant (" + reason + "); configure a model provider "
+                            + "or enable dc3.agentic.transport-fallback-enabled");
+        }
+        log.debug(
+                "Agentic {} - serving an uncached fallback ChatClient, tenantId={}, model={}",
+                reason,
+                tenantId,
+                sanitize(model));
+        return fallbackBuilder.build();
+    }
+
     private ChatClient getOrCreateByProvider(Long tenantId, Long providerId) {
         ProviderKey key = new ProviderKey(tenantId, providerId);
-        return clientCache.computeIfAbsent(key, ignored -> {
-            ModelProviderBO provider = providerCache.get(key);
-            if (provider == null
-                    || provider.getEnableFlag() == null
-                    || provider.getEnableFlag().getIndex() != 0) {
-                log.warn("Agentic provider cache miss or disabled, tenantId={}, providerId={}", tenantId, providerId);
-                return fallbackBuilder.build();
-            }
-            ChatClient client = AgenticModelProviderTypeEnum.ANTHROPIC.equals(provider.getProviderType())
-                    ? buildAnthropicClient(provider)
-                    : buildOpenAiClient(provider);
-            log.info(
-                    "Agentic ChatClient created, tenantId={}, providerId={}, name={}, type={}, baseUrl={}",
-                    tenantId,
-                    providerId,
-                    provider.getName(),
-                    provider.getProviderType(),
-                    provider.getBaseUrl());
-            return client;
-        });
+        ChatClient cached = clientCache.getIfPresent(key);
+        if (cached != null) return cached;
+        ModelProviderBO provider = providerCache.getIfPresent(key);
+        if (provider == null
+                || provider.getEnableFlag() == null
+                || provider.getEnableFlag().getIndex() != 0) {
+            log.warn("Agentic provider cache miss or disabled, tenantId={}, providerId={}", tenantId, providerId);
+            return uncachedFallbackClient(tenantId, String.valueOf(providerId), "provider cache miss or disabled");
+        }
+        ChatClient client = AgenticModelProviderTypeEnum.ANTHROPIC.equals(provider.getProviderType())
+                ? buildAnthropicClient(provider)
+                : buildOpenAiClient(provider);
+        clientCache.put(key, client);
+        log.info(
+                "Agentic ChatClient created, tenantId={}, providerId={}, name={}, type={}, baseUrl={}",
+                tenantId,
+                providerId,
+                provider.getName(),
+                provider.getProviderType(),
+                provider.getBaseUrl());
+        return client;
     }
 
     private <B extends ChatOptions.Builder<B>> B applyCommonOptions(

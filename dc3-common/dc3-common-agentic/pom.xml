@@ -85,6 +85,14 @@
             <artifactId>springdoc-openapi-starter-common</artifactId>
         </dependency>
 
+        <!-- Bounded TTL caches for connectivity-check results and the
+             provider/model/client transport caches (same usage as the
+             data/manager/auth common modules). -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-r2dbc</artifactId>

@@ -21,6 +21,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
+import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
@@ -29,8 +31,10 @@ import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
+import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +43,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -57,14 +63,29 @@ class AgenticChatServiceImplTest {
     @Mock
     private AgenticRuntime agenticRuntime;
 
+    @Mock
+    private ChatClientFactory chatClientFactory;
+
+    private AgenticProperties properties;
+
+    private SimpleMeterRegistry meterRegistry;
+
     private AgenticChatServiceImpl service;
 
     private RequestHeader.PrincipalHeader userHeader;
 
     @BeforeEach
     void setUp() {
+        properties = new AgenticProperties();
+        meterRegistry = new SimpleMeterRegistry();
         service = new AgenticChatServiceImpl(
-                requestPreparer, new AgenticChatResponseCodec(new ObjectMapper()), messageRecorder, agenticRuntime);
+                requestPreparer,
+                new AgenticChatResponseCodec(new ObjectMapper()),
+                messageRecorder,
+                agenticRuntime,
+                properties,
+                chatClientFactory,
+                meterRegistry);
         userHeader = new RequestHeader.PrincipalHeader();
         userHeader.setTenantId(1L);
         userHeader.setPrincipalId(2L);
@@ -117,6 +138,52 @@ class AgenticChatServiceImplTest {
         assertThat(prepared.runTrace().pendingEvents())
                 .singleElement()
                 .satisfies(event -> assertThat(event.status()).isEqualTo("cancelled"));
+    }
+
+    @Test
+    void perTenantQpsGateRejectsBurstsBeyondTheConfiguredRate() {
+        properties.setTransportPerTenantQps(1);
+        ChatCompletionRequestVO request = new ChatCompletionRequestVO();
+        AgenticPreparedChatBO prepared = prepared();
+        when(requestPreparer.prepareReactive(request, userHeader, "blocking")).thenReturn(Mono.just(prepared));
+        when(agenticRuntime.call(prepared)).thenReturn(Mono.fromSupplier(() -> new AgenticRuntimeResult("ok", "stop")));
+        // First request passes the gate and proceeds; the immediate second is rejected.
+        service.chatCompletion(request, userHeader).block(Duration.ofSeconds(5));
+
+        StepVerifier.create(service.chatCompletion(request, userHeader))
+                .expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(ResponseStatusException.class);
+                    assertThat(((ResponseStatusException) error).getStatusCode())
+                            .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+                })
+                .verify(Duration.ofSeconds(5));
+
+        assertThat(meterRegistry
+                        .get("agentic.chat.requests")
+                        .tag("tenant", "1")
+                        .tag("result", "rejected")
+                        .counter()
+                        .count())
+                .isEqualTo(1.0);
+    }
+
+    @Test
+    void qpsGateIsDisabledAtZero() {
+        properties.setTransportPerTenantQps(0);
+        ChatCompletionRequestVO request = new ChatCompletionRequestVO();
+        AgenticPreparedChatBO prepared = prepared();
+        when(requestPreparer.prepareReactive(request, userHeader, "blocking")).thenReturn(Mono.just(prepared));
+        when(agenticRuntime.call(prepared)).thenReturn(Mono.fromSupplier(() -> new AgenticRuntimeResult("ok", "stop")));
+
+        service.chatCompletion(request, userHeader).block(Duration.ofSeconds(5));
+        service.chatCompletion(request, userHeader).block(Duration.ofSeconds(5));
+        assertThat(meterRegistry
+                        .get("agentic.chat.requests")
+                        .tag("tenant", "1")
+                        .tag("result", "completed")
+                        .counter()
+                        .count())
+                .isEqualTo(2.0);
     }
 
     private AgenticPreparedChatBO prepared() {
