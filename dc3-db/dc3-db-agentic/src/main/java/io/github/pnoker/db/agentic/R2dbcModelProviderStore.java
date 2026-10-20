@@ -16,9 +16,11 @@
  */
 package io.github.pnoker.db.agentic;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.ConnectivityCheckProfile;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
+import io.github.pnoker.common.agentic.utils.AgenticKeyCipher;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityStatusEnum;
@@ -28,7 +30,7 @@ import io.github.pnoker.common.utils.UuidV7;
 import io.github.pnoker.db.core.time.DatabaseInstant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
@@ -36,10 +38,13 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/** Explicit SQL adapter for agentic model providers. */
+/**
+ * Explicit SQL adapter for agentic model providers. API keys cross the
+ * persistence boundary encrypted (AES-256-GCM envelope); reads accept legacy
+ * plaintext rows and the next write upgrades them to ciphertext.
+ */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class})
-@RequiredArgsConstructor
 public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
 
     private static final String TABLE = "dc3_agentic.dc3_model_provider";
@@ -50,6 +55,22 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
 
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
+    private final AgenticKeyCipher keyCipher;
+
+    /**
+     * Store adapter constructor: the cipher resolves its master key from the
+     * agentic properties when the module is active, and from the platform
+     * environment otherwise (the store must stay constructible when the
+     * agentic module is disabled while this adapter remains on the classpath).
+     */
+    public R2dbcModelProviderStore(
+            DatabaseClient databaseClient,
+            TransactionalOperator transactionalOperator,
+            ObjectProvider<AgenticProperties> propertiesProvider) {
+        this.databaseClient = databaseClient;
+        this.transactionalOperator = transactionalOperator;
+        this.keyCipher = new AgenticKeyCipher(propertiesProvider.getIfAvailable());
+    }
 
     @Override
     public Flux<ModelProviderBO> list(RequestHeader.PrincipalHeader header) {
@@ -94,7 +115,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 .bind("name", value.getName())
                 .bind("provider_type", providerType(value))
                 .bind("base_url", value.getBaseUrl())
-                .bind("api_key", value.getApiKey())
+                .bind("api_key", keyCipher.encrypt(value.getApiKey()))
                 .bind("default_flag", defaultFlag(value))
                 .bind("enable_flag", enableFlag(value))
                 .bind("tenant_id", value.getTenantId())
@@ -132,7 +153,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 .bind("name", value.getName())
                 .bind("provider_type", providerType(value))
                 .bind("base_url", value.getBaseUrl())
-                .bind("api_key", value.getApiKey())
+                .bind("api_key", keyCipher.encrypt(value.getApiKey()))
                 .bind("default_flag", defaultFlag(value))
                 .bind("enable_flag", enableFlag(value))
                 .bind("remark", value.getRemark())
@@ -243,7 +264,7 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
         value.setProviderType(
                 AgenticModelProviderTypeEnum.ofIndex(providerType == null ? null : providerType.byteValue()));
         value.setBaseUrl(row.get("base_url", String.class));
-        value.setApiKey(row.get("api_key", String.class));
+        value.setApiKey(keyCipher.decrypt(row.get("api_key", String.class)));
         Number defaultFlag = row.get("default_flag", Number.class);
         value.setDefaultFlag(DefaultFlagEnum.ofIndex(defaultFlag == null ? null : defaultFlag.byteValue()));
         Number enableFlag = row.get("enable_flag", Number.class);

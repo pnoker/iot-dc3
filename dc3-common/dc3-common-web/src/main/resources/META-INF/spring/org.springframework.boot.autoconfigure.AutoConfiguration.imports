@@ -20,3 +20,4 @@ io.github.pnoker.common.config.WebFluxConfig
 io.github.pnoker.common.config.WebFluxSecurityConfig
 io.github.pnoker.common.config.SpringDocConfig
 io.github.pnoker.common.filter.RequestIdWebFilter
+io.github.pnoker.common.config.RequestIdContextPropagationConfig

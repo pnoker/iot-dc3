@@ -18,7 +18,9 @@ package io.github.pnoker.common.agentic.tools;
 
 import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.utils.AgenticToolContextUtil;
+import io.github.pnoker.common.constant.common.RequestIdConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import io.github.pnoker.common.exception.RequestException;
 import io.github.pnoker.common.facade.api.InsightFacade;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,6 +28,8 @@ import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -34,6 +38,11 @@ import tools.jackson.databind.ObjectMapper;
 /**
  * Insight tools exposing alert analytics, dashboard stats, analytics queries and the point
  * command status loop through the {@link InsightFacade} insight channel.
+ *
+ * <p>Downstream failures never leak their raw exception messages back to the
+ * model: the tool answers with a stable, category-classified phrase plus the
+ * request correlation id, while the internal detail (with stack trace) stays
+ * in the server log.
  *
  * @author pnoker
  * @since 2016.10.1
@@ -44,6 +53,9 @@ import tools.jackson.databind.ObjectMapper;
 public class InsightTool {
 
     private static final String DOMAIN = "insight";
+
+    /** Upper bound of the failure message returned to the model. */
+    private static final int FAILURE_MESSAGE_MAX_LENGTH = 200;
 
     private final Optional<InsightFacade> insightFacade;
 
@@ -526,9 +538,53 @@ public class InsightTool {
                         ? AgenticToolResult.<Object>empty("No data returned by " + toolName, null)
                         : AgenticToolResult.ok(okMessage, objectMapper.readValue(json, Object.class)))
                 .onErrorResume(error -> {
-                    log.warn("Agentic insight tool failed, tool={}, operation={}", toolName, operation, error);
-                    return Mono.just(AgenticToolResult.error(
-                            AgenticConstant.ToolMessage.REQUEST_FAILED + ": " + error.getMessage()));
+                    log.warn(
+                            "Agentic insight tool failed, tool={}, operation={}, tenantId={}, classification={}",
+                            toolName,
+                            operation,
+                            tenantId,
+                            classify(error),
+                            error);
+                    return Mono.just(AgenticToolResult.error(sanitizedFailureMessage(error)));
                 });
+    }
+
+    /**
+     * Stable, category-classified failure phrase for the model, correlated
+     * with the request id so an operator can join it to the full server-side
+     * detail. Never contains the raw downstream exception message.
+     */
+    private static String sanitizedFailureMessage(Throwable error) {
+        String category = classify(error);
+        String requestId = MDC.get(RequestIdConstant.MDC_KEY);
+        String message = AgenticConstant.ToolMessage.REQUEST_FAILED + " (" + category + ")";
+        if (StringUtils.isNotBlank(requestId)) {
+            message += ", requestId=" + requestId;
+        }
+        message += "; see server logs for details";
+        return StringUtils.abbreviate(message, FAILURE_MESSAGE_MAX_LENGTH);
+    }
+
+    /** Map a downstream failure to a coarse, stable category by walking the cause chain. */
+    private static String classify(Throwable error) {
+        for (Throwable current = error; current != null; current = current.getCause()) {
+            if (current instanceof IllegalArgumentException || current instanceof RequestException) {
+                return "invalid request";
+            }
+            if (current instanceof java.io.IOException || current instanceof java.util.concurrent.TimeoutException) {
+                return "network";
+            }
+            if (current instanceof org.springframework.dao.DataAccessException) {
+                return "storage";
+            }
+            String name = current.getClass().getSimpleName();
+            if (name.contains("Timeout") || name.contains("Connect") || name.contains("Unavailable")) {
+                return "network";
+            }
+            if (name.contains("DataAccess") || name.contains("R2dbc") || name.contains("Sql")) {
+                return "storage";
+            }
+        }
+        return "unexpected";
     }
 }

@@ -35,6 +35,7 @@ import io.github.pnoker.common.agentic.entity.vo.ProviderCheckRequestVO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
 import io.github.pnoker.common.agentic.service.check.impl.AgenticConnectivityCheckServiceImpl;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityCheckLevelEnum;
@@ -42,6 +43,8 @@ import io.github.pnoker.common.enums.ConnectivityErrorTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityStatusEnum;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import java.net.InetAddress;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,12 +74,35 @@ class AgenticConnectivityCheckServiceImplTest {
 
     private RequestHeader.PrincipalHeader header;
 
+    /** Validator stub resolving every host to a public address. */
+    private static AgenticBaseUrlValidator permissiveValidator() {
+        return validatorFor("93.184.216.34");
+    }
+
+    /** Validator stub resolving every host to a loopback address (SSRF target). */
+    private static AgenticBaseUrlValidator loopbackValidator() {
+        return validatorFor("127.0.0.1");
+    }
+
+    private static AgenticBaseUrlValidator validatorFor(String literal) {
+        return new AgenticBaseUrlValidator(host -> InetAddress.getAllByName(literal));
+    }
+
+    private AgenticConnectivityCheckServiceImpl serviceWith(AgenticBaseUrlValidator validator) {
+        return new AgenticConnectivityCheckServiceImpl(
+                modelProviderStore,
+                modelConfigStore,
+                properties,
+                List.of(checker),
+                validator,
+                new SimpleMeterRegistry());
+    }
+
     @BeforeEach
     void setUp() {
         properties = new AgenticProperties();
         properties.setCheckCacheTtlSeconds(60);
-        service = new AgenticConnectivityCheckServiceImpl(
-                modelProviderStore, modelConfigStore, properties, List.of(checker));
+        service = serviceWith(permissiveValidator());
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
         header.setPrincipalId(2L);
@@ -157,14 +183,14 @@ class AgenticConnectivityCheckServiceImplTest {
     @Test
     void draftCheckUsesRequestBodyAndNeverPersists() {
         when(checker.checkL1(any(ModelProviderBO.class)))
-                .thenReturn(Mono.just(ConnectivityLevelResult.passL1(90, List.of("local-model"))));
-        when(checker.checkL2(any(ModelProviderBO.class), eq("local-model")))
-                .thenReturn(Mono.just(ConnectivityLevelResult.passL2(150, "local-model")));
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL1(90, List.of("remote-model"))));
+        when(checker.checkL2(any(ModelProviderBO.class), eq("remote-model")))
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL2(150, "remote-model")));
 
         ProviderCheckRequestVO request = new ProviderCheckRequestVO();
         request.setProviderType(AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
-        request.setBaseUrl("http://localhost:11434/v1");
-        request.setModel("local-model");
+        request.setBaseUrl("https://api.openai.com/v1");
+        request.setModel("remote-model");
 
         StepVerifier.create(service.checkProvider(request, header))
                 .assertNext(result -> assertEquals(ConnectivityStatusEnum.PASS, result.overall()))
@@ -172,9 +198,95 @@ class AgenticConnectivityCheckServiceImplTest {
 
         ArgumentCaptor<ModelProviderBO> targetCaptor = ArgumentCaptor.forClass(ModelProviderBO.class);
         verify(checker).checkL1(targetCaptor.capture());
-        assertEquals("http://localhost:11434/v1", targetCaptor.getValue().getBaseUrl());
+        assertEquals("https://api.openai.com/v1", targetCaptor.getValue().getBaseUrl());
         assertEquals("", targetCaptor.getValue().getApiKey());
         verify(modelProviderStore, never()).updateCheckProfile(any(), any(), any());
+    }
+
+    @Test
+    void draftCheckRejectsNonPublicBaseUrlBeforeProbing() {
+        service = serviceWith(loopbackValidator());
+
+        ProviderCheckRequestVO request = new ProviderCheckRequestVO();
+        request.setProviderType(AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
+        request.setBaseUrl("http://127.0.0.1:11434/v1");
+        request.setApiKey("attacker-supplied-key");
+
+        StepVerifier.create(service.checkProvider(request, header))
+                .expectErrorSatisfies(error -> {
+                    assertEquals(RequestException.class, error.getClass());
+                    assertEquals(
+                            "Provider base URL is not allowed: host '127.0.0.1' does not resolve to a public address",
+                            error.getMessage());
+                })
+                .verify();
+
+        verify(checker, never()).checkL1(any());
+        verify(checker, never()).checkL2(any(), any());
+    }
+
+    @Test
+    void storedProviderProbeWithChangedBaseUrlRequiresAnExplicitApiKey() {
+        when(modelProviderStore.get(100L, header)).thenReturn(Mono.just(savedProvider()));
+
+        ProviderCheckRequestVO request = new ProviderCheckRequestVO();
+        request.setId("100");
+        request.setBaseUrl("https://attacker.example.com/v1");
+
+        StepVerifier.create(service.checkProvider(request, header))
+                .expectErrorSatisfies(error -> {
+                    assertEquals(RequestException.class, error.getClass());
+                    assertEquals(
+                            "Probing a custom base URL requires an explicit API key; the stored key is only "
+                                    + "sent to the provider's configured base URL",
+                            error.getMessage());
+                })
+                .verify();
+
+        verify(checker, never()).checkL1(any());
+        verify(checker, never()).checkL2(any(), any());
+    }
+
+    @Test
+    void storedProviderProbeWithChangedBaseUrlAndExplicitKeyUsesTheOverride() {
+        when(modelProviderStore.get(100L, header)).thenReturn(Mono.just(savedProvider()));
+        when(checker.checkL1(any(ModelProviderBO.class)))
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL1(80, List.of("deepseek-chat"))));
+        when(checker.checkL2(any(ModelProviderBO.class), eq("deepseek-chat")))
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL2(140, "deepseek-chat")));
+        when(modelConfigStore.list(header, true)).thenReturn(Flux.just(configOf("deepseek-chat", 100L)));
+        when(modelProviderStore.updateCheckProfile(any(), any(), any())).thenReturn(Mono.just(true));
+
+        ProviderCheckRequestVO request = new ProviderCheckRequestVO();
+        request.setId("100");
+        request.setBaseUrl("https://api.deepseek.com/v2");
+        request.setApiKey("fresh-explicit-key");
+
+        StepVerifier.create(service.checkProvider(request, header))
+                .assertNext(result -> assertEquals(ConnectivityStatusEnum.PASS, result.overall()))
+                .verifyComplete();
+
+        ArgumentCaptor<ModelProviderBO> targetCaptor = ArgumentCaptor.forClass(ModelProviderBO.class);
+        verify(checker).checkL1(targetCaptor.capture());
+        assertEquals("https://api.deepseek.com/v2", targetCaptor.getValue().getBaseUrl());
+        assertEquals("fresh-explicit-key", targetCaptor.getValue().getApiKey());
+    }
+
+    @Test
+    void storedProviderProbeRejectsBlockedStoredBaseUrl() {
+        service = serviceWith(loopbackValidator());
+        ModelProviderBO provider = savedProvider();
+        provider.setBaseUrl("http://10.0.0.5:8080/v1");
+        when(modelProviderStore.get(100L, header)).thenReturn(Mono.just(provider));
+
+        ProviderCheckRequestVO request = new ProviderCheckRequestVO();
+        request.setId("100");
+
+        StepVerifier.create(service.checkProvider(request, header))
+                .expectError(RequestException.class)
+                .verify();
+
+        verify(checker, never()).checkL1(any());
     }
 
     @Test
@@ -276,6 +388,39 @@ class AgenticConnectivityCheckServiceImplTest {
 
         verify(checker, times(1)).checkL1(any(ModelProviderBO.class));
         verify(modelProviderStore, times(1)).updateCheckProfile(any(), any(), any());
+    }
+
+    @Test
+    void draftResultsOccupyTheirOwnPartition() {
+        // Draft probes are keyed by client material; the draft partition is a
+        // small fixed cache, so probing 40 distinct drafts must not evict
+        // stored-provider results and cannot grow beyond its cap.
+        when(modelProviderStore.get(100L, header)).thenReturn(Mono.just(savedProvider()));
+        when(checker.checkL1(any(ModelProviderBO.class)))
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL1(80, List.of("deepseek-chat"))));
+        when(checker.checkL2(any(ModelProviderBO.class), eq("deepseek-chat")))
+                .thenReturn(Mono.just(ConnectivityLevelResult.passL2(140, "deepseek-chat")));
+        when(modelConfigStore.list(header, true)).thenReturn(Flux.just(configOf("deepseek-chat", 100L)));
+        when(modelProviderStore.updateCheckProfile(any(), any(), any())).thenReturn(Mono.just(true));
+
+        ProviderCheckRequestVO providerRequest = new ProviderCheckRequestVO();
+        providerRequest.setId("100");
+        service.checkProvider(providerRequest, header).block();
+
+        for (int i = 0; i < 40; i++) {
+            ProviderCheckRequestVO draft = new ProviderCheckRequestVO();
+            draft.setProviderType(AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE);
+            draft.setBaseUrl("https://host" + i + ".example.com/v1");
+            draft.setApiKey("draft-key-" + i);
+            service.checkProvider(draft, header).block();
+        }
+
+        // The stored-provider result survives the draft flood: the repeat
+        // check is served from cache, so the provider was probed once.
+        service.checkProvider(providerRequest, header).block();
+        verify(checker, times(1))
+                .checkL1(org.mockito.ArgumentMatchers.argThat(
+                        target -> target != null && Long.valueOf(100L).equals(target.getId())));
     }
 
     @Test
