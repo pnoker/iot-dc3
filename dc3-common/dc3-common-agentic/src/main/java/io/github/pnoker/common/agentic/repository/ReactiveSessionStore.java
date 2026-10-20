@@ -26,7 +26,15 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for agentic conversation sessions. */
 public interface ReactiveSessionStore {
 
-    /** Create or refresh the session and emit the stored state. */
+    /**
+     * Create or refresh the session and emit the stored state.
+     *
+     * <p>Soft-deleted conversation ids are reusable: when the conversation's row is a soft-delete
+     * tombstone, {@code touch} revives that row as a brand-new session (title and extension reset,
+     * creation restarted) instead of failing on the natural-key uniqueness constraint, which must
+     * stay a full constraint because {@code dc3_message}, {@code dc3_attachment}, and
+     * {@code dc3_action} reference it with foreign keys.
+     */
     Mono<SessionBO> touch(String conversationId, SessionExt sessionExt, RequestHeader.PrincipalHeader header);
 
     /** Load the session for the request. */
@@ -40,14 +48,20 @@ public interface ReactiveSessionStore {
             java.util.List<SortSpec> sort,
             RequestHeader.PrincipalHeader header);
 
-    /** Update one session and emit the updated row. */
+    /**
+     * Update one session and emit the updated row. The read-merge-write sequence runs under a
+     * row lock inside one transaction, so concurrent updates merge instead of overwriting each
+     * other. Completes empty when the session does not exist.
+     */
     Mono<SessionBO> update(
             String conversationId, SessionExt sessionExt, String title, RequestHeader.PrincipalHeader header);
 
     /**
-     * Delete the session. Implementations also remove the session's stored attachment files
-     * best-effort after the database delete commits; file cleanup failures must not fail the
-     * delete.
+     * Soft-delete the session and its messages, attachments, and actions in one transaction,
+     * locking the session row first so concurrent attachment uploads serialize against the
+     * delete. Returns the number of deleted session rows (0 when already deleted); stored
+     * attachment file cleanup is the caller's responsibility, driven by
+     * {@link ReactiveAttachmentStore#listDeletedFilePaths}.
      */
     Mono<Long> delete(String conversationId, RequestHeader.PrincipalHeader header);
 }

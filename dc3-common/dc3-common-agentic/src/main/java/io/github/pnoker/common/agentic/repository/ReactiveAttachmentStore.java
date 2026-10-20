@@ -25,11 +25,24 @@ import reactor.core.publisher.Mono;
 /** Reactive persistence port for attachment metadata. */
 public interface ReactiveAttachmentStore {
 
-    /** Save the attachment, inserting or updating as needed. */
+    /**
+     * Save the attachment. The insert runs in one transaction with a live-session guard
+     * ({@code SELECT ... FOR UPDATE} on the owning session), so a save racing a concurrent
+     * session delete either lands before the delete or fails with a clear error instead of
+     * leaving a zombie row for a soft-deleted conversation.
+     */
     Mono<AttachmentBO> save(AttachmentBO attachment);
 
     /** Stream attachments matching the request. */
     Flux<AttachmentBO> list(String conversationId, RequestHeader.PrincipalHeader header);
+
+    /**
+     * Stream the stored file paths of the conversation's soft-deleted attachments. Used by the
+     * session delete orchestration to unlink files after the database delete commits; live
+     * attachments are excluded on purpose so a conversation revived after the delete keeps its
+     * newly uploaded files.
+     */
+    Flux<String> listDeletedFilePaths(String conversationId, RequestHeader.PrincipalHeader header);
 
     /** Load the attachments for the given ids. */
     Flux<AttachmentBO> getByIds(Collection<Long> ids, RequestHeader.PrincipalHeader header);

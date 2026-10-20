@@ -23,32 +23,48 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Best-effort filesystem cleanup for stored conversation attachments.
  *
- * <p>Owns the attachment storage-root policy so upload path resolution and delete-time
- * file unlinking share one root and one boundary guard and can never drift apart. All
- * operations are warn-only: a missing, undeletable, or out-of-root file must never fail
- * the database side of an attachment or session delete.
+ * <p>Owns the attachment storage-root policy so upload path resolution and delete-time file
+ * unlinking share one root and one boundary guard and can never drift apart. All operations are
+ * warn-only: a missing, undeletable, or out-of-root file must never fail the database side of an
+ * attachment or session delete. The blocking {@link Files} unlink always runs on the injected
+ * {@link Scheduler} (bounded elastic in production), so no caller can execute file deletion on a
+ * Reactor Netty event loop.
  *
  * @author pnoker
  * @since 2026.9.22
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class AttachmentFileCleaner {
 
     private final AgenticProperties properties;
+    private final Scheduler unlinkScheduler;
 
     private Path storageRoot;
+
+    /** Spring wiring: unlinks run on the shared bounded-elastic scheduler. */
+    @Autowired
+    public AttachmentFileCleaner(AgenticProperties properties) {
+        this(properties, Schedulers.boundedElastic());
+    }
+
+    /** Test and alternate-wiring path: unlinks run on the given scheduler. */
+    AttachmentFileCleaner(AgenticProperties properties, Scheduler unlinkScheduler) {
+        this.properties = properties;
+        this.unlinkScheduler = unlinkScheduler;
+    }
 
     @PostConstruct
     void initializeStorageRoot() {
@@ -63,24 +79,26 @@ public class AttachmentFileCleaner {
     /** Unlink one stored attachment file, resolving it and enforcing the storage-root boundary. */
     public Mono<Void> unlink(String storedFilePath) {
         if (StringUtils.isBlank(storedFilePath)) return Mono.empty();
-        return Mono.fromRunnable(() -> {
-            try {
-                Files.deleteIfExists(resolveWithinRoot(storedFilePath));
-            } catch (Exception exception) {
-                log.warn("Attachment file cleanup failed, file={}", storedFilePath, exception);
-            }
-        });
+        return Mono.<Void>fromRunnable(() -> {
+                    try {
+                        Files.deleteIfExists(resolveWithinRoot(storedFilePath));
+                    } catch (Exception exception) {
+                        log.warn("Attachment file cleanup failed, file={}", storedFilePath, exception);
+                    }
+                })
+                .subscribeOn(unlinkScheduler);
     }
 
     /** Unlink one already-resolved attachment file, used for upload rollback of just-created paths. */
     Mono<Void> unlink(Path path) {
-        return Mono.fromRunnable(() -> {
-            try {
-                Files.deleteIfExists(path);
-            } catch (Exception exception) {
-                log.warn("Attachment file cleanup failed, file={}", path, exception);
-            }
-        });
+        return Mono.<Void>fromRunnable(() -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (Exception exception) {
+                        log.warn("Attachment file cleanup failed, file={}", path, exception);
+                    }
+                })
+                .subscribeOn(unlinkScheduler);
     }
 
     /** Unlink every stored attachment file in the collection, each best-effort. */

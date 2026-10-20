@@ -19,10 +19,9 @@ package io.github.pnoker.db.agentic;
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
 import io.github.pnoker.common.entity.common.RequestHeader;
+import io.github.pnoker.db.core.dialect.R2dbcDialect;
 import io.github.pnoker.db.core.time.DatabaseInstant;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -34,7 +33,14 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/** Explicit SQL adapter for attachment metadata. */
+/**
+ * Explicit SQL adapter for attachment metadata.
+ *
+ * <p>Timestamps are stored in {@code TIMESTAMPTZ} columns and bound as {@link Instant} through
+ * {@link R2dbcDialect#bindInstant}, so encoding never depends on the database session timezone.
+ * The {@link AttachmentBO} wall-clock fields stay UTC-naive; reads normalize through
+ * {@link DatabaseInstant#toLocalDateTimeUtc}.
+ */
 @Repository
 @ConditionalOnClass({DatabaseClient.class, TransactionalOperator.class})
 @RequiredArgsConstructor
@@ -47,18 +53,34 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
 
     private final DatabaseClient databaseClient;
     private final TransactionalOperator transactionalOperator;
+    private final R2dbcDialect dialect;
 
     @Override
     public Mono<AttachmentBO> save(AttachmentBO attachment) {
         Objects.requireNonNull(attachment, "attachment must not be null");
+        Instant now = Instant.now();
         String sql = "INSERT INTO " + TABLE
                 + " (conversation_id, file_name, content_type, size, file_path, tenant_id, user_id,"
                 + " creator_id, creator_name, operator_id, operator_name, create_time, operate_time, deleted)"
                 + " VALUES (:conversation_id, :file_name, :content_type, :size, :file_path, :tenant_id, :user_id,"
                 + " :creator_id, :creator_name, :operator_id, :operator_name, :create_time, :operate_time, 0)";
-        LocalDateTime now = utcNow();
+        // Guard on the live session row under the same lock the session delete takes: a save
+        // racing a delete either lands before the delete soft-deletes the children or fails
+        // here, never surviving as a live row of a soft-deleted conversation.
+        Mono<Void> sessionGuard = databaseClient
+                .sql("SELECT id FROM dc3_agentic.dc3_session"
+                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id AND deleted = 0 FOR UPDATE")
+                .bind("conversation_id", attachment.getConversationId())
+                .bind("tenant_id", attachment.getTenantId())
+                .bind("user_id", attachment.getUserId())
+                .fetch()
+                .all()
+                .switchIfEmpty(Mono.error(
+                        new IllegalStateException("session must exist and must be live before saving an attachment")))
+                .then();
         return transactionalOperator
-                .transactional(databaseClient
+                .transactional(sessionGuard.then(databaseClient
                         .sql(sql)
                         .bind("conversation_id", attachment.getConversationId())
                         .bind("file_name", attachment.getFileName())
@@ -71,14 +93,14 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
                         .bind("creator_name", attachment.getCreatorName())
                         .bind("operator_id", attachment.getOperatorId())
                         .bind("operator_name", attachment.getOperatorName())
-                        .bind("create_time", now)
-                        .bind("operate_time", now)
+                        .bind("create_time", dialect.bindInstant(now))
+                        .bind("operate_time", dialect.bindInstant(now))
                         .fetch()
                         .rowsUpdated()
                         .flatMap(rows -> rows == 1
                                 ? getByPath(attachment.getFilePath(), attachment.getTenantId(), attachment.getUserId())
                                 : Mono.error(
-                                        new IllegalStateException("attachment insert affected " + rows + " rows"))))
+                                        new IllegalStateException("attachment insert affected " + rows + " rows")))))
                 .switchIfEmpty(Mono.error(new IllegalStateException("attachment insert returned no row")));
     }
 
@@ -94,6 +116,21 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
                 .map(this::map)
+                .all();
+    }
+
+    @Override
+    public Flux<String> listDeletedFilePaths(String conversationId, RequestHeader.PrincipalHeader header) {
+        if (header == null) return Flux.error(new IllegalArgumentException("header must not be null"));
+        if (conversationId == null || conversationId.isBlank()) return Flux.empty();
+        return databaseClient
+                .sql("SELECT file_path FROM " + TABLE
+                        + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id"
+                        + " AND user_id = :user_id AND deleted = 1")
+                .bind("conversation_id", conversationId)
+                .bind("tenant_id", header.getTenantId())
+                .bind("user_id", header.getUserId())
+                .map((row, metadata) -> row.get("file_path", String.class))
                 .all();
     }
 
@@ -139,7 +176,7 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
                         + " operate_time = :operate_time WHERE id = :id AND tenant_id = :tenant_id"
                         + " AND user_id = :user_id AND deleted = 0")
                 .bind("operator_id", header.getUserId())
-                .bind("operate_time", utcNow())
+                .bind("operate_time", dialect.bindInstant(Instant.now()))
                 .bind("id", id)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
@@ -178,9 +215,5 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
         attachment.setOperatorName(row.get("operator_name", String.class));
         attachment.setOperateTime(DatabaseInstant.toLocalDateTimeUtc(row.get("operate_time")));
         return attachment;
-    }
-
-    private LocalDateTime utcNow() {
-        return LocalDateTime.ofInstant(Instant.now(), ZoneOffset.UTC);
     }
 }
