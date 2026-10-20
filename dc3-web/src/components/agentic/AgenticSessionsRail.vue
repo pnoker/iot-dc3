@@ -135,8 +135,19 @@
         <div v-if="filteredSessions.length === 0" class="agentic-sessions__empty">
           {{ searchQuery ? t('agentic.searchEmpty') : t('agentic.headerNoHistory') }}
         </div>
-        <div v-else-if="truncated" class="agentic-sessions__hint">
-          {{ t('agentic.sessionsTruncated') }}
+        <!-- Pagination: the store fetched the first page; more sessions stay
+             reachable instead of permanently hidden behind the page size. -->
+        <div v-if="hasMore" class="agentic-sessions__more">
+          <el-button
+            :loading="loadingMore"
+            :disabled="disabled"
+            class="agentic-sessions__more-button"
+            link
+            size="small"
+            @click="emit('load-more')"
+          >
+            {{ t('agentic.sessionsLoadMore') }}
+          </el-button>
         </div>
 
         <div v-if="filteredArchived.length" class="agentic-sessions__archived">
@@ -239,7 +250,7 @@
         :maxlength="80"
         :placeholder="t('agentic.dialogConversationTitle')"
         clearable
-        @keydown.enter.prevent="confirmRename"
+        @keydown.enter.prevent="handleRenameKeydown"
       />
       <template #footer>
         <el-button size="small" @click="renameDialogVisible = false">{{ t('agentic.dialogCancel') }}</el-button>
@@ -260,16 +271,19 @@
 import {Box, ChatDotRound, Delete, EditPen, Expand, Fold, FolderOpened, MoreFilled, Plus, Search} from '@element-plus/icons-vue';
 import {computed, nextTick, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
-import type {AgenticSession} from '@/config/types';
+import {isImeCompositionKey} from './ime';
+import {isSessionArchived, sessionMatchesSearch, type SessionListItem} from './sessionList';
 
 const props = defineProps<{
-  sessions: Array<AgenticSession & {title: string}>;
+  sessions: SessionListItem[];
   activeId: string;
   sessionActionLoading: Record<string, boolean>;
   disabled: boolean;
   collapsed: boolean;
-  /** The store caps the list at 50; surface that instead of silently hiding. */
-  truncated?: boolean;
+  /** More session pages remain on the server; the rail can extend the list. */
+  hasMore?: boolean;
+  /** A follow-up page request is in flight. */
+  loadingMore?: boolean;
 }>();
 const emit = defineEmits<{
   select: [conversationId: string];
@@ -279,6 +293,7 @@ const emit = defineEmits<{
   /** Toggle the archive mark of a session (true = archive, false = restore). */
   archive: [conversationId: string, archived: boolean];
   'toggle-collapse': [];
+  'load-more': [];
 }>();
 
 const {t} = useI18n();
@@ -286,14 +301,11 @@ const archivedOpen = ref(false);
 const searchQuery = ref('');
 const searchInputRef = ref<{focus?: () => void}>();
 
-const isArchived = (session: AgenticSession) => Boolean(session.sessionExt?.archived);
-const matchesSearch = (session: AgenticSession & {title: string}) => {
-  const needle = searchQuery.value.trim().toLowerCase();
-  if (!needle) return true;
-  return `${session.title} ${session.summary || ''}`.toLowerCase().includes(needle);
-};
-const filteredSessions = computed(() => props.sessions.filter((session) => !isArchived(session) && matchesSearch(session)));
-const filteredArchived = computed(() => props.sessions.filter((session) => isArchived(session) && matchesSearch(session)));
+// Archive folding and search matching come from the shared session-list
+// contract so the docked history dropdown applies the exact same rules.
+const matchesSearch = (session: SessionListItem) => sessionMatchesSearch(session, searchQuery.value);
+const filteredSessions = computed(() => props.sessions.filter((session) => !isSessionArchived(session) && matchesSearch(session)));
+const filteredArchived = computed(() => props.sessions.filter((session) => isSessionArchived(session) && matchesSearch(session)));
 
 const focusSearch = () => {
   if (props.collapsed) emit('toggle-collapse');
@@ -304,7 +316,7 @@ const renameDialogVisible = ref(false);
 const renameTargetId = ref('');
 const renameDraft = ref('');
 
-const handleItemCommand = (command: string, session: AgenticSession & {title: string}) => {
+const handleItemCommand = (command: string, session: SessionListItem) => {
   if (command === 'rename') {
     renameTargetId.value = session.conversationId;
     renameDraft.value = session.title;
@@ -321,6 +333,14 @@ const confirmRename = () => {
   if (!title || !renameTargetId.value || props.disabled) return;
   renameDialogVisible.value = false;
   emit('rename', renameTargetId.value, title);
+};
+
+const handleRenameKeydown = (event: Event | KeyboardEvent) => {
+  // The Enter that commits an IME candidate (CJK input) must not save.
+  // el-input re-emits keydown as Event | KeyboardEvent; at runtime a keydown
+  // is always a KeyboardEvent.
+  if (isImeCompositionKey(event as KeyboardEvent)) return;
+  confirmRename();
 };
 </script>
 
@@ -463,10 +483,15 @@ const confirmRename = () => {
     font-size: 12px;
   }
 
-  &__hint {
-    padding: var(--dc3-space-2) var(--dc3-space-3);
-    color: var(--dc3-text-muted);
-    font-size: 11px;
+  &__more {
+    display: flex;
+    justify-content: center;
+    padding: var(--dc3-space-1) 0;
+  }
+
+  &__more-button {
+    // Link buttons stretch full-width by default inside the flex column.
+    width: auto;
   }
 
   &__archived {
@@ -532,7 +557,7 @@ const confirmRename = () => {
   // Icon rail only — text rows and the archive section need full width.
   .agentic-sessions__item-text,
   .agentic-sessions__item-more,
-  .agentic-sessions__hint,
+  .agentic-sessions__more,
   .agentic-sessions__empty,
   .agentic-sessions__archived {
     display: none;

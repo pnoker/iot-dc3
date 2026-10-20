@@ -56,6 +56,22 @@ const DEFAULT_MODEL: AgenticModel = {
   reasoning: false,
 };
 
+/**
+ * Page size for session list requests. The first load fetches this many rows;
+ * `loadMoreSessions` walks subsequent pages so older conversations stay
+ * reachable instead of being permanently hidden behind the page size.
+ */
+export const AGENTIC_SESSIONS_PAGE_LIMIT = 50;
+
+/**
+ * Coalescing window for streaming text deltas. Every token used to write
+ * straight into the store, re-rendering the whole conversation per token
+ * (O(n²) over a long stream); deltas now accumulate for one window and land
+ * in a single store write (~20 updates/s), and always flush synchronously
+ * when a stream settles (finish, failure, or reset) so no text is ever lost.
+ */
+export const AGENTIC_DELTA_FLUSH_INTERVAL_MS = 50;
+
 /** Pinia store for the agentic chat panel: sessions, messages, attachments, models, and streaming state. */
 export const useAgenticStore = defineStore('agentic', () => {
   const visible = ref(false);
@@ -67,6 +83,13 @@ export const useAgenticStore = defineStore('agentic', () => {
   const loading = ref(false);
   const sessionsLoading = ref(false);
   const sessionsError = ref<unknown | null>(null);
+  // Session pagination: the list loads one page; `loadMoreSessions` appends
+  // the next page without replacing the rows already on screen.
+  const sessionsHasMore = ref(false);
+  const sessionsLoadingMore = ref(false);
+  // Rows actually received from the server — the offset for the next page.
+  // Optimistic local sessions (never seen by the server) must not advance it.
+  let sessionsServerCount = 0;
   const streaming = ref(false);
   const streamingConversationId = ref('');
   const sessions = ref<AgenticSession[]>([]);
@@ -100,6 +123,18 @@ export const useAgenticStore = defineStore('agentic', () => {
   const pendingActionsRequestTokens = new Map<string, number>();
   const sessionModelRequestTokens = new Map<string, number>();
   const sessionPreferenceRequestTokens = new Map<string, number>();
+
+  // ---- streaming delta coalescing -------------------------------------------
+  // Incoming text deltas buffer here (keyed by the streaming message id) and
+  // flush to the store on the coalescing cadence or when the stream settles,
+  // turning per-token store writes into per-window writes.
+  interface PendingStreamText {
+    conversationId: string;
+    content: string;
+    reasoning: string;
+  }
+  const pendingStreamText = new Map<string, PendingStreamText>();
+  let streamFlushTimer: ReturnType<typeof setTimeout> | undefined;
 
   const activeModel = computed(() => {
     return models.value.find((model) => model.model === selectedModel.value) || models.value[0] || DEFAULT_MODEL;
@@ -245,15 +280,32 @@ export const useAgenticStore = defineStore('agentic', () => {
     maxTokens.value = maxTokens.value ?? firstModel.maxTokens;
   };
 
+  // `hasNext` is the contract flag; fall back to the page-size heuristic for
+  // backends that omit it.
+  /**
+   * @param response - the session list response (may omit hasNext)
+   * @param items - the normalized rows of that page
+   * @returns true when another page can be requested
+   */
+  const hasMoreSessionPages = (
+    response: {hasNext?: boolean} | undefined,
+    items: AgenticSession[]
+  ): boolean => {
+    return typeof response?.hasNext === 'boolean' ? response.hasNext : items.length >= AGENTIC_SESSIONS_PAGE_LIMIT;
+  };
+
   const loadSessions = async () => {
     const currentLifecycle = lifecycleToken;
     const requestToken = ++sessionsRequestToken;
     sessionsLoading.value = true;
     sessionsError.value = null;
     try {
-      const response = await listAgenticSessions({offset: 0, limit: 50});
+      const response = await listAgenticSessions({offset: 0, limit: AGENTIC_SESSIONS_PAGE_LIMIT});
       if (currentLifecycle !== lifecycleToken || requestToken !== sessionsRequestToken) return true;
-      sessions.value = (response?.items || []).map(normalizeSession);
+      const items = (response?.items || []).map(normalizeSession);
+      sessions.value = items;
+      sessionsServerCount = items.length;
+      sessionsHasMore.value = hasMoreSessionPages(response, items);
       sessionsError.value = null;
       if (activeConversationId.value) {
         restoreSessionModel(sessions.value.find((session) => session.conversationId === activeConversationId.value));
@@ -266,6 +318,48 @@ export const useAgenticStore = defineStore('agentic', () => {
       return false;
     } finally {
       if (currentLifecycle === lifecycleToken && requestToken === sessionsRequestToken) sessionsLoading.value = false;
+    }
+  };
+
+  /**
+   * Append the next session page to the list. Appending — never replacing —
+   * keeps the rows already on screen at stable identities, so the rail and
+   * the history dropdown extend without flashing (SWR semantics for
+   * pagination).
+   *
+   * @returns true when the next page was appended (or the list is complete)
+   */
+  const loadMoreSessions = async (): Promise<boolean> => {
+    if (sessionsLoadingMore.value || !sessionsHasMore.value) return false;
+    const currentLifecycle = lifecycleToken;
+    const requestToken = ++sessionsRequestToken;
+    sessionsLoadingMore.value = true;
+    try {
+      const response = await listAgenticSessions({
+        offset: sessionsServerCount,
+        limit: AGENTIC_SESSIONS_PAGE_LIMIT,
+      });
+      if (currentLifecycle !== lifecycleToken || requestToken !== sessionsRequestToken) return false;
+      const rawItems = response?.items || [];
+      const items = rawItems.map(normalizeSession);
+      sessionsServerCount += rawItems.length;
+      sessionsHasMore.value = hasMoreSessionPages(response, items);
+      // Offset pagination can re-serve a row after another client inserted
+      // or deleted sessions; dedupe keeps the list honest.
+      const known = new Set(sessions.value.map((session) => session.conversationId));
+      const appended = items.filter((session) => !known.has(session.conversationId));
+      if (appended.length) {
+        sessions.value = [...sessions.value, ...appended];
+      }
+      return true;
+    } catch (error) {
+      if (currentLifecycle !== lifecycleToken || requestToken !== sessionsRequestToken) return false;
+      warnMessage(i18n.global.t('agentic.failedSessions'), 'Agentic', error);
+      return false;
+    } finally {
+      if (currentLifecycle === lifecycleToken && requestToken === sessionsRequestToken) {
+        sessionsLoadingMore.value = false;
+      }
     }
   };
 
@@ -363,6 +457,9 @@ export const useAgenticStore = defineStore('agentic', () => {
 
     if (currentLifecycle !== lifecycleToken) return false;
 
+    // A server-persisted row no longer occupies a page slot; keep the next
+    // page's offset honest.
+    if (persisted) sessionsServerCount = Math.max(0, sessionsServerCount - 1);
     delete messagesByConversation.value[conversationId];
     delete attachmentsByConversation.value[conversationId];
     delete pendingAttachmentIdsByConversation.value[conversationId];
@@ -475,7 +572,10 @@ export const useAgenticStore = defineStore('agentic', () => {
     }
   };
 
-  const sendMessage = async (content: string): Promise<boolean> => {
+  const sendMessage = async (
+    content: string,
+    options: {attachmentIds?: string[]} = {}
+  ): Promise<boolean> => {
     const text = content.trim();
     if (!text || streaming.value) {
       return false;
@@ -493,7 +593,12 @@ export const useAgenticStore = defineStore('agentic', () => {
     applyModelCapabilities();
     updateSessionLocally(conversationId, {sessionExt: buildCurrentSessionExt(model)});
     const now = new Date().toISOString();
-    const sentAttachmentIds = currentAttachments.value.map((attachment) => String(attachment.id));
+    // Retries replay the original turn's attachment ids; fresh sends carry
+    // the pending ones. Either way the request and the optimistic user
+    // message must agree on what travelled with the prompt.
+    const sentAttachmentIds = options.attachmentIds?.length
+      ? options.attachmentIds.map(String)
+      : currentAttachments.value.map((attachment) => String(attachment.id));
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
@@ -527,7 +632,7 @@ export const useAgenticStore = defineStore('agentic', () => {
         conversationId,
         temperature: temperature.value,
         maxTokens: maxTokens.value,
-        attachments: currentAttachments.value.map((attachment) => attachment.id),
+        attachments: sentAttachmentIds,
         reasoning: activeModel.value.reasoning && reasoningEnabled.value,
       };
       if (activeModel.value.stream) {
@@ -597,6 +702,40 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const stopStreaming = () => {
     currentAbortController.value?.abort();
+  };
+
+  /**
+   * Regenerate an assistant turn: cut the reply (and the user message it
+   * answered) and replay that user message through the normal sendMessage
+   * pipeline — same request shape, same stream handling, same attachment ids
+   * as the original turn. Both list edits and sendMessage's re-append run
+   * synchronously before the first render, so the conversation never shows a
+   * state without the user's question (no flicker).
+   *
+   * @param messageId - the assistant message to regenerate
+   * @returns true when the retry stream started
+   */
+  const retryFailedTurn = async (messageId: string): Promise<boolean> => {
+    if (!messageId || streaming.value || loading.value) return false;
+    const conversationId = activeConversationId.value;
+    if (!conversationId) return false;
+    const messages = messagesByConversation.value[conversationId] || [];
+    const targetIndex = messages.findIndex((message) => message.id === messageId);
+    if (targetIndex < 0) return false;
+    const target = messages[targetIndex]!;
+    if (target.role !== 'assistant') return false;
+    let userIndex = targetIndex - 1;
+    while (userIndex >= 0 && messages[userIndex]!.role !== 'user') userIndex -= 1;
+    if (userIndex < 0) return false;
+    const userMessage = messages[userIndex]!;
+    const attachmentIds = (userMessage.contentExt?.attachments || []).filter(
+      (id): id is string => typeof id === 'string' && id.length > 0
+    );
+    messagesByConversation.value[conversationId] = messages.filter(
+      (_message, index) => index !== targetIndex && index !== userIndex
+    );
+    persistMessages();
+    return sendMessage(userMessage.content, {attachmentIds});
   };
 
   const loadMessages = async (conversationId: string) => {
@@ -906,24 +1045,58 @@ export const useAgenticStore = defineStore('agentic', () => {
     persistMessages();
   };
 
+  // Deltas and reasoning chunks buffer per streaming message and flush on the
+  // coalescing cadence — one store write per window instead of one per token.
+  const bufferStreamText = (conversationId: string, messageId: string): PendingStreamText => {
+    const existing = pendingStreamText.get(messageId);
+    if (existing) return existing;
+    const created: PendingStreamText = {conversationId, content: '', reasoning: ''};
+    pendingStreamText.set(messageId, created);
+    return created;
+  };
+
+  const scheduleStreamFlush = () => {
+    if (streamFlushTimer !== undefined) return;
+    streamFlushTimer = setTimeout(() => {
+      streamFlushTimer = undefined;
+      flushStreamText();
+    }, AGENTIC_DELTA_FLUSH_INTERVAL_MS);
+  };
+
+  /** Apply every buffered delta in one store write per message. Runs on the coalescing timer and whenever a stream settles. */
+  const flushStreamText = () => {
+    if (streamFlushTimer !== undefined) {
+      clearTimeout(streamFlushTimer);
+      streamFlushTimer = undefined;
+    }
+    if (pendingStreamText.size === 0) return;
+    const pending = [...pendingStreamText.entries()];
+    pendingStreamText.clear();
+    for (const [messageId, entry] of pending) {
+      const messages = messagesByConversation.value[entry.conversationId];
+      if (!messages) continue;
+      const index = messages.findIndex((message) => message.id === messageId);
+      if (index < 0) continue;
+      const target = messages[index]!;
+      messages[index] = {
+        ...target,
+        content: target.content + entry.content,
+        reasoning: entry.reasoning ? (target.reasoning || '') + entry.reasoning : target.reasoning,
+      };
+      messagesByConversation.value[entry.conversationId] = [...messages];
+    }
+  };
+
   const appendAssistantDelta = (conversationId: string, messageId: string, delta: string) => {
-    const messages = messagesByConversation.value[conversationId];
-    if (!messages) return;
-    const index = messages.findIndex((message) => message.id === messageId);
-    if (index < 0) return;
-    const target = messages[index]!;
-    messages[index] = {...target, content: target.content + delta};
-    messagesByConversation.value[conversationId] = [...messages];
+    if (!delta) return;
+    bufferStreamText(conversationId, messageId).content += delta;
+    scheduleStreamFlush();
   };
 
   const appendAssistantReasoning = (conversationId: string, messageId: string, reasoning: string) => {
-    const messages = messagesByConversation.value[conversationId];
-    if (!messages) return;
-    const index = messages.findIndex((message) => message.id === messageId);
-    if (index < 0) return;
-    const target = messages[index]!;
-    messages[index] = {...target, reasoning: (target.reasoning || '') + reasoning};
-    messagesByConversation.value[conversationId] = [...messages];
+    if (!reasoning) return;
+    bufferStreamText(conversationId, messageId).reasoning += reasoning;
+    scheduleStreamFlush();
   };
 
   const appendAssistantVisualization = (
@@ -948,6 +1121,9 @@ export const useAgenticStore = defineStore('agentic', () => {
   };
 
   const markAssistantComplete = (conversationId: string, messageId: string) => {
+    // The stream settled: land any still-buffered text before the completion
+    // write so the final message state is complete.
+    flushStreamText();
     const messages = messagesByConversation.value[conversationId] || [];
     setConversationMessages(
       conversationId,
@@ -956,6 +1132,9 @@ export const useAgenticStore = defineStore('agentic', () => {
   };
 
   const setAssistantFinishReason = (conversationId: string, messageId: string, reason: string) => {
+    // The finish frame is the stream's last content boundary — flush the
+    // buffer first so the finished message renders its full text.
+    flushStreamText();
     const messages = messagesByConversation.value[conversationId];
     if (!messages) return;
     const index = messages.findIndex((message) => message.id === messageId);
@@ -994,6 +1173,8 @@ export const useAgenticStore = defineStore('agentic', () => {
     loading,
     sessionsLoading,
     sessionsError,
+    sessionsHasMore,
+    sessionsLoadingMore,
     streaming,
     streamingConversationId,
     sessions,
@@ -1036,6 +1217,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     toggleWorkbench,
     bootstrap,
     loadSessions,
+    loadMoreSessions,
     retrySessions,
     newSession,
     selectSession,
@@ -1045,6 +1227,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     setSelectedModel,
     persistCurrentSessionPrefs,
     sendMessage,
+    retryFailedTurn,
     stopStreaming,
     loadMessages,
     loadAttachments,
@@ -1056,12 +1239,22 @@ export const useAgenticStore = defineStore('agentic', () => {
     reset() {
       lifecycleToken += 1;
       currentAbortController.value?.abort();
+      // Drop any still-buffered stream text and its pending flush — the
+      // aborted lifecycle's messages are discarded with it.
+      if (streamFlushTimer !== undefined) {
+        clearTimeout(streamFlushTimer);
+        streamFlushTimer = undefined;
+      }
+      pendingStreamText.clear();
       visible.value = false;
       workbenchExpanded.value = false;
       bootstrapped.value = false;
       loading.value = false;
       sessionsLoading.value = false;
       sessionsError.value = null;
+      sessionsHasMore.value = false;
+      sessionsLoadingMore.value = false;
+      sessionsServerCount = 0;
       streaming.value = false;
       streamingConversationId.value = '';
       sessions.value = [];

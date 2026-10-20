@@ -34,12 +34,14 @@
       :key="message.id"
       :attachments-by-id="attachmentsById"
       :continued="isContinued(messageIndex)"
+      :disabled="disabled"
       :focused="message.id === focusedMessageId"
       :live-traces="liveTraces"
       :message="message"
       @copy="emit('copy', $event)"
       @focus="emit('focus-message', message.id)"
       @quote="emit('quote', $event)"
+      @retry="emit('retry', $event)"
     />
   </div>
 </template>
@@ -65,11 +67,14 @@ const props = defineProps<{
   focusedMessageId: string;
   prompts: AssistantPromptItem[];
   attachmentsById?: Record<string, AgenticAttachment>;
+  /** Global interaction lock — disables per-message actions like retry. */
+  disabled?: boolean;
 }>();
 const emit = defineEmits<{
   'focus-message': [messageId: string];
   copy: [message: AgenticMessage];
   quote: [message: AgenticMessage];
+  retry: [message: AgenticMessage];
   'prompt-click': [item: AssistantPromptItem];
 }>();
 

@@ -61,6 +61,7 @@
           v-if="message.role === 'assistant'"
           :charts="message.contentExt?.charts || []"
           :content="message.content"
+          :streaming="message.streaming"
         />
         <div v-else class="agentic-user-content">
           <QuoteCard
@@ -143,13 +144,26 @@
             </el-icon>
           </button>
         </el-tooltip>
+        <el-tooltip v-if="canRetry" :content="t('agentic.actionRetry')" placement="top">
+          <button
+            :aria-label="t('agentic.actionRetry')"
+            :disabled="disabled"
+            class="agentic-message__action"
+            type="button"
+            @click="emit('retry', message)"
+          >
+            <el-icon>
+              <RefreshRight/>
+            </el-icon>
+          </button>
+        </el-tooltip>
       </div>
     </div>
   </article>
 </template>
 
 <script lang="ts" setup>
-import {CircleCheck, DocumentCopy, Loading, Tickets} from '@element-plus/icons-vue';
+import {CircleCheck, DocumentCopy, Loading, RefreshRight, Tickets} from '@element-plus/icons-vue';
 import {computed} from 'vue';
 import {useI18n} from 'vue-i18n';
 import type {AgenticAttachment, AgenticMessage, AgenticTraceEvent} from '@/config/types';
@@ -171,10 +185,13 @@ const props = defineProps<{
   /** Currently inspected message (feeds the workbench context panel). */
   focused: boolean;
   liveTraces: AgenticTraceEvent[];
+  /** Global interaction lock (loading / another stream in flight) disables retry. */
+  disabled?: boolean;
 }>();
 const emit = defineEmits<{
   copy: [message: AgenticMessage];
   quote: [message: AgenticMessage];
+  retry: [message: AgenticMessage];
   focus: [];
 }>();
 
@@ -203,6 +220,11 @@ const messageBadge = computed(() => {
   if (message.contentExt?.recovered) return {label: t('agentic.recovered'), tone: 'warning' as const};
   return null;
 });
+
+// Failed assistant turns are the only ones worth regenerating: the retry
+// replays the preceding user message through the normal send pipeline.
+// Cancelled turns keep their partial output (the user chose to stop).
+const canRetry = computed(() => props.message.role === 'assistant' && messageBadge.value?.tone === 'danger');
 
 const historyAttachments = computed(() =>
   (props.message.contentExt?.attachments || [])

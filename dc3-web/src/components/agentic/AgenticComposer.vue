@@ -77,7 +77,7 @@
         resize="none"
         type="textarea"
         @update:model-value="emit('update:draft', $event)"
-        @keydown.enter.exact.prevent="handleSubmit"
+        @keydown.enter.exact.prevent="handleEnterKeydown"
       />
 
       <div class="agentic-composer__bar">
@@ -258,6 +258,7 @@ import {ElMessage, ElMessageBox} from 'element-plus';
 import type {AgenticMessage} from '@/config/types';
 import {useAgenticStore} from '@/store';
 import {quoteExcerpt, toPlainText} from './assistantContent';
+import {isImeCompositionKey} from './ime';
 import ActionApprovalCard from './cards/ActionApprovalCard.vue';
 import AttachmentCard from './cards/AttachmentCard.vue';
 import NoticeBar from './cards/NoticeBar.vue';
@@ -413,6 +414,14 @@ const handleSubmit = async () => {
     emit('update:quotedMessage', undefined);
     emit('submitted');
   }
+};
+
+const handleEnterKeydown = (event: Event | KeyboardEvent) => {
+  // The Enter that commits an IME candidate (CJK input) must confirm the
+  // composition, not submit the draft. el-input re-emits keydown as
+  // Event | KeyboardEvent; at runtime a keydown is always a KeyboardEvent.
+  if (isImeCompositionKey(event as KeyboardEvent)) return;
+  void handleSubmit();
 };
 </script>
 

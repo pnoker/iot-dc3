@@ -52,12 +52,14 @@
         :active-id="activeConversationId"
         :collapsed="agenticRailCollapsed"
         :disabled="interactionLocked"
+        :has-more="sessionsHasMore"
+        :loading-more="sessionsLoadingMore"
         :session-action-loading="sessionActionLoading"
         :sessions="conversationItems"
-        :truncated="conversationItems.length >= 50"
         @delete="handleDeleteSession"
         @new="handleNewSession"
         @archive="handleArchiveSession"
+        @load-more="handleLoadMoreSessions"
         @rename="handleRenameSession"
         @select="handleSelectSession"
         @toggle-collapse="appStore.toggleAgenticRailCollapsed()"
@@ -124,8 +126,21 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <!-- Same session-list contract as the workbench rail: one
+                       search field, archived sessions folded out, pagination
+                       reachable — the dropdown is a quick switcher over the
+                       SAME data, not a second list with its own rules. -->
+                  <div class="agentic-history-search" @click.stop @keydown.stop>
+                    <el-input
+                      v-model="historySearch"
+                      :placeholder="t('agentic.searchSessions')"
+                      :prefix-icon="Search"
+                      clearable
+                      size="small"
+                    />
+                  </div>
                   <el-dropdown-item
-                    v-for="session in conversationItems"
+                    v-for="session in filteredHistoryItems"
                     :key="session.conversationId"
                     :command="`select:${session.conversationId}`"
                     :disabled="Boolean(sessionActionLoading[session.conversationId])"
@@ -138,8 +153,18 @@
                       <small v-if="session.summary">{{ session.summary }}</small>
                     </span>
                   </el-dropdown-item>
-                  <el-dropdown-item v-if="conversationItems.length === 0" disabled
-                  >{{ t('agentic.headerNoHistory') }}
+                  <el-dropdown-item v-if="filteredHistoryItems.length === 0" disabled>
+                    {{ historySearch ? t('agentic.searchEmpty') : t('agentic.headerNoHistory') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    v-if="sessionsHasMore"
+                    :command="'load-more'"
+                    :disabled="sessionsLoadingMore"
+                    divided
+                  >
+                    <span class="agentic-history-item">
+                      <strong class="agentic-history-more">{{ t('agentic.sessionsLoadMore') }}</strong>
+                    </span>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
@@ -180,7 +205,7 @@
                   :placeholder="t('agentic.dialogConversationTitle')"
                   clearable
                   size="small"
-                  @keydown.enter.prevent="handleRenameCurrent"
+                  @keydown.enter.prevent="handleRenameKeydown"
                 />
                 <div class="agentic-popover-actions">
                   <el-button size="small" @click="renamePopoverVisible = false">
@@ -294,11 +319,13 @@
           :live-traces="currentTraceEvents"
           :messages="currentMessages"
           :attachments-by-id="attachmentsById"
+          :disabled="interactionLocked"
         :prompts="promptItems"
           @copy="handleCopyMessage"
           @focus-message="focusedMessageId = $event"
           @prompt-click="handlePromptClick"
           @quote="handleQuoteMessage"
+          @retry="handleRetryTurn"
         />
       </main>
 
@@ -334,6 +361,7 @@ import {
   EditPen,
   FullScreen,
   Plus,
+  Search,
 } from '@element-plus/icons-vue';
 import {ElMessage, ElMessageBox} from 'element-plus';
 import {storeToRefs} from 'pinia';
@@ -348,6 +376,8 @@ import AgenticContextPanel from './AgenticContextPanel.vue';
 import AgenticComposer from './AgenticComposer.vue';
 import AgenticSessionsRail from './AgenticSessionsRail.vue';
 import {toPlainText} from './assistantContent';
+import {isImeCompositionKey} from './ime';
+import {isSessionArchived, sessionMatchesSearch} from './sessionList';
 import {formatShortDateTime} from '@/utils/timeUtil';
 import {sessionIcon} from './sessionIcons';
 import {routeLocationKey, routerKey} from 'vue-router';
@@ -374,6 +404,8 @@ const {
   sessionsError,
   streaming,
   sessions,
+  sessionsHasMore,
+  sessionsLoadingMore,
   activeConversationId,
   activeModel,
   selectedModel,
@@ -473,13 +505,32 @@ const conversationItems = computed(() => {
   }));
 });
 
-const messageScrollSignature = computed(() =>
-  currentMessages.value
-    .map((message) =>
-      [message.id, message.content.length, message.reasoning?.length || 0, message.streaming].join(':')
-    )
-    .join('|')
-);
+// Docked history dropdown: the SAME session-list contract as the rail —
+// archived sessions never mix in, and search matches title+summary through
+// the shared helper (M41: one data rule, two surfaces).
+const historySearch = ref('');
+const filteredHistoryItems = computed(() => {
+  return conversationItems.value.filter(
+    (session) => !isSessionArchived(session) && sessionMatchesSearch(session, historySearch.value)
+  );
+});
+
+// O(1) scroll signature: only the tail message can change the conversation
+// height while it is on screen (streaming deltas, charts landing, the
+// streaming flag flip), and the list length covers appends/removals. The
+// previous per-message map was O(messages) on every streamed delta.
+const messageScrollSignature = computed(() => {
+  const messages = currentMessages.value;
+  const last = messages[messages.length - 1];
+  return [
+    messages.length,
+    last?.id || '',
+    last?.content.length || 0,
+    last?.reasoning?.length || 0,
+    last?.contentExt?.charts?.length || 0,
+    last?.streaming ? 1 : 0,
+  ].join(':');
+});
 
 watch(
   () => visible.value,
@@ -590,9 +641,17 @@ const handleRetrySessions = async () => {
 
 const handleHistoryCommand = async (command: string) => {
   if (interactionLocked.value) return;
+  if (command === 'load-more') {
+    await handleLoadMoreSessions();
+    return;
+  }
   if (command.startsWith('select:')) {
     await agenticStore.selectSession(command.replace('select:', ''));
   }
+};
+
+const handleLoadMoreSessions = async () => {
+  await agenticStore.loadMoreSessions();
 };
 
 const handleSelectSession = async (conversationId: string) => {
@@ -725,6 +784,21 @@ const handleRenameCurrent = async () => {
   }
   const updated = await agenticStore.renameSession(conversationId, title);
   if (updated) renamePopoverVisible.value = false;
+};
+
+const handleRenameKeydown = (event: Event | KeyboardEvent) => {
+  // The Enter that commits an IME candidate (CJK input) must not save.
+  // el-input re-emits keydown as Event | KeyboardEvent; at runtime a keydown
+  // is always a KeyboardEvent.
+  if (isImeCompositionKey(event as KeyboardEvent)) return;
+  void handleRenameCurrent();
+};
+
+// Regenerate a failed assistant turn: the store cuts the failed reply and
+// replays the preceding user message through the normal send pipeline.
+const handleRetryTurn = (message: AgenticMessage) => {
+  if (interactionLocked.value) return;
+  void agenticStore.retryFailedTurn(message.id);
 };
 
 const handleDeleteCurrent = () => handleDeleteSession(activeConversationId.value);
@@ -1630,6 +1704,18 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
 .agentic-history-popover {
   max-height: 360px;
   overflow-y: auto;
+}
+
+// Search field at the top of the docked history dropdown — same contract as
+// the rail's search box (shared helper, shared placeholder).
+.agentic-history-search {
+  padding: 4px 12px 8px;
+}
+
+// Load-more entry: reads as an action, not a session row.
+.agentic-history-more {
+  color: var(--el-color-primary);
+  font-weight: 600;
 }
 
 // Rename popper content (shared by the docked header and the sessions rail;

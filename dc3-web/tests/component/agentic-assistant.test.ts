@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import {mount} from '@vue/test-utils';
+import {flushPromises, mount} from '@vue/test-utils';
 import {createPinia, setActivePinia} from 'pinia';
 import {defineComponent, h} from 'vue';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -27,6 +27,22 @@ import {useAgenticStore} from '@/store';
 
 import {createElButtonStub, layoutStubs} from '../setup/stubs/element-plus';
 
+const apiMocks = vi.hoisted(() => ({
+  completeAgenticChatCompletion: vi.fn(),
+  confirmAgenticAction: vi.fn(),
+  deleteAgenticSession: vi.fn(),
+  listAgenticAttachments: vi.fn(),
+  listAgenticMessages: vi.fn(),
+  listAgenticModels: vi.fn(),
+  listPendingAgenticActions: vi.fn(),
+  listAgenticSessions: vi.fn(),
+  rejectAgenticAction: vi.fn(),
+  streamAgenticChatCompletion: vi.fn(),
+  updateAgenticSession: vi.fn(),
+  uploadAgenticAttachment: vi.fn(),
+}));
+
+vi.mock('@/api/agentic', () => apiMocks);
 vi.mock('vue-element-plus-x/styles/index.css', () => ({}));
 vi.mock('vue-element-plus-x', () => ({
   Prompts: {template: '<div class="prompts-stub" />'},
@@ -83,7 +99,7 @@ function mountAssistant() {
       stubs: {
         ...layoutStubs,
         ElButton: createElButtonStub(),
-        ElDropdown: {template: '<span><slot /><slot name="dropdown" /></span>'},
+        ElDropdown: {name: 'ElDropdown', template: '<span><slot /><slot name="dropdown" /></span>'},
         ElDropdownItem: {template: '<span><slot /></span>'},
         ElDropdownMenu: {template: '<span><slot /></span>'},
         ElIcon: PassthroughStub,
@@ -212,5 +228,72 @@ describe('AgenticAssistant', () => {
     expect(wrapper.find('.chat-quote--on-primary').text()).toContain('FAN-03 温度趋势存在异常');
     expect(wrapper.find('.agentic-text').text()).toBe('请继续分析原因。');
     expect(wrapper.find('.agentic-message__content').text()).not.toContain('> **');
+  });
+
+  // M41: the docked history dropdown must apply the SAME session-list
+  // contract as the workbench rail — archived sessions folded out, one
+  // shared search rule, pagination reachable.
+  it('docked history dropdown shares the rail data rules and pagination', async () => {
+    seedAssistant([
+      {
+        id: 'assistant-1',
+        role: 'assistant',
+        content: '当前共有 3 台设备在线。',
+        streaming: false,
+      },
+    ]);
+    const store = useAgenticStore();
+    apiMocks.listAgenticSessions
+      .mockResolvedValueOnce({
+        items: [
+          {conversationId: 'conversation-ui-test', title: 'Reasoning UI'},
+          {conversationId: 'archived-1', title: 'Archived work', sessionExt: {archived: true}},
+          {conversationId: 'live-2', title: 'Live session'},
+        ],
+        hasNext: true,
+      })
+      .mockResolvedValueOnce({
+        items: [
+          {conversationId: 'page-2-a', title: 'Older session A'},
+          {conversationId: 'page-2-b', title: 'Older session B'},
+        ],
+        hasNext: false,
+      });
+    await store.loadSessions();
+    expect(store.sessionsHasMore).toBe(true);
+
+    const wrapper = mountAssistant();
+
+    // Session titles as the dropdown lists them (the load-more entry is
+    // filtered out — it is an action, not a conversation).
+    const historyTitles = () =>
+      wrapper
+        .findAll('.agentic-history-item')
+        .filter((item) => item.find('.agentic-history-more').exists() === false)
+        .map((item) => item.find('strong').text());
+
+    // Archived sessions never mix into the docked switcher.
+    expect(historyTitles()).toEqual(['Reasoning UI', 'Live session']);
+    expect(wrapper.find('.agentic-history-search').exists()).toBe(true);
+
+    // The dropdown search narrows by the same title+summary rule as the rail.
+    const search = wrapper.find('.agentic-history-search input');
+    await search.setValue('Live');
+    expect(historyTitles()).toEqual(['Live session']);
+    await search.setValue('no-such-session');
+    expect(historyTitles()).toEqual([]);
+    expect(wrapper.text()).toMatch(/无匹配|No matching/);
+
+    // Clearing the search restores the list; the load-more command appends
+    // the next page through the store (offset pagination, no flicker).
+    await search.setValue('');
+    expect(historyTitles()).toEqual(['Reasoning UI', 'Live session']);
+
+    wrapper.findComponent({name: 'ElDropdown'}).vm.$emit('command', 'load-more');
+    await flushPromises();
+
+    expect(apiMocks.listAgenticSessions).toHaveBeenLastCalledWith({offset: 3, limit: 50});
+    expect(historyTitles()).toEqual(['Reasoning UI', 'Live session', 'Older session A', 'Older session B']);
+    expect(store.sessionsHasMore).toBe(false);
   });
 });
