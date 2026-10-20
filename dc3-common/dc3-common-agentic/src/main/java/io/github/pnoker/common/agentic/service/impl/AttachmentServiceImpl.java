@@ -43,8 +43,10 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /** Reactive attachment upload, listing, delete, and metadata summarization. */
 @Slf4j
@@ -57,6 +59,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final ReactiveAttachmentStore attachmentStore;
     private final SessionService sessionService;
     private final AttachmentFileCleaner fileCleaner;
+    private final AgenticProperties properties;
 
     @Override
     public Mono<AttachmentBO> upload(String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header) {
@@ -65,6 +68,10 @@ public class AttachmentServiceImpl implements AttachmentService {
                 || StringUtils.isBlank(filePart.filename())
                 || header == null) {
             return Mono.error(new RequestException("Attachment data is required"));
+        }
+        if (!isAllowedExtension(filePart.filename())) {
+            return Mono.error(new RequestException(
+                    "Attachment type is not allowed; permitted extensions: " + properties.getAttachmentAllowedExtensions()));
         }
         long declaredLength = filePart.headers().getContentLength();
         if (declaredLength > MAX_BYTES) return Mono.error(new RequestException("Attachment size exceeds 10 MB"));
@@ -171,17 +178,57 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private Mono<AsynchronousFileChannel> open(Path path) {
         return Mono.fromCallable(
-                () -> AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE));
+                        () -> AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))
+                // Filesystem syscalls must never run on the event loop.
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Mono<Void> close(AsynchronousFileChannel channel) {
-        return Mono.fromRunnable(() -> {
-            try {
-                channel.close();
-            } catch (IOException exception) {
-                log.warn("Attachment channel close failed", exception);
+        return Mono.<Void>fromRunnable(() -> {
+                    try {
+                        channel.close();
+                    } catch (IOException exception) {
+                        log.warn("Attachment channel close failed", exception);
+                    }
+                })
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    /**
+     * Extension whitelist check: anything outside the configured list is rejected
+     * before a single byte is written to disk.
+     */
+    private boolean isAllowedExtension(String fileName) {
+        String extension = StringUtils.lowerCase(StringUtils.substringAfterLast(fileName, "."));
+        if (StringUtils.isBlank(extension) || extension.equals(StringUtils.lowerCase(fileName))) {
+            return false;
+        }
+        for (String allowed : StringUtils.split(properties.getAttachmentAllowedExtensions(), ',')) {
+            if (extension.equals(StringUtils.lowerCase(StringUtils.trim(allowed)))) {
+                return true;
             }
-        });
+        }
+        return false;
+    }
+
+    /**
+     * Normalize a client file name before it is persisted and replayed into prompts:
+     * strip control characters (they cannot be rendered and could smuggle delimiters)
+     * and cap the length at the configured budget while preserving the extension (it
+     * carries the whitelist classification).
+     */
+    private String normalizeFileName(String fileName) {
+        String cleaned = StringUtils.defaultIfBlank(fileName, "attachment").replaceAll("\\p{Cntrl}", "");
+        int maxLength = properties.getAttachmentNameMaxLength();
+        if (cleaned.length() <= maxLength) {
+            return cleaned;
+        }
+        String extension = StringUtils.substringAfterLast(cleaned, ".");
+        if (StringUtils.isBlank(extension) || extension.length() >= maxLength) {
+            return cleaned.substring(0, maxLength);
+        }
+        int stemBudget = maxLength - extension.length() - 1;
+        return cleaned.substring(0, stemBudget) + "." + extension;
     }
 
     private Path resolveFilePath(String conversationId, RequestHeader.PrincipalHeader header, String fileName) {
@@ -189,8 +236,15 @@ public class AttachmentServiceImpl implements AttachmentService {
         String prefix = "tenant_" + safePathPart(String.valueOf(header.getTenantId()))
                 + "_user_" + safePathPart(String.valueOf(header.getUserId()))
                 + "_conversation_" + safePathPart(conversationId);
-        Path path = root.resolve(
-                        prefix + SymbolConstant.HYPHEN + UuidV7.next() + SymbolConstant.HYPHEN + safePathPart(fileName))
+        // The sanitized name must also fit a filesystem path segment (255 bytes on
+        // common filesystems); the UUID prefix already spends ~40 of them.
+        String namePart = safePathPart(fileName);
+        int nameBudget = 128;
+        if (namePart.length() > nameBudget) {
+            namePart = namePart.substring(0, nameBudget);
+        }
+        Path path = root
+                .resolve(prefix + SymbolConstant.HYPHEN + UuidV7.next() + SymbolConstant.HYPHEN + namePart)
                 .normalize();
         if (!path.startsWith(root)) throw new IllegalStateException("Attachment file path is invalid");
         return path;
@@ -204,7 +258,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             String conversationId, FilePart filePart, RequestHeader.PrincipalHeader header, long size, Path path) {
         AttachmentBO attachment = new AttachmentBO();
         attachment.setConversationId(conversationId);
-        attachment.setFileName(filePart.filename());
+        attachment.setFileName(normalizeFileName(filePart.filename()));
         MediaType contentType = filePart.headers().getContentType();
         attachment.setContentType(contentType == null ? "application/octet-stream" : contentType.toString());
         attachment.setSize(size);

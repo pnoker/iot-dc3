@@ -83,7 +83,7 @@ class AttachmentServiceImplTest {
         AgenticProperties properties = new AgenticProperties();
         properties.setAttachmentStoragePath(storageRoot.toString());
         fileCleaner = new AttachmentFileCleaner(properties);
-        service = new AttachmentServiceImpl(attachmentStore, sessionService, fileCleaner);
+        service = new AttachmentServiceImpl(attachmentStore, sessionService, fileCleaner, properties);
         outsideRoot = Files.createTempDirectory("dc3-attachment-outside");
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
@@ -178,6 +178,42 @@ class AttachmentServiceImplTest {
         Path storedPath = Path.of(captor.getValue().getFilePath());
         assertThat(storedPath.startsWith(storageRoot)).as("stored file must stay inside the storage root").isTrue();
         assertThat(Files.exists(storedPath)).as("upload writes the file at the captured path").isTrue();
+    }
+
+    @Test
+    void uploadRejectsFilesOutsideTheExtensionWhitelist() {
+        FilePart filePart = org.mockito.Mockito.mock(FilePart.class);
+        when(filePart.filename()).thenReturn("payload.exe");
+
+        StepVerifier.create(service.upload("conv-1", filePart, header))
+                .expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(RequestException.class);
+                    assertThat(error.getMessage()).contains("Attachment type is not allowed");
+                })
+                .verify();
+        verifyNoInteractions(attachmentStore);
+    }
+
+    @Test
+    void uploadNormalizesThePersistedFileName() {
+        // Control characters must be stripped and the name capped at the configured budget.
+        StringBuilder longName = new StringBuilder("a");
+        longName.append("\b".repeat(8));
+        longName.append("b".repeat(200));
+        longName.append(".txt");
+        FilePart filePart = filePart(longName.toString(), "abc".getBytes(StandardCharsets.UTF_8));
+        when(sessionService.touch("conv-1", header, null)).thenReturn(Mono.just(new SessionBO()));
+        when(attachmentStore.save(any(AttachmentBO.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, AttachmentBO.class)));
+
+        StepVerifier.create(service.upload("conv-1", filePart, header)).expectNextCount(1).verifyComplete();
+
+        ArgumentCaptor<AttachmentBO> captor = ArgumentCaptor.forClass(AttachmentBO.class);
+        verify(attachmentStore).save(captor.capture());
+        String persisted = captor.getValue().getFileName();
+        assertThat(persisted).doesNotContain("\b");
+        assertThat(persisted.length()).isLessThanOrEqualTo(128);
+        assertThat(persisted).endsWith(".txt");
     }
 
     @Test
