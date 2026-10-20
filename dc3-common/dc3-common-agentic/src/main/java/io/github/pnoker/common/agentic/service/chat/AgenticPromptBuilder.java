@@ -57,7 +57,9 @@ public class AgenticPromptBuilder {
 
     /**
      * Build the Spring AI prompt spec for a prepared chat: user message, tool context,
-     * memory advisor, system prompt, tool callbacks, and request options.
+     * system prompt, tool callbacks, and request options. Conversation replay is handled
+     * by the OpenAI-compatible runtime path; Spring AI chat-memory advisors are
+     * intentionally not registered.
      *
      * @param prepared the prepared chat
      * @return the assembled prompt spec
@@ -103,8 +105,17 @@ public class AgenticPromptBuilder {
     }
 
     /**
-     * Assemble the system prompt from the base prompt, the tool prompt (when tool
-     * calling is enabled), and the request-specific context.
+     * Assemble the system prompt. Merge order is fixed and load-bearing:
+     *
+     * <ol>
+     *   <li>the platform base prompt (platform identity and guardrails, never overridable),</li>
+     *   <li>the tool prompt when tool calling is enabled,</li>
+     *   <li>client-supplied instructions (trusted input from the authenticated caller),</li>
+     *   <li>the untrusted attachment metadata block, explicitly delimited as data.</li>
+     * </ol>
+     *
+     * Instructions always precede untrusted data, so attachment content cannot reframe
+     * the sections above it.
      *
      * @param prepared the prepared chat
      * @return the joined system prompt

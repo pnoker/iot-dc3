@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.entity.vo;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.pnoker.common.agentic.entity.dto.ChatMessageDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -51,11 +52,15 @@ public class ChatCompletionRequestVO {
     private String model;
 
     /**
-     * Conversation messages in chronological order.
+     * Conversation messages in chronological order. System messages are merged into the
+     * platform system prompt, the last user message drives this turn, and every earlier
+     * user/assistant turn is replayed as conversation context.
      */
     @Schema(
             description =
-                    "Ordered list of conversation messages (system, user, assistant turns) comprising the prompt context.")
+                    "Ordered list of conversation messages (system, user, assistant turns) comprising the prompt context. "
+                            + "System messages are merged into the system prompt; the last user message becomes this turn's prompt; "
+                            + "earlier user and assistant turns are replayed as conversation context.")
     private List<ChatMessageDTO> messages;
 
     /**
@@ -68,11 +73,16 @@ public class ChatCompletionRequestVO {
     private Double temperature;
 
     /**
-     * Maximum tokens to generate. Null uses the server default.
+     * Maximum tokens to generate. Accepts the OpenAI wire names {@code max_tokens} and
+     * {@code max_completion_tokens} in addition to the platform camelCase name; null uses
+     * the server default.
      */
     @Schema(
-            description = "Maximum number of tokens to generate in the completion. Null defers to the server default.",
+            description =
+                    "Maximum number of tokens to generate in the completion. Accepts max_tokens, max_completion_tokens, "
+                            + "or maxTokens as the JSON field name; the value is applied to the model request. Null defers to the server default.",
             example = "2048")
+    @JsonAlias({"max_tokens", "max_completion_tokens"})
     private Integer maxTokens;
 
     /**
@@ -85,12 +95,16 @@ public class ChatCompletionRequestVO {
     private Boolean stream;
 
     /**
-     * Conversation ID for chat memory correlation. If omitted, a new conversation is
-     * started each request.
+     * Conversation ID for chat memory correlation. Optional: when omitted the server
+     * generates a fresh UUIDv7 conversation id, matching the OpenAI stateless request
+     * style — each such request starts a new conversation. Pass a stable id to keep
+     * server-side memory replay across turns.
      */
     @Schema(
             description =
-                    "Opaque conversation identifier used to correlate multi-turn memory. If omitted, each request is treated as a new conversation.",
+                    "Opaque conversation identifier used to correlate multi-turn memory. Optional: when omitted the server "
+                            + "generates a fresh UUIDv7 id and each request starts a new conversation (OpenAI stateless style); "
+                            + "pass a stable id to replay server-side memory across turns.",
             example = "conv-7f3a1b2c")
     private String conversationId;
 

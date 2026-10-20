@@ -17,6 +17,7 @@
 package io.github.pnoker.common.agentic.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -88,8 +89,9 @@ public class ChatCompletionResponseVO {
 
         @Schema(
                 description =
-                        "Reason the model stopped generating tokens; 'stop' means natural end, 'length' means token limit reached.",
+                        "Reason the model stopped generating tokens; 'stop' means natural end, 'length' means token limit reached. Serialized as finish_reason per the OpenAI wire contract.",
                 example = "stop")
+        @JsonProperty("finish_reason")
         private String finishReason;
     }
 
@@ -120,7 +122,8 @@ public class ChatCompletionResponseVO {
     }
 
     /**
-     * Token usage of the completion (prompt/completion/total).
+     * Token usage of the completion (prompt/completion/total). All three fields keep
+     * their OpenAI snake_case wire names.
      */
     @Getter
     @Setter
@@ -129,15 +132,23 @@ public class ChatCompletionResponseVO {
     @ToString
     public static class Usage {
 
-        @Schema(description = "Number of tokens consumed by the input prompt.", example = "42")
+        @Schema(
+                description = "Number of tokens consumed by the input prompt. Serialized as prompt_tokens.",
+                example = "42")
+        @JsonProperty("prompt_tokens")
         private int promptTokens;
 
-        @Schema(description = "Number of tokens generated in the completion response.", example = "128")
+        @Schema(
+                description = "Number of tokens generated in the completion response. Serialized as completion_tokens.",
+                example = "128")
+        @JsonProperty("completion_tokens")
         private int completionTokens;
 
         @Schema(
-                description = "Total tokens used by the request; equals promptTokens + completionTokens.",
+                description =
+                        "Total tokens used by the request; equals prompt_tokens + completion_tokens. Serialized as total_tokens.",
                 example = "170")
+        @JsonProperty("total_tokens")
         private int totalTokens;
     }
 }

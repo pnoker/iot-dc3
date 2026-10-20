@@ -105,7 +105,7 @@ export const listAgenticProviders = () => httpGet<AgenticProvider[]>(`${API_AGEN
  * @returns the operation result
  */
 export const addAgenticProvider = (data: AgenticProvider) =>
-  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/add`, data);
+  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/add`, data);
 
 /**
  * Update agentic provider.
@@ -113,7 +113,7 @@ export const addAgenticProvider = (data: AgenticProvider) =>
  * @returns the operation result
  */
 export const updateAgenticProvider = (data: AgenticProvider) =>
-  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/config/update`, data);
+  httpPost<AgenticProvider>(`${API_AGENTIC_BASE}/provider/update`, data);
 
 /**
  * Delete agentic provider.
@@ -121,7 +121,7 @@ export const updateAgenticProvider = (data: AgenticProvider) =>
  * @returns the operation result
  */
 export const deleteAgenticProvider = (id: string) =>
-  httpDelete<void>(`${API_AGENTIC_BASE}/provider/config/delete`, {params: {id}});
+  httpDelete<void>(`${API_AGENTIC_BASE}/provider/delete`, {params: {id}});
 
 /**
  * Check agentic provider connectivity. Probe a saved provider by id (blank
@@ -180,12 +180,35 @@ export const updateAgenticSession = (
   });
 
 /**
- * List agentic messages.
+ * List agentic messages, walking all pages so callers keep receiving the full
+ * conversation history. The endpoint paginates (limit capped at 200 server-side);
+ * this wrapper stitches the pages back together until hasNext turns false.
  * @param conversationId - conversation id to scope the request
  * @returns the listed agentic messages
  */
-export const listAgenticMessages = (conversationId: string) =>
-  httpGet<AgenticMessage[]>(`${API_AGENTIC_BASE}/message/list`, {params: {conversation_id: conversationId}});
+export const listAgenticMessages = async (conversationId: string): Promise<AgenticMessage[]> => {
+  const limit = 200;
+  let offset = 0;
+  const messages: AgenticMessage[] = [];
+  // Safety bound: 100 pages x 200 rows is far beyond any real conversation and stops
+  // a buggy backend hasNext flag from looping forever.
+  for (let page = 0; page < 100; page += 1) {
+    const result = await httpPost<PageResult<AgenticMessage>>(`${API_AGENTIC_BASE}/message/list`, {
+      conversationId,
+      offset,
+      limit,
+    });
+    if (!result || !Array.isArray(result.items)) {
+      return messages;
+    }
+    messages.push(...result.items);
+    if (!result.hasNext) {
+      return messages;
+    }
+    offset += result.items.length || limit;
+  }
+  return messages;
+};
 
 /**
  * Upload agentic attachment.
@@ -220,8 +243,10 @@ export const listAgenticAttachments = (conversationId: string) =>
  * @returns the listed pending agentic actions
  */
 export const listPendingAgenticActions = (conversationId: string, query?: Pick<PageQuery, 'offset' | 'limit'>) =>
-  httpGet<PageResult<AgenticAction>>(`${API_AGENTIC_BASE}/action/pending`, {
-    params: {conversation_id: conversationId, ...(query ?? {})},
+  httpPost<PageResult<AgenticAction>>(`${API_AGENTIC_BASE}/action/pending`, {
+    conversationId,
+    offset: query?.offset ?? 0,
+    limit: query?.limit ?? 50,
   });
 
 /**
@@ -241,7 +266,11 @@ export const rejectAgenticAction = (actionId: string) =>
   httpPost<AgenticAction>(`${API_AGENTIC_BASE}/action/reject`, undefined, {params: {action_id: actionId}});
 
 /**
- * Stream agentic chat completion.
+ * Stream agentic chat completion. The SSE parser reads data lines only, so the
+ * server's named events (chat.completion.chunk, agentic.event, agentic.visualization)
+ * and keep-alive comment frames are transparent to it. An omitted conversationId is
+ * allowed: the server generates a fresh one (OpenAI stateless style) — pass a stable
+ * id to keep server-side memory replay across turns.
  * @param data - payload to send or render
  * @param callbacks - callbacks entries
  */
@@ -249,9 +278,6 @@ export const streamAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   callbacks: AgenticStreamCallbacks = {}
 ) => {
-  if (!data.conversationId) {
-    throw new Error('conversationId is required — generate a stable UUID per conversation before calling.');
-  }
   try {
     const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
       method: 'post',
@@ -290,7 +316,8 @@ export const streamAgenticChatCompletion = async (
 };
 
 /**
- * Complete agentic chat completion.
+ * Complete agentic chat completion. An omitted conversationId is allowed: the server
+ * generates a fresh one (OpenAI stateless style).
  * @param data - payload to send or render
  * @param signal - abort signal
  * @returns the operation result
@@ -299,10 +326,6 @@ export const completeAgenticChatCompletion = async (
   data: AgenticChatCompletionRequest,
   signal?: AbortSignal
 ): Promise<AgenticChatCompletionResponse> => {
-  if (!data.conversationId) {
-    throw new Error('conversationId is required — generate a stable UUID per conversation before calling.');
-  }
-
   const response = await fetch(`/${API_AGENTIC_BASE}/chat/completions`, {
     method: 'post',
     credentials: 'include',

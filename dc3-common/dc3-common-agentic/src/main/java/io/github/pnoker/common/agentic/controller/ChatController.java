@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.controller;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
 import io.github.pnoker.common.agentic.service.AgenticChatService;
 import io.github.pnoker.common.base.BaseController;
@@ -24,26 +25,43 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.extensions.Extension;
 import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.time.Duration;
 import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * OpenAI-compatible chat completion endpoint.
  * <p>
  * Exposes {@code POST /v1/chat/completions} with both streaming (SSE) and non-streaming
  * (JSON) response modes, following the OpenAI API format.
+ * <p>
+ * Streaming wire policy applied here: every JSON data frame is tagged with an SSE event
+ * name derived from its {@code object} discriminator ({@code chat.completion.chunk},
+ * {@code agentic.event}, {@code agentic.visualization}); the {@code [DONE]} sentinel and
+ * comment frames stay on the default event. Spec clients dispatch on the event names,
+ * while data-line parsers (OpenAI SDKs, the platform frontend) are unaffected. A
+ * keep-alive comment heartbeat (see {@code streamHeartbeatSeconds}) is merged into the
+ * stream and terminates with it so long tool rounds do not trip idle-connection cutoffs.
  *
  * @author pnoker
  * @since 2016.10.1
  */
+@Slf4j
 @Tag(
         name = "chat",
         description =
@@ -53,7 +71,17 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ChatController implements BaseController {
 
+    /** SSE object discriminators that carry a stable event name. */
+    private static final Set<String> NAMED_EVENT_OBJECTS = Set.of(
+            AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT,
+            AgenticConstant.RunEvent.OBJECT,
+            AgenticConstant.Visualization.OBJECT);
+
     private final AgenticChatService agenticChatService;
+
+    private final AgenticProperties properties;
+
+    private final ObjectMapper objectMapper;
 
     /**
      * Submit a chat prompt and receive the assistant reply in OpenAI-compatible format.
@@ -64,7 +92,7 @@ public class ChatController implements BaseController {
      * @param request chat completion payload carrying the prompt, conversation context, model selection and stream flag
      * @return a streaming SSE entity when stream is true, otherwise the completion resource as JSON
      */
-    @PreAuthorize("@perm.can('chat', 'list')")
+    @PreAuthorize("@perm.can('chat', 'add')")
     @Operation(
             summary = "Create Chat Completion",
             description =
@@ -85,7 +113,7 @@ public class ChatController implements BaseController {
             if (Objects.nonNull(request) && request.isStream()) {
                 return Mono.just(ResponseEntity.ok()
                         .contentType(MediaType.TEXT_EVENT_STREAM)
-                        .body(agenticChatService.streamChatCompletion(request, header)));
+                        .body(applyStreamWirePolicy(agenticChatService.streamChatCompletion(request, header))));
             }
             return agenticChatService
                     .chatCompletion(request, header)
@@ -93,5 +121,61 @@ public class ChatController implements BaseController {
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(response));
         });
+    }
+
+    /**
+     * Apply the streaming wire policy: name every JSON data frame after its object
+     * discriminator, then merge the keep-alive heartbeat. The heartbeat stops when the
+     * main stream terminates (complete, error or cancel) because both branches of the
+     * merge are cancelled together.
+     */
+    private Flux<ServerSentEvent<String>> applyStreamWirePolicy(Flux<ServerSentEvent<String>> stream) {
+        Flux<ServerSentEvent<String>> named = stream.map(this::withEventName);
+        int heartbeatSeconds = properties.getStreamHeartbeatSeconds();
+        if (heartbeatSeconds <= 0) {
+            return named;
+        }
+        Sinks.Empty<Void> mainTerminated = Sinks.empty();
+        Flux<ServerSentEvent<String>> guarded = named.doFinally(signal -> mainTerminated.tryEmitEmpty());
+        Flux<ServerSentEvent<String>> heartbeats = Flux.interval(Duration.ofSeconds(heartbeatSeconds))
+                .map(tick ->
+                        ServerSentEvent.<String>builder().comment("keep-alive").build())
+                .takeUntilOther(mainTerminated.asMono());
+        return guarded.mergeWith(heartbeats);
+    }
+
+    /**
+     * Tag one frame with its event name when it carries a known object discriminator.
+     * Frames that already carry an event name, non-JSON payloads (the {@code [DONE]}
+     * sentinel) and unparseable data pass through unchanged on the default event.
+     */
+    private ServerSentEvent<String> withEventName(ServerSentEvent<String> frame) {
+        if (Objects.nonNull(frame.event()) || Objects.isNull(frame.data())) {
+            return frame;
+        }
+        String eventName = resolveEventName(frame.data());
+        if (Objects.isNull(eventName)) {
+            return frame;
+        }
+        return ServerSentEvent.<String>builder()
+                .data(frame.data())
+                .event(eventName)
+                .build();
+    }
+
+    /**
+     * Map a JSON frame payload to its SSE event name via the {@code object} field; the
+     * event name equals the object discriminator.
+     */
+    private String resolveEventName(String data) {
+        if (AgenticConstant.Chat.STREAM_DONE.equals(data)) {
+            return null;
+        }
+        try {
+            String objectName = objectMapper.readTree(data).path("object").asString();
+            return NAMED_EVENT_OBJECTS.contains(objectName) ? objectName : null;
+        } catch (JacksonException e) {
+            return null;
+        }
     }
 }

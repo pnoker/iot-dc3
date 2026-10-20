@@ -507,6 +507,27 @@ describe('agentic streaming contract', () => {
     expect(window.location.hash).toBe('#/login');
   });
 
+  it('accepts stateless requests without a client conversationId', async () => {
+    setStorage(AUTH_HEADERS.TENANT, 'default');
+    setStorage(AUTH_HEADERS.LOGIN, 'dc3');
+    setStorage(AUTH_HEADERS.TOKEN, {salt: 'salt', token: 'token'});
+
+    const fetchMock = vi.fn(async () => new Response('data: [DONE]\n\n', {
+      status: 200,
+      headers: {'Content-Type': 'text/event-stream'},
+    }));
+    vi.stubGlobal('fetch', fetchMock);
+
+    // The server generates a fresh UUIDv7 conversation id when the field is omitted
+    // (OpenAI stateless style) — the wrapper must not pre-reject the request.
+    const statelessRequest = {messages: [{role: 'user', content: 'hello'}], stream: true} as AgenticChatCompletionRequest;
+
+    await expect(agenticApi.streamAgenticChatCompletion(statelessRequest)).resolves.toBeUndefined();
+
+    const requestInit = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(requestInit.body))).toEqual(statelessRequest);
+  });
+
   it('keeps backend SSE error events as structured trace events', async () => {
     vi.stubGlobal(
       'fetch',

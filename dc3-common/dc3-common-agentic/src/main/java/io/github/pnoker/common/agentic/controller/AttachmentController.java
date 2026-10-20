@@ -69,7 +69,7 @@ public class AttachmentController implements BaseController {
      * @param filePart       multipart file part carrying the file bytes to upload
      * @return the stored AttachmentVO metadata; the file then becomes available as context the assistant can reference
      */
-    @PreAuthorize("@perm.can('attachment', 'list')")
+    @PreAuthorize("@perm.can('attachment', 'add')")
     @Operation(
             summary = "Upload Attachment",
             description =
@@ -167,6 +167,7 @@ public class AttachmentController implements BaseController {
                     @NotNull
                     @RequestParam(value = "id")
                     Long id) {
-        return getPrincipalHeader().flatMap(header -> attachmentService.delete(id, header).then());
+        return getPrincipalHeader()
+                .flatMap(header -> attachmentService.delete(id, header).then());
     }
 }

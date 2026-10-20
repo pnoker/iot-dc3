@@ -24,6 +24,12 @@ import java.util.Map;
 /**
  * Immutable request state shared by the chat orchestration pipeline.
  *
+ * <p>{@code memoryHistory} is the <b>replay transcript</b> for the turn: either the
+ * client-provided prior turns (when the client manages its own context) or the
+ * platform-persisted history loaded per the memory window. Runtimes replay it ahead of
+ * {@code userMessage}; trailing user turns adjacent to the prompt are suppressed by the
+ * runtime to avoid double-prompting.
+ *
  * @author pnoker
  * @since 2016.10.1
  */

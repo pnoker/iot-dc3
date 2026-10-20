@@ -53,14 +53,4 @@ public class SessionVO extends BaseVO {
             description =
                     "Extended attributes of the session (model configuration, temperature, context window, etc.); structured as a JSON object.")
     private SessionExt sessionExt;
-
-    @Schema(
-            description = "Identifier of the tenant that owns this session; enforces tenant-level data isolation.",
-            example = "1024")
-    private String tenantId;
-
-    @Schema(
-            description = "Identifier of the user who created or owns this session; must belong to the same tenant.",
-            example = "2048")
-    private String userId;
 }

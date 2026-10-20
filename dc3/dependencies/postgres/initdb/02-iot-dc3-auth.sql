@@ -1768,6 +1768,87 @@ VALUES (20000, 0, 'Administrator Wildcard', '*', '', 6, 3, 0, '{}', 0,
         '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0);
 
 -- ----------------------------
+-- Records of dc3_resource (agentic API permissions)
+-- resource_code: {spring.application.name}:{domain}:{scope}, matching the @perm.can
+-- annotations in dc3-common-agentic controllers (verified by
+-- AgenticPermissionMappingTest) and the codes the resource registrar derives from them.
+-- resource_type_flag: 6=API   resource_scope_flag: 0=add, 1=delete, 2=update, 3=list, 4=get
+-- service_name: dc3-center-agentic (the owning center service)
+-- entity_id: -1 placeholder, NOT 0 — the registrar treats type-6 rows with entity_id 0
+-- as grouping nodes; on the first service sync it rewrites entity_id to the dc3_api row
+-- and reparents the row under the auto-created service/group nodes. Seeding these rows
+-- keeps the agentic permissions grantable before the center's first boot (or when the
+-- registrar is disabled); the runtime registrar converges ownership afterwards.
+-- One row per DISTINCT permission code: confirm and reject share action:update.
+-- ----------------------------
+INSERT INTO dc3_resource (id, parent_resource_id, resource_name, resource_code, service_name, resource_type_flag,
+                          resource_scope_flag, entity_id, resource_ext, enable_flag, remark, creator_id, creator_name,
+                          create_time, operator_id, operator_name, operate_time, deleted)
+VALUES (10001, 0, 'Create Chat Completion', 'dc3-center-agentic:chat:add', 'dc3-center-agentic', 6, 0, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10002, 0, 'List Sessions', 'dc3-center-agentic:session:list', 'dc3-center-agentic', 6, 3, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10003, 0, 'Get Session', 'dc3-center-agentic:session:get', 'dc3-center-agentic', 6, 4, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10004, 0, 'Update Session', 'dc3-center-agentic:session:update', 'dc3-center-agentic', 6, 2, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10005, 0, 'Delete Session', 'dc3-center-agentic:session:delete', 'dc3-center-agentic', 6, 1, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10006, 0, 'List Session Messages', 'dc3-center-agentic:message:list', 'dc3-center-agentic', 6, 3, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10007, 0, 'Upload Attachment', 'dc3-center-agentic:attachment:add', 'dc3-center-agentic', 6, 0, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10008, 0, 'List Attachments', 'dc3-center-agentic:attachment:list', 'dc3-center-agentic', 6, 3, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10009, 0, 'Delete Attachment', 'dc3-center-agentic:attachment:delete', 'dc3-center-agentic', 6, 1, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10010, 0, 'List Pending Agent Actions', 'dc3-center-agentic:action:list', 'dc3-center-agentic', 6, 3, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10011, 0, 'Confirm Or Reject Agent Action', 'dc3-center-agentic:action:update', 'dc3-center-agentic', 6, 2,
+        -1, '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1,
+        'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10012, 0, 'List AI Models', 'dc3-center-agentic:model:list', 'dc3-center-agentic', 6, 3, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10013, 0, 'Add AI Model Configuration', 'dc3-center-agentic:model:add', 'dc3-center-agentic', 6, 0, -1, '{}',
+        0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10014, 0, 'Update AI Model Configuration', 'dc3-center-agentic:model:update', 'dc3-center-agentic', 6, 2, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10015, 0, 'Delete AI Model Configuration', 'dc3-center-agentic:model:delete', 'dc3-center-agentic', 6, 1, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10016, 0, 'Check AI Model Configuration', 'dc3-center-agentic:model:get', 'dc3-center-agentic', 6, 4, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10017, 0, 'List Model Providers', 'dc3-center-agentic:provider:list', 'dc3-center-agentic', 6, 3, -1, '{}',
+        0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10018, 0, 'Add Model Provider', 'dc3-center-agentic:provider:add', 'dc3-center-agentic', 6, 0, -1, '{}', 0,
+        'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10019, 0, 'Update Model Provider', 'dc3-center-agentic:provider:update', 'dc3-center-agentic', 6, 2, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10020, 0, 'Delete Model Provider', 'dc3-center-agentic:provider:delete', 'dc3-center-agentic', 6, 1, -1,
+        '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1, 'dc3',
+        '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0),
+       (10021, 0, 'Check Model Provider Connectivity', 'dc3-center-agentic:provider:get', 'dc3-center-agentic', 6, 4,
+        -1, '{}', 0, 'Seeded agentic permission; linked to its API row by the resource registrar on first sync.', 1,
+        'dc3', '2026-05-01 00:00:00 +00:00', 1, 'dc3', '2026-05-01 00:00:00 +00:00', 0);
+
+-- ----------------------------
 -- Records of dc3_role_resource_bind
 -- ----------------------------
 INSERT INTO dc3_role_resource_bind (id, role_id, resource_id, remark, creator_id, creator_name, create_time,

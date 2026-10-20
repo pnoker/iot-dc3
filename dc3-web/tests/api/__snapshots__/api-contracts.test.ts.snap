@@ -17,7 +17,7 @@ exports[`API wrapper contracts > agentic > addAgenticModelConfig maps to its tra
 exports[`API wrapper contracts > agentic > addAgenticProvider maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/agentic/provider/config/add",
+    "api/v3/agentic/provider/add",
     {
       "enableFlag": "ENABLE",
       "id": "payload-1",
@@ -92,7 +92,7 @@ exports[`API wrapper contracts > agentic > deleteAgenticModelConfig maps to its 
 exports[`API wrapper contracts > agentic > deleteAgenticProvider maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/agentic/provider/config/delete",
+    "api/v3/agentic/provider/delete",
     {
       "params": {
         "id": "id-1",
@@ -167,18 +167,18 @@ exports[`API wrapper contracts > agentic > listAgenticMessages maps to its trans
   "args": [
     "api/v3/agentic/message/list",
     {
-      "params": {
-        "conversation_id": {
-          "keyword": "demo",
-          "page": {
-            "current": 2,
-            "size": 20,
-          },
+      "conversationId": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
         },
       },
+      "limit": 200,
+      "offset": 0,
     },
   ],
-  "transport": "httpGet",
+  "transport": "httpPost",
 }
 `;
 
@@ -230,18 +230,18 @@ exports[`API wrapper contracts > agentic > listPendingAgenticActions maps to its
   "args": [
     "api/v3/agentic/action/pending",
     {
-      "params": {
-        "conversation_id": {
-          "keyword": "demo",
-          "page": {
-            "current": 2,
-            "size": 20,
-          },
+      "conversationId": {
+        "keyword": "demo",
+        "page": {
+          "current": 2,
+          "size": 20,
         },
       },
+      "limit": 50,
+      "offset": 0,
     },
   ],
-  "transport": "httpGet",
+  "transport": "httpPost",
 }
 `;
 
@@ -277,7 +277,7 @@ exports[`API wrapper contracts > agentic > updateAgenticModelConfig maps to its 
 exports[`API wrapper contracts > agentic > updateAgenticProvider maps to its transport contract 1`] = `
 {
   "args": [
-    "api/v3/agentic/provider/config/update",
+    "api/v3/agentic/provider/update",
     {
       "enableFlag": "ENABLE",
       "id": "payload-1",

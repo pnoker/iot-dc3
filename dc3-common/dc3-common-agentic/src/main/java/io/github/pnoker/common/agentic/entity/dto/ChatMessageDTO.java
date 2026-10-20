@@ -37,11 +37,15 @@ public class ChatMessageDTO {
 
     /**
      * Message role: {@link AgenticConstant.Chat#ROLE_SYSTEM},
-     * {@link AgenticConstant.Chat#ROLE_USER},
-     * {@link AgenticConstant.Chat#ROLE_ASSISTANT}, or
-     * {@link AgenticConstant.Chat#ROLE_TOOL}.
+     * {@link AgenticConstant.Chat#ROLE_USER}, or
+     * {@link AgenticConstant.Chat#ROLE_ASSISTANT}. {@link AgenticConstant.Chat#ROLE_TOOL}
+     * is accepted on the wire but treated as advisory: tool results cannot be correlated
+     * to tool calls on this endpoint and are not replayed.
      */
-    @Schema(description = "Role of the message sender: system, user, assistant, or tool.", example = "user")
+    @Schema(
+            description =
+                    "Role of the message sender: system, user, or assistant. Tool messages are accepted but not replayed.",
+            example = "user")
     private String role;
 
     /**
