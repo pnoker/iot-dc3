@@ -32,6 +32,17 @@ public interface ReactiveAgenticTool {
     /** Tool definition exposed to the chat model. */
     ToolDefinition definition();
 
+    /**
+     * Domain grouping used by tracing and metrics (e.g. {@code "point"}, {@code "insight"}).
+     * Declared explicitly at registration time so telemetry never has to reverse-engineer
+     * the domain from the tool name.
+     *
+     * @return the tool domain, never {@code null}
+     */
+    default String domain() {
+        return "platform";
+    }
+
     /** Execute the tool for the JSON arguments within the given context. */
     Mono<?> call(String arguments, ToolContext context);
 }

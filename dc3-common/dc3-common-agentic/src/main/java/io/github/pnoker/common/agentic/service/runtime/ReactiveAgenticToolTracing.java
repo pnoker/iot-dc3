@@ -43,7 +43,7 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
     @Override
     public Mono<?> call(String arguments, ToolContext context) {
         return Mono.defer(() -> {
-            AgenticToolContextUtil.recordToolInvocation(context, name, domain(), name);
+            AgenticToolContextUtil.recordToolInvocation(context, name, delegate.domain(), name);
             return delegate.call(arguments, context)
                     .cast(Object.class)
                     .doOnNext(result -> recordResult(context, result))
@@ -62,17 +62,6 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
         });
     }
 
-    private String domain() {
-        String value = name;
-        for (String prefix : new String[] {"lookup", "search", "list", "get", "read", "write"}) {
-            if (value.startsWith(prefix) && value.length() > prefix.length()) {
-                value = value.substring(prefix.length());
-                break;
-            }
-        }
-        int separator = value.indexOf("By");
-        return (separator > 0 ? value.substring(0, separator) : value).toLowerCase();
-    }
 
     private void recordResult(ToolContext context, Object result) {
         if (result instanceof AgenticToolResult<?> toolResult) {

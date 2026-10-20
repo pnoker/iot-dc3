@@ -42,6 +42,7 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.bo.MessageBO;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
+import io.github.pnoker.common.agentic.entity.model.AgenticToolResult;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -140,11 +141,16 @@ public class OpenAiCompatibleAgenticRuntime {
      */
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
         return Flux.create(sink -> {
+            AgenticBackpressureGuard guard = AgenticBackpressureGuard.create(
+                    properties.getStreamBackpressureBuffer(),
+                    properties.getStreamIdleTimeoutSeconds() * 1_000_000_000L,
+                    System::nanoTime);
+            sink.onRequest(guard::onDownstreamRequest);
             ModelProviderBO provider = requireProvider(prepared);
             OpenAIClient client = createClient(provider);
             OpenAIClientAsync asyncClient = client.async();
             Disposable execution = streamRound(
-                            asyncClient, prepared, initialMessages(prepared), toolCallbacksByName(), sink, 0)
+                            asyncClient, prepared, initialMessages(prepared), toolCallbacksByName(), sink, guard, 0)
                     .doFinally(signal -> client.close())
                     .subscribe(ignored -> {}, sink::error, sink::complete);
             sink.onCancel(execution::dispose);
@@ -177,22 +183,22 @@ public class OpenAiCompatibleAgenticRuntime {
             List<ChatCompletionMessageParam> messages,
             Map<String, ToolCallback> callbacks,
             int round) {
-        if (round >= AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS) {
-            return Mono.error(new IllegalStateException(
-                    "Agent loop exceeded max rounds: " + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS));
+        if (round >= properties.getLoopMaxRounds()) {
+            return forceFinalCallRound(client, prepared, messages);
         }
         return Mono.fromFuture(client.chat().completions().create(buildRequest(prepared, messages, true, false)))
                 .flatMap(completion -> {
                     if (completion.choices().isEmpty()) {
-                        return Mono.just(new AgenticRuntimeResult("", AgenticConstant.Chat.FINISH_REASON_STOP));
+                        return Mono.just(new AgenticRuntimeResult(
+                                "", AgenticConstant.Chat.FINISH_REASON_STOP, toTokenUsage(completion)));
                     }
                     ChatCompletion.Choice choice = completion.choices().get(0);
                     ChatCompletionMessage message = choice.message();
                     String finishReason = choice.finishReason().asString();
                     List<ToolCall> toolCalls = toolCallsFromMessage(message);
                     if (toolCalls.isEmpty()) {
-                        return Mono.just(
-                                new AgenticRuntimeResult(message.content().orElse(""), finishReason));
+                        return Mono.just(new AgenticRuntimeResult(
+                                message.content().orElse(""), finishReason, toTokenUsage(completion)));
                     }
                     messages.add(assistantToolCallMessage(
                             message.content().orElse(null),
@@ -207,21 +213,41 @@ public class OpenAiCompatibleAgenticRuntime {
                 });
     }
 
+    /**
+     * Close a call-mode turn that exhausted the loop budget with one forced no-tools
+     * round, mirroring {@link #forceFinalStreamRound}.
+     */
+    private Mono<AgenticRuntimeResult> forceFinalCallRound(
+            OpenAIClientAsync client, AgenticPreparedChatBO prepared, List<ChatCompletionMessageParam> messages) {
+        if (!properties.isLoopForceFinalRound()) {
+            return Mono.error(new IllegalStateException(
+                    "Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
+        }
+        return Mono.fromFuture(client.chat().completions().create(buildRequest(prepared, messages, false, false)))
+                .map(completion -> {
+                    String content = completion.choices().isEmpty()
+                            ? ""
+                            : completion.choices().get(0).message().content().orElse("");
+                    return new AgenticRuntimeResult(
+                            content, AgenticRuntimeResult.FINISH_REASON_MAX_ROUNDS, toTokenUsage(completion));
+                });
+    }
+
     private Mono<Void> streamRound(
             OpenAIClientAsync client,
             AgenticPreparedChatBO prepared,
             List<ChatCompletionMessageParam> messages,
             Map<String, ToolCallback> callbacks,
             FluxSink<AgenticRuntimeStreamFrame> sink,
+            AgenticBackpressureGuard guard,
             int round) {
         if (sink.isCancelled()) {
             return Mono.empty();
         }
-        if (round >= AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS) {
-            return Mono.error(new IllegalStateException(
-                    "Agent loop exceeded max rounds: " + AgenticConstant.ToolLimit.MAX_AGENT_LOOP_ROUNDS));
+        if (round >= properties.getLoopMaxRounds()) {
+            return forceFinalStreamRound(client, prepared, messages, sink, guard);
         }
-        return streamOneRound(client, prepared, messages, sink).flatMap(result -> {
+        return streamOneRound(client, prepared, messages, sink, guard, true).flatMap(result -> {
             if (result.toolCalls().isEmpty()) {
                 if (StringUtils.isNotBlank(result.finishReason()) && !sink.isCancelled()) {
                     sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), result.finishReason()));
@@ -236,8 +262,35 @@ public class OpenAiCompatibleAgenticRuntime {
                         if (!sink.isCancelled()) {
                             sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), null));
                         }
-                        return streamRound(client, prepared, messages, callbacks, sink, round + 1);
+                        return streamRound(client, prepared, messages, callbacks, sink, guard, round + 1);
                     });
+        });
+    }
+
+    /**
+     * Close a turn that exhausted the loop budget: replay the conversation once without
+     * tools so the model is forced to produce a textual answer instead of failing the
+     * whole turn. Legacy hard-failure stays available via
+     * {@code dc3.agentic.loop-force-final-round=false}.
+     */
+    private Mono<Void> forceFinalStreamRound(
+            OpenAIClientAsync client,
+            AgenticPreparedChatBO prepared,
+            List<ChatCompletionMessageParam> messages,
+            FluxSink<AgenticRuntimeStreamFrame> sink,
+            AgenticBackpressureGuard guard) {
+        if (!properties.isLoopForceFinalRound()) {
+            return Mono.error(new IllegalStateException(
+                    "Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
+        }
+        return streamOneRound(client, prepared, messages, sink, guard, false).flatMap(result -> {
+            if (!sink.isCancelled()) {
+                sink.next(new AgenticRuntimeStreamFrame(
+                        AgenticStreamDelta.empty(),
+                        StringUtils.defaultIfBlank(
+                                result.finishReason(), AgenticRuntimeResult.FINISH_REASON_MAX_ROUNDS)));
+            }
+            return Mono.empty();
         });
     }
 
@@ -245,13 +298,16 @@ public class OpenAiCompatibleAgenticRuntime {
             OpenAIClientAsync client,
             AgenticPreparedChatBO prepared,
             List<ChatCompletionMessageParam> messages,
-            FluxSink<AgenticRuntimeStreamFrame> sink) {
+            FluxSink<AgenticRuntimeStreamFrame> sink,
+            AgenticBackpressureGuard guard,
+            boolean includeTools) {
         StringBuilder content = new StringBuilder();
         StringBuilder reasoningContent = new StringBuilder();
         Map<Long, StreamingToolCallBuilder> toolCallBuilders = new LinkedHashMap<>();
         AtomicReference<String> finishReason = new AtomicReference<>();
+        AtomicReference<AgenticTokenUsage> usage = new AtomicReference<>(AgenticTokenUsage.empty());
 
-        ChatCompletionCreateParams request = buildRequest(prepared, messages, true, true);
+        ChatCompletionCreateParams request = buildRequest(prepared, messages, includeTools, true);
         return Mono.create(resultSink -> {
             AsyncStreamResponse<ChatCompletionChunk> response =
                     client.chat().completions().createStreaming(request);
@@ -268,12 +324,19 @@ public class OpenAiCompatibleAgenticRuntime {
                         response.close();
                         return;
                     }
-                    if (sink.requestedFromDownstream() == 0) {
+                    // Bounded backpressure: tolerate a slow consumer up to the buffer
+                    // budget; only a stall that persists past the idle timeout kills
+                    // the turn (instead of the legacy zero-demand instant kill).
+                    if (guard != null && guard.onFrameEmitted()) {
                         response.close();
-                        resultSink.error(new IllegalStateException("Agentic model stream consumer is too slow"));
+                        resultSink.error(new IllegalStateException(
+                                "Agentic model stream consumer stalled beyond the backpressure budget"));
                         return;
                     }
                     if (chunk.choices().isEmpty()) {
+                        // Terminal usage frame: keep the provider-reported numbers
+                        // instead of relying on estimation downstream.
+                        chunk.usage().ifPresent(value -> usage.set(toTokenUsage(value)));
                         return;
                     }
                     for (ChatCompletionChunk.Choice choice : chunk.choices()) {
@@ -313,7 +376,8 @@ public class OpenAiCompatibleAgenticRuntime {
                                     .map(StreamingToolCallBuilder::build)
                                     .filter(Objects::nonNull)
                                     .toList(),
-                            finishReason.get()));
+                            finishReason.get(),
+                            usage.get()));
                 }
             });
         });
@@ -455,8 +519,12 @@ public class OpenAiCompatibleAgenticRuntime {
                     }
                     ToolCallback callback = callbacks.get(toolCall.name());
                     if (callback == null) {
-                        return Mono.error(
-                                new IllegalStateException("No tool callback found for tool: " + toolCall.name()));
+                        // A hallucinated tool name is a tool-level failure, not a turn
+                        // failure: answer with a tool error envelope (listing the real
+                        // tools) so the model can self-correct on the next round.
+                        return Mono.just(toolMessage(toolCall.id(), serializeToolResult(
+                                AgenticToolResult.error("Unknown tool '" + toolCall.name()
+                                        + "'. Available tools: " + String.join(", ", reactiveTools.keySet())))));
                     }
                     // @Tool callbacks may block (bounded) while bridging to their facade calls,
                     // so run them off the event loop on the bounded elastic scheduler.
@@ -514,12 +582,42 @@ public class OpenAiCompatibleAgenticRuntime {
         return tools;
     }
 
+    /** Upper bound for one serialized tool result before truncation. */
+    private static final int TOOL_RESULT_MAX_CHARS = 32_768;
+
     private String serializeToolResult(Object result) {
         try {
-            return objectMapper.writeValueAsString(result);
+            String json = objectMapper.writeValueAsString(result);
+            if (json.length() <= TOOL_RESULT_MAX_CHARS) {
+                return json;
+            }
+            // Tool results are replayed into the model context on every round; an
+            // unbounded payload (e.g. thousands of analytics samples) would crowd out
+            // the conversation. Wrap the truncated payload in a valid envelope and say
+            // so — the model can narrow the query instead of receiving broken JSON.
+            Map<String, Object> truncated = new LinkedHashMap<>();
+            truncated.put("success", true);
+            truncated.put("code", "OK");
+            truncated.put(
+                    "message",
+                    "Result truncated to fit the context budget; narrow the query (smaller limit or time range).");
+            truncated.put("data", json.substring(0, TOOL_RESULT_MAX_CHARS) + "...(truncated)");
+            return objectMapper.writeValueAsString(truncated);
         } catch (JacksonException error) {
             throw new IllegalStateException("Failed to serialize agentic tool result", error);
         }
+    }
+
+    private AgenticTokenUsage toTokenUsage(ChatCompletion completion) {
+        return completion.usage().map(this::toTokenUsage).orElseGet(AgenticTokenUsage::empty);
+    }
+
+    private AgenticTokenUsage toTokenUsage(ChatCompletionChunk chunk) {
+        return chunk.usage().map(this::toTokenUsage).orElseGet(AgenticTokenUsage::empty);
+    }
+
+    private AgenticTokenUsage toTokenUsage(com.openai.models.completions.CompletionUsage value) {
+        return new AgenticTokenUsage(value.promptTokens(), value.completionTokens(), value.totalTokens());
     }
 
     private Map<String, ReactiveAgenticTool> reactiveTools() {
@@ -613,7 +711,11 @@ public class OpenAiCompatibleAgenticRuntime {
     }
 
     private record StreamRoundResult(
-            String content, String reasoningContent, List<ToolCall> toolCalls, String finishReason) {}
+            String content,
+            String reasoningContent,
+            List<ToolCall> toolCalls,
+            String finishReason,
+            AgenticTokenUsage usage) {}
 
     private static class StreamingToolCallBuilder {
 

@@ -26,6 +26,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 /**
  * Default agentic runtime: routes to the explicit OpenAI-compatible agent loop when
@@ -68,26 +69,31 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
 
     private Flux<AgenticRuntimeStreamFrame> springAiStream(AgenticPreparedChatBO prepared) {
         return Flux.defer(() -> {
-            ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-            return promptSpec.stream()
-                    .chatResponse()
-                    .map(response -> new AgenticRuntimeStreamFrame(
-                            responseMapper.streamDelta(response), responseMapper.finishReasonOrNull(response)));
-        });
+                    ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
+                    return promptSpec.stream()
+                            .chatResponse()
+                            .map(response -> new AgenticRuntimeStreamFrame(
+                                    responseMapper.streamDelta(response), responseMapper.finishReasonOrNull(response)));
+                })
+                // Spring AI executes tool callbacks synchronously on the subscribing
+                // thread; bounded elastic keeps those blocking waits off event loops.
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Mono<AgenticRuntimeResult> springAiCall(AgenticPreparedChatBO prepared) {
         return Mono.defer(() -> {
-            ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
-            return promptSpec.stream().chatResponse().collectList().map(responses -> {
-                ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
-                if (chatResponse == null) {
-                    return new AgenticRuntimeResult("", null);
-                }
-                return new AgenticRuntimeResult(
-                        responseMapper.assistantContent(chatResponse), responseMapper.finishReasonOrNull(chatResponse));
-            });
-        });
+                    ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
+                    return promptSpec.stream().chatResponse().collectList().map(responses -> {
+                        ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
+                        if (chatResponse == null) {
+                            return new AgenticRuntimeResult("", null);
+                        }
+                        return new AgenticRuntimeResult(
+                                responseMapper.assistantContent(chatResponse),
+                                responseMapper.finishReasonOrNull(chatResponse));
+                    });
+                })
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Long tenantId(AgenticPreparedChatBO prepared) {
