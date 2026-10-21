@@ -117,6 +117,10 @@
 
 ---
 
+## 八、查漏补缺二轮结果（2026-10-21/22）
+
+62 条逐条销账（52 fixed / 9 partial / 2 missed）+ 回归扫描 + 同步面检查（50-agent workflow），全部 partial/missed 已补齐：key 外带向量、https-only、NAT64/6to4、usage 端到端、工具指标、重复调用检测、工具格式缓存、token 预算、附件配额、fetch 401 收敛、快照重同步 + 漂移守护测试、mock 对齐、历史附件数字 id bug。**pinnedDns 的 OkHttp 接线经 javap 实证不可行**（SDK builder 无定制口）——缝隙 API 保留待 SDK 演进，此为唯一技术性未闭环项。L61 结构化输出维持豁免。
+
 ## 附：方法论与可信度说明
 
 - 7 维度审查员各自独立读码（非仅依赖读图摘要），每条 finding 带 file:line+代码证据+可落地建议
