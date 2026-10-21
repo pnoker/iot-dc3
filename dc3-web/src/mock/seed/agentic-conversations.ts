@@ -770,7 +770,7 @@ export const agenticActions: LocalizedAction[] = [
 
 export const agenticAttachments: AgenticAttachment[] = [
   {
-    id: '91001',
+    id: 91001,
     conversationId: sessionDefs[3]!.id,
     fileName: 'opcua-handshake-20260811.log',
     contentType: 'text/plain',
@@ -778,7 +778,7 @@ export const agenticAttachments: AgenticAttachment[] = [
     createTime: at(1, 10, 58)
   },
   {
-    id: '91002',
+    id: 91002,
     conversationId: sessionDefs[5]!.id,
     fileName: 'M-104-vibration-spectrum.csv',
     contentType: 'text/csv',
@@ -786,7 +786,7 @@ export const agenticAttachments: AgenticAttachment[] = [
     createTime: at(3, 9, 54)
   },
   {
-    id: '91003',
+    id: 91003,
     conversationId: sessionDefs[6]!.id,
     fileName: 'canary-rollout-metrics.json',
     contentType: 'application/json',

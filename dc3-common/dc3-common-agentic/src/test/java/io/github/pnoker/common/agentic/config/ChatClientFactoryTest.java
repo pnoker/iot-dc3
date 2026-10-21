@@ -27,6 +27,7 @@ import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.lang.reflect.Field;
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -180,6 +181,55 @@ class ChatClientFactoryTest {
     void globalAndProviderPermitGaugesAreRegistered() {
         assertThat(meterRegistry.get("agentic.transport.global.permits").gauge().value())
                 .isEqualTo(16.0);
+    }
+
+    /**
+     * Cancellation race: a request parked on the exhausted global semaphore is
+     * cancelled, the permit it was waiting for is then freed, and the permit the
+     * cancelled acquire wins must be returned through the discard hook instead of
+     * leaking (a leaked slot would keep the gauge at zero and starve later requests
+     * until restart).
+     */
+    @Test
+    void cancellingAnAcquireParkedOnTheFullGlobalSemaphoreReturnsThePermitItWins() throws Exception {
+        properties.setTransportGlobalMaxConcurrentRequests(1);
+        properties.setTransportAcquireTimeoutSeconds(5);
+        // Fresh registry: registering a second global-permits gauge on a shared
+        // registry would keep serving the first factory's gauge (16 permits).
+        SimpleMeterRegistry raceRegistry = new SimpleMeterRegistry();
+        factory =
+                new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties, raceRegistry);
+        injectField("fallbackModel", "gpt-4o");
+
+        // Hold the only global slot.
+        ChatClientFactory.InFlightLease held =
+                factory.acquireInFlightSlot("unknown-model", 1L).block(Duration.ofSeconds(5));
+        assertThat(held).isNotNull();
+
+        // Park a second acquire on the exhausted semaphore, then cancel it while parked.
+        AtomicReference<ChatClientFactory.InFlightLease> emitted = new AtomicReference<>();
+        reactor.core.Disposable parked =
+                factory.acquireInFlightSlot("unknown-model", 1L).subscribe(emitted::set);
+        Thread.sleep(300);
+        parked.dispose();
+
+        // Free the slot: the cancelled acquire is the only waiter, so it wins the
+        // permit, sees its subscription cancelled and must hand it straight back.
+        factory.releaseInFlightSlot(held);
+        Thread.sleep(500);
+
+        assertThat(emitted.get())
+                .as("the cancelled acquire must not emit a lease")
+                .isNull();
+        // Settled state after the race: the permit is back. A leak would pin this at 0.
+        assertThat(raceRegistry.get("agentic.transport.global.permits").gauge().value())
+                .as("the permit the cancelled acquire won must be returned")
+                .isEqualTo(1.0);
+
+        // A fresh acquire goes through immediately — the slot did not leak.
+        ChatClientFactory.InFlightLease fresh =
+                factory.acquireInFlightSlot("unknown-model", 1L).block(Duration.ofSeconds(5));
+        assertThat(fresh).isNotNull();
     }
 
     private void stubTenantModel(String model) {

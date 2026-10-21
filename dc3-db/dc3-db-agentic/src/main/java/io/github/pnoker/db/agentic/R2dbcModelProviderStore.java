@@ -322,14 +322,6 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
         return value == null ? Instant.now() : value.toInstant(ZoneOffset.UTC);
     }
 
-    private LocalDateTime utc(LocalDateTime value) {
-        return value == null ? utcNow() : value;
-    }
-
-    private LocalDateTime utcNow() {
-        return LocalDateTime.now(ZoneOffset.UTC);
-    }
-
     private LocalDateTime time(Object value) {
         return DatabaseInstant.toLocalDateTimeUtc(value);
     }

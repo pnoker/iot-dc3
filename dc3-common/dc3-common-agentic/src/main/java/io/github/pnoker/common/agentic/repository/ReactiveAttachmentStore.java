@@ -52,4 +52,16 @@ public interface ReactiveAttachmentStore {
 
     /** Soft-delete one attachment by id within the caller's tenant and user scope. */
     Mono<Long> delete(Long id, RequestHeader.PrincipalHeader header);
+
+    /**
+     * Count the caller's live attachments across the whole tenant (every user,
+     * soft-deleted rows excluded). Feeds the per-tenant attachment count quota.
+     */
+    Mono<Long> countByTenant(RequestHeader.PrincipalHeader header);
+
+    /**
+     * Sum the stored bytes of the caller's live attachments across the whole tenant
+     * (soft-deleted rows excluded). Feeds the per-tenant attachment storage quota.
+     */
+    Mono<Long> sumSizeByTenant(RequestHeader.PrincipalHeader header);
 }

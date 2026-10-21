@@ -299,7 +299,9 @@ export function registerAgenticHandlers(): void {
 
   // ── agentic: attachments ──
   on('post', 'api/v3/agentic/attachment/upload', (ctx) =>
-    responseOf(ctx.config, ok({id: newId(), ...ctx.body, createTime: stamp()})),
+    // Attachment ids are numeric on the wire (server Long) — the chat request
+    // and message contentExt send them as numbers.
+    responseOf(ctx.config, ok({id: Number(newId()), ...ctx.body, createTime: stamp()})),
   );
   on('get', 'api/v3/agentic/attachment/list', (ctx) => {
     const rows = ctx.db.agenticAttachments.filter(

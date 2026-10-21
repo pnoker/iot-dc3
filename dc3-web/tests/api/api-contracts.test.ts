@@ -72,6 +72,7 @@ const apiSpies = vi.hoisted(() => ({
   httpPatch: vi.fn(() => Promise.resolve({ok: true, data: null})),
   httpDelete: vi.fn(() => Promise.resolve({ok: true, data: null})),
   request: vi.fn(() => Promise.resolve({ok: true, data: null})),
+  handleAuthFailure: vi.fn(),
 }));
 
 vi.mock('@/api/common', () => ({
@@ -90,6 +91,7 @@ vi.mock('@/api/common', () => ({
 
 vi.mock('@/config/axios', () => ({
   default: apiSpies.request,
+  handleAuthFailure: apiSpies.handleAuthFailure,
 }));
 
 type ApiModule = Record<string, unknown>;
@@ -491,7 +493,8 @@ describe('agentic streaming contract', () => {
     expect(onDone).toHaveBeenCalledTimes(1);
   });
 
-  it('normalizes failed stream responses and redirects on 401', async () => {
+  it('normalizes failed stream responses and routes 401 through the shared auth-failure helper', async () => {
+    apiSpies.handleAuthFailure.mockClear();
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => new Response('expired', {status: 401}))
@@ -504,7 +507,9 @@ describe('agentic streaming contract', () => {
     );
 
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
-    expect(window.location.hash).toBe('#/login');
+    // The fetch path must share the axios interceptor's 401 recovery (aggregated
+    // toast + auth-session reset + router redirect) instead of a raw hash jump.
+    expect(apiSpies.handleAuthFailure).toHaveBeenCalledTimes(1);
   });
 
   it('accepts stateless requests without a client conversationId', async () => {

@@ -16,11 +16,12 @@ model uses to read and operate platform resources.
 | Area          | Components                                                                                                                                                          |
 |---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Chat client   | `ChatClientConfig`, `ChatClientFactory` — build Spring AI `ChatClient`s per model configuration                                                                     |
-| Memory        | `MessageChatMemoryRepository` — JDBC-backed conversation memory                                                                                                     |
+| Memory        | conversation history replay backed by the reactive R2DBC stores (`ReactiveMessageStore`), configured through `AgenticProperties`                                    |
 | Configuration | `AgenticProperties` (prefix `dc3.agentic`), `AgenticApiGroupConfig`, `AgenticAutoConfiguration`                                                                     |
-| Tools         | `DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`, `CommandTool`, `EventTool`, `UserTool`, `TenantTool`, `SystemTool`                        |
+| Tools         | `DriverTool`, `DeviceTool`, `PointTool`, `PointValueTool`, `ProfileTool`, `CommandTool`, `EventTool`, `HistoryTool`, `InsightTool`, `UserTool`, `TenantTool`, `SystemTool` |
+| Tool registry | `ReactiveAgenticToolRegistry` — the single registration path every tool goes through; both runtimes (Spring AI chat client and OpenAI-compatible loop) consume the same registry |
 | Model mgmt    | `ModelController` + MapStruct mappers (`Session`, `Message`, `Attachment`, `ModelProvider`, `ModelConfig`, `Action`)                                                |
-| Tool support  | `AgenticToolMetadata` annotation, `AgenticToolUtil`, `AgenticToolContextUtil`, `AgenticConversationIdUtil`, `AgenticVisualizationUtil`, `AgenticTokenEstimatorUtil` |
+| Tool support  | `AgenticToolUtil`, `AgenticToolContextUtil`, `AgenticVisualizationUtil`, `AgenticTokenEstimatorUtil`, `AgenticBaseUrlValidator`, `AgenticKeyCipher`                  |
 
 ## Configuration
 

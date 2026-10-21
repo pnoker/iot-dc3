@@ -208,6 +208,11 @@ final class ScriptedAgenticDatabase implements DatabaseClient {
     }
 
     void seedAttachment(long tenantId, long userId, String conversationId, String filePath, boolean deleted) {
+        seedAttachment(tenantId, userId, conversationId, filePath, 1L, deleted);
+    }
+
+    void seedAttachment(
+            long tenantId, long userId, String conversationId, String filePath, long size, boolean deleted) {
         AttachmentRow row = new AttachmentRow();
         row.id = attachmentIds.incrementAndGet();
         row.tenantId = tenantId;
@@ -215,7 +220,7 @@ final class ScriptedAgenticDatabase implements DatabaseClient {
         row.conversationId = conversationId;
         row.fileName = "seed.txt";
         row.contentType = "text/plain";
-        row.size = 1L;
+        row.size = size;
         row.filePath = filePath;
         row.creatorId = userId;
         row.createTime = Instant.parse("2026-01-01T00:00:00Z");
@@ -586,6 +591,12 @@ final class ScriptedAgenticDatabase implements DatabaseClient {
         if (sql.startsWith("SELECT id, action_id, conversation_id")) {
             return selectAction(binds);
         }
+        if (sql.startsWith("SELECT COUNT(*) AS total FROM dc3_agentic.dc3_attachment")) {
+            return countLiveAttachmentsByTenant(binds);
+        }
+        if (sql.startsWith("SELECT COALESCE(SUM(size)")) {
+            return sumLiveAttachmentBytesByTenant(binds);
+        }
         if (sql.startsWith("SELECT COUNT(*) AS total")) {
             return Mono.just(new Outcome(List.of(Map.of("total", 0L)), 0));
         }
@@ -715,6 +726,21 @@ final class ScriptedAgenticDatabase implements DatabaseClient {
                 .map(row -> Map.<String, Object>of("file_path", row.filePath))
                 .toList();
         return Mono.just(new Outcome(rows, 0));
+    }
+
+    private Mono<Outcome> countLiveAttachmentsByTenant(Map<String, Object> binds) {
+        long total = attachments.stream()
+                .filter(row -> row.tenantId.equals(binds.get("tenant_id")) && row.deleted == 0)
+                .count();
+        return Mono.just(new Outcome(List.of(Map.of("total", total)), 0));
+    }
+
+    private Mono<Outcome> sumLiveAttachmentBytesByTenant(Map<String, Object> binds) {
+        long total = attachments.stream()
+                .filter(row -> row.tenantId.equals(binds.get("tenant_id")) && row.deleted == 0)
+                .mapToLong(row -> row.size == null ? 0L : row.size)
+                .sum();
+        return Mono.just(new Outcome(List.of(Map.of("total", total)), 0));
     }
 
     private Mono<Outcome> selectAttachment(Map<String, Object> binds) {

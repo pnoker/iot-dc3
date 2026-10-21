@@ -103,7 +103,7 @@ export const useAgenticStore = defineStore('agentic', () => {
   const currentAbortController = ref<AbortController>();
   const messagesByConversation = ref<Record<string, AgenticMessage[]>>(readCachedMessages());
   const attachmentsByConversation = ref<Record<string, AgenticAttachment[]>>({});
-  const pendingAttachmentIdsByConversation = ref<Record<string, string[]>>({});
+  const pendingAttachmentIdsByConversation = ref<Record<string, number[]>>({});
   const pendingActionsByConversation = ref<Record<string, AgenticAction[]>>({});
   const traceEventsByConversation = ref<Record<string, AgenticTraceEvent[]>>({});
   const sessionActionLoading = ref<Record<string, boolean>>({});
@@ -574,7 +574,7 @@ export const useAgenticStore = defineStore('agentic', () => {
 
   const sendMessage = async (
     content: string,
-    options: {attachmentIds?: string[]} = {}
+    options: {attachmentIds?: number[]} = {}
   ): Promise<boolean> => {
     const text = content.trim();
     if (!text || streaming.value) {
@@ -595,10 +595,11 @@ export const useAgenticStore = defineStore('agentic', () => {
     const now = new Date().toISOString();
     // Retries replay the original turn's attachment ids; fresh sends carry
     // the pending ones. Either way the request and the optimistic user
-    // message must agree on what travelled with the prompt.
+    // message must agree on what travelled with the prompt. Ids are the
+    // attachment table's numeric ids (server List<Long>).
     const sentAttachmentIds = options.attachmentIds?.length
-      ? options.attachmentIds.map(String)
-      : currentAttachments.value.map((attachment) => String(attachment.id));
+      ? options.attachmentIds
+      : currentAttachments.value.map((attachment) => attachment.id);
     const userMessage: AgenticMessage = {
       id: createMessageId('user'),
       role: 'user',
@@ -728,9 +729,11 @@ export const useAgenticStore = defineStore('agentic', () => {
     while (userIndex >= 0 && messages[userIndex]!.role !== 'user') userIndex -= 1;
     if (userIndex < 0) return false;
     const userMessage = messages[userIndex]!;
-    const attachmentIds = (userMessage.contentExt?.attachments || []).filter(
-      (id): id is string => typeof id === 'string' && id.length > 0
-    );
+    const attachmentIds = (userMessage.contentExt?.attachments || [])
+      // Legacy local echoes may still hold numeric-string ids (pre number[]
+      // contract) or junk entries; normalize to the numeric id contract.
+      .map((id) => (typeof id === 'number' ? id : Number(id)))
+      .filter((id) => Number.isInteger(id) && id > 0);
     messagesByConversation.value[conversationId] = messages.filter(
       (_message, index) => index !== targetIndex && index !== userIndex
     );
@@ -822,7 +825,7 @@ export const useAgenticStore = defineStore('agentic', () => {
     return true;
   };
 
-  const removeLocalAttachment = (attachmentId: string) => {
+  const removeLocalAttachment = (attachmentId: number) => {
     const conversationId = activeConversationId.value;
     pendingAttachmentIdsByConversation.value[conversationId] = (
       pendingAttachmentIdsByConversation.value[conversationId] || []
