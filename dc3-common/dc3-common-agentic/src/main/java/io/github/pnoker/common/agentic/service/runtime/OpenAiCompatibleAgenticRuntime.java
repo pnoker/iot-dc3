@@ -150,7 +150,14 @@ public class OpenAiCompatibleAgenticRuntime {
             OpenAIClient client = createClient(provider);
             OpenAIClientAsync asyncClient = client.async();
             Disposable execution = streamRound(
-                            asyncClient, prepared, initialMessages(prepared), toolCallbacksByName(), sink, guard, 0)
+                            asyncClient,
+                            prepared,
+                            initialMessages(prepared),
+                            toolCallbacksByName(),
+                            new java.util.concurrent.ConcurrentHashMap<>(),
+                            sink,
+                            guard,
+                            0)
                     .doFinally(signal -> client.close())
                     .subscribe(ignored -> {}, sink::error, sink::complete);
             sink.onCancel(execution::dispose);
@@ -172,7 +179,7 @@ public class OpenAiCompatibleAgenticRuntime {
             OpenAIClient client = createClient(provider);
             OpenAIClientAsync asyncClient = client.async();
             List<ChatCompletionMessageParam> messages = initialMessages(prepared);
-            return callRound(asyncClient, prepared, messages, toolCallbacksByName(), 0)
+            return callRound(asyncClient, prepared, messages, toolCallbacksByName(), new java.util.concurrent.ConcurrentHashMap<>(), 0)
                     .doFinally(signal -> client.close());
         });
     }
@@ -182,6 +189,7 @@ public class OpenAiCompatibleAgenticRuntime {
             AgenticPreparedChatBO prepared,
             List<ChatCompletionMessageParam> messages,
             Map<String, ToolCallback> callbacks,
+            Map<String, Integer> repeatedCallCount,
             int round) {
         if (round >= properties.getLoopMaxRounds()) {
             return forceFinalCallRound(client, prepared, messages);
@@ -204,11 +212,11 @@ public class OpenAiCompatibleAgenticRuntime {
                             message.content().orElse(null),
                             extractReasoningContent(message._additionalProperties()),
                             toolCalls));
-                    return executeToolCallsReactive(callbacks, prepared, toolCalls)
+                    return executeToolCallsReactive(callbacks, prepared, toolCalls, repeatedCallCount)
                             .collectList()
                             .flatMap(toolMessages -> {
                                 messages.addAll(toolMessages);
-                                return callRound(client, prepared, messages, callbacks, round + 1);
+                                return callRound(client, prepared, messages, callbacks, repeatedCallCount, round + 1);
                             });
                 });
     }
@@ -238,6 +246,7 @@ public class OpenAiCompatibleAgenticRuntime {
             AgenticPreparedChatBO prepared,
             List<ChatCompletionMessageParam> messages,
             Map<String, ToolCallback> callbacks,
+            Map<String, Integer> repeatedCallCount,
             FluxSink<AgenticRuntimeStreamFrame> sink,
             AgenticBackpressureGuard guard,
             int round) {
@@ -256,14 +265,14 @@ public class OpenAiCompatibleAgenticRuntime {
                 return Mono.empty();
             }
             messages.add(assistantToolCallMessage(result.content(), result.reasoningContent(), result.toolCalls()));
-            return executeToolCallsReactive(callbacks, prepared, result.toolCalls())
+            return executeToolCallsReactive(callbacks, prepared, result.toolCalls(), repeatedCallCount)
                     .collectList()
                     .flatMap(toolMessages -> {
                         messages.addAll(toolMessages);
                         if (!sink.isCancelled()) {
                             sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), null));
                         }
-                        return streamRound(client, prepared, messages, callbacks, sink, guard, round + 1);
+                        return streamRound(client, prepared, messages, callbacks, repeatedCallCount, sink, guard, round + 1);
                     });
         });
     }
@@ -507,11 +516,24 @@ public class OpenAiCompatibleAgenticRuntime {
     }
 
     private Flux<ChatCompletionMessageParam> executeToolCallsReactive(
-            Map<String, ToolCallback> callbacks, AgenticPreparedChatBO prepared, List<ToolCall> toolCalls) {
+            Map<String, ToolCallback> callbacks,
+            AgenticPreparedChatBO prepared,
+            List<ToolCall> toolCalls,
+            Map<String, Integer> repeatedCallCount) {
         ToolContext toolContext = new ToolContext(prepared.toolContext());
         Map<String, ReactiveAgenticTool> reactiveTools = reactiveTools();
         return Flux.fromIterable(toolCalls)
                 .concatMap(toolCall -> Mono.defer(() -> {
+                    // The same tool with the same arguments over and over is a stuck
+                    // loop: still execute it, but the answer tells the model to change
+                    // course before the loop budget burns the turn.
+                    String callKey = toolCall.name() + ":" + StringUtils.defaultString(toolCall.arguments());
+                    int seen = repeatedCallCount.merge(callKey, 1, Integer::sum);
+                    if (seen >= 3) {
+                        return Mono.just(toolMessage(toolCall.id(), serializeToolResult(AgenticToolResult.error(
+                                "Tool '" + toolCall.name() + "' was already called with the same arguments "
+                                        + seen + " times. Change the arguments or answer from what you already have."))));
+                    }
                     ReactiveAgenticTool reactiveTool = reactiveTools.get(toolCall.name());
                     if (reactiveTool != null) {
                         return reactiveTool
@@ -537,7 +559,15 @@ public class OpenAiCompatibleAgenticRuntime {
                 }));
     }
 
+    /** Cached provider-format tool list and callback map; the registry snapshot is immutable after construction. */
+    private volatile List<ChatCompletionTool> cachedProviderTools;
+    private volatile Map<String, ToolCallback> cachedCallbacks;
+
     private Map<String, ToolCallback> toolCallbacksByName() {
+        Map<String, ToolCallback> cached = cachedCallbacks;
+        if (cached != null) {
+            return cached;
+        }
         Map<String, ToolCallback> callbacks = new HashMap<>();
         for (ToolCallback callback : toolCallbackProvider.getToolCallbacks()) {
             if (Objects.nonNull(callback)
@@ -546,10 +576,22 @@ public class OpenAiCompatibleAgenticRuntime {
                 callbacks.put(callback.getToolDefinition().name(), callback);
             }
         }
-        return callbacks;
+        Map<String, ToolCallback> snapshot = Map.copyOf(callbacks);
+        cachedCallbacks = snapshot;
+        return snapshot;
     }
 
     private List<ChatCompletionTool> chatCompletionTools() {
+        List<ChatCompletionTool> cached = cachedProviderTools;
+        if (cached != null) {
+            return cached;
+        }
+        List<ChatCompletionTool> snapshot = buildChatCompletionTools();
+        cachedProviderTools = snapshot;
+        return snapshot;
+    }
+
+    private List<ChatCompletionTool> buildChatCompletionTools() {
         List<ChatCompletionTool> tools = new ArrayList<>();
         Map<String, ReactiveAgenticTool> reactive = reactiveTools();
         Set<String> reactiveNames = reactive.keySet();
