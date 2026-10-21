@@ -198,16 +198,14 @@ public final class AgenticKeyCipher {
         if (platformKey != null && !platformKey.isBlank()) {
             if (WARNED_DERIVED_KEY.compareAndSet(false, true)) {
                 log.warn(
-                        "Agentic provider key encryption derives its master key from {}; set {} "
-                                + "(Base64, 256-bit) or dc3.agentic.security-master-key in production",
+                        "Agentic provider key encryption derives its master key from {}; set {} (Base64, 256-bit) or dc3.agentic.security-master-key in production",
                         PLATFORM_KEY_ENV,
                         MASTER_KEY_ENV);
             }
             return new SecretKeySpec(hkdfSha256(platformKey), "AES");
         }
         log.warn(
-                "No master key material for agentic provider key encryption; set {} or {} before "
-                        + "storing provider API keys",
+                "No master key material for agentic provider key encryption; set {} or {} before storing provider API keys",
                 MASTER_KEY_ENV,
                 PLATFORM_KEY_ENV);
         return null;

@@ -253,8 +253,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             recordLifecycle(
                     userHeader, prepared.model(), providerTag(prepared.model(), userHeader), "completed", startNanos);
             log.info(
-                    "Agentic chat complete, tenantId={}, userId={}, conversationId={}, model={}, contentLen={},"
-                            + " finishReason={}, durationMs={}",
+                    "Agentic chat complete, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, finishReason={}, durationMs={}",
                     userHeader.getTenantId(),
                     userHeader.getUserId(),
                     sanitize(prepared.conversationId()),
@@ -310,8 +309,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                 userHeader, prepared.model(), providerTag(prepared.model(), userHeader), statusTag(status), startNanos);
         return persistAssistantMessage(prepared, content.toString(), reasoningContent.toString(), status, userHeader)
                 .then(Mono.fromRunnable(() -> log.info(
-                        "Agentic stream terminated, tenantId={}, userId={}, conversationId={}, model={},"
-                                + " contentLen={}, status={}, finishReason={}, durationMs={}",
+                        "Agentic stream terminated, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, status={}, finishReason={}, durationMs={}",
                         userHeader.getTenantId(),
                         userHeader.getUserId(),
                         sanitize(prepared.conversationId()),

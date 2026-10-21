@@ -142,8 +142,7 @@ public class AgenticChatRequestPreparer {
                                     AgenticMessageContent.Tokens inputTokens = buildInputTokens(
                                             turns.finalUserMessage(), contexts, replayTranscript, toolCallingEnabled);
                                     log.debug(
-                                            "Agentic replay transcript resolved, conversationId={}, "
-                                                    + "memoryEnabled={}, clientManaged={}, count={}",
+                                            "Agentic replay transcript resolved, conversationId={}, memoryEnabled={}, clientManaged={}, count={}",
                                             sanitize(conversationId),
                                             properties.isMemoryEnabled(),
                                             !turns.priorTurns().isEmpty(),
