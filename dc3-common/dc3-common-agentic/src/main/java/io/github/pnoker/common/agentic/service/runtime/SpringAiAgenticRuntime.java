@@ -73,7 +73,9 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
                     return promptSpec.stream()
                             .chatResponse()
                             .map(response -> new AgenticRuntimeStreamFrame(
-                                    responseMapper.streamDelta(response), responseMapper.finishReasonOrNull(response)));
+                                    responseMapper.streamDelta(response),
+                                    responseMapper.finishReasonOrNull(response),
+                                    usageOf(response)));
                 })
                 // Spring AI executes tool callbacks synchronously on the subscribing
                 // thread; bounded elastic keeps those blocking waits off event loops.
@@ -90,10 +92,26 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
                         }
                         return new AgenticRuntimeResult(
                                 responseMapper.assistantContent(chatResponse),
-                                responseMapper.finishReasonOrNull(chatResponse));
+                                responseMapper.finishReasonOrNull(chatResponse),
+                                usageOf(chatResponse));
                     });
                 })
                 .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    /**
+     * Map the provider usage Spring AI attaches to a chat response; absent metadata
+     * yields an empty usage and consumers fall back to estimation.
+     */
+    private AgenticTokenUsage usageOf(ChatResponse response) {
+        if (response == null || response.getMetadata() == null || response.getMetadata().getUsage() == null) {
+            return AgenticTokenUsage.empty();
+        }
+        org.springframework.ai.chat.metadata.Usage usage = response.getMetadata().getUsage();
+        return new AgenticTokenUsage(
+                usage.getPromptTokens() == null ? null : (long) usage.getPromptTokens(),
+                usage.getCompletionTokens() == null ? null : (long) usage.getCompletionTokens(),
+                usage.getTotalTokens() == null ? null : (long) usage.getTotalTokens());
     }
 
     private Long tenantId(AgenticPreparedChatBO prepared) {

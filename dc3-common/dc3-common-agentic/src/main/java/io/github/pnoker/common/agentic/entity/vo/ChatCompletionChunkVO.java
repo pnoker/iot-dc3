@@ -73,6 +73,13 @@ public class ChatCompletionChunkVO {
     private List<ChunkChoice> choices;
 
     /**
+     * Provider-reported token usage; present on the terminal chunk when the provider
+     * reported it (OpenAI include_usage semantics), absent otherwise.
+     */
+    @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+    private ChatCompletionResponseVO.Usage usage;
+
+    /**
      * One streaming choice: index + incremental delta.
      */
     @Getter

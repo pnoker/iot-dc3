@@ -150,5 +150,23 @@ public class ChatCompletionResponseVO {
                 example = "170")
         @JsonProperty("total_tokens")
         private int totalTokens;
+
+        @Schema(
+                description =
+                        "Present and true when the numbers are heuristic estimates instead of provider-reported usage. Absent means provider-reported.",
+                example = "true")
+        @com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL)
+        private Boolean estimated;
+
+        /**
+         * Three-argument constructor for provider-reported usage (estimated absent).
+         *
+         * @param promptTokens     prompt tokens
+         * @param completionTokens completion tokens
+         * @param totalTokens      total tokens
+         */
+        public Usage(int promptTokens, int completionTokens, int totalTokens) {
+            this(promptTokens, completionTokens, totalTokens, null);
+        }
     }
 }

@@ -17,6 +17,9 @@
 package io.github.pnoker.common.agentic.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,12 +28,14 @@ import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionRequestVO;
+import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatRequestPreparer;
 import io.github.pnoker.common.agentic.service.chat.AgenticChatResponseCodec;
 import io.github.pnoker.common.agentic.service.chat.AgenticMessageRecorder;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
+import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
@@ -113,7 +118,8 @@ class AgenticChatServiceImplTest {
                 .verifyComplete();
 
         verify(messageRecorder).persistUserMessage(prepared, userHeader);
-        verify(messageRecorder).persistAssistantMessage(prepared, "", "", AgenticMessageStatusEnum.FAILED, userHeader);
+        verify(messageRecorder)
+                .persistAssistantMessage(prepared, "", "", AgenticMessageStatusEnum.FAILED, AgenticTokenUsage.empty(), userHeader);
         assertThat(prepared.runTrace().recordedEvents()).hasSize(1);
         assertThat(prepared.runTrace().recordedEvents().get(0).status()).isEqualTo("failed");
     }
@@ -132,9 +138,11 @@ class AgenticChatServiceImplTest {
 
         verify(messageRecorder).persistUserMessage(prepared, userHeader);
         verify(messageRecorder)
-                .persistAssistantMessage(prepared, "", "", AgenticMessageStatusEnum.CANCELLED, userHeader);
+                .persistAssistantMessage(
+                        prepared, "", "", AgenticMessageStatusEnum.CANCELLED, AgenticTokenUsage.empty(), userHeader);
         verify(messageRecorder, never())
-                .persistAssistantMessage(prepared, "", "", AgenticMessageStatusEnum.COMPLETED, userHeader);
+                .persistAssistantMessage(
+                        prepared, "", "", AgenticMessageStatusEnum.COMPLETED, AgenticTokenUsage.empty(), userHeader);
         assertThat(prepared.runTrace().pendingEvents())
                 .singleElement()
                 .satisfies(event -> assertThat(event.status()).isEqualTo("cancelled"));
@@ -184,6 +192,35 @@ class AgenticChatServiceImplTest {
                         .counter()
                         .count())
                 .isEqualTo(2.0);
+    }
+
+    @Test
+    void blockingChatCompletionPropagatesProviderUsageToWireAndPersistence() {
+        ChatCompletionRequestVO request = new ChatCompletionRequestVO();
+        AgenticPreparedChatBO prepared = prepared();
+        AgenticTokenUsage usage = new AgenticTokenUsage(11L, 22L, 33L);
+        when(requestPreparer.prepareReactive(request, userHeader, "blocking")).thenReturn(Mono.just(prepared));
+        when(agenticRuntime.call(prepared))
+                .thenReturn(Mono.fromSupplier(() -> new AgenticRuntimeResult("done", "stop", usage)));
+        when(messageRecorder.persistAssistantMessage(any(), any(), any(), any(), any(), any()))
+                .thenReturn(Mono.empty());
+
+        ChatCompletionResponseVO response = service.chatCompletion(request, userHeader).block(Duration.ofSeconds(5));
+
+        assertThat(response).isNotNull();
+        assertThat(response.getUsage().getPromptTokens()).isEqualTo(11);
+        assertThat(response.getUsage().getCompletionTokens()).isEqualTo(22);
+        assertThat(response.getUsage().getTotalTokens()).isEqualTo(33);
+        assertThat(response.getUsage().getEstimated()).isFalse();
+        verify(messageRecorder).persistAssistantMessage(
+                eq(prepared), eq("done"), isNull(), eq(AgenticMessageStatusEnum.COMPLETED), eq(usage), eq(userHeader));
+        assertThat(meterRegistry
+                        .get("agentic.chat.tokens")
+                        .tag("tenant", "1")
+                        .tag("model", "dc3-test-model")
+                        .counter()
+                        .count())
+                .isEqualTo(33.0);
     }
 
     private AgenticPreparedChatBO prepared() {

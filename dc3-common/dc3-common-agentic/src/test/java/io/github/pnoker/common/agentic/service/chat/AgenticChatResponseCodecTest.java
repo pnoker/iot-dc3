@@ -22,6 +22,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.entity.model.AgenticVisualizationSpec;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
+import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,7 @@ class AgenticChatResponseCodecTest {
         runTrace.recordPendingVisualization(visualization());
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared, "Analysis ready", "stop"));
+        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared, "Analysis ready", "stop", AgenticTokenUsage.empty()));
 
         assertThat(json).contains("\"contentExt\"");
         assertThat(json).contains("\"charts\"");

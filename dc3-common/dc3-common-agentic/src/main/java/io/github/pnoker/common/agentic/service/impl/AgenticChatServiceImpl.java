@@ -34,6 +34,7 @@ import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
+import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
@@ -116,11 +117,15 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         StringBuilder assistantContent = new StringBuilder();
         StringBuilder assistantReasoningContent = new StringBuilder();
         AtomicReference<String> lastFinishReason = new AtomicReference<>(AgenticConstant.Chat.FINISH_REASON_STOP);
+        AtomicReference<AgenticTokenUsage> lastUsage = new AtomicReference<>(AgenticTokenUsage.empty());
 
         Flux<ServerSentEvent<String>> runtimeEvents = agenticRuntime.stream(prepared)
                 .doOnNext(frame -> {
                     if (frame.hasFinishReason()) {
                         lastFinishReason.set(frame.finishReason());
+                    }
+                    if (frame.hasUsage()) {
+                        lastUsage.set(frame.usage());
                     }
                     if (frame.delta().content() != null) {
                         assistantContent.append(frame.delta().content());
@@ -156,6 +161,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                         assistantReasoningContent,
                         streamStatus(lastFinishReason.get()),
                         lastFinishReason.get(),
+                        lastUsage.get(),
                         userHeader,
                         startNanos),
                 (ignored, error) -> {
@@ -166,6 +172,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                             assistantReasoningContent,
                             AgenticMessageStatusEnum.FAILED,
                             AgenticConstant.Chat.FINISH_REASON_ERROR,
+                            lastUsage.get(),
                             userHeader,
                             startNanos);
                 },
@@ -177,12 +184,14 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                             assistantReasoningContent,
                             AgenticMessageStatusEnum.CANCELLED,
                             AgenticConstant.Chat.FINISH_REASON_CANCELLED,
+                            lastUsage.get(),
                             userHeader,
                             startNanos);
                 });
         return persistedResponse
                 .concatWith(Mono.fromSupplier(() -> ServerSentEvent.<String>builder()
-                        .data(responseCodec.formatFinalChunk(chatId, created, prepared.model(), lastFinishReason.get()))
+                        .data(responseCodec.formatFinalChunk(
+                                chatId, created, prepared.model(), lastFinishReason.get(), lastUsage.get()))
                         .build()))
                 .concatWith(Mono.just(ServerSentEvent.<String>builder()
                         .data(AgenticConstant.Chat.STREAM_DONE)
@@ -249,9 +258,11 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             RequestHeader.PrincipalHeader userHeader,
             long startNanos) {
         String assistantText = StringUtils.defaultString(result.content());
-        return persistAssistantMessage(prepared, assistantText, userHeader).then(Mono.fromSupplier(() -> {
+        return persistAssistantMessage(prepared, assistantText, result.usage(), userHeader)
+                .then(Mono.fromSupplier(() -> {
             recordLifecycle(
                     userHeader, prepared.model(), providerTag(prepared.model(), userHeader), "completed", startNanos);
+            recordTokenUsage(result.usage(), prepared, userHeader);
             log.info(
                     "Agentic chat complete, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, finishReason={}, durationMs={}",
                     userHeader.getTenantId(),
@@ -261,7 +272,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                     assistantText.length(),
                     result.finishReason(),
                     Duration.ofNanos(System.nanoTime() - startNanos).toMillis());
-            return responseCodec.blockingResponse(prepared, assistantText, result.finishReason());
+            return responseCodec.blockingResponse(prepared, assistantText, result.finishReason(), result.usage());
         }));
     }
 
@@ -273,6 +284,16 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private Mono<Void> persistAssistantMessage(
             AgenticPreparedChatBO prepared, String content, RequestHeader.PrincipalHeader userHeader) {
         Mono<Void> persistence = messageRecorder.persistAssistantMessage(prepared, content, userHeader);
+        return persistence == null ? Mono.empty() : persistence;
+    }
+
+    private Mono<Void> persistAssistantMessage(
+            AgenticPreparedChatBO prepared,
+            String content,
+            AgenticTokenUsage usage,
+            RequestHeader.PrincipalHeader userHeader) {
+        Mono<Void> persistence = messageRecorder.persistAssistantMessage(
+                prepared, content, null, AgenticMessageStatusEnum.COMPLETED, usage, userHeader);
         return persistence == null ? Mono.empty() : persistence;
     }
 
@@ -303,11 +324,15 @@ public class AgenticChatServiceImpl implements AgenticChatService {
             StringBuilder reasoningContent,
             AgenticMessageStatusEnum status,
             String finishReason,
+            AgenticTokenUsage usage,
             RequestHeader.PrincipalHeader userHeader,
             long startNanos) {
         recordLifecycle(
                 userHeader, prepared.model(), providerTag(prepared.model(), userHeader), statusTag(status), startNanos);
-        return persistAssistantMessage(prepared, content.toString(), reasoningContent.toString(), status, userHeader)
+        recordTokenUsage(usage, prepared, userHeader);
+        Mono<Void> persistence = messageRecorder.persistAssistantMessage(
+                prepared, content.toString(), reasoningContent.toString(), status, usage, userHeader);
+        return (persistence == null ? Mono.empty() : persistence)
                 .then(Mono.fromRunnable(() -> log.info(
                         "Agentic stream terminated, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, status={}, finishReason={}, durationMs={}",
                         userHeader.getTenantId(),
@@ -335,7 +360,7 @@ public class AgenticChatServiceImpl implements AgenticChatService {
     private void recordLifecycle(
             RequestHeader.PrincipalHeader userHeader, String model, String provider, String result, long startNanos) {
         String tenant = String.valueOf(userHeader.getTenantId());
-        String modelTag = StringUtils.defaultIfBlank(model, "unspecified");
+        String modelTag = labelValue(model);
         meterRegistry
                 .counter(
                         "agentic.chat.requests",
@@ -360,6 +385,37 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                         "result",
                         result)
                 .record(Duration.ofNanos(System.nanoTime() - startNanos));
+    }
+
+    /**
+     * Bound a user-controlled string before it becomes a meter label: blank becomes
+     * "unspecified" and anything longer than 64 characters is truncated, so a hostile
+     * tenant cannot explode the registry cardinality.
+     */
+    private static String labelValue(String value) {
+        String normalized = StringUtils.defaultIfBlank(value, "unspecified");
+        return normalized.length() <= 64 ? normalized : normalized.substring(0, 64);
+    }
+
+    /**
+     * Record provider-reported token usage per tenant/provider/model. Estimated turns
+     * are not counted — the metric is the authoritative consumption signal.
+     */
+    private void recordTokenUsage(
+            AgenticTokenUsage usage, AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {
+        if (usage == null || !usage.isPresent() || usage.totalTokens() == null) {
+            return;
+        }
+        meterRegistry
+                .counter(
+                        "agentic.chat.tokens",
+                        "tenant",
+                        String.valueOf(userHeader.getTenantId()),
+                        "provider",
+                        providerTag(prepared.model(), userHeader),
+                        "model",
+                        labelValue(prepared.model()))
+                .increment(usage.totalTokens());
     }
 
     private static String statusTag(AgenticMessageStatusEnum status) {

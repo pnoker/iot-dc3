@@ -25,11 +25,17 @@ import org.apache.commons.lang3.StringUtils;
  * @author pnoker
  * @since 2016.10.1
  */
-public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
+public record AgenticRuntimeStreamFrame(
+        AgenticStreamDelta delta, String finishReason, AgenticTokenUsage usage) {
+
+    public AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
+        this(delta, finishReason, AgenticTokenUsage.empty());
+    }
 
     /** Agentic runtime stream frame compact constructor: normalizes the record. */
     public AgenticRuntimeStreamFrame {
         delta = Objects.nonNull(delta) ? delta : AgenticStreamDelta.empty();
+        usage = Objects.nonNull(usage) ? usage : AgenticTokenUsage.empty();
     }
 
     /**
@@ -48,5 +54,15 @@ public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishR
      */
     public boolean hasFinishReason() {
         return StringUtils.isNotBlank(finishReason);
+    }
+
+    /**
+     * Determine whether the frame carries provider-reported token usage. Only the
+     * terminal frame of a turn carries usage; intermediate frames stay empty.
+     *
+     * @return {@code true} when provider usage is present
+     */
+    public boolean hasUsage() {
+        return usage.isPresent();
     }
 }

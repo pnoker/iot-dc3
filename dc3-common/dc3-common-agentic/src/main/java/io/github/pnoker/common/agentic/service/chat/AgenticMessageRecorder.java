@@ -19,6 +19,7 @@ package io.github.pnoker.common.agentic.service.chat;
 import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.entity.model.AgenticRunEvent;
 import io.github.pnoker.common.agentic.repository.ReactiveMessageStore;
+import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
@@ -98,8 +99,24 @@ public class AgenticMessageRecorder {
             String reasoningContent,
             AgenticMessageStatusEnum status,
             RequestHeader.PrincipalHeader userHeader) {
+        return persistAssistantMessage(
+                prepared, content, reasoningContent, status, AgenticTokenUsage.empty(), userHeader);
+    }
+
+    /**
+     * Persist the assistant reply with provider-reported token usage. When the usage
+     * is present its numbers replace the heuristic estimates and the persisted token
+     * object is marked as reported; otherwise the estimates are marked as such.
+     */
+    public Mono<Void> persistAssistantMessage(
+            AgenticPreparedChatBO prepared,
+            String content,
+            String reasoningContent,
+            AgenticMessageStatusEnum status,
+            AgenticTokenUsage usage,
+            RequestHeader.PrincipalHeader userHeader) {
         AgenticMessageContent messageContent = buildAssistantContent(
-                prepared, StringUtils.defaultString(content), StringUtils.trimToNull(reasoningContent));
+                prepared, StringUtils.defaultString(content), StringUtils.trimToNull(reasoningContent), usage);
         if (status == AgenticMessageStatusEnum.COMPLETED && !hasPersistableAssistantContent(messageContent)) {
             return Mono.empty();
         }
@@ -123,7 +140,7 @@ public class AgenticMessageRecorder {
     }
 
     private AgenticMessageContent buildAssistantContent(
-            AgenticPreparedChatBO prepared, String text, String reasoningContent) {
+            AgenticPreparedChatBO prepared, String text, String reasoningContent, AgenticTokenUsage usage) {
         List<AgenticRunEvent> runEvents = drainRunEvents(prepared);
         List<String> tools = runEvents.stream()
                 .filter(event -> AgenticConstant.RunEvent.TYPE_TOOL.equals(event.type()))
@@ -140,7 +157,7 @@ public class AgenticMessageRecorder {
         content.setReasoning(prepared.reasoning());
         content.setReasoningContent(reasoningContent);
         content.setContexts(prepared.contexts());
-        content.setTokens(outputTokens(prepared.inputTokens(), text));
+        content.setTokens(outputTokens(prepared.inputTokens(), text, usage));
         return content;
     }
 
@@ -186,15 +203,26 @@ public class AgenticMessageRecorder {
         return prepared.runTrace().drainAndRecordedEvents();
     }
 
-    private AgenticMessageContent.Tokens outputTokens(AgenticMessageContent.Tokens inputTokens, String assistantText) {
-        int outputTokens = AgenticTokenEstimatorUtil.estimate(assistantText);
+    private AgenticMessageContent.Tokens outputTokens(
+            AgenticMessageContent.Tokens inputTokens, String assistantText, AgenticTokenUsage usage) {
         AgenticMessageContent.Tokens tokens = new AgenticMessageContent.Tokens();
+        if (usage != null && usage.isPresent()) {
+            tokens.setInput(usage.promptTokens() == null ? null : usage.promptTokens().intValue());
+            tokens.setOutput(usage.completionTokens() == null ? null : usage.completionTokens().intValue());
+            tokens.setText(inputTokens.getText());
+            tokens.setContext(inputTokens.getContext());
+            tokens.setSystem(inputTokens.getSystem());
+            tokens.setMemory(inputTokens.getMemory());
+            tokens.setEstimated(false);
+            return tokens;
+        }
         tokens.setInput(inputTokens.getInput());
-        tokens.setOutput(outputTokens);
+        tokens.setOutput(AgenticTokenEstimatorUtil.estimate(assistantText));
         tokens.setText(inputTokens.getText());
         tokens.setContext(inputTokens.getContext());
         tokens.setSystem(inputTokens.getSystem());
         tokens.setMemory(inputTokens.getMemory());
+        tokens.setEstimated(true);
         return tokens;
     }
 }

@@ -24,6 +24,7 @@ import io.github.pnoker.common.agentic.entity.vo.AgenticVisualizationVO;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionChunkVO;
 import io.github.pnoker.common.agentic.entity.vo.ChatCompletionResponseVO;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
+import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
 import io.github.pnoker.common.agentic.utils.AgenticTokenEstimatorUtil;
 import io.github.pnoker.common.constant.common.SymbolConstant;
 import io.github.pnoker.common.constant.service.AgenticConstant;
@@ -64,10 +65,26 @@ public class AgenticChatResponseCodec {
      * @return the chat completion response
      */
     public ChatCompletionResponseVO blockingResponse(
-            AgenticPreparedChatBO prepared, String content, String finishReason) {
+            AgenticPreparedChatBO prepared,
+            String content,
+            String finishReason,
+            AgenticTokenUsage usage) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens =
                 Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
+        ChatCompletionResponseVO.Usage wireUsage;
+        if (Objects.nonNull(usage) && usage.isPresent()) {
+            wireUsage = new ChatCompletionResponseVO.Usage(
+                    usage.promptTokens() == null ? promptTokens : usage.promptTokens().intValue(),
+                    usage.completionTokens() == null ? completionTokens : usage.completionTokens().intValue(),
+                    usage.totalTokens() == null
+                            ? promptTokens + completionTokens
+                            : usage.totalTokens().intValue(),
+                    false);
+        } else {
+            wireUsage = new ChatCompletionResponseVO.Usage(
+                    promptTokens, completionTokens, promptTokens + completionTokens, true);
+        }
         return ChatCompletionResponseVO.builder()
                 .id(newChatId())
                 .object(AgenticConstant.Chat.COMPLETION_OBJECT)
@@ -79,8 +96,7 @@ public class AgenticChatResponseCodec {
                                 AgenticConstant.Chat.ROLE_ASSISTANT, content, buildResponseContentExt(prepared)))
                         .finishReason(normalizeFinishReason(finishReason))
                         .build()))
-                .usage(new ChatCompletionResponseVO.Usage(
-                        promptTokens, completionTokens, promptTokens + completionTokens))
+                .usage(wireUsage)
                 .build();
     }
 
@@ -106,19 +122,29 @@ public class AgenticChatResponseCodec {
      * @param finishReason finish reason
      * @return format final chunk result
      */
-    public String formatFinalChunk(String id, long created, String model, String finishReason) {
-        ChatCompletionChunkVO chunk = ChatCompletionChunkVO.builder()
+    public String formatFinalChunk(
+            String id, long created, String model, String finishReason, AgenticTokenUsage usage) {
+        ChatCompletionChunkVO.ChunkChoice choice = ChatCompletionChunkVO.ChunkChoice.builder()
+                .index(0)
+                .delta(new ChatCompletionChunkVO.Delta(null, null, null))
+                .finishReason(normalizeFinishReason(finishReason))
+                .build();
+        ChatCompletionChunkVO.ChatCompletionChunkVOBuilder builder = ChatCompletionChunkVO.builder()
                 .id(id)
                 .object(AgenticConstant.Chat.COMPLETION_CHUNK_OBJECT)
                 .created(created)
                 .model(model)
-                .choices(List.of(ChatCompletionChunkVO.ChunkChoice.builder()
-                        .index(0)
-                        .delta(new ChatCompletionChunkVO.Delta(null, null, null))
-                        .finishReason(normalizeFinishReason(finishReason))
-                        .build()))
-                .build();
-        return toJson(chunk);
+                .choices(List.of(choice));
+        if (Objects.nonNull(usage) && usage.isPresent()) {
+            // include_usage semantics: the terminal chunk carries the provider-reported
+            // numbers; estimates are never put on the wire.
+            builder.usage(new ChatCompletionResponseVO.Usage(
+                    usage.promptTokens() == null ? null : usage.promptTokens().intValue(),
+                    usage.completionTokens() == null ? null : usage.completionTokens().intValue(),
+                    usage.totalTokens() == null ? null : usage.totalTokens().intValue(),
+                    false));
+        }
+        return toJson(builder.build());
     }
 
     /**

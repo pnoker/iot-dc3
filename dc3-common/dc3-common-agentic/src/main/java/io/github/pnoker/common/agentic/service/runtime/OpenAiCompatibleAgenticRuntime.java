@@ -250,7 +250,8 @@ public class OpenAiCompatibleAgenticRuntime {
         return streamOneRound(client, prepared, messages, sink, guard, true).flatMap(result -> {
             if (result.toolCalls().isEmpty()) {
                 if (StringUtils.isNotBlank(result.finishReason()) && !sink.isCancelled()) {
-                    sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), result.finishReason()));
+                    sink.next(new AgenticRuntimeStreamFrame(
+                            AgenticStreamDelta.empty(), result.finishReason(), result.usage()));
                 }
                 return Mono.empty();
             }
@@ -288,7 +289,8 @@ public class OpenAiCompatibleAgenticRuntime {
                 sink.next(new AgenticRuntimeStreamFrame(
                         AgenticStreamDelta.empty(),
                         StringUtils.defaultIfBlank(
-                                result.finishReason(), AgenticRuntimeResult.FINISH_REASON_MAX_ROUNDS)));
+                                result.finishReason(), AgenticRuntimeResult.FINISH_REASON_MAX_ROUNDS),
+                        result.usage()));
             }
             return Mono.empty();
         });

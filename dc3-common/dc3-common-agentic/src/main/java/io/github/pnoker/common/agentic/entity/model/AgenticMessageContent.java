@@ -206,6 +206,13 @@ public class AgenticMessageContent implements Serializable {
         private Integer memory;
 
         /**
+         * Whether the input/output counts are provider-reported (absent/false) or
+         * heuristic estimates (true). Old rows without the flag read as null and are
+         * treated as estimates.
+         */
+        private Boolean estimated;
+
+        /**
          * Of.
          *
          * @param input   input
