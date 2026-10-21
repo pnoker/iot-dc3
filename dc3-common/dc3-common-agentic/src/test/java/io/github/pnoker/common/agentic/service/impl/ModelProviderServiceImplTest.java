@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -119,6 +120,7 @@ class ModelProviderServiceImplTest {
         ModelProviderBO existing = provider(7L);
         ModelProviderBO updated = provider(7L);
         updated.setBaseUrl("https://10.0.0.5/v1");
+        updated.setApiKey("fresh-key");
         when(modelProviderStore.get(7L, header)).thenReturn(Mono.just(existing));
         when(baseUrlValidator.validateReactive("https://10.0.0.5/v1"))
                 .thenReturn(Mono.error(new RequestException("Provider base URL is not allowed")));
@@ -128,6 +130,43 @@ class ModelProviderServiceImplTest {
                 .verify();
 
         verify(modelProviderStore, never()).update(any(), any());
+    }
+
+    @Test
+    void updateRejectsBaseUrlChangeWithoutAFreshApiKey() {
+        // Re-pointing a provider while keeping the stored (write-only) key would send
+        // that secret to the new host — the update path must demand a fresh key.
+        ModelProviderBO existing = provider(8L);
+        existing.setApiKey("stored-secret");
+        ModelProviderBO updated = provider(8L);
+        updated.setBaseUrl("https://attacker.example/v1");
+        when(modelProviderStore.get(8L, header)).thenReturn(Mono.just(existing));
+
+        StepVerifier.create(service.update(updated, header))
+                .expectErrorSatisfies(error -> {
+                    assert error instanceof RequestException;
+                    assert error.getMessage().contains("new API key");
+                })
+                .verify();
+
+        verify(modelProviderStore, never()).update(any(), any());
+    }
+
+    @Test
+    void updateKeepsStoredKeyWhenBaseUrlIsUntouched() {
+        ModelProviderBO existing = provider(9L);
+        existing.setApiKey("stored-secret");
+        ModelProviderBO updated = provider(9L);
+        updated.setRemark("renamed");
+        when(modelProviderStore.get(9L, header)).thenReturn(Mono.just(existing));
+        when(modelProviderStore.update(any(), any()))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, ModelProviderBO.class)));
+
+        StepVerifier.create(service.update(updated, header)).expectNextCount(1).verifyComplete();
+
+        ArgumentCaptor<ModelProviderBO> captor = ArgumentCaptor.forClass(ModelProviderBO.class);
+        verify(modelProviderStore).update(captor.capture(), any());
+        assert captor.getValue().getApiKey().equals("stored-secret");
     }
 
     @Test
@@ -176,6 +215,7 @@ class ModelProviderServiceImplTest {
         ModelProviderBO existing = provider(7L);
         existing.setBaseUrl("https://old");
         ModelProviderBO updated = provider(7L);
+        updated.setApiKey("fresh-key");
         when(modelProviderStore.get(7L, header)).thenReturn(Mono.just(existing));
         when(modelProviderStore.update(any(ModelProviderBO.class), any())).thenReturn(Mono.just(updated));
 

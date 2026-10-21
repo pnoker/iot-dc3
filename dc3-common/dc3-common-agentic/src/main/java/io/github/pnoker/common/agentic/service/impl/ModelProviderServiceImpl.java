@@ -128,10 +128,21 @@ public class ModelProviderServiceImpl implements ModelProviderService {
                         ? AgenticModelProviderTypeEnum.OPENAI_COMPATIBLE
                         : source.getProviderType());
         value.setBaseUrl(source.getBaseUrl().trim());
-        value.setApiKey(
-                StringUtils.isBlank(source.getApiKey()) && existing != null
-                        ? existing.getApiKey()
-                        : StringUtils.defaultString(source.getApiKey()));
+        boolean baseUrlChanged = existing != null
+                && !Objects.equals(existing.getBaseUrl(), value.getBaseUrl());
+        if (StringUtils.isBlank(source.getApiKey()) && existing != null && !baseUrlChanged) {
+            // Untouched key on an untouched endpoint: keep the stored secret so the
+            // write-only field does not have to round-trip through the client.
+            value.setApiKey(existing.getApiKey());
+        } else if (StringUtils.isBlank(source.getApiKey()) && baseUrlChanged) {
+            // Re-pointing an existing provider without a fresh key would silently send
+            // the stored (write-only) secret to the new host — an exfiltration vector.
+            // Same rule the connectivity probe already enforces.
+            throw new RequestException(
+                    "Changing the base URL requires providing a new API key for the provider");
+        } else {
+            value.setApiKey(StringUtils.defaultString(source.getApiKey()));
+        }
         value.setDefaultFlag(source.getDefaultFlag() == null ? DefaultFlagEnum.NOT_DEFAULT : source.getDefaultFlag());
         value.setEnableFlag(source.getEnableFlag() == null ? EnableFlagEnum.ENABLE : source.getEnableFlag());
         value.setRemark(StringUtils.defaultString(source.getRemark()));
