@@ -1138,8 +1138,8 @@ export async function ensureE2eData(page: Page): Promise<E2eDataContext> {
       page,
       {
         listUrl: '/api/v3/agentic/provider/list',
-        addUrl: '/api/v3/agentic/provider/config/add',
-        deleteUrl: '/api/v3/agentic/provider/config/delete',
+        addUrl: '/api/v3/agentic/provider/add',
+        deleteUrl: '/api/v3/agentic/provider/delete',
         nameField: 'name',
         body: {
           name: suffix,

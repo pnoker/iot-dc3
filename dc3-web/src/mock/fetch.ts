@@ -26,8 +26,24 @@ const CHAT_URL = '/api/v3/agentic/chat/completions';
 const API_PREFIX = '/api/';
 
 const encoder = new TextEncoder();
-const sse = (obj: unknown): Uint8Array => encoder.encode(`data: ${JSON.stringify(obj)}\n\n`);
+
+/**
+ * SSE event name carried by a frame, derived from its `object` discriminator.
+ * @param obj - frame payload to name
+ * @returns the event name, or an empty string for unnamed frames
+ */
+const eventName = (obj: unknown): string => {
+  if (typeof obj !== 'object' || obj === null) return '';
+  const name = (obj as {object?: unknown}).object;
+  return typeof name === 'string' ? name : '';
+};
+
+const sse = (obj: unknown): Uint8Array =>
+  encoder.encode(`${eventName(obj) ? `event: ${eventName(obj)}\n` : ''}data: ${JSON.stringify(obj)}\n\n`);
 const DONE = encoder.encode('data: [DONE]\n\n');
+const HEARTBEAT = encoder.encode(': keep-alive\n\n');
+/** Frames between keep-alive comments, mirroring the server's stream heartbeat. */
+const HEARTBEAT_EVERY = 5;
 
 const round = (n: number, d = 1) => Number(n.toFixed(d));
 const hourly = (i: number) => `${String(i).padStart(2, '0')}:00`;
@@ -320,10 +336,12 @@ export const trailingHint = (): string =>
 const streamChunks = (prompt: string): unknown[] => {
   const s = pickScenario(prompt);
   const chunks: unknown[] = localizedEvents(s).map((e) => ({object: 'agentic.event', ...e}));
-  for (const delta of tokenDeltas(scenarioText(s))) chunks.push({choices: [{delta: {content: delta}}]});
+  for (const delta of tokenDeltas(scenarioText(s)))
+    chunks.push({object: 'chat.completion.chunk', choices: [{delta: {content: delta}}]});
   for (const c of s.charts()) chunks.push({object: 'agentic.visualization', visualization: localizedChart(c)});
-  for (const delta of tokenDeltas(trailingHint())) chunks.push({choices: [{delta: {content: delta}}]});
-  chunks.push({choices: [{finish_reason: 'stop'}]});
+  for (const delta of tokenDeltas(trailingHint()))
+    chunks.push({object: 'chat.completion.chunk', choices: [{delta: {content: delta}}]});
+  chunks.push({object: 'chat.completion.chunk', choices: [{finish_reason: 'stop'}]});
   return chunks;
 };
 
@@ -331,13 +349,21 @@ const isContentChunk = (chunk: unknown): chunk is {choices: Array<{delta?: {cont
   return typeof (chunk as {choices?: Array<{delta?: {content?: string}}>}).choices?.[0]?.delta?.content === 'string';
 };
 
-const mockResponse = (prompt: string, stream: boolean): Response => {
+const mockResponse = (prompt: string, stream: boolean, model?: string): Response => {
   const s = pickScenario(prompt);
   if (stream) {
     const body = new ReadableStream<Uint8Array>({
       start(controller) {
         let splitOnce = false;
+        let sinceHeartbeat = 0;
         for (const chunk of streamChunks(prompt)) {
+          // Periodic keep-alive comment frames mirror the server's stream
+          // heartbeat, exercising the client parser's comment-skipping path.
+          if (sinceHeartbeat >= HEARTBEAT_EVERY) {
+            controller.enqueue(HEARTBEAT);
+            sinceHeartbeat = 0;
+          }
+          sinceHeartbeat += 1;
           const frame = sse(chunk);
           // Split the first content frame across two enqueues so every
           // stream exercises the parser's partial-block path: bytes can
@@ -361,12 +387,22 @@ const mockResponse = (prompt: string, stream: boolean): Response => {
       headers: {'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache'},
     });
   }
+  // Blocking replies use the full OpenAI completion envelope (id/object/created/
+  // model/finish_reason/usage) so non-streaming clients see the real wire shape.
+  const modelId = model || 'gpt-4o';
+  const content = scenarioText(s);
   return new Response(
     JSON.stringify({
+      id: `chatcmpl-mock-${Date.now().toString(36)}`,
+      object: 'chat.completion',
+      created: Math.floor(Date.now() / 1000),
+      model: modelId,
       choices: [{
-        message: {role: 'assistant', content: scenarioText(s), contentExt: {charts: s.charts().map(localizedChart)}},
-        finishReason: 'stop'
+        index: 0,
+        message: {role: 'assistant', content, contentExt: {charts: s.charts().map(localizedChart)}},
+        finish_reason: 'stop',
       }],
+      usage: {prompt_tokens: 1480, completion_tokens: 680, total_tokens: 2160},
     }),
     {status: 200, headers: {'Content-Type': 'application/json'}},
   );
@@ -378,17 +414,36 @@ interface MockChatRequest {
   messages?: Array<{ role?: string; content?: string }>;
 }
 
+/**
+ * Fresh conversation id, matching the client-side generation the real frontend uses.
+ * @returns a new conversation identifier
+ */
+const newConversationId = (): string =>
+  typeof crypto !== 'undefined' && crypto.randomUUID
+    ? crypto.randomUUID()
+    : `conv-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): void => {
-  if (!request.conversationId) return;
   const scenario = pickScenario(prompt);
-  const rows = db.agenticMessages.filter((message) => String(message.conversationId) === request.conversationId);
-  const nextIndex = rows.reduce((max, message) => Math.max(max, Number(message.messageIndex ?? -1)), -1) + 1;
+  // Stateless requests (no conversationId) still persist: generate an id and
+  // seed a session row, mirroring the server's server-side conversation id.
+  const conversationId = request.conversationId || newConversationId();
   const created = new Date().toISOString();
+  if (!request.conversationId) {
+    db.agenticSessions.push({
+      conversationId,
+      title: prompt.slice(0, 30) || 'New Conversation',
+      createTime: created,
+      operateTime: created,
+    });
+  }
+  const rows = db.agenticMessages.filter((message) => String(message.conversationId) === conversationId);
+  const nextIndex = rows.reduce((max, message) => Math.max(max, Number(message.messageIndex ?? -1)), -1) + 1;
   const suffix = trailingHint();
   db.agenticMessages.push(
     {
       id: `mock-user-${Date.now()}`,
-      conversationId: request.conversationId,
+      conversationId,
       role: 'user',
       content: prompt,
       messageIndex: nextIndex,
@@ -398,7 +453,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
     },
     {
       id: `mock-assistant-${Date.now()}`,
-      conversationId: request.conversationId,
+      conversationId,
       role: 'assistant',
       content: `${scenarioText(scenario)}${suffix}`,
       contentExt: {
@@ -411,7 +466,7 @@ const persistMockTurn = (db: MockDb, request: MockChatRequest, prompt: string): 
       finishReason: 'stop', createTime: created,
     },
   );
-  const session = db.agenticSessions.find((item) => String(item.conversationId) === request.conversationId);
+  const session = db.agenticSessions.find((item) => String(item.conversationId) === conversationId);
   if (session) session.operateTime = created;
 };
 
@@ -439,7 +494,7 @@ export function installAgenticFetchMock(db: MockDb): void {
         /* defaults */
       }
       persistMockTurn(db, request, prompt);
-      return Promise.resolve(mockResponse(prompt, stream));
+      return Promise.resolve(mockResponse(prompt, stream, request.model));
     }
     return original(input as RequestInfo, init);
   }) as typeof window.fetch;

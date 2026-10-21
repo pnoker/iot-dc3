@@ -123,6 +123,13 @@
             <artifactId>dc3-common-resource</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Agentic controllers on the test classpath so the frozen openapi-agentic.json
+             snapshot can be guarded against controller route drift by reflection -->
+        <dependency>
+            <groupId>io.github.pnoker</groupId>
+            <artifactId>dc3-common-agentic</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

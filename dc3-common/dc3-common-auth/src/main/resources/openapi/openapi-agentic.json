@@ -2,7 +2,7 @@
     "openapi": "3.1.0",
     "info": {
         "title": "IoT DC3 REST API",
-        "description": "IoT DC3 platform REST API documentation.\n\nCovers all service modules: auth (authentication and authorization),\nmanager (device/driver/point/profile configuration), data (telemetry,\nevents, commands, notifications), and agentic (AI chat and tools).\n\nAuthentication: obtain a salt and token via /api/v3/auth/token/*, then\nuse the Authorize button to set X-Auth-Tenant, X-Auth-Login, and\nX-Auth-Token. X-Auth-Token is a JSON object {\"salt\":\"...\",\"token\":\"...\"}.\n",
+        "description": "IoT DC3 platform REST API documentation.\n\nCovers all service modules: auth (authentication and authorization),\nmanager (device/driver/point/profile configuration), data (telemetry,\nevents, commands, notifications), and agentic (AI chat and tools).\n\nAuthentication: obtain a salt and token via /api/v3/auth/token/*, then\nuse the Authorize button to set X-Auth-Tenant, X-Auth-Login, and\nX-Auth-Token. X-Auth-Token is a JSON object {\"salt\":\"...\",\"token\":\"...\"}.\n\nAgentic snapshot resynchronized with the dc3-center-agentic controllers (2026.10): provider routes flattened to /provider/{add,update,delete},\nmessage/action pagination moved to POST bodies returning OffsetPage envelopes, /attachment/delete added, session and\nattachment VOs trimmed to the current wire shape.\n",
         "contact": {
             "name": "pnoker",
             "url": "https://github.com/pnoker/iot-dc3",
@@ -12,7 +12,7 @@
             "name": "GNU Affero General Public License v3.0",
             "url": "https://www.gnu.org/licenses/agpl-3.0.txt"
         },
-        "version": "2026.6.0"
+        "version": "2026.6.1"
     },
     "servers": [
         {
@@ -184,7 +184,7 @@
                 }
             }
         },
-        "/provider/config/update": {
+        "/provider/update": {
             "post": {
                 "tags": [
                     "provider"
@@ -242,7 +242,7 @@
                 }
             }
         },
-        "/provider/config/add": {
+        "/provider/add": {
             "post": {
                 "tags": [
                     "provider"
@@ -456,11 +456,17 @@
                         }
                     },
                     "200": {
-                        "description": "OK",
+                        "description": "OK \u2014 the full completion as JSON, or an SSE stream when stream=true",
                         "content": {
-                            "*/*": {
+                            "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/ChatCompletionResponseVO"
+                                }
+                            },
+                            "text/event-stream": {
+                                "description": "Server-Sent Events stream of chat.completion.chunk frames. Every JSON data frame is tagged with an SSE event name equal to its object discriminator: chat.completion.chunk for token deltas, agentic.event for run-trace events, agentic.visualization for structured charts. The [DONE] sentinel and the periodic : keep-alive comment heartbeat ride on the default (unnamed) event, so clients that parse data lines only (OpenAI SDKs) are unaffected.",
+                                "schema": {
+                                    "$ref": "#/components/schemas/ChatCompletionChunkVO"
                                 }
                             }
                         }
@@ -497,13 +503,14 @@
                 ],
                 "requestBody": {
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
                                 "type": "object",
                                 "properties": {
                                     "file": {
                                         "type": "string",
-                                        "format": "binary"
+                                        "format": "binary",
+                                        "description": "File bytes to attach, sent as the 'file' multipart part."
                                     }
                                 },
                                 "required": [
@@ -511,7 +518,8 @@
                                 ]
                             }
                         }
-                    }
+                    },
+                    "description": "Multipart form carrying the file bytes in the 'file' part; the target conversation is selected with the conversation_id query parameter, not the body."
                 },
                 "responses": {
                     "500": {
@@ -889,26 +897,23 @@
             }
         },
         "/message/list": {
-            "get": {
+            "post": {
                 "tags": [
                     "message"
                 ],
                 "summary": "List Session Messages",
-                "description": "List the ordered message history of one AI chat session for the current user and tenant. Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.",
+                "description": "Page the ordered message history of one AI chat session for the current user and tenant. Returns each turn (user prompts and assistant replies) in chronological order; use to read or resume a past conversation.",
                 "operationId": "list_3",
-                "parameters": [
-                    {
-                        "name": "conversation_id",
-                        "in": "query",
-                        "description": "Client-visible conversation identifier scoped to the current user and tenant; used to retrieve the full message history of one chat session.",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        "example": "conv-20240101-abc123"
-                    }
-                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConversationPageQueryDTO"
+                            }
+                        }
+                    },
+                    "description": "Page query carrying the conversation id and optional offset/limit (defaults 0/50, limit capped at 200); the body itself may be omitted."
+                },
                 "responses": {
                     "500": {
                         "description": "Internal Server Error",
@@ -935,10 +940,7 @@
                         "content": {
                             "*/*": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/MessageVO"
-                                    }
+                                    "$ref": "#/components/schemas/OffsetPageMessageVO"
                                 }
                             }
                         }
@@ -1016,51 +1018,78 @@
                 }
             }
         },
+        "/attachment/delete": {
+            "delete": {
+                "tags": [
+                    "attachment"
+                ],
+                "summary": "Delete Attachment",
+                "description": "Delete one uploaded attachment by id within the current tenant and user. Soft-deletes the metadata row and removes the stored file best-effort; the file is no longer referenceable in the conversation.",
+                "operationId": "delete_3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Primary key of the attachment to delete. Must belong to the current tenant and user.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        },
+                        "example": 1024
+                    }
+                ],
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetailsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ProblemDetailsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "No Content"
+                    }
+                },
+                "x-dc3-ai": {
+                    "idempotent": "false",
+                    "openWorld": "false",
+                    "riskLevel": "HIGH",
+                    "destructive": "true"
+                }
+            }
+        },
         "/action/pending": {
-            "get": {
+            "post": {
                 "tags": [
                     "action"
                 ],
                 "summary": "List Pending Agent Actions",
-                "description": "List agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
+                "description": "Page agent tool calls awaiting human approval in the given conversation, scoped to the current tenant and user. Returns each pending action with its tool name and parameters so the user can confirm or reject before execution.",
                 "operationId": "pending",
-                "parameters": [
-                    {
-                        "name": "conversation_id",
-                        "in": "query",
-                        "description": "Unique identifier of the agentic conversation whose pending tool calls are to be listed; scoped to the current tenant and user.",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "minLength": 1
-                        },
-                        "example": "conv-20240618-abc123"
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConversationPageQueryDTO"
+                            }
+                        }
                     },
-                    {
-                        "name": "offset",
-                        "in": "query",
-                        "description": "Zero-based offset into the pending action collection.",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int64",
-                            "default": 0
-                        },
-                        "example": 0
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Maximum number of pending actions to return (1-200).",
-                        "required": false,
-                        "schema": {
-                            "type": "integer",
-                            "format": "int32",
-                            "default": 50
-                        },
-                        "example": 50
-                    }
-                ],
+                    "description": "Page query carrying the conversation id and optional offset/limit (defaults 0/50, limit capped at 200); the body itself may be omitted."
+                },
                 "responses": {
                     "500": {
                         "description": "Internal Server Error",
@@ -1154,7 +1183,7 @@
                 }
             }
         },
-        "/provider/config/delete": {
+        "/provider/delete": {
             "delete": {
                 "tags": [
                     "provider"
@@ -1326,6 +1355,21 @@
                         "format": "int32",
                         "description": "Maximum number of tokens the model may generate in a single response.",
                         "example": 2048
+                    },
+                    "icon": {
+                        "type": "string",
+                        "description": "Visual category metadata for rich clients (e.g. rail icon: monitor, warning, trend, ...).",
+                        "example": "monitor"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Free-form session category label for rich clients.",
+                        "example": "health"
+                    },
+                    "archived": {
+                        "type": "boolean",
+                        "description": "Archived sessions leave the main conversation list and rest in the folded archive section.",
+                        "example": false
                     }
                 }
             },
@@ -1388,16 +1432,6 @@
                     "sessionExt": {
                         "$ref": "#/components/schemas/SessionExt",
                         "description": "Extended attributes of the session (model configuration, temperature, context window, etc.); structured as a JSON object."
-                    },
-                    "tenantId": {
-                        "type": "string",
-                        "description": "Identifier of the tenant that owns this session; enforces tenant-level data isolation.",
-                        "example": "1024"
-                    },
-                    "userId": {
-                        "type": "string",
-                        "description": "Identifier of the user who created or owns this session; must belong to the same tenant.",
-                        "example": "2048"
                     }
                 },
                 "required": [
@@ -1550,7 +1584,7 @@
                             "NOT_DEFAULT",
                             "DEFAULT"
                         ],
-                        "example": "NON_DEFAULT"
+                        "example": "NOT_DEFAULT"
                     },
                     "enableFlag": {
                         "type": "string",
@@ -1570,6 +1604,41 @@
                         "type": "string",
                         "description": "API key used to authenticate requests to the provider's endpoint. Write-only: never included in API responses.",
                         "writeOnly": true
+                    },
+                    "lastCheckStatus": {
+                        "type": "string",
+                        "description": "Status of the latest connectivity check against this provider; null when it has never been checked. Read-only: ignored on write.",
+                        "enum": [
+                            "PASS",
+                            "FAIL"
+                        ],
+                        "example": "PASS"
+                    },
+                    "lastCheckTime": {
+                        "type": "string",
+                        "description": "Completion time of the latest connectivity check. Read-only: ignored on write.",
+                        "example": "2026-10-04T08:30:00"
+                    },
+                    "lastCheckLatencyMs": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Round-trip latency in milliseconds of the latest connectivity check. Read-only: ignored on write.",
+                        "example": 320
+                    },
+                    "lastCheckErrorType": {
+                        "type": "string",
+                        "description": "Error type code of the latest failed connectivity check, e.g. AUTH_FAILED; null when it passed. Read-only: ignored on write.",
+                        "example": "AUTH_FAILED"
+                    },
+                    "lastCheckErrorMessage": {
+                        "type": "string",
+                        "description": "Sanitized error message of the latest failed connectivity check; never contains credentials. Read-only: ignored on write.",
+                        "example": "HTTP 401 from api.example.com"
+                    },
+                    "lastCheckModel": {
+                        "type": "string",
+                        "description": "Model identifier the latest L2 chat probe used for this provider. Read-only: ignored on write.",
+                        "example": "deepseek-chat"
                     }
                 },
                 "required": [
@@ -1696,6 +1765,36 @@
                         "type": "string",
                         "description": "Identifier of the tenant this model configuration belongs to.",
                         "example": "1024"
+                    },
+                    "lastCheckStatus": {
+                        "type": "string",
+                        "description": "Status of the latest connectivity check against this model configuration; null when it has never been checked. Read-only: ignored on write.",
+                        "enum": [
+                            "PASS",
+                            "FAIL"
+                        ],
+                        "example": "PASS"
+                    },
+                    "lastCheckTime": {
+                        "type": "string",
+                        "description": "Completion time of the latest connectivity check. Read-only: ignored on write.",
+                        "example": "2026-10-04T08:30:00"
+                    },
+                    "lastCheckLatencyMs": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Round-trip latency in milliseconds of the latest connectivity check. Read-only: ignored on write.",
+                        "example": 840
+                    },
+                    "lastCheckErrorType": {
+                        "type": "string",
+                        "description": "Error type code of the latest failed connectivity check, e.g. MODEL_NOT_FOUND; null when it passed. Read-only: ignored on write.",
+                        "example": "MODEL_NOT_FOUND"
+                    },
+                    "lastCheckErrorMessage": {
+                        "type": "string",
+                        "description": "Sanitized error message of the latest failed connectivity check; never contains credentials. Read-only: ignored on write.",
+                        "example": "HTTP 404 model not visible to this key"
                     }
                 },
                 "required": [
@@ -1713,7 +1812,7 @@
                     },
                     "messages": {
                         "type": "array",
-                        "description": "Ordered list of conversation messages (system, user, assistant turns) comprising the prompt context.",
+                        "description": "Ordered list of conversation messages (system, user, assistant turns) comprising the prompt context. System messages are merged into the system prompt; the last user message becomes this turn's prompt; earlier user and assistant turns are replayed as conversation context.",
                         "items": {
                             "$ref": "#/components/schemas/ChatMessageDTO"
                         }
@@ -1727,7 +1826,7 @@
                     "maxTokens": {
                         "type": "integer",
                         "format": "int32",
-                        "description": "Maximum number of tokens to generate in the completion. Null defers to the server default.",
+                        "description": "Maximum number of tokens to generate in the completion. Accepts max_tokens, max_completion_tokens, or maxTokens as the JSON field name; the value is applied to the model request. Null defers to the server default.",
                         "example": 2048
                     },
                     "stream": {
@@ -1737,7 +1836,7 @@
                     },
                     "conversationId": {
                         "type": "string",
-                        "description": "Opaque conversation identifier used to correlate multi-turn memory. If omitted, each request is treated as a new conversation.",
+                        "description": "Opaque conversation identifier used to correlate multi-turn memory. Optional: when omitted the server generates a fresh UUIDv7 id and each request starts a new conversation (OpenAI stateless style); pass a stable id to replay server-side memory across turns.",
                         "example": "conv-7f3a1b2c"
                     },
                     "attachments": {
@@ -1760,7 +1859,7 @@
                 "properties": {
                     "role": {
                         "type": "string",
-                        "description": "Role of the message sender: system, user, assistant, or tool.",
+                        "description": "Role of the message sender: system, user, or assistant. Tool messages are accepted but not replayed.",
                         "example": "user"
                     },
                     "content": {
@@ -1836,11 +1935,6 @@
                         "format": "int64",
                         "description": "File size of the attachment in bytes.",
                         "example": 10240
-                    },
-                    "filePath": {
-                        "type": "string",
-                        "description": "Server-side storage path where the attachment file is persisted.",
-                        "example": "/storage/attachments/2026/report.pdf"
                     }
                 },
                 "required": [
@@ -2207,11 +2301,13 @@
                     },
                     "status": {
                         "type": "string",
-                        "description": "Persistence status: OK (stored successfully) or ERROR (storage failed).",
+                        "description": "Generation lifecycle status: COMPLETED, FAILED, or CANCELLED.",
                         "enum": [
-                            "OK"
+                            "COMPLETED",
+                            "FAILED",
+                            "CANCELLED"
                         ],
-                        "example": "OK"
+                        "example": "COMPLETED"
                     }
                 },
                 "required": [
@@ -2300,6 +2396,240 @@
                     },
                     "hasNext": {
                         "type": "boolean"
+                    }
+                }
+            },
+            "ConversationPageQueryDTO": {
+                "type": "object",
+                "description": "Conversation-scoped query parameters with offset pagination",
+                "properties": {
+                    "conversationId": {
+                        "type": "string",
+                        "description": "Client-visible conversation identifier whose records are listed; scoped to the current user and tenant.",
+                        "example": "conv-20240101-abc123"
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Zero-based result offset.",
+                        "minimum": 0,
+                        "example": 0
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "format": "int32",
+                        "description": "Maximum number of items, between 1 and 200.",
+                        "minimum": 1,
+                        "maximum": 200,
+                        "example": 50
+                    }
+                },
+                "required": [
+                    "conversationId"
+                ]
+            },
+            "OffsetPageMessageVO": {
+                "type": "object",
+                "properties": {
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/MessageVO"
+                        }
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "hasNext": {
+                        "type": "boolean"
+                    }
+                }
+            },
+            "ChatCompletionResponseVO": {
+                "type": "object",
+                "description": "OpenAI-compatible non-streaming chat completion response returned by the agentic service.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier of this completion response, prefixed with 'chatcmpl-'.",
+                        "example": "chatcmpl-abc123xyz"
+                    },
+                    "object": {
+                        "type": "string",
+                        "description": "Object type discriminator; always 'chat.completion' for non-streaming responses.",
+                        "example": "chat.completion"
+                    },
+                    "created": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds since epoch) when the completion was created.",
+                        "example": 1718700000
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Identifier of the model that generated the response.",
+                        "example": "gpt-4o"
+                    },
+                    "choices": {
+                        "type": "array",
+                        "description": "List of generated completion choices; contains one entry per requested choice (n parameter).",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "index": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Zero-based index of this choice within the choices array.",
+                                    "example": 0
+                                },
+                                "message": {
+                                    "type": "object",
+                                    "description": "Generated assistant message.",
+                                    "properties": {
+                                        "role": {
+                                            "type": "string",
+                                            "description": "Role of the message author; always 'assistant' for generated responses.",
+                                            "example": "assistant"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "description": "Text content of the assistant's reply; null when contentExt carries structured content.",
+                                            "example": "The temperature sensor reads 23.5 C."
+                                        },
+                                        "contentExt": {
+                                            "$ref": "#/components/schemas/AgenticMessageContent",
+                                            "description": "Structured content extension carrying multi-part or tool-call message payloads; present when plain text content is insufficient."
+                                        }
+                                    }
+                                },
+                                "finish_reason": {
+                                    "type": "string",
+                                    "description": "Reason the model stopped generating: 'stop' (natural end), 'length' (token limit), 'tool_calls' (tool invocation requested); 'max_rounds' (agent loop round cap reached), 'error' (turn failed) and 'cancelled' (turn cancelled) are platform extensions beyond the OpenAI set.",
+                                    "enum": [
+                                        "stop",
+                                        "length",
+                                        "tool_calls",
+                                        "max_rounds",
+                                        "error",
+                                        "cancelled"
+                                    ],
+                                    "example": "stop"
+                                }
+                            }
+                        }
+                    },
+                    "usage": {
+                        "type": "object",
+                        "description": "Token usage statistics for the request and response; snake_case per the OpenAI wire contract.",
+                        "properties": {
+                            "prompt_tokens": {
+                                "type": "integer",
+                                "format": "int32",
+                                "description": "Number of tokens consumed by the input prompt.",
+                                "example": 42
+                            },
+                            "completion_tokens": {
+                                "type": "integer",
+                                "format": "int32",
+                                "description": "Number of tokens generated in the completion response.",
+                                "example": 128
+                            },
+                            "total_tokens": {
+                                "type": "integer",
+                                "format": "int32",
+                                "description": "Total tokens used by the request; equals prompt_tokens + completion_tokens.",
+                                "example": 170
+                            }
+                        }
+                    }
+                }
+            },
+            "ChatCompletionChunkVO": {
+                "type": "object",
+                "description": "A single SSE chunk returned in an OpenAI-compatible streaming chat completion response.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "description": "Unique identifier for this streaming completion, shared across all chunks of the same response.",
+                        "example": "chatcmpl-abc123"
+                    },
+                    "object": {
+                        "type": "string",
+                        "description": "Object type for a streaming chunk; always 'chat.completion.chunk' per the OpenAI API contract.",
+                        "example": "chat.completion.chunk"
+                    },
+                    "created": {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "Unix timestamp (seconds) indicating when the chunk was generated by the model.",
+                        "example": 1718700000
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Identifier of the model that generated this chunk, e.g. 'gpt-4o' or a locally hosted model name.",
+                        "example": "gpt-4o"
+                    },
+                    "choices": {
+                        "type": "array",
+                        "description": "List of streaming choices included in this chunk; typically contains exactly one element for non-branching completions.",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "index": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "description": "Zero-based index of this choice within the choices array.",
+                                    "example": 0
+                                },
+                                "delta": {
+                                    "type": "object",
+                                    "description": "Incremental content/role fragment of one chunk.",
+                                    "properties": {
+                                        "role": {
+                                            "type": "string",
+                                            "description": "Role of the message author; present only in the first chunk of a response, e.g. 'assistant'.",
+                                            "example": "assistant"
+                                        },
+                                        "content": {
+                                            "type": "string",
+                                            "description": "Incremental text content for this chunk; concatenate all non-null content values across chunks to reconstruct the full assistant reply.",
+                                            "example": "Hello"
+                                        },
+                                        "reasoning_content": {
+                                            "type": "string",
+                                            "description": "Incremental chain-of-thought or reasoning text for this chunk, supported by reasoning-capable models (e.g. DeepSeek-R1); null for standard models.",
+                                            "example": "Let me think step by step..."
+                                        }
+                                    }
+                                },
+                                "finish_reason": {
+                                    "type": [
+                                        "string",
+                                        "null"
+                                    ],
+                                    "description": "Reason the model stopped generating: 'stop' (natural end), 'length' (token limit), 'tool_calls' (tool invocation requested); 'max_rounds' (agent loop round cap reached), 'error' (turn failed) and 'cancelled' (turn cancelled) are platform extensions beyond the OpenAI set. Null while generation is still in progress; the final chunk carries the terminal reason.",
+                                    "enum": [
+                                        "stop",
+                                        "length",
+                                        "tool_calls",
+                                        "max_rounds",
+                                        "error",
+                                        "cancelled",
+                                        null
+                                    ],
+                                    "example": "stop"
+                                }
+                            }
+                        }
                     }
                 }
             }

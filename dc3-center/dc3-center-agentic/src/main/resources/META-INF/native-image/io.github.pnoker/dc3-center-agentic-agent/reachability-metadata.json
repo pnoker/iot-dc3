@@ -118,9 +118,6 @@
       "type": "io.github.pnoker.common.agentic.AgenticAutoConfiguration"
     },
     {
-      "type": "io.github.pnoker.common.agentic.annotation.AgenticToolMetadata"
-    },
-    {
       "type": "io.github.pnoker.common.agentic.config.AgenticApiGroupConfig"
     },
     {

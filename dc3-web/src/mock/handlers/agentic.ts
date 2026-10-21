@@ -258,34 +258,31 @@ export function registerAgenticHandlers(): void {
     return responseOf(ctx.config, fail('NOT_FOUND', 'Session not found', 404), 404);
   });
   on('post', 'api/v3/agentic/message/list', (ctx) => {
-    const id = (ctx.body ?? {}).conversationId ?? ctx.params.conversation_id;
+    const conversationId = (ctx.body ?? {}).conversationId;
+    if (!conversationId || !String(conversationId).trim()) {
+      // Mirrors the server's RequestException: 422 problem detail, conversation_id required.
+      return responseOf(ctx.config, fail('R422', 'conversation_id is required', 422), 422);
+    }
+    const id = String(conversationId);
     const rows = ctx.db.agenticMessages
-      .filter((m) => String(m.conversationId) === String(id))
+      .filter((m) => String(m.conversationId) === id)
       .sort((a, b) => Number(a.messageIndex ?? 0) - Number(b.messageIndex ?? 0))
       .map(localizeAgenticRow);
-    return responseOf(ctx.config, ok(paginate(rows, ctx.body, (row) => String(row.conversationId) === String(id))));
+    return responseOf(ctx.config, ok(paginate(rows, ctx.body, (row) => String(row.conversationId) === id)));
   });
 
   // ── agentic: chat & actions ──
-  on('post', 'api/v3/agentic/chat/completions', (ctx) =>
-    responseOf(
-      ctx.config,
-      ok({
-        conversationId: ctx.body?.conversationId,
-        message: {
-          role: 'assistant',
-          content: '这是一个 mock 演示回复。在真实环境中将调用配置的 AI 模型。',
-          status: 'COMPLETED',
-          finishReason: 'stop',
-        },
-        createTime: stamp(),
-      }),
-    ),
-  );
+  // (chat/completions is NOT handled here: the frontend streams it over raw fetch,
+  // which installAgenticFetchMock intercepts before this dispatch table is reached.)
   on('post', 'api/v3/agentic/action/pending', (ctx) => {
-    const conversationId = (ctx.body ?? {}).conversationId ?? ctx.params.conversation_id;
+    const conversationId = (ctx.body ?? {}).conversationId;
+    if (!conversationId || !String(conversationId).trim()) {
+      // Mirrors the server's RequestException: 422 problem detail, conversation_id required.
+      return responseOf(ctx.config, fail('R422', 'conversation_id is required', 422), 422);
+    }
+    const id = String(conversationId);
     const rows = ctx.db.agenticActions
-      .filter((action) => String(action.conversationId) === String(conversationId) && Number(action.status) === 0)
+      .filter((action) => String(action.conversationId) === id && Number(action.status) === 0)
       .map(localizeAgenticRow);
     return responseOf(ctx.config, ok(paginate(rows, ctx.body)));
   });

@@ -88,14 +88,16 @@ export const listMessages = async (
   config: LiveRunConfig,
   conversationId: string
 ): Promise<MessageRow[]> => {
-  const response = await fetch(
-    `${baseUrl.replace(/\/$/, '')}/api/v3/agentic/message/list?conversation_id=${encodeURIComponent(conversationId)}`,
-    {
-      method: 'GET',
-      headers: authHeaders(config),
-    }
-  );
-  if (!response.ok) return [];
-  const rows = await unwrap<MessageRow[] | {items?: MessageRow[]}>(response);
-  return Array.isArray(rows) ? rows : (rows.items ?? []);
+  const response = await fetch(`${baseUrl.replace(/\/$/, '')}/api/v3/agentic/message/list`, {
+    method: 'POST',
+    headers: authHeaders(config),
+    body: JSON.stringify({conversationId, offset: 0, limit: 200}),
+  });
+  if (!response.ok) {
+    // A non-200 here means the harness no longer speaks the server contract —
+    // fail loudly instead of silently reporting an empty history.
+    throw new Error(`message/list returned HTTP ${response.status} for conversation ${conversationId}`);
+  }
+  const page = await unwrap<{items?: MessageRow[]} | MessageRow[]>(response);
+  return Array.isArray(page) ? page : (page.items ?? []);
 };
