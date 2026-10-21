@@ -149,6 +149,38 @@ public class AgenticBaseUrlValidator {
         }
     }
 
+    /**
+     * Resolve and validate the base URL host NOW and return a resolver that always
+     * answers with exactly those validated addresses. Wiring this into the HTTP
+     * client's DNS hook closes the rebinding window: the connection cannot be
+     * re-resolved to a different (private) address between validation and connect.
+     * The functional shape keeps this module free of any HTTP-client dependency;
+     * OkHttp adapters are {@code hostname -> pinnedDns(url).apply(hostname)}.
+     *
+     * @param baseUrl the base URL to pin
+     * @return a resolver fixed to the validated addresses of the base URL host
+     * @throws RequestException when the base URL fails validation
+     */
+    public java.util.function.Function<String, java.util.List<InetAddress>> pinnedDns(String baseUrl) {
+        URI uri = parse(baseUrl);
+        String host = uri.getHost();
+        InetAddress[] addresses;
+        try {
+            addresses = resolver.resolve(host);
+        } catch (java.net.UnknownHostException exception) {
+            throw new RequestException(
+                    "Provider base URL is not allowed: host '{}' does not resolve to a public address", host);
+        }
+        for (InetAddress address : addresses) {
+            if (isBlockedAddress(address)) {
+                throw new RequestException(
+                        "Provider base URL is not allowed: host '{}' does not resolve to a public address", host);
+            }
+        }
+        java.util.List<InetAddress> pinned = java.util.List.of(addresses);
+        return ignored -> pinned;
+    }
+
     private URI parse(String baseUrl) {
         if (StringUtils.isBlank(baseUrl)) {
             throw new RequestException("Provider base URL is required");

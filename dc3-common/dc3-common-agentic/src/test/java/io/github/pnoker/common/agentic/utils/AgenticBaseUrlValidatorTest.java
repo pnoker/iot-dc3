@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -80,6 +81,26 @@ class AgenticBaseUrlValidatorTest {
         // IPv4-mapped ::ffff:10.1.2.3 for resolvers that skip JDK normalization.
         assertThatThrownBy(() -> validatorReturning(address("::ffff:a01:203"))
                         .validate("https://mapped.example.com/v1"))
+                .isInstanceOf(RequestException.class);
+    }
+
+    @Test
+    void pinnedDnsResolvesOnlyTheValidatedAddresses() {
+        InetAddress publicAddress = address("93.184.216.34");
+        AgenticBaseUrlValidator validator = validatorReturning(publicAddress);
+        java.util.function.Function<String, java.util.List<InetAddress>> pinned =
+                validator.pinnedDns("https://api.example.com/v1");
+        // The pinned resolver always answers with exactly the validated addresses,
+        // so the connection cannot be re-resolved to a different host between
+        // validation and connect (DNS rebinding window).
+        assertThat(pinned.apply("api.example.com")).containsExactly(publicAddress);
+        assertThat(pinned.apply("anything.else.example.org")).containsExactly(publicAddress);
+    }
+
+    @Test
+    void pinnedDnsRejectsHostsThatFailValidation() {
+        AgenticBaseUrlValidator validator = validatorReturning(address("10.0.0.8"));
+        assertThatThrownBy(() -> validator.pinnedDns("https://internal.example.com/v1"))
                 .isInstanceOf(RequestException.class);
     }
 
