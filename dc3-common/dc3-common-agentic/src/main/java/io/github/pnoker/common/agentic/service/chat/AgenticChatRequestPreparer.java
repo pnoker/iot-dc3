@@ -139,8 +139,10 @@ public class AgenticChatRequestPreparer {
                                 String requestSystemContext =
                                         buildRequestSystemContext(turns.clientSystemContext(), attachmentContext);
                                 return replayPublisher.flatMap(replayTranscript -> {
+                                    List<MessageBO> boundedTranscript =
+                                            applyContextTokenBudget(turns.finalUserMessage(), replayTranscript);
                                     AgenticMessageContent.Tokens inputTokens = buildInputTokens(
-                                            turns.finalUserMessage(), contexts, replayTranscript, toolCallingEnabled);
+                                            turns.finalUserMessage(), contexts, boundedTranscript, toolCallingEnabled);
                                     log.debug(
                                             "Agentic replay transcript resolved, conversationId={}, memoryEnabled={}, clientManaged={}, count={}",
                                             sanitize(conversationId),
@@ -163,10 +165,45 @@ public class AgenticChatRequestPreparer {
                                                     attachments,
                                                     contexts,
                                                     inputTokens,
-                                                    replayTranscript));
+                                                    boundedTranscript));
                                 });
                             });
                         }));
+    }
+
+    /**
+     * Enforce {@code dc3.agentic.context-token-budget} on the replayed memory: when the
+     * estimated prompt (user message + memory turns) exceeds the budget, the oldest
+     * memory turns are dropped until it fits. A zero budget keeps everything. Tool
+     * schemas and tool results are not part of this estimate; they are bounded by the
+     * runtime's tool-result truncation cap.
+     */
+    private List<MessageBO> applyContextTokenBudget(String finalUserMessage, List<MessageBO> transcript) {
+        int budget = properties.getContextTokenBudget();
+        if (budget <= 0 || transcript.isEmpty()) {
+            return transcript;
+        }
+        int used = AgenticTokenEstimatorUtil.estimate(StringUtils.defaultString(finalUserMessage));
+        int kept = 0;
+        for (int index = transcript.size() - 1; index >= 0; index--) {
+            MessageBO row = transcript.get(index);
+            int cost = row == null || row.getContent() == null || row.getContent().getText() == null
+                    ? 0
+                    : AgenticTokenEstimatorUtil.estimate(row.getContent().getText());
+            if (used + cost > budget && kept > 0) {
+                int dropped = transcript.size() - kept;
+                if (dropped > 0) {
+                    log.info(
+                            "Agentic context budget applied, dropped {} oldest memory turn(s) to fit {} tokens",
+                            dropped,
+                            budget);
+                }
+                return transcript.subList(transcript.size() - kept, transcript.size());
+            }
+            used += cost;
+            kept++;
+        }
+        return transcript;
     }
 
     private Map<String, Object> buildToolContext(

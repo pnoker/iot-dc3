@@ -69,6 +69,16 @@ public class AgenticProperties {
     private boolean toolCallingEnabled = true;
 
     /**
+     * Soft token budget for the assembled prompt context (system prompt + final user
+     * message + replayed memory turns). When the estimate exceeds the budget the
+     * oldest memory turns are dropped until it fits. Zero disables the budget.
+     * Note: tool schemas and tool results are not yet counted — they are bounded
+     * separately by the tool-result truncation cap.
+     */
+    @Min(value = 0, message = "Context token budget must not be negative")
+    private int contextTokenBudget = 0;
+
+    /**
      * Whether the Spring AI fallback model should be advertised and executed with
      * provider-native tool calls when no database model configuration exists.
      */
