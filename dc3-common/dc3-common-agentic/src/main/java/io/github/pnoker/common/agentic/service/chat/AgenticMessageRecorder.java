@@ -207,8 +207,12 @@ public class AgenticMessageRecorder {
             AgenticMessageContent.Tokens inputTokens, String assistantText, AgenticTokenUsage usage) {
         AgenticMessageContent.Tokens tokens = new AgenticMessageContent.Tokens();
         if (usage != null && usage.isPresent()) {
-            tokens.setInput(usage.promptTokens() == null ? null : usage.promptTokens().intValue());
-            tokens.setOutput(usage.completionTokens() == null ? null : usage.completionTokens().intValue());
+            tokens.setInput(
+                    usage.promptTokens() == null ? null : usage.promptTokens().intValue());
+            tokens.setOutput(
+                    usage.completionTokens() == null
+                            ? null
+                            : usage.completionTokens().intValue());
             tokens.setText(inputTokens.getText());
             tokens.setContext(inputTokens.getContext());
             tokens.setSystem(inputTokens.getSystem());

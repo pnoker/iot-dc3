@@ -456,7 +456,7 @@
                         }
                     },
                     "200": {
-                        "description": "OK \u2014 the full completion as JSON, or an SSE stream when stream=true",
+                        "description": "OK — the full completion as JSON, or an SSE stream when stream=true",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1347,7 +1347,7 @@
                     "temperature": {
                         "type": "number",
                         "format": "double",
-                        "description": "Sampling temperature controlling response randomness; higher values increase diversity (typically 0.0\u20132.0).",
+                        "description": "Sampling temperature controlling response randomness; higher values increase diversity (typically 0.0–2.0).",
                         "example": 0.7
                     },
                     "maxTokens": {
@@ -1734,7 +1734,7 @@
                     "temperature": {
                         "type": "number",
                         "format": "double",
-                        "description": "Sampling temperature controlling output randomness; typically in the range 0.0\u20132.0.",
+                        "description": "Sampling temperature controlling output randomness; typically in the range 0.0–2.0.",
                         "example": 0.7
                     },
                     "maxTokens": {
@@ -2077,7 +2077,7 @@
                     "temperature": {
                         "type": "number",
                         "format": "double",
-                        "description": "Sampling temperature controlling output randomness; higher values produce more creative responses. Valid range is typically 0.0\u20132.0.",
+                        "description": "Sampling temperature controlling output randomness; higher values produce more creative responses. Valid range is typically 0.0–2.0.",
                         "example": 0.7
                     },
                     "maxTokens": {
@@ -2630,6 +2630,10 @@
                                 }
                             }
                         }
+                    },
+                    "usage": {
+                        "$ref": "#/components/schemas/ChatCompletionResponseVO_usage",
+                        "description": "Provider-reported token usage; present on the terminal chunk when the provider reported it (OpenAI include_usage semantics), absent otherwise. Estimates are never emitted on the wire."
                     }
                 }
             }

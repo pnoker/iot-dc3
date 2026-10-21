@@ -176,8 +176,20 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                 promptBuilder,
                 ToolCallbackProvider.from(callback),
                 new ReactiveAgenticToolRegistry(
-                        null, null, null, null, null, null, null, null, null, null, null, null,
-                        new tools.jackson.databind.ObjectMapper(), null),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        new tools.jackson.databind.ObjectMapper(),
+                        null),
                 new AgenticProperties());
     }
 

@@ -179,7 +179,13 @@ public class OpenAiCompatibleAgenticRuntime {
             OpenAIClient client = createClient(provider);
             OpenAIClientAsync asyncClient = client.async();
             List<ChatCompletionMessageParam> messages = initialMessages(prepared);
-            return callRound(asyncClient, prepared, messages, toolCallbacksByName(), new java.util.concurrent.ConcurrentHashMap<>(), 0)
+            return callRound(
+                            asyncClient,
+                            prepared,
+                            messages,
+                            toolCallbacksByName(),
+                            new java.util.concurrent.ConcurrentHashMap<>(),
+                            0)
                     .doFinally(signal -> client.close());
         });
     }
@@ -228,8 +234,8 @@ public class OpenAiCompatibleAgenticRuntime {
     private Mono<AgenticRuntimeResult> forceFinalCallRound(
             OpenAIClientAsync client, AgenticPreparedChatBO prepared, List<ChatCompletionMessageParam> messages) {
         if (!properties.isLoopForceFinalRound()) {
-            return Mono.error(new IllegalStateException(
-                    "Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
+            return Mono.error(
+                    new IllegalStateException("Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
         }
         return Mono.fromFuture(client.chat().completions().create(buildRequest(prepared, messages, false, false)))
                 .map(completion -> {
@@ -272,7 +278,8 @@ public class OpenAiCompatibleAgenticRuntime {
                         if (!sink.isCancelled()) {
                             sink.next(new AgenticRuntimeStreamFrame(AgenticStreamDelta.empty(), null));
                         }
-                        return streamRound(client, prepared, messages, callbacks, repeatedCallCount, sink, guard, round + 1);
+                        return streamRound(
+                                client, prepared, messages, callbacks, repeatedCallCount, sink, guard, round + 1);
                     });
         });
     }
@@ -290,8 +297,8 @@ public class OpenAiCompatibleAgenticRuntime {
             FluxSink<AgenticRuntimeStreamFrame> sink,
             AgenticBackpressureGuard guard) {
         if (!properties.isLoopForceFinalRound()) {
-            return Mono.error(new IllegalStateException(
-                    "Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
+            return Mono.error(
+                    new IllegalStateException("Agent loop exceeded max rounds: " + properties.getLoopMaxRounds()));
         }
         return streamOneRound(client, prepared, messages, sink, guard, false).flatMap(result -> {
             if (!sink.isCancelled()) {
@@ -530,9 +537,11 @@ public class OpenAiCompatibleAgenticRuntime {
                     String callKey = toolCall.name() + ":" + StringUtils.defaultString(toolCall.arguments());
                     int seen = repeatedCallCount.merge(callKey, 1, Integer::sum);
                     if (seen >= 3) {
-                        return Mono.just(toolMessage(toolCall.id(), serializeToolResult(AgenticToolResult.error(
-                                "Tool '" + toolCall.name() + "' was already called with the same arguments "
-                                        + seen + " times. Change the arguments or answer from what you already have."))));
+                        return Mono.just(toolMessage(
+                                toolCall.id(),
+                                serializeToolResult(AgenticToolResult.error("Tool '" + toolCall.name()
+                                        + "' was already called with the same arguments " + seen
+                                        + " times. Change the arguments or answer from what you already have."))));
                     }
                     ReactiveAgenticTool reactiveTool = reactiveTools.get(toolCall.name());
                     if (reactiveTool != null) {
@@ -546,8 +555,9 @@ public class OpenAiCompatibleAgenticRuntime {
                         // A hallucinated tool name is a tool-level failure, not a turn
                         // failure: answer with a tool error envelope (listing the real
                         // tools) so the model can self-correct on the next round.
-                        return Mono.just(toolMessage(toolCall.id(), serializeToolResult(
-                                AgenticToolResult.error("Unknown tool '" + toolCall.name()
+                        return Mono.just(toolMessage(
+                                toolCall.id(),
+                                serializeToolResult(AgenticToolResult.error("Unknown tool '" + toolCall.name()
                                         + "'. Available tools: " + String.join(", ", reactiveTools.keySet())))));
                     }
                     // @Tool callbacks may block (bounded) while bridging to their facade calls,
@@ -561,6 +571,7 @@ public class OpenAiCompatibleAgenticRuntime {
 
     /** Cached provider-format tool list and callback map; the registry snapshot is immutable after construction. */
     private volatile List<ChatCompletionTool> cachedProviderTools;
+
     private volatile Map<String, ToolCallback> cachedCallbacks;
 
     private Map<String, ToolCallback> toolCallbacksByName() {

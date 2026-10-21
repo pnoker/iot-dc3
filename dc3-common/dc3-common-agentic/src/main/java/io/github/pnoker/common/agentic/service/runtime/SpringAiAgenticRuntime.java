@@ -104,10 +104,13 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
      * yields an empty usage and consumers fall back to estimation.
      */
     private AgenticTokenUsage usageOf(ChatResponse response) {
-        if (response == null || response.getMetadata() == null || response.getMetadata().getUsage() == null) {
+        if (response == null
+                || response.getMetadata() == null
+                || response.getMetadata().getUsage() == null) {
             return AgenticTokenUsage.empty();
         }
-        org.springframework.ai.chat.metadata.Usage usage = response.getMetadata().getUsage();
+        org.springframework.ai.chat.metadata.Usage usage =
+                response.getMetadata().getUsage();
         return new AgenticTokenUsage(
                 usage.getPromptTokens() == null ? null : (long) usage.getPromptTokens(),
                 usage.getCompletionTokens() == null ? null : (long) usage.getCompletionTokens(),

@@ -41,11 +41,7 @@ import tools.jackson.databind.ObjectMapper;
 class AgenticToolContractTest {
 
     private static Stream<Class<?>> toolTypes() {
-        return List.of(
-                        TenantTool.class,
-                        UserTool.class,
-                        SystemTool.class)
-                .stream();
+        return List.of(TenantTool.class, UserTool.class, SystemTool.class).stream();
     }
 
     private static ReactiveAgenticToolRegistry registry() {
@@ -62,7 +58,8 @@ class AgenticToolContractTest {
                 mock(TenantTool.class),
                 mock(UserTool.class),
                 mock(SystemTool.class),
-                new ObjectMapper(), null);
+                new ObjectMapper(),
+                null);
     }
 
     private static Stream<Method> publicToolMethods() {
@@ -81,17 +78,19 @@ class AgenticToolContractTest {
     @MethodSource("publicToolMethods")
     void everyPublicToolMethodIsRegistered(Method method) {
         assertThat(registry().tools())
-                .as("tool method %s.%s must be registered in the registry",
+                .as(
+                        "tool method %s.%s must be registered in the registry",
                         method.getDeclaringClass().getSimpleName(), method.getName())
                 .containsKey(method.getName());
     }
 
     @Test
     void platformToolsReturnStructuredResults() {
-        publicToolMethods().forEach(method -> assertThat(method.getReturnType())
-                .as("Tool method %s must return AgenticToolResult or Mono", method.getName())
-                .satisfiesAnyOf(
-                        type -> assertThat(type).isEqualTo(AgenticToolResult.class),
-                        type -> assertThat(type).isEqualTo(Mono.class)));
+        publicToolMethods()
+                .forEach(method -> assertThat(method.getReturnType())
+                        .as("Tool method %s must return AgenticToolResult or Mono", method.getName())
+                        .satisfiesAnyOf(
+                                type -> assertThat(type).isEqualTo(AgenticToolResult.class),
+                                type -> assertThat(type).isEqualTo(Mono.class)));
     }
 }

@@ -187,9 +187,11 @@ public class AgenticChatRequestPreparer {
         int kept = 0;
         for (int index = transcript.size() - 1; index >= 0; index--) {
             MessageBO row = transcript.get(index);
-            int cost = row == null || row.getContent() == null || row.getContent().getText() == null
-                    ? 0
-                    : AgenticTokenEstimatorUtil.estimate(row.getContent().getText());
+            int cost =
+                    row == null || row.getContent() == null || row.getContent().getText() == null
+                            ? 0
+                            : AgenticTokenEstimatorUtil.estimate(
+                                    row.getContent().getText());
             if (used + cost > budget && kept > 0) {
                 int dropped = transcript.size() - kept;
                 if (dropped > 0) {

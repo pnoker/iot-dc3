@@ -90,7 +90,11 @@ public class ReactiveAgenticToolRegistry {
     }
 
     private static ToolDefinition insight(String name, String description, String schema) {
-        return DefaultToolDefinition.builder().name(name).description(description).inputSchema(schema).build();
+        return DefaultToolDefinition.builder()
+                .name(name)
+                .description(description)
+                .inputSchema(schema)
+                .build();
     }
 
     private static String pageProps(String leading) {
@@ -248,7 +252,8 @@ public class ReactiveAgenticToolRegistry {
     private static final ToolDefinition SEARCH_DEVICES = toolDef(
             "searchDevices",
             "Search tenant-scoped devices with canonical offset pagination.",
-            pageProps("\"deviceName\":{\"type\":\"string\"},\"deviceCode\":{\"type\":\"string\"},\"driverId\":{\"type\":\"integer\"}"),
+            pageProps(
+                    "\"deviceName\":{\"type\":\"string\"},\"deviceCode\":{\"type\":\"string\"},\"driverId\":{\"type\":\"integer\"}"),
             "\"offset\",\"limit\"");
     private static final ToolDefinition LIST_DEVICES_BY_DRIVER = toolDef(
             "listDevicesByDriverId",
@@ -408,7 +413,8 @@ public class ReactiveAgenticToolRegistry {
     private static final ToolDefinition SEARCH_COMMAND_HISTORIES = toolDef(
             "searchCommandHistories",
             "Search custom command execution records with canonical offset pagination.",
-            pageProps("\"deviceId\":{\"type\":\"integer\"},\"commandId\":{\"type\":\"integer\"},\"commandCode\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}"),
+            pageProps(
+                    "\"deviceId\":{\"type\":\"integer\"},\"commandId\":{\"type\":\"integer\"},\"commandCode\":{\"type\":\"string\"},\"status\":{\"type\":\"string\"}"),
             "\"offset\",\"limit\"");
     private static final ToolDefinition LOOKUP_EVENT_HISTORY = toolDef(
             "lookupEventHistoryByRecordId",
@@ -424,10 +430,7 @@ public class ReactiveAgenticToolRegistry {
     // ===== Tenant / user / system tools (formerly the reflective @Tool channel) =====
 
     private static final ToolDefinition GET_CURRENT_TENANT_INFO = toolDef(
-            "getCurrentTenantInfo",
-            "Get the current tenant context. Returns only the current tenant ID.",
-            null,
-            null);
+            "getCurrentTenantInfo", "Get the current tenant context. Returns only the current tenant ID.", null, null);
     private static final ToolDefinition GET_CURRENT_USER_PROFILE = toolDef(
             "getCurrentUserProfile",
             "Get the current user profile. Returns only user ID, username, and nickname.",
@@ -494,7 +497,8 @@ public class ReactiveAgenticToolRegistry {
             UserTool userTool,
             SystemTool systemTool,
             ObjectMapper objectMapper,
-            org.springframework.beans.factory.ObjectProvider<io.micrometer.core.instrument.MeterRegistry> meterRegistryProvider) {
+            org.springframework.beans.factory.ObjectProvider<io.micrometer.core.instrument.MeterRegistry>
+                    meterRegistryProvider) {
         this.pointValueTool = pointValueTool;
         this.pointTool = pointTool;
         this.profileTool = profileTool;
@@ -507,8 +511,7 @@ public class ReactiveAgenticToolRegistry {
         this.tenantTool = tenantTool;
         this.userTool = userTool;
         this.systemTool = systemTool;
-        this.meterRegistry =
-                meterRegistryProvider == null ? null : meterRegistryProvider.getIfAvailable();
+        this.meterRegistry = meterRegistryProvider == null ? null : meterRegistryProvider.getIfAvailable();
         this.toolsSnapshot = buildSnapshot(objectMapper);
     }
 
@@ -558,7 +561,8 @@ public class ReactiveAgenticToolRegistry {
      * {@link AgenticToolResult#invalid} envelopes the model can self-correct from —
      * instead of blowing up the agent loop.
      */
-    private static ReactiveAgenticTool tool(ToolDefinition definition, String domain, ObjectMapper mapper, ToolCall call) {
+    private static ReactiveAgenticTool tool(
+            ToolDefinition definition, String domain, ObjectMapper mapper, ToolCall call) {
         return new ReactiveAgenticTool() {
             @Override
             public ToolDefinition definition() {
@@ -600,26 +604,38 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "writePointValue",
-                tool(WRITE_POINT_VALUE, "pointValue", mapper, (values, context) -> pointValueTool
-                        .writePointValueReactive(
+                tool(
+                        WRITE_POINT_VALUE,
+                        "pointValue",
+                        mapper,
+                        (values, context) -> pointValueTool.writePointValueReactive(
                                 number(values.get("deviceId")),
                                 number(values.get("pointId")),
                                 string(values.get("value")),
                                 context)));
         tools.put(
                 "readPointValue",
-                tool(READ_POINT_VALUE, "pointValue", mapper, (values, context) -> pointValueTool
-                        .readPointValueReactive(
+                tool(
+                        READ_POINT_VALUE,
+                        "pointValue",
+                        mapper,
+                        (values, context) -> pointValueTool.readPointValueReactive(
                                 number(values.get("deviceId")), number(values.get("pointId")), context)));
         tools.put(
                 "getLatestPointValue",
-                tool(GET_LATEST_POINT_VALUE, "pointValue", mapper, (values, context) -> pointValueTool
-                        .getLatestPointValueReactive(
+                tool(
+                        GET_LATEST_POINT_VALUE,
+                        "pointValue",
+                        mapper,
+                        (values, context) -> pointValueTool.getLatestPointValueReactive(
                                 number(values.get("deviceId")), number(values.get("pointId")), context)));
         tools.put(
                 "getPointValueHistory",
-                tool(GET_POINT_VALUE_HISTORY, "pointValue", mapper, (values, context) -> pointValueTool
-                        .getPointValueHistoryReactive(
+                tool(
+                        GET_POINT_VALUE_HISTORY,
+                        "pointValue",
+                        mapper,
+                        (values, context) -> pointValueTool.getPointValueHistoryReactive(
                                 number(values.get("deviceId")),
                                 number(values.get("pointId")),
                                 intValue(values.get("count")),
@@ -632,31 +648,50 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupPointById",
-                tool(LOOKUP_POINT, "point", mapper, (values, context) ->
-                        pointTool.lookupPointByIdReactive(number(values.get("pointId")), context)));
+                tool(
+                        LOOKUP_POINT,
+                        "point",
+                        mapper,
+                        (values, context) ->
+                                pointTool.lookupPointByIdReactive(number(values.get("pointId")), context)));
         tools.put(
                 "lookupPointsByIds",
-                tool(LOOKUP_POINTS, "point", mapper, (values, context) ->
-                        pointTool.lookupPointsByIdsReactive(numbers(values.get("pointIds")), context)));
+                tool(
+                        LOOKUP_POINTS,
+                        "point",
+                        mapper,
+                        (values, context) ->
+                                pointTool.lookupPointsByIdsReactive(numbers(values.get("pointIds")), context)));
         tools.put(
                 "searchPoints",
-                tool(SEARCH_POINTS, "point", mapper, (values, context) -> pointTool.searchPointsReactive(
-                        string(values.get("pointName")),
-                        number(values.get("profileId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_POINTS,
+                        "point",
+                        mapper,
+                        (values, context) -> pointTool.searchPointsReactive(
+                                string(values.get("pointName")),
+                                number(values.get("profileId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listPointsByDevice",
-                tool(LIST_POINTS_BY_DEVICE, "point", mapper, (values, context) -> pointTool.listPointsByDeviceIdReactive(
-                        number(values.get("deviceId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        LIST_POINTS_BY_DEVICE,
+                        "point",
+                        mapper,
+                        (values, context) -> pointTool.listPointsByDeviceIdReactive(
+                                number(values.get("deviceId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listPointsByProfile",
-                tool(LIST_POINTS_BY_PROFILE, "point", mapper, (values, context) -> pointTool
-                        .listPointsByProfileIdReactive(
+                tool(
+                        LIST_POINTS_BY_PROFILE,
+                        "point",
+                        mapper,
+                        (values, context) -> pointTool.listPointsByProfileIdReactive(
                                 number(values.get("profileId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
@@ -669,25 +704,40 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupProfileById",
-                tool(LOOKUP_PROFILE, "profile", mapper, (values, context) ->
-                        profileTool.lookupProfileByIdReactive(number(values.get("profileId")), context)));
+                tool(
+                        LOOKUP_PROFILE,
+                        "profile",
+                        mapper,
+                        (values, context) ->
+                                profileTool.lookupProfileByIdReactive(number(values.get("profileId")), context)));
         tools.put(
                 "lookupProfilesByIds",
-                tool(LOOKUP_PROFILES, "profile", mapper, (values, context) -> profileTool
-                        .lookupProfilesByIdsReactive(numbers(values.get("profileIds")), context)));
+                tool(
+                        LOOKUP_PROFILES,
+                        "profile",
+                        mapper,
+                        (values, context) ->
+                                profileTool.lookupProfilesByIdsReactive(numbers(values.get("profileIds")), context)));
         tools.put(
                 "searchProfiles",
-                tool(SEARCH_PROFILES, "profile", mapper, (values, context) -> profileTool.searchProfilesReactive(
-                        string(values.get("profileName")),
-                        string(values.get("profileCode")),
-                        string(values.get("profileType")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_PROFILES,
+                        "profile",
+                        mapper,
+                        (values, context) -> profileTool.searchProfilesReactive(
+                                string(values.get("profileName")),
+                                string(values.get("profileCode")),
+                                string(values.get("profileType")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listProfilesByDeviceId",
-                tool(LIST_PROFILES_BY_DEVICE, "profile", mapper, (values, context) -> profileTool
-                        .listProfilesByDeviceIdReactive(
+                tool(
+                        LIST_PROFILES_BY_DEVICE,
+                        "profile",
+                        mapper,
+                        (values, context) -> profileTool.listProfilesByDeviceIdReactive(
                                 number(values.get("deviceId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
@@ -700,32 +750,50 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupCommandById",
-                tool(LOOKUP_COMMAND, "command", mapper, (values, context) ->
-                        commandTool.lookupCommandByIdReactive(number(values.get("commandId")), context)));
+                tool(
+                        LOOKUP_COMMAND,
+                        "command",
+                        mapper,
+                        (values, context) ->
+                                commandTool.lookupCommandByIdReactive(number(values.get("commandId")), context)));
         tools.put(
                 "lookupCommandsByIds",
-                tool(LOOKUP_COMMANDS, "command", mapper, (values, context) -> commandTool
-                        .lookupCommandsByIdsReactive(numbers(values.get("commandIds")), context)));
+                tool(
+                        LOOKUP_COMMANDS,
+                        "command",
+                        mapper,
+                        (values, context) ->
+                                commandTool.lookupCommandsByIdsReactive(numbers(values.get("commandIds")), context)));
         tools.put(
                 "searchCommands",
-                tool(SEARCH_COMMANDS, "command", mapper, (values, context) -> commandTool.searchCommandsReactive(
-                        string(values.get("commandName")),
-                        number(values.get("profileId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_COMMANDS,
+                        "command",
+                        mapper,
+                        (values, context) -> commandTool.searchCommandsReactive(
+                                string(values.get("commandName")),
+                                number(values.get("profileId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listCommandsByDeviceId",
-                tool(LIST_COMMANDS_BY_DEVICE, "command", mapper, (values, context) -> commandTool
-                        .listCommandsByDeviceIdReactive(
+                tool(
+                        LIST_COMMANDS_BY_DEVICE,
+                        "command",
+                        mapper,
+                        (values, context) -> commandTool.listCommandsByDeviceIdReactive(
                                 number(values.get("deviceId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
                                 context)));
         tools.put(
                 "listCommandsByProfileId",
-                tool(LIST_COMMANDS_BY_PROFILE, "command", mapper, (values, context) -> commandTool
-                        .listCommandsByProfileIdReactive(
+                tool(
+                        LIST_COMMANDS_BY_PROFILE,
+                        "command",
+                        mapper,
+                        (values, context) -> commandTool.listCommandsByProfileIdReactive(
                                 number(values.get("profileId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
@@ -738,31 +806,50 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupEventById",
-                tool(LOOKUP_EVENT, "event", mapper, (values, context) ->
-                        eventTool.lookupEventByIdReactive(number(values.get("eventId")), context)));
+                tool(
+                        LOOKUP_EVENT,
+                        "event",
+                        mapper,
+                        (values, context) ->
+                                eventTool.lookupEventByIdReactive(number(values.get("eventId")), context)));
         tools.put(
                 "lookupEventsByIds",
-                tool(LOOKUP_EVENTS, "event", mapper, (values, context) ->
-                        eventTool.lookupEventsByIdsReactive(numbers(values.get("eventIds")), context)));
+                tool(
+                        LOOKUP_EVENTS,
+                        "event",
+                        mapper,
+                        (values, context) ->
+                                eventTool.lookupEventsByIdsReactive(numbers(values.get("eventIds")), context)));
         tools.put(
                 "searchEvents",
-                tool(SEARCH_EVENTS, "event", mapper, (values, context) -> eventTool.searchEventsReactive(
-                        string(values.get("eventName")),
-                        number(values.get("profileId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_EVENTS,
+                        "event",
+                        mapper,
+                        (values, context) -> eventTool.searchEventsReactive(
+                                string(values.get("eventName")),
+                                number(values.get("profileId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listEventsByDeviceId",
-                tool(LIST_EVENTS_BY_DEVICE, "event", mapper, (values, context) -> eventTool.listEventsByDeviceIdReactive(
-                        number(values.get("deviceId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        LIST_EVENTS_BY_DEVICE,
+                        "event",
+                        mapper,
+                        (values, context) -> eventTool.listEventsByDeviceIdReactive(
+                                number(values.get("deviceId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listEventsByProfileId",
-                tool(LIST_EVENTS_BY_PROFILE, "event", mapper, (values, context) -> eventTool
-                        .listEventsByProfileIdReactive(
+                tool(
+                        LIST_EVENTS_BY_PROFILE,
+                        "event",
+                        mapper,
+                        (values, context) -> eventTool.listEventsByProfileIdReactive(
                                 number(values.get("profileId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
@@ -775,41 +862,62 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupDeviceById",
-                tool(LOOKUP_DEVICE, "device", mapper, (values, context) ->
-                        deviceTool.lookupDeviceByIdReactive(number(values.get("deviceId")), context)));
+                tool(
+                        LOOKUP_DEVICE,
+                        "device",
+                        mapper,
+                        (values, context) ->
+                                deviceTool.lookupDeviceByIdReactive(number(values.get("deviceId")), context)));
         tools.put(
                 "lookupDevicesByIds",
-                tool(LOOKUP_DEVICES, "device", mapper, (values, context) ->
-                        deviceTool.lookupDevicesByIdsReactive(numbers(values.get("deviceIds")), context)));
+                tool(
+                        LOOKUP_DEVICES,
+                        "device",
+                        mapper,
+                        (values, context) ->
+                                deviceTool.lookupDevicesByIdsReactive(numbers(values.get("deviceIds")), context)));
         tools.put(
                 "searchDevices",
-                tool(SEARCH_DEVICES, "device", mapper, (values, context) -> deviceTool.searchDevicesReactive(
-                        string(values.get("deviceName")),
-                        string(values.get("deviceCode")),
-                        number(values.get("driverId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_DEVICES,
+                        "device",
+                        mapper,
+                        (values, context) -> deviceTool.searchDevicesReactive(
+                                string(values.get("deviceName")),
+                                string(values.get("deviceCode")),
+                                number(values.get("driverId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "listDevicesByDriverId",
-                tool(LIST_DEVICES_BY_DRIVER, "device", mapper, (values, context) -> deviceTool
-                        .listDevicesByDriverIdReactive(
+                tool(
+                        LIST_DEVICES_BY_DRIVER,
+                        "device",
+                        mapper,
+                        (values, context) -> deviceTool.listDevicesByDriverIdReactive(
                                 number(values.get("driverId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
                                 context)));
         tools.put(
                 "listDevicesByProfileId",
-                tool(LIST_DEVICES_BY_PROFILE, "device", mapper, (values, context) -> deviceTool
-                        .listDevicesByProfileIdReactive(
+                tool(
+                        LIST_DEVICES_BY_PROFILE,
+                        "device",
+                        mapper,
+                        (values, context) -> deviceTool.listDevicesByProfileIdReactive(
                                 number(values.get("profileId")),
                                 longValue(values.get("offset")),
                                 intValue(values.get("limit")),
                                 context)));
         tools.put(
                 "getDeviceLatestPointValues",
-                tool(DEVICE_LATEST_VALUES, "device", mapper, (values, context) -> deviceTool
-                        .getDeviceLatestPointValuesReactive(
+                tool(
+                        DEVICE_LATEST_VALUES,
+                        "device",
+                        mapper,
+                        (values, context) -> deviceTool.getDeviceLatestPointValuesReactive(
                                 number(values.get("deviceId")), intValue(values.get("limit")), context)));
     }
 
@@ -819,120 +927,223 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupDriverById",
-                tool(LOOKUP_DRIVER, "driver", mapper, (values, context) ->
-                        driverTool.lookupDriverByIdReactive(number(values.get("driverId")), context)));
+                tool(
+                        LOOKUP_DRIVER,
+                        "driver",
+                        mapper,
+                        (values, context) ->
+                                driverTool.lookupDriverByIdReactive(number(values.get("driverId")), context)));
         tools.put(
                 "lookupDriversByIds",
-                tool(LOOKUP_DRIVERS, "driver", mapper, (values, context) ->
-                        driverTool.lookupDriversByIdsReactive(numbers(values.get("driverIds")), context)));
+                tool(
+                        LOOKUP_DRIVERS,
+                        "driver",
+                        mapper,
+                        (values, context) ->
+                                driverTool.lookupDriversByIdsReactive(numbers(values.get("driverIds")), context)));
         tools.put(
                 "searchDrivers",
-                tool(SEARCH_DRIVERS, "driver", mapper, (values, context) -> driverTool.searchDriversReactive(
-                        string(values.get("driverName")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_DRIVERS,
+                        "driver",
+                        mapper,
+                        (values, context) -> driverTool.searchDriversReactive(
+                                string(values.get("driverName")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
     }
 
     private void registerInsightTools(Map<String, ReactiveAgenticTool> tools, ObjectMapper mapper) {
         if (insightTool == null) {
             return;
         }
-        tools.put("getAlertStats", tool(GET_ALERT_STATS, "insight", mapper, (values, context) -> insightTool.getAlertStats(context)));
+        tools.put(
+                "getAlertStats",
+                tool(GET_ALERT_STATS, "insight", mapper, (values, context) -> insightTool.getAlertStats(context)));
         tools.put(
                 "getLatestAlerts",
-                tool(GET_LATEST_ALERTS, "insight", mapper, (values, context) ->
-                        insightTool.getLatestAlerts(intOrNull(values.get("limit")), context)));
+                tool(
+                        GET_LATEST_ALERTS,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getLatestAlerts(intOrNull(values.get("limit")), context)));
         tools.put(
                 "pageAlerts",
-                tool(PAGE_ALERTS, "insight", mapper, (values, context) -> insightTool.pageAlerts(
-                        string(values.get("source")),
-                        number(values.get("sourceId")),
-                        intOrNull(values.get("alarmTypeFlag")),
-                        intOrNull(values.get("confirmFlag")),
-                        string(values.get("rangeKey")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        PAGE_ALERTS,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.pageAlerts(
+                                string(values.get("source")),
+                                number(values.get("sourceId")),
+                                intOrNull(values.get("alarmTypeFlag")),
+                                intOrNull(values.get("confirmFlag")),
+                                string(values.get("rangeKey")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "getAlertTrend",
-                tool(GET_ALERT_TREND, "insight", mapper, (values, context) ->
-                        insightTool.getAlertTrend(intOrNull(values.get("days")), context)));
+                tool(
+                        GET_ALERT_TREND,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getAlertTrend(intOrNull(values.get("days")), context)));
         tools.put(
                 "getAlertTopSources",
-                tool(GET_ALERT_TOP_SOURCES, "insight", mapper, (values, context) -> insightTool.getAlertTopSources(
-                        intOrNull(values.get("days")), intOrNull(values.get("limit")), context)));
+                tool(
+                        GET_ALERT_TOP_SOURCES,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getAlertTopSources(
+                                intOrNull(values.get("days")), intOrNull(values.get("limit")), context)));
         tools.put(
                 "getAlertTypeDistribution",
-                tool(GET_ALERT_TYPE_DISTRIBUTION, "insight", mapper, (values, context) ->
-                        insightTool.getAlertTypeDistribution(intOrNull(values.get("days")), context)));
+                tool(
+                        GET_ALERT_TYPE_DISTRIBUTION,
+                        "insight",
+                        mapper,
+                        (values, context) ->
+                                insightTool.getAlertTypeDistribution(intOrNull(values.get("days")), context)));
         tools.put(
                 "getAlertAgingBacklog",
-                tool(GET_ALERT_AGING_BACKLOG, "insight", mapper, (values, context) -> insightTool.getAlertAgingBacklog(context)));
+                tool(
+                        GET_ALERT_AGING_BACKLOG,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getAlertAgingBacklog(context)));
         tools.put(
                 "getAlertMtta",
-                tool(GET_ALERT_MTTA, "insight", mapper, (values, context) ->
-                        insightTool.getAlertMtta(intOrNull(values.get("days")), context)));
+                tool(
+                        GET_ALERT_MTTA,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getAlertMtta(intOrNull(values.get("days")), context)));
         tools.put(
                 "getTodayStats",
                 tool(GET_TODAY_STATS, "insight", mapper, (values, context) -> insightTool.getTodayStats(context)));
         tools.put(
                 "getStatsTimeseries",
-                tool(GET_STATS_TIMESERIES, "insight", mapper, (values, context) -> insightTool.getStatsTimeseries(
-                        string(values.get("granularity")), intOrNull(values.get("rangeHours")), context)));
+                tool(
+                        GET_STATS_TIMESERIES,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getStatsTimeseries(
+                                string(values.get("granularity")), intOrNull(values.get("rangeHours")), context)));
         tools.put(
                 "getTopEntities",
-                tool(GET_TOP_ENTITIES, "insight", mapper, (values, context) -> insightTool.getTopEntities(
-                        string(values.get("dimension")),
-                        intOrNull(values.get("rangeHours")),
-                        intOrNull(values.get("limit")),
-                        context)));
+                tool(
+                        GET_TOP_ENTITIES,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getTopEntities(
+                                string(values.get("dimension")),
+                                intOrNull(values.get("rangeHours")),
+                                intOrNull(values.get("limit")),
+                                context)));
         tools.put(
                 "getLatestValueStream",
-                tool(GET_LATEST_VALUE_STREAM, "insight", mapper, (values, context) ->
-                        insightTool.getLatestValueStream(intOrNull(values.get("limit")), context)));
+                tool(
+                        GET_LATEST_VALUE_STREAM,
+                        "insight",
+                        mapper,
+                        (values, context) ->
+                                insightTool.getLatestValueStream(intOrNull(values.get("limit")), context)));
         tools.put(
                 "getLatencyHistogram",
-                tool(GET_LATENCY_HISTOGRAM, "insight", mapper, (values, context) ->
-                        insightTool.getLatencyHistogram(intOrNull(values.get("rangeHours")), context)));
+                tool(
+                        GET_LATENCY_HISTOGRAM,
+                        "insight",
+                        mapper,
+                        (values, context) ->
+                                insightTool.getLatencyHistogram(intOrNull(values.get("rangeHours")), context)));
         tools.put(
                 "getHourlyActivity",
-                tool(GET_HOURLY_ACTIVITY, "insight", mapper, (values, context) ->
-                        insightTool.getHourlyActivity(intOrNull(values.get("rangeHours")), context)));
+                tool(
+                        GET_HOURLY_ACTIVITY,
+                        "insight",
+                        mapper,
+                        (values, context) ->
+                                insightTool.getHourlyActivity(intOrNull(values.get("rangeHours")), context)));
         tools.put(
                 "getProtocolHealth",
-                tool(GET_PROTOCOL_HEALTH, "insight", mapper, (values, context) -> insightTool.getProtocolHealth(context)));
+                tool(
+                        GET_PROTOCOL_HEALTH,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.getProtocolHealth(context)));
         tools.put(
                 "analyticsQueryLatest",
-                tool(ANALYTICS_QUERY_LATEST, "insight", mapper, (values, context) -> insightTool.analyticsQueryLatest(values, context)));
+                tool(
+                        ANALYTICS_QUERY_LATEST,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsQueryLatest(values, context)));
         tools.put(
                 "analyticsQueryHistory",
-                tool(ANALYTICS_QUERY_HISTORY, "insight", mapper, (values, context) -> insightTool.analyticsQueryHistory(values, context)));
+                tool(
+                        ANALYTICS_QUERY_HISTORY,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsQueryHistory(values, context)));
         tools.put(
                 "analyticsComputeStats",
-                tool(ANALYTICS_COMPUTE_STATS, "insight", mapper, (values, context) -> insightTool.analyticsComputeStats(values, context)));
+                tool(
+                        ANALYTICS_COMPUTE_STATS,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsComputeStats(values, context)));
         tools.put(
                 "analyticsComparePeriods",
-                tool(ANALYTICS_COMPARE_PERIODS, "insight", mapper, (values, context) -> insightTool.analyticsComparePeriods(values, context)));
+                tool(
+                        ANALYTICS_COMPARE_PERIODS,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsComparePeriods(values, context)));
         tools.put(
                 "analyticsRankEntities",
-                tool(ANALYTICS_RANK_ENTITIES, "insight", mapper, (values, context) -> insightTool.analyticsRankEntities(values, context)));
+                tool(
+                        ANALYTICS_RANK_ENTITIES,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsRankEntities(values, context)));
         tools.put(
                 "analyticsTrendAnalysis",
-                tool(ANALYTICS_TREND_ANALYSIS, "insight", mapper, (values, context) -> insightTool.analyticsTrendAnalysis(values, context)));
+                tool(
+                        ANALYTICS_TREND_ANALYSIS,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsTrendAnalysis(values, context)));
         tools.put(
                 "analyticsThresholdReport",
-                tool(ANALYTICS_THRESHOLD_REPORT, "insight", mapper, (values, context) -> insightTool.analyticsThresholdReport(values, context)));
+                tool(
+                        ANALYTICS_THRESHOLD_REPORT,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsThresholdReport(values, context)));
         tools.put(
                 "analyticsCorrelate",
-                tool(ANALYTICS_CORRELATE, "insight", mapper, (values, context) -> insightTool.analyticsCorrelate(values, context)));
+                tool(
+                        ANALYTICS_CORRELATE,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsCorrelate(values, context)));
         tools.put(
                 "analyticsDataQualityReport",
-                tool(ANALYTICS_DATA_QUALITY_REPORT, "insight", mapper, (values, context) -> insightTool.analyticsDataQualityReport(values, context)));
+                tool(
+                        ANALYTICS_DATA_QUALITY_REPORT,
+                        "insight",
+                        mapper,
+                        (values, context) -> insightTool.analyticsDataQualityReport(values, context)));
         tools.put(
                 "getPointCommandStatus",
-                tool(GET_POINT_COMMAND_STATUS, "insight", mapper, (values, context) ->
-                        insightTool.getPointCommandStatus(string(values.get("commandId")), context)));
+                tool(
+                        GET_POINT_COMMAND_STATUS,
+                        "insight",
+                        mapper,
+                        (values, context) ->
+                                insightTool.getPointCommandStatus(string(values.get("commandId")), context)));
     }
 
     private void registerHistoryTools(Map<String, ReactiveAgenticTool> tools, ObjectMapper mapper) {
@@ -941,74 +1152,103 @@ public class ReactiveAgenticToolRegistry {
         }
         tools.put(
                 "lookupCommandHistoryByRecordId",
-                tool(LOOKUP_COMMAND_HISTORY, "history", mapper, (values, context) -> historyTool
-                        .lookupCommandHistoryByRecordId(string(values.get("recordId")), context)));
+                tool(
+                        LOOKUP_COMMAND_HISTORY,
+                        "history",
+                        mapper,
+                        (values, context) ->
+                                historyTool.lookupCommandHistoryByRecordId(string(values.get("recordId")), context)));
         tools.put(
                 "searchCommandHistories",
-                tool(SEARCH_COMMAND_HISTORIES, "history", mapper, (values, context) -> historyTool.searchCommandHistories(
-                        string(values.get("deviceId")),
-                        string(values.get("commandId")),
-                        string(values.get("commandCode")),
-                        string(values.get("status")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_COMMAND_HISTORIES,
+                        "history",
+                        mapper,
+                        (values, context) -> historyTool.searchCommandHistories(
+                                string(values.get("deviceId")),
+                                string(values.get("commandId")),
+                                string(values.get("commandCode")),
+                                string(values.get("status")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
         tools.put(
                 "lookupEventHistoryByRecordId",
-                tool(LOOKUP_EVENT_HISTORY, "history", mapper, (values, context) -> historyTool
-                        .lookupEventHistoryByRecordId(string(values.get("recordId")), context)));
+                tool(
+                        LOOKUP_EVENT_HISTORY,
+                        "history",
+                        mapper,
+                        (values, context) ->
+                                historyTool.lookupEventHistoryByRecordId(string(values.get("recordId")), context)));
         tools.put(
                 "searchEventHistories",
-                tool(SEARCH_EVENT_HISTORIES, "history", mapper, (values, context) -> historyTool.searchEventHistories(
-                        string(values.get("deviceId")),
-                        string(values.get("eventId")),
-                        longValue(values.get("offset")),
-                        intValue(values.get("limit")),
-                        context)));
+                tool(
+                        SEARCH_EVENT_HISTORIES,
+                        "history",
+                        mapper,
+                        (values, context) -> historyTool.searchEventHistories(
+                                string(values.get("deviceId")),
+                                string(values.get("eventId")),
+                                longValue(values.get("offset")),
+                                intValue(values.get("limit")),
+                                context)));
     }
 
     private void registerContextTools(Map<String, ReactiveAgenticTool> tools, ObjectMapper mapper) {
         if (tenantTool != null) {
             tools.put(
                     "getCurrentTenantInfo",
-                    tool(GET_CURRENT_TENANT_INFO, "tenant", mapper, (values, context) ->
-                            Mono.just(tenantTool.getCurrentTenantInfo(context))));
+                    tool(
+                            GET_CURRENT_TENANT_INFO,
+                            "tenant",
+                            mapper,
+                            (values, context) -> Mono.just(tenantTool.getCurrentTenantInfo(context))));
         }
         if (userTool != null) {
             tools.put(
                     "getCurrentUserProfile",
-                    tool(GET_CURRENT_USER_PROFILE, "user", mapper, (values, context) ->
-                            Mono.just(userTool.getCurrentUserProfile(context))));
+                    tool(
+                            GET_CURRENT_USER_PROFILE,
+                            "user",
+                            mapper,
+                            (values, context) -> Mono.just(userTool.getCurrentUserProfile(context))));
         }
         if (systemTool != null) {
             tools.put(
                     "getSystemHealth",
-                    tool(GET_SYSTEM_HEALTH, "system", mapper, (values, context) ->
-                            Mono.just(systemTool.getSystemHealth(context))));
-            tools.put(
-                    "getDeviceStatuses",
-                    tool(GET_DEVICE_STATUSES, "system", mapper, (values, context) -> {
-                        List<Long> requested = numbers(values.get("deviceIds"));
-                        List<Long> bounded = boundedIds(requested);
-                        return Mono.just(systemTool.getDeviceStatuses(bounded, context))
-                                .map(result -> withTruncationNote(result, requested));
-                    }));
+                    tool(
+                            GET_SYSTEM_HEALTH,
+                            "system",
+                            mapper,
+                            (values, context) -> Mono.just(systemTool.getSystemHealth(context))));
+            tools.put("getDeviceStatuses", tool(GET_DEVICE_STATUSES, "system", mapper, (values, context) -> {
+                List<Long> requested = numbers(values.get("deviceIds"));
+                List<Long> bounded = boundedIds(requested);
+                return Mono.just(systemTool.getDeviceStatuses(bounded, context))
+                        .map(result -> withTruncationNote(result, requested));
+            }));
             tools.put(
                     "getDeviceStatusesByProfile",
-                    tool(GET_DEVICE_STATUSES_BY_PROFILE, "system", mapper, (values, context) -> Mono.just(
-                            systemTool.getDeviceStatusesByProfile(number(values.get("profileId")), context))));
-            tools.put(
-                    "getDriverStatuses",
-                    tool(GET_DRIVER_STATUSES, "system", mapper, (values, context) -> {
-                        List<Long> requested = numbers(values.get("driverIds"));
-                        List<Long> bounded = boundedIds(requested);
-                        return Mono.just(systemTool.getDriverStatuses(bounded, context))
-                                .map(result -> withTruncationNote(result, requested));
-                    }));
+                    tool(
+                            GET_DEVICE_STATUSES_BY_PROFILE,
+                            "system",
+                            mapper,
+                            (values, context) -> Mono.just(
+                                    systemTool.getDeviceStatusesByProfile(number(values.get("profileId")), context))));
+            tools.put("getDriverStatuses", tool(GET_DRIVER_STATUSES, "system", mapper, (values, context) -> {
+                List<Long> requested = numbers(values.get("driverIds"));
+                List<Long> bounded = boundedIds(requested);
+                return Mono.just(systemTool.getDriverStatuses(bounded, context))
+                        .map(result -> withTruncationNote(result, requested));
+            }));
             tools.put(
                     "getDriverDeviceStatusSummary",
-                    tool(GET_DRIVER_DEVICE_STATUS_SUMMARY, "system", mapper, (values, context) -> Mono.just(
-                            systemTool.getDriverDeviceStatusSummary(number(values.get("driverId")), context))));
+                    tool(
+                            GET_DRIVER_DEVICE_STATUS_SUMMARY,
+                            "system",
+                            mapper,
+                            (values, context) -> Mono.just(
+                                    systemTool.getDriverDeviceStatusSummary(number(values.get("driverId")), context))));
         }
     }
 

@@ -54,7 +54,8 @@ class ReactiveAgenticToolRegistryTest {
                 mock(TenantTool.class),
                 mock(UserTool.class),
                 mock(SystemTool.class),
-                new ObjectMapper(), null);
+                new ObjectMapper(),
+                null);
     }
 
     @Test
@@ -187,8 +188,7 @@ class ReactiveAgenticToolRegistryTest {
         var first = registry.tools();
         var second = registry.tools();
         assertThat(second).isSameAs(first);
-        org.assertj.core.api.Assertions
-                .assertThatCode(() -> first.put("rogue", mock(ReactiveAgenticTool.class)))
+        org.assertj.core.api.Assertions.assertThatCode(() -> first.put("rogue", mock(ReactiveAgenticTool.class)))
                 .as("the snapshot must reject registration after construction")
                 .isInstanceOf(UnsupportedOperationException.class);
     }
@@ -236,9 +236,10 @@ class ReactiveAgenticToolRegistryTest {
                 Map.entry("getCurrentTenantInfo", "tenant"),
                 Map.entry("getCurrentUserProfile", "user"),
                 Map.entry("getSystemHealth", "system"));
-        expectedDomains.forEach((toolName, domain) -> assertThat(registry.tools().get(toolName).domain())
-                .as("tool %s must declare its domain explicitly", toolName)
-                .isEqualTo(domain));
+        expectedDomains.forEach(
+                (toolName, domain) -> assertThat(registry.tools().get(toolName).domain())
+                        .as("tool %s must declare its domain explicitly", toolName)
+                        .isEqualTo(domain));
     }
 
     @Test

@@ -57,7 +57,8 @@ public class DriverTool {
                 .collectList()
                 .map(values -> values.isEmpty()
                         ? AgenticToolResult.empty("No drivers found for IDs: " + ids, List.of())
-                        : AgenticToolResult.ok("Drivers loaded" + AgenticToolUtil.idTruncationNote(driverIds, ids), values));
+                        : AgenticToolResult.ok(
+                                "Drivers loaded" + AgenticToolUtil.idTruncationNote(driverIds, ids), values));
     }
 
     /** Search drivers matching the request. */

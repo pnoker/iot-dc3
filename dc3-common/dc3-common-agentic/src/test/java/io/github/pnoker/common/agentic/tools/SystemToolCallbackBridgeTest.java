@@ -60,7 +60,8 @@ class SystemToolCallbackBridgeTest {
                 mock(TenantTool.class),
                 mock(UserTool.class),
                 systemTool,
-                new ObjectMapper(), null);
+                new ObjectMapper(),
+                null);
     }
 
     @Test
@@ -73,7 +74,9 @@ class SystemToolCallbackBridgeTest {
 
         ReactiveAgenticTool deviceStatusesTool = registry.tools().get("getDeviceStatuses");
         ReactiveAgenticTool systemHealthTool = registry.tools().get("getSystemHealth");
-        assertThat(deviceStatusesTool).as("getDeviceStatuses must be registered").isNotNull();
+        assertThat(deviceStatusesTool)
+                .as("getDeviceStatuses must be registered")
+                .isNotNull();
         assertThat(systemHealthTool).as("getSystemHealth must be registered").isNotNull();
 
         ToolCallback deviceStatuses = new ReactiveAgenticToolCallback(deviceStatusesTool);
@@ -98,8 +101,7 @@ class SystemToolCallbackBridgeTest {
             ids.append(id);
         }
         ids.append(']');
-        String result = registry
-                .tools()
+        String result = registry.tools()
                 .get("getDeviceStatuses")
                 .call("{\"deviceIds\":" + ids + "}", new ToolContext(Map.of("dc3.agentic.tenantId", 1L)))
                 .block(java.time.Duration.ofSeconds(5))

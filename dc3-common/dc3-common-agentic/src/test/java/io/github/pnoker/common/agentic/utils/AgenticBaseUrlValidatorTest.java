@@ -71,16 +71,16 @@ class AgenticBaseUrlValidatorTest {
     @Test
     void nat64And6to4AndIpv4MappedAddressesAreRejected() {
         // NAT64 64:ff9b::/96 embeds 10.1.2.3 — must not tunnel past the IPv4 rules.
-        assertThatThrownBy(() -> validatorReturning(address("64:ff9b::a01:203"))
-                        .validate("https://nat64.example.com/v1"))
+        assertThatThrownBy(
+                        () -> validatorReturning(address("64:ff9b::a01:203")).validate("https://nat64.example.com/v1"))
                 .isInstanceOf(RequestException.class);
         // 6to4 2002:c000:203:: embeds 192.0.2.3.
-        assertThatThrownBy(() -> validatorReturning(address("2002:c000:203::1"))
-                        .validate("https://sixtofour.example.com/v1"))
+        assertThatThrownBy(() ->
+                        validatorReturning(address("2002:c000:203::1")).validate("https://sixtofour.example.com/v1"))
                 .isInstanceOf(RequestException.class);
         // IPv4-mapped ::ffff:10.1.2.3 for resolvers that skip JDK normalization.
-        assertThatThrownBy(() -> validatorReturning(address("::ffff:a01:203"))
-                        .validate("https://mapped.example.com/v1"))
+        assertThatThrownBy(
+                        () -> validatorReturning(address("::ffff:a01:203")).validate("https://mapped.example.com/v1"))
                 .isInstanceOf(RequestException.class);
     }
 

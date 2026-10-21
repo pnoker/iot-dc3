@@ -60,8 +60,7 @@ public interface ReactiveMessageStore {
      * @param limit page size, 1..200 enforced by the caller
      * @return the page rows in message-index order
      */
-    default Flux<MessageBO> list(
-            String conversationId, RequestHeader.PrincipalHeader header, long offset, int limit) {
+    default Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header, long offset, int limit) {
         Flux<MessageBO> window = list(conversationId, header).skip(offset);
         return limit > 0 ? window.take(limit) : window;
     }

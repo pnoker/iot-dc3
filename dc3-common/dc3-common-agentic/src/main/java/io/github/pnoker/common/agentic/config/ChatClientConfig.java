@@ -76,8 +76,7 @@ public class ChatClientConfig {
             - Device, driver, profile, and point metadata lookup.
             - Point-value read, history, read-command, and pending write action preparation.
             - Insight analytics and system health lookup.
-            """
-            + UNTRUSTED_CONTENT_PROMPT;
+            """ + UNTRUSTED_CONTENT_PROMPT;
 
     /**
      * Create and configure the application-managed agentic tool call advisor.

@@ -178,19 +178,18 @@ public class R2dbcMessageStore implements ReactiveMessageStore {
         if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
         if (conversationId == null || conversationId.isBlank()) return Mono.just(0L);
         return databaseClient
-                .sql("SELECT COUNT(*) FROM " + TABLE
+                .sql("SELECT COUNT(*) AS total FROM " + TABLE
                         + " WHERE conversation_id = :conversation_id AND tenant_id = :tenant_id AND user_id = :user_id"
                         + " AND deleted = 0")
                 .bind("conversation_id", conversationId)
                 .bind("tenant_id", header.getTenantId())
                 .bind("user_id", header.getUserId())
-                .map((row, metadata) -> row.get(0, Long.class))
+                .map((row, metadata) -> row.get("total", Long.class))
                 .first();
     }
 
     @Override
-    public Flux<MessageBO> list(
-            String conversationId, RequestHeader.PrincipalHeader header, long offset, int limit) {
+    public Flux<MessageBO> list(String conversationId, RequestHeader.PrincipalHeader header, long offset, int limit) {
         if (header == null) return Flux.error(new IllegalArgumentException("header must not be null"));
         if (conversationId == null || conversationId.isBlank()) return Flux.empty();
         if (limit <= 0) return Flux.empty();

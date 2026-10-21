@@ -25,8 +25,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author pnoker
  * @since 2016.10.1
  */
-public record AgenticRuntimeStreamFrame(
-        AgenticStreamDelta delta, String finishReason, AgenticTokenUsage usage) {
+public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason, AgenticTokenUsage usage) {
 
     public AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
         this(delta, finishReason, AgenticTokenUsage.empty());

@@ -44,7 +44,9 @@ class AgenticBackpressureGuardTest {
         AtomicLong clock = new AtomicLong(0);
         AgenticBackpressureGuard guard = AgenticBackpressureGuard.create(LIMIT, TIMEOUT_NANOS, clock::get);
         for (int i = 0; i < (int) LIMIT + 2; i++) {
-            assertThat(guard.onFrameEmitted()).as("over budget but within grace").isFalse();
+            assertThat(guard.onFrameEmitted())
+                    .as("over budget but within grace")
+                    .isFalse();
         }
         // The timeout is measured from the first over-budget frame; not reached yet.
         clock.set(TIMEOUT_NANOS - 1);

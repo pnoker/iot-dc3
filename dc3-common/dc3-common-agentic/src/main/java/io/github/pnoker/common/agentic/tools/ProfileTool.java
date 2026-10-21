@@ -68,7 +68,8 @@ public class ProfileTool {
                     .collectList()
                     .map(values -> values.isEmpty()
                             ? AgenticToolResult.empty("No profiles found for IDs: " + ids, List.of())
-                            : AgenticToolResult.ok("Profiles loaded" + AgenticToolUtil.idTruncationNote(profileIds, ids), values));
+                            : AgenticToolResult.ok(
+                                    "Profiles loaded" + AgenticToolUtil.idTruncationNote(profileIds, ids), values));
         });
     }
 

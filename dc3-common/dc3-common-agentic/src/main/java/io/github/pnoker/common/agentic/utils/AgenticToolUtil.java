@@ -67,8 +67,7 @@ public class AgenticToolUtil {
         if (Objects.isNull(requested) || Objects.isNull(normalized) || requested.size() <= normalized.size()) {
             return "";
         }
-        return " (queried first "
-                + normalized.size() + " of " + requested.size() + " provided ids)";
+        return " (queried first " + normalized.size() + " of " + requested.size() + " provided ids)";
     }
 
     /**

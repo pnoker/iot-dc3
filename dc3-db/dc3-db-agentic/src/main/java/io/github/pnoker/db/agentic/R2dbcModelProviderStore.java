@@ -210,7 +210,8 @@ public class R2dbcModelProviderStore implements ReactiveModelProviderStore {
                 : spec.bind("last_check_status", profile.status().getIndex());
         spec = profile.time() == null
                 ? spec.bindNull("last_check_time", Instant.class)
-                : spec.bind("last_check_time", dialect.bindInstant(profile.time().toInstant(ZoneOffset.UTC)));
+                : spec.bind(
+                        "last_check_time", dialect.bindInstant(profile.time().toInstant(ZoneOffset.UTC)));
         spec = profile.latencyMs() == null
                 ? spec.bindNull("last_check_latency_ms", Integer.class)
                 : spec.bind("last_check_latency_ms", profile.latencyMs());

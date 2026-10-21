@@ -260,20 +260,25 @@ public class AgenticChatServiceImpl implements AgenticChatService {
         String assistantText = StringUtils.defaultString(result.content());
         return persistAssistantMessage(prepared, assistantText, result.usage(), userHeader)
                 .then(Mono.fromSupplier(() -> {
-            recordLifecycle(
-                    userHeader, prepared.model(), providerTag(prepared.model(), userHeader), "completed", startNanos);
-            recordTokenUsage(result.usage(), prepared, userHeader);
-            log.info(
-                    "Agentic chat complete, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, finishReason={}, durationMs={}",
-                    userHeader.getTenantId(),
-                    userHeader.getUserId(),
-                    sanitize(prepared.conversationId()),
-                    sanitize(prepared.model()),
-                    assistantText.length(),
-                    result.finishReason(),
-                    Duration.ofNanos(System.nanoTime() - startNanos).toMillis());
-            return responseCodec.blockingResponse(prepared, assistantText, result.finishReason(), result.usage());
-        }));
+                    recordLifecycle(
+                            userHeader,
+                            prepared.model(),
+                            providerTag(prepared.model(), userHeader),
+                            "completed",
+                            startNanos);
+                    recordTokenUsage(result.usage(), prepared, userHeader);
+                    log.info(
+                            "Agentic chat complete, tenantId={}, userId={}, conversationId={}, model={}, contentLen={}, finishReason={}, durationMs={}",
+                            userHeader.getTenantId(),
+                            userHeader.getUserId(),
+                            sanitize(prepared.conversationId()),
+                            sanitize(prepared.model()),
+                            assistantText.length(),
+                            result.finishReason(),
+                            Duration.ofNanos(System.nanoTime() - startNanos).toMillis());
+                    return responseCodec.blockingResponse(
+                            prepared, assistantText, result.finishReason(), result.usage());
+                }));
     }
 
     private Mono<Void> persistUserMessage(AgenticPreparedChatBO prepared, RequestHeader.PrincipalHeader userHeader) {

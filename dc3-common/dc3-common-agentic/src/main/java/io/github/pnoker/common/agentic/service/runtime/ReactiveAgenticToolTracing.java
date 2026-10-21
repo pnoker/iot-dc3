@@ -35,8 +35,8 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
         this(name, delegate, null);
     }
 
-    ReactiveAgenticToolTracing(String name, ReactiveAgenticTool delegate,
-            io.micrometer.core.instrument.MeterRegistry meterRegistry) {
+    ReactiveAgenticToolTracing(
+            String name, ReactiveAgenticTool delegate, io.micrometer.core.instrument.MeterRegistry meterRegistry) {
         this.name = Objects.requireNonNull(name, "name");
         this.delegate = Objects.requireNonNull(delegate, "delegate");
         this.meterRegistry = meterRegistry;

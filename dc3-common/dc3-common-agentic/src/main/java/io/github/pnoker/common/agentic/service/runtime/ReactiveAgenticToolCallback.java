@@ -69,7 +69,8 @@ public class ReactiveAgenticToolCallback implements ToolCallback {
                             + "subscribed on bounded elastic (see SpringAiAgenticRuntime)");
         }
         try {
-            Object result = tool.call(toolInput, toolContext).subscribeOn(scheduler).block(CALL_TIMEOUT);
+            Object result =
+                    tool.call(toolInput, toolContext).subscribeOn(scheduler).block(CALL_TIMEOUT);
             return serialize(result);
         } catch (IllegalStateException error) {
             throw error;

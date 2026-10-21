@@ -27,13 +27,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.github.pnoker.common.agentic.config.AgenticProperties;
-import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.utils.AgenticKeyCipher;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.github.pnoker.common.enums.EnableFlagEnum;
+import io.github.pnoker.db.core.dialect.StandardR2dbcDialect;
 import io.r2dbc.spi.Row;
 import java.util.Base64;
 import java.util.function.BiFunction;
@@ -84,7 +84,10 @@ class R2dbcModelProviderStoreTest {
         lenient().when(propertiesProvider.getIfAvailable()).thenReturn(properties);
         keyCipher = new AgenticKeyCipher(properties);
         store = new R2dbcModelProviderStore(
-                databaseClient, transactionalOperator, propertiesProvider, new StandardR2dbcDialect("postgres", "public.dc3_schema_fingerprint"));
+                databaseClient,
+                transactionalOperator,
+                propertiesProvider,
+                new StandardR2dbcDialect("postgres", "public.dc3_schema_fingerprint"));
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
         header.setPrincipalId(2L);

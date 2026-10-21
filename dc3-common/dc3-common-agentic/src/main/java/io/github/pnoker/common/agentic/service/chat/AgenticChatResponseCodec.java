@@ -65,18 +65,19 @@ public class AgenticChatResponseCodec {
      * @return the chat completion response
      */
     public ChatCompletionResponseVO blockingResponse(
-            AgenticPreparedChatBO prepared,
-            String content,
-            String finishReason,
-            AgenticTokenUsage usage) {
+            AgenticPreparedChatBO prepared, String content, String finishReason, AgenticTokenUsage usage) {
         int completionTokens = AgenticTokenEstimatorUtil.estimate(content);
         int promptTokens =
                 Objects.nonNull(prepared.inputTokens()) ? prepared.inputTokens().getInput() : 0;
         ChatCompletionResponseVO.Usage wireUsage;
         if (Objects.nonNull(usage) && usage.isPresent()) {
             wireUsage = new ChatCompletionResponseVO.Usage(
-                    usage.promptTokens() == null ? promptTokens : usage.promptTokens().intValue(),
-                    usage.completionTokens() == null ? completionTokens : usage.completionTokens().intValue(),
+                    usage.promptTokens() == null
+                            ? promptTokens
+                            : usage.promptTokens().intValue(),
+                    usage.completionTokens() == null
+                            ? completionTokens
+                            : usage.completionTokens().intValue(),
                     usage.totalTokens() == null
                             ? promptTokens + completionTokens
                             : usage.totalTokens().intValue(),
@@ -140,7 +141,9 @@ public class AgenticChatResponseCodec {
             // numbers; estimates are never put on the wire.
             builder.usage(new ChatCompletionResponseVO.Usage(
                     usage.promptTokens() == null ? null : usage.promptTokens().intValue(),
-                    usage.completionTokens() == null ? null : usage.completionTokens().intValue(),
+                    usage.completionTokens() == null
+                            ? null
+                            : usage.completionTokens().intValue(),
                     usage.totalTokens() == null ? null : usage.totalTokens().intValue(),
                     false));
         }

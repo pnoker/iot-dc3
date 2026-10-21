@@ -123,7 +123,9 @@ class AgenticChatResponseCodecTest {
         runTrace.recordPendingVisualization(visualization());
         AgenticPreparedChatBO prepared = prepared(runTrace);
 
-        String json = new ObjectMapper().writeValueAsString(codec.blockingResponse(prepared, "Analysis ready", "stop", AgenticTokenUsage.empty()));
+        String json = new ObjectMapper()
+                .writeValueAsString(
+                        codec.blockingResponse(prepared, "Analysis ready", "stop", AgenticTokenUsage.empty()));
 
         assertThat(json).contains("\"contentExt\"");
         assertThat(json).contains("\"charts\"");
