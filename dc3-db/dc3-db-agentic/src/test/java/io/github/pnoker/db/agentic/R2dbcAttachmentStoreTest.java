@@ -29,10 +29,12 @@ import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
 /**
- * Regression coverage for the attachment save guard: the insert runs in one transaction behind a
- * live-session row lock, so a save racing a concurrent session delete either lands before the
- * delete or fails with a clear error, never surviving as a zombie row of a soft-deleted
- * conversation. Timestamps bind as {@link Instant} so TIMESTAMPTZ encoding cannot drift.
+ * Regression coverage for the attachment save guard and the per-tenant quota aggregates: the
+ * insert runs in one transaction behind a live-session row lock, so a save racing a concurrent
+ * session delete either lands before the delete or fails with a clear error, never surviving as
+ * a zombie row of a soft-deleted conversation. Timestamps bind as {@link Instant} so TIMESTAMPTZ
+ * encoding cannot drift. The count/byte aggregates span the whole tenant (every user), exclude
+ * soft-deleted rows, and return zero for tenants without live attachments.
  */
 class R2dbcAttachmentStoreTest {
 
@@ -140,6 +142,27 @@ class R2dbcAttachmentStoreTest {
         StepVerifier.create(store.listDeletedFilePaths(CONVERSATION_ID, header))
                 .expectNext("/store/gone.txt")
                 .verifyComplete();
+    }
+
+    @Test
+    void tenantAggregatesCountEveryLiveRowOfTheTenantRegardlessOfUser() {
+        database.seedAttachment(TENANT_ID, USER_ID, CONVERSATION_ID, "/store/live-1.txt", 11L, false);
+        // Quotas are per tenant: a colleague's upload counts against the same budget.
+        database.seedAttachment(TENANT_ID, 43L, "conv-other-user", "/store/live-2.txt", 22L, false);
+        // Soft-deleted rows release their budget; other tenants never touch it.
+        database.seedAttachment(TENANT_ID, USER_ID, CONVERSATION_ID, "/store/gone.txt", 33L, true);
+        database.seedAttachment(999L, 43L, "conv-other-tenant", "/store/other-tenant.txt", 44L, false);
+
+        StepVerifier.create(store.countByTenant(header)).expectNext(2L).verifyComplete();
+        StepVerifier.create(store.sumSizeByTenant(header)).expectNext(33L).verifyComplete();
+    }
+
+    @Test
+    void tenantAggregatesReturnZeroForATenantWithoutLiveAttachments() {
+        database.seedAttachment(999L, USER_ID, "conv-elsewhere", "/store/other.txt", 44L, false);
+
+        StepVerifier.create(store.countByTenant(header)).expectNext(0L).verifyComplete();
+        StepVerifier.create(store.sumSizeByTenant(header)).expectNext(0L).verifyComplete();
     }
 
     @Test

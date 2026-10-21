@@ -53,10 +53,10 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 /**
- * Unit coverage of attachment deletion and upload failure classification: row soft-delete plus
- * best-effort file unlink, the negative guarantees (cross-tenant ids fail closed as not-found,
- * unlink failures never roll back the row), and the split between client validation failures and
- * infrastructure faults on upload.
+ * Unit coverage of attachment deletion, upload quota gating and upload failure classification: row soft-delete plus
+ * best-effort file unlink, the negative guarantees (cross-tenant ids fail closed as not-found, unlink failures never
+ * roll back the row), the per-tenant count/byte quota rejections (no byte written, usage reported), and the split
+ * between client validation failures and infrastructure faults on upload.
  */
 @ExtendWith(MockitoExtension.class)
 class AttachmentServiceImplTest {
@@ -78,9 +78,11 @@ class AttachmentServiceImplTest {
 
     private RequestHeader.PrincipalHeader header;
 
+    private AgenticProperties properties;
+
     @BeforeEach
     void setUp() throws Exception {
-        AgenticProperties properties = new AgenticProperties();
+        properties = new AgenticProperties();
         properties.setAttachmentStoragePath(storageRoot.toString());
         fileCleaner = new AttachmentFileCleaner(properties);
         service = new AttachmentServiceImpl(attachmentStore, sessionService, fileCleaner, properties);
@@ -100,7 +102,9 @@ class AttachmentServiceImplTest {
 
         StepVerifier.create(service.delete(42L, header)).expectNext(1L).verifyComplete();
 
-        assertThat(Files.exists(file)).as("stored file must be unlinked after the row is soft-deleted").isFalse();
+        assertThat(Files.exists(file))
+                .as("stored file must be unlinked after the row is soft-deleted")
+                .isFalse();
         verify(attachmentStore).delete(42L, header);
     }
 
@@ -139,8 +143,7 @@ class AttachmentServiceImplTest {
 
     @Test
     void deleteCommitsSoftDeleteWhenStoredFileIsAlreadyGone() {
-        AttachmentBO row = attachment(
-                42L, storageRoot.resolve("tenant_1_user_2_conversation_conv-1-missing.txt"));
+        AttachmentBO row = attachment(42L, storageRoot.resolve("tenant_1_user_2_conversation_conv-1-missing.txt"));
         when(attachmentStore.getById(42L, header)).thenReturn(Mono.just(row));
         when(attachmentStore.delete(42L, header)).thenReturn(Mono.just(1L));
 
@@ -158,13 +161,16 @@ class AttachmentServiceImplTest {
 
         StepVerifier.create(service.delete(42L, header)).expectNext(1L).verifyComplete();
 
-        assertThat(Files.exists(outsideFile)).as("guard must refuse to unlink outside the storage root").isTrue();
+        assertThat(Files.exists(outsideFile))
+                .as("guard must refuse to unlink outside the storage root")
+                .isTrue();
         verify(attachmentStore).delete(42L, header);
     }
 
     @Test
     void uploadStoresFileUnderConfiguredStorageRoot() {
         FilePart filePart = filePart("note.txt", "abc".getBytes(StandardCharsets.UTF_8));
+        stubQuota(0L, 0L);
         when(sessionService.touch("conv-1", header, null)).thenReturn(Mono.just(new SessionBO()));
         when(attachmentStore.save(any(AttachmentBO.class)))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, AttachmentBO.class)));
@@ -176,8 +182,12 @@ class AttachmentServiceImplTest {
         ArgumentCaptor<AttachmentBO> captor = ArgumentCaptor.forClass(AttachmentBO.class);
         verify(attachmentStore).save(captor.capture());
         Path storedPath = Path.of(captor.getValue().getFilePath());
-        assertThat(storedPath.startsWith(storageRoot)).as("stored file must stay inside the storage root").isTrue();
-        assertThat(Files.exists(storedPath)).as("upload writes the file at the captured path").isTrue();
+        assertThat(storedPath.startsWith(storageRoot))
+                .as("stored file must stay inside the storage root")
+                .isTrue();
+        assertThat(Files.exists(storedPath))
+                .as("upload writes the file at the captured path")
+                .isTrue();
     }
 
     @Test
@@ -202,11 +212,14 @@ class AttachmentServiceImplTest {
         longName.append("b".repeat(200));
         longName.append(".txt");
         FilePart filePart = filePart(longName.toString(), "abc".getBytes(StandardCharsets.UTF_8));
+        stubQuota(0L, 0L);
         when(sessionService.touch("conv-1", header, null)).thenReturn(Mono.just(new SessionBO()));
         when(attachmentStore.save(any(AttachmentBO.class)))
                 .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, AttachmentBO.class)));
 
-        StepVerifier.create(service.upload("conv-1", filePart, header)).expectNextCount(1).verifyComplete();
+        StepVerifier.create(service.upload("conv-1", filePart, header))
+                .expectNextCount(1)
+                .verifyComplete();
 
         ArgumentCaptor<AttachmentBO> captor = ArgumentCaptor.forClass(AttachmentBO.class);
         verify(attachmentStore).save(captor.capture());
@@ -219,6 +232,7 @@ class AttachmentServiceImplTest {
     @Test
     void uploadWrapsInfrastructureFailuresAsServiceErrors() {
         FilePart filePart = filePart("note.txt", "abc".getBytes(StandardCharsets.UTF_8));
+        stubQuota(0L, 0L);
         when(sessionService.touch("conv-1", header, null)).thenReturn(Mono.just(new SessionBO()));
         when(attachmentStore.save(any(AttachmentBO.class)))
                 .thenReturn(Mono.error(new RuntimeException("connection refused")));
@@ -244,8 +258,90 @@ class AttachmentServiceImplTest {
         assertThat(Files.exists(outside)).as("out-of-root file must survive").isTrue();
     }
 
+    @Test
+    void uploadRejectsWhenTheTenantAttachmentCountQuotaIsExceeded() throws Exception {
+        properties.setAttachmentTenantMaxCount(2000);
+        FilePart filePart = declaredFilePart("note.txt", 3);
+        stubQuota(2000L, 0L);
+
+        StepVerifier.create(service.upload("conv-1", filePart, header))
+                .expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(RequestException.class);
+                    assertThat(error.getMessage())
+                            .contains("quota exceeded")
+                            .contains("2000")
+                            .contains("delete old attachments");
+                })
+                .verify();
+
+        verify(attachmentStore, never()).save(any(AttachmentBO.class));
+        verifyNoInteractions(sessionService);
+        try (var files = Files.list(storageRoot)) {
+            assertThat(files.count())
+                    .as("no byte is written when the quota is exceeded")
+                    .isZero();
+        }
+    }
+
+    @Test
+    void uploadRejectsWhenTheTenantAttachmentStorageQuotaIsExceeded() throws Exception {
+        properties.setAttachmentTenantMaxBytes(1000L);
+        FilePart filePart = declaredFilePart("note.txt", 500);
+        stubQuota(1999L, 600L);
+
+        StepVerifier.create(service.upload("conv-1", filePart, header))
+                .expectErrorSatisfies(error -> {
+                    assertThat(error).isInstanceOf(RequestException.class);
+                    assertThat(error.getMessage())
+                            .contains("storage quota exceeded")
+                            .contains("600")
+                            .contains("1000")
+                            .contains("1100");
+                })
+                .verify();
+
+        verify(attachmentStore, never()).save(any(AttachmentBO.class));
+        verifyNoInteractions(sessionService);
+        try (var files = Files.list(storageRoot)) {
+            assertThat(files.count())
+                    .as("no byte is written when the quota is exceeded")
+                    .isZero();
+        }
+    }
+
+    @Test
+    void uploadAcceptsWhenBothTenantQuotasStillHaveHeadroom() {
+        FilePart filePart = filePart("note.txt", "abc".getBytes(StandardCharsets.UTF_8));
+        stubQuota(1999L, 1000L);
+        when(sessionService.touch("conv-1", header, null)).thenReturn(Mono.just(new SessionBO()));
+        when(attachmentStore.save(any(AttachmentBO.class)))
+                .thenAnswer(invocation -> Mono.just(invocation.getArgument(0, AttachmentBO.class)));
+
+        StepVerifier.create(service.upload("conv-1", filePart, header))
+                .expectNextCount(1)
+                .verifyComplete();
+
+        verify(attachmentStore).save(any(AttachmentBO.class));
+    }
+
+    private void stubQuota(long count, long storedBytes) {
+        when(attachmentStore.countByTenant(header)).thenReturn(Mono.just(count));
+        when(attachmentStore.sumSizeByTenant(header)).thenReturn(Mono.just(storedBytes));
+    }
+
     private Path storedFile(Path directory, String fileName) throws Exception {
         return Files.writeString(directory.resolve(fileName), "payload");
+    }
+
+    /** FilePart mock that only carries the declared metadata — for paths rejected before any content is read. */
+    private FilePart declaredFilePart(String fileName, int declaredLength) {
+        FilePart part = org.mockito.Mockito.mock(FilePart.class);
+        when(part.filename()).thenReturn(fileName);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(declaredLength);
+        headers.setContentType(MediaType.TEXT_PLAIN);
+        when(part.headers()).thenReturn(headers);
+        return part;
     }
 
     private FilePart filePart(String fileName, byte[] content) {

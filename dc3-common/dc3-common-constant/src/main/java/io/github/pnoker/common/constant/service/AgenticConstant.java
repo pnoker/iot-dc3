@@ -502,11 +502,6 @@ public class AgenticConstant {
          */
         public static final int MAX_HISTORY_RECORDS = 200;
 
-        /**
-         * Maximum agentic loop rounds per conversation turn.
-         */
-        public static final int MAX_AGENT_LOOP_ROUNDS = 8;
-
         private ToolLimit() {
             throw new IllegalStateException(BaseConstant.UTILITY_CLASS);
         }

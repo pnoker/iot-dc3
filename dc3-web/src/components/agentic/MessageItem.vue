@@ -228,9 +228,11 @@ const canRetry = computed(() => props.message.role === 'assistant' && messageBad
 
 const historyAttachments = computed(() =>
   (props.message.contentExt?.attachments || [])
-    // legacy payloads may store whole objects instead of ids — skip junk
-    .filter((id): id is string => typeof id === 'string' && id.length > 0)
-    .map((id) => props.attachmentsById?.[id])
+    // legacy local echoes may hold numeric-string ids (pre number[] contract)
+    // or whole objects — normalize to the numeric id contract and skip junk
+    .map((id) => (typeof id === 'number' ? id : Number(id)))
+    .filter((id) => Number.isInteger(id) && id > 0)
+    .map((id) => props.attachmentsById?.[String(id)])
     .filter((attachment): attachment is AgenticAttachment => Boolean(attachment))
 );
 </script>

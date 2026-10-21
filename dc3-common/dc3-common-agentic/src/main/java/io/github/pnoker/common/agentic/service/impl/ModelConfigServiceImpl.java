@@ -61,6 +61,13 @@ public class ModelConfigServiceImpl implements ModelConfigService {
     public Mono<List<ModelVO>> listOptions(RequestHeader.PrincipalHeader header) {
         return modelConfigStore.list(header, true).collectList().map(configs -> {
             if (configs.isEmpty()) {
+                // The chat path refuses to serve the fallback model unless the
+                // deployment opted in (transport-fallback-enabled, default off:
+                // the fallback bypasses per-tenant accounting). Advertising it
+                // here anyway would surface a selectable model that 503s on use.
+                if (!properties.isTransportFallbackEnabled()) {
+                    return List.<ModelVO>of();
+                }
                 return List.of(new ModelVO(
                         fallbackModel,
                         fallbackModel,

@@ -51,6 +51,24 @@ const normalizeProblem = (status: number, data: unknown, fallback?: string): Pro
   return {status, title: fallback ?? 'HTTP request failed', detail: fallback ?? 'HTTP request failed'};
 };
 
+/**
+ * Shared 401 recovery for every HTTP transport: one aggregated warning toast,
+ * a frontend auth-session reset (the token cookie is cleared server-side on
+ * 401 — only the local flags go), and a router-based redirect to the login
+ * view. The axios response interceptor and the fetch-based agentic streaming
+ * path both call this so a session expiry behaves identically regardless of
+ * transport — never a raw `window.location.hash` jump.
+ */
+export const handleAuthFailure = () => {
+  notifyAggregatedFailure(
+      'auth-401',
+      (message, title) => warnMessage(message, title),
+      i18n.global.t('common.axios.unauthorizedTitle'),
+      i18n.global.t('common.axios.unauthorized'));
+  resetAuthSession();
+  router.push({name: 'login'}).catch(() => {});
+};
+
 const notifyProblem = (status: number, problem: ProblemPayload) => {
   if (typeof problem.code === 'string' && PASSWORD_CHANGE_CODES.includes(problem.code as (typeof PASSWORD_CHANGE_CODES)[number])) {
     return;
@@ -60,13 +78,7 @@ const notifyProblem = (status: number, problem: ProblemPayload) => {
   // shows at most a handful of notifications with repeat counts, not one
   // toast per request.
   if (status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
-    notifyAggregatedFailure(
-        'auth-401',
-        (message, title) => warnMessage(message, title),
-        i18n.global.t('common.axios.unauthorizedTitle'),
-        i18n.global.t('common.axios.unauthorized'));
-    resetAuthSession();
-    router.push({name: 'login'}).catch(() => {});
+    handleAuthFailure();
   } else if (status >= 500) {
     notifyAggregatedFailure(
         `http-${status}`,

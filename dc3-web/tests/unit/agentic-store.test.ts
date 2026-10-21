@@ -411,7 +411,7 @@ describe('agentic store', () => {
     apiMocks.streamAgenticChatCompletion.mockImplementation(async (_request: unknown, callbacks: AgenticStreamCallbacks) => {
       callbacks.onDelta?.('ok');
     });
-    apiMocks.uploadAgenticAttachment.mockResolvedValue({id: 'att-1', fileName: 'a.csv', size: 3});
+    apiMocks.uploadAgenticAttachment.mockResolvedValue({id: 91001, fileName: 'a.csv', size: 3});
 
     const store = useAgenticStore();
     store.newSession();
@@ -421,10 +421,10 @@ describe('agentic store', () => {
 
     const user = store.messagesByConversation[conversationId].find((m) => m.role === 'user');
     expect(typeof user?.createTime).toBe('string');
-    expect(user?.contentExt?.attachments).toEqual(['att-1']);
+    expect(user?.contentExt?.attachments).toEqual([91001]);
     // the chat request carries the same ids
     const request = apiMocks.streamAgenticChatCompletion.mock.calls[0][0];
-    expect(request.attachments).toEqual(['att-1']);
+    expect(request.attachments).toEqual([91001]);
   });
 
   it('passes createTime through when messages are reloaded', async () => {
@@ -616,7 +616,7 @@ describe('agentic store', () => {
         id: 'failed-user',
         role: 'user',
         content: 'retry this question',
-        contentExt: {attachments: ['att-1', 'att-2']},
+        contentExt: {attachments: [91001, 91002]},
         createTime: '2026-10-01 09:01:00',
       },
       {
@@ -639,7 +639,7 @@ describe('agentic store', () => {
     expect(messages.some((message) => message.id === 'failed-user')).toBe(false);
     expect(messages.filter((message) => message.content === 'retry this question')).toHaveLength(1);
     const retriedUser = messages.find((message) => message.content === 'retry this question')!;
-    expect(retriedUser.contentExt?.attachments).toEqual(['att-1', 'att-2']);
+    expect(retriedUser.contentExt?.attachments).toEqual([91001, 91002]);
     // The replayed turn keeps the earlier history intact.
     expect(messages.some((message) => message.id === 'older-user')).toBe(true);
     expect(messages[messages.length - 1]!.role).toBe('assistant');
@@ -647,7 +647,7 @@ describe('agentic store', () => {
 
     const request = apiMocks.streamAgenticChatCompletion.mock.calls.at(-1)![0];
     expect(request.messages).toEqual([{role: 'user', content: 'retry this question'}]);
-    expect(request.attachments).toEqual(['att-1', 'att-2']);
+    expect(request.attachments).toEqual([91001, 91002]);
   });
 
   it('refuses regeneration for unknown or non-assistant messages and while streaming', async () => {

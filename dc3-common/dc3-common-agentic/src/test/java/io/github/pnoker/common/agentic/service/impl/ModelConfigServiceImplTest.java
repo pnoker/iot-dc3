@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -31,11 +32,13 @@ import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.exception.NotFoundException;
 import io.github.pnoker.common.exception.RequestException;
 import java.lang.reflect.Field;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -53,11 +56,12 @@ class ModelConfigServiceImplTest {
 
     private ModelConfigServiceImpl service;
     private RequestHeader.PrincipalHeader header;
+    private AgenticProperties properties;
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new ModelConfigServiceImpl(
-                modelConfigStore, modelProviderStore, new AgenticProperties(), chatClientFactory);
+        properties = new AgenticProperties();
+        service = new ModelConfigServiceImpl(modelConfigStore, modelProviderStore, properties, chatClientFactory);
         lenient().when(modelConfigStore.clearCheckProfile(any(), any())).thenReturn(Mono.just(true));
         injectField("fallbackModel", "gpt-4o");
         injectField("fallbackTemperature", 0.7);
@@ -66,6 +70,29 @@ class ModelConfigServiceImplTest {
         header.setTenantId(1L);
         header.setPrincipalId(2L);
         header.setPrincipalName("admin");
+    }
+
+    @Test
+    void listOptionsHidesTheFallbackModelWhenTheTransportFallbackIsDisabled() {
+        // transport-fallback-enabled defaults to false: advertising the fallback
+        // model to a tenant without configurations would surface a model that
+        // fails with 503 the moment it is selected.
+        when(modelConfigStore.list(header, true)).thenReturn(Flux.empty());
+
+        StepVerifier.create(service.listOptions(header)).expectNext(List.of()).verifyComplete();
+    }
+
+    @Test
+    void listOptionsAdvertisesTheFallbackModelOnlyWhenExplicitlyEnabled() {
+        properties.setTransportFallbackEnabled(true);
+        when(modelConfigStore.list(header, true)).thenReturn(Flux.empty());
+
+        StepVerifier.create(service.listOptions(header))
+                .assertNext(options -> {
+                    assertThat(options).hasSize(1);
+                    assertThat(options.get(0).getModel()).isEqualTo("gpt-4o");
+                })
+                .verifyComplete();
     }
 
     @Test

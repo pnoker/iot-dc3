@@ -29,12 +29,9 @@ import reactor.core.publisher.Mono;
 
 /**
  * Tenant-scoped message history service backing the message REST resource.
- *
- * <p>Pagination is currently applied in memory: the store port has no offset/limit
- * overload yet, so the full ordered conversation is materialized and sliced here. The
- * pushdown point is a {@code list(conversationId, offset, limit, header)} overload on
- * {@link ReactiveMessageStore}; until that port lands (owned by the storage war zone),
- * this keeps the controller contract paginated and bounded.
+ * Pagination is pushed down to the store: the port's offset/limit overload and
+ * its count query bound each page at the database, so the full conversation is
+ * never materialized here.
  *
  * @author pnoker
  * @since 2026.10.21

@@ -185,6 +185,33 @@ public class R2dbcAttachmentStore implements ReactiveAttachmentStore {
                 .map(Long::valueOf));
     }
 
+    @Override
+    public Mono<Long> countByTenant(RequestHeader.PrincipalHeader header) {
+        if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
+        return databaseClient
+                .sql("SELECT COUNT(*) AS total FROM " + TABLE + " WHERE tenant_id = :tenant_id AND deleted = 0")
+                .bind("tenant_id", header.getTenantId())
+                .map((row, metadata) -> {
+                    Number value = row.get("total", Number.class);
+                    return value == null ? 0L : value.longValue();
+                })
+                .first();
+    }
+
+    @Override
+    public Mono<Long> sumSizeByTenant(RequestHeader.PrincipalHeader header) {
+        if (header == null) return Mono.error(new IllegalArgumentException("header must not be null"));
+        return databaseClient
+                .sql("SELECT COALESCE(SUM(size), 0) AS total FROM " + TABLE
+                        + " WHERE tenant_id = :tenant_id AND deleted = 0")
+                .bind("tenant_id", header.getTenantId())
+                .map((row, metadata) -> {
+                    Number value = row.get("total", Number.class);
+                    return value == null ? 0L : value.longValue();
+                })
+                .first();
+    }
+
     private Mono<AttachmentBO> getByPath(String path, Long tenantId, Long userId) {
         return databaseClient
                 .sql("SELECT " + COLUMNS + " FROM " + TABLE

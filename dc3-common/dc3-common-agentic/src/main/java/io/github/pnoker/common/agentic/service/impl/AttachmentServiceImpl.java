@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.common.agentic.service.impl;
 
+import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.AttachmentBO;
 import io.github.pnoker.common.agentic.repository.ReactiveAttachmentStore;
 import io.github.pnoker.common.agentic.service.AttachmentService;
@@ -43,7 +44,6 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
-import io.github.pnoker.common.agentic.config.AgenticProperties;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -70,8 +70,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             return Mono.error(new RequestException("Attachment data is required"));
         }
         if (!isAllowedExtension(filePart.filename())) {
-            return Mono.error(new RequestException(
-                    "Attachment type is not allowed; permitted extensions: " + properties.getAttachmentAllowedExtensions()));
+            return Mono.error(new RequestException("Attachment type is not allowed; permitted extensions: "
+                    + properties.getAttachmentAllowedExtensions()));
         }
         long declaredLength = filePart.headers().getContentLength();
         if (declaredLength > MAX_BYTES) return Mono.error(new RequestException("Attachment size exceeds 10 MB"));
@@ -102,7 +102,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 channel -> close(channel),
                 (channel, error) -> close(channel),
                 channel -> close(channel));
-        return Mono.usingWhen(
+        Mono<AttachmentBO> store = Mono.usingWhen(
                         Mono.just(finalPath),
                         ignored -> write.then(sessionService.touch(conversationId, header, null))
                                 .then(Mono.defer(() ->
@@ -111,6 +111,10 @@ public class AttachmentServiceImpl implements AttachmentService {
                         (ignored, error) -> fileCleaner.unlink(finalPath),
                         ignored -> fileCleaner.unlink(finalPath))
                 .onErrorMap(error -> classifyUploadFailure(conversationId, header, error));
+        // Quota gate runs after the whitelist/size validations and before a single
+        // byte is written: tenants already at either cap are rejected with their
+        // current usage instead of writing a file the database row would betray.
+        return checkTenantQuota(header, declaredLength).then(store);
     }
 
     @Override
@@ -144,7 +148,37 @@ public class AttachmentServiceImpl implements AttachmentService {
                                 id,
                                 header.getTenantId(),
                                 header.getUserId()))
-                        .flatMap(deleted -> fileCleaner.unlink(row.getFilePath()).thenReturn(deleted)));
+                        .flatMap(
+                                deleted -> fileCleaner.unlink(row.getFilePath()).thenReturn(deleted)));
+    }
+
+    /**
+     * Enforce the per-tenant attachment quotas before the upload starts: the tenant's
+     * live attachment count against {@code attachment-tenant-max-count}, and its stored
+     * bytes (plus this upload's declared length) against {@code attachment-tenant-max-bytes}.
+     * Rejections carry the current usage and the cap so the caller can act on them.
+     * A missing Content-Length ({@code declaredLength < 0}) still gets the count check
+     * and a budget check at zero growth; the streamed per-file cap bounds the rest.
+     */
+    private Mono<Void> checkTenantQuota(RequestHeader.PrincipalHeader header, long declaredLength) {
+        return Mono.zip(attachmentStore.countByTenant(header), attachmentStore.sumSizeByTenant(header))
+                .flatMap(usage -> {
+                    long count = usage.getT1();
+                    long storedBytes = usage.getT2();
+                    if (count >= properties.getAttachmentTenantMaxCount()) {
+                        return Mono.<Void>error(new RequestException("Attachment quota exceeded: tenant already stores "
+                                + count + " of " + properties.getAttachmentTenantMaxCount()
+                                + " allowed attachments; delete old attachments before uploading new ones"));
+                    }
+                    long projectedBytes = storedBytes + Math.max(declaredLength, 0);
+                    if (projectedBytes > properties.getAttachmentTenantMaxBytes()) {
+                        return Mono.<Void>error(new RequestException("Attachment storage quota exceeded: tenant already"
+                                + " stores " + storedBytes + " of " + properties.getAttachmentTenantMaxBytes()
+                                + " bytes; this upload would reach " + projectedBytes
+                                + "; delete old attachments before uploading new ones"));
+                    }
+                    return Mono.<Void>empty();
+                });
     }
 
     /**
@@ -177,8 +211,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     private Mono<AsynchronousFileChannel> open(Path path) {
-        return Mono.fromCallable(
-                        () -> AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))
+        return Mono.fromCallable(() ->
+                        AsynchronousFileChannel.open(path, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE))
                 // Filesystem syscalls must never run on the event loop.
                 .subscribeOn(Schedulers.boundedElastic());
     }
@@ -243,8 +277,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if (namePart.length() > nameBudget) {
             namePart = namePart.substring(0, nameBudget);
         }
-        Path path = root
-                .resolve(prefix + SymbolConstant.HYPHEN + UuidV7.next() + SymbolConstant.HYPHEN + namePart)
+        Path path = root.resolve(prefix + SymbolConstant.HYPHEN + UuidV7.next() + SymbolConstant.HYPHEN + namePart)
                 .normalize();
         if (!path.startsWith(root)) throw new IllegalStateException("Attachment file path is invalid");
         return path;

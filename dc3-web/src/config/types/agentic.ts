@@ -204,7 +204,8 @@ export interface AgenticMessage {
 export interface AgenticMessageContent {
   text?: string;
   format?: string;
-  attachments?: string[];
+  /** Attachment ids that travelled with the prompt (server stores List<Long>). */
+  attachments?: number[];
   tools?: string[];
   traces?: AgenticTraceEvent[];
   charts?: AgenticVisualizationSpec[];
@@ -276,7 +277,8 @@ export interface AgenticMessageTokens {
  * AgenticAttachment data contract.
  */
 export interface AgenticAttachment {
-  id: string;
+  /** Numeric database id (server Long) — also used as the chat request attachment id. */
+  id: number;
   conversationId: string;
   fileName: string;
   contentType: string;
@@ -328,7 +330,8 @@ export interface AgenticChatCompletionRequest {
    * (OpenAI stateless style); the generated conversation appears in the session list.
    */
   conversationId?: string;
-  attachments?: string[];
+  /** Attachment ids to summarize into the prompt (server expects List<Long>). */
+  attachments?: number[];
   reasoning?: boolean;
 }
 

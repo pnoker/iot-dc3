@@ -21,8 +21,13 @@
 spring:
   ai:
     openai:
-      # Used only by Spring AI's fallback ChatClient when no database model/provider matches.
+      # Used only by Spring AI's fallback ChatClient when no database model/provider
+      # matches AND dc3.agentic.transport-fallback-enabled is explicitly true (it is
+      # off by default: the fallback bypasses per-tenant accounting).
       # Normal Agentic provider credentials are loaded from dc3_model_provider.
+      # NOTE: provider base URLs must resolve exclusively to public addresses —
+      # private/loopback hosts are rejected before the server connects (SSRF guard,
+      # no allowlist). Internal model gateways need a publicly resolvable hostname.
       base-url: ${AGENTIC_FALLBACK_OPENAI_BASE_URL:https://api.openai.com}
       api-key: ${AGENTIC_FALLBACK_OPENAI_API_KEY:}
       chat:
@@ -42,3 +47,31 @@ dc3:
     fallback-reasoning-enabled: ${AGENTIC_FALLBACK_REASONING_ENABLED:false}
     memory-max-messages: ${AGENTIC_MEMORY_MAX_MESSAGES:50}
     attachment-storage-path: ${AGENTIC_ATTACHMENT_STORAGE_PATH:dc3/data/upload/agentic/attachment}
+    # Provider API keys are AES-GCM encrypted at rest with this base64 256-bit master
+    # key. Blank derives a stable key from the platform security key (local/dev only);
+    # production MUST set an explicit key: `openssl rand -base64 32`.
+    security-master-key: ${DC3_AGENTIC_MASTER_KEY:}
+    # Transport hardening. Requests waiting longer than the acquire timeout for an
+    # in-flight slot fail fast with an UNAVAILABLE problem instead of queueing forever.
+    transport-acquire-timeout-seconds: ${AGENTIC_TRANSPORT_ACQUIRE_TIMEOUT_SECONDS:30}
+    # Upper bound of in-flight model requests across ALL providers for paths with no
+    # provider-specific semaphore (fallback model, uncached model configs).
+    transport-global-max-concurrent-requests: ${AGENTIC_TRANSPORT_GLOBAL_MAX_CONCURRENT_REQUESTS:16}
+    # Keep OFF in production: the platform-wide fallback bypasses per-tenant accounting.
+    # With it off, tenants without a model configuration get a clear UNAVAILABLE problem
+    # instead of silently using the shared provider.
+    transport-fallback-enabled: ${AGENTIC_TRANSPORT_FALLBACK_ENABLED:false}
+    # Per-tenant chat requests per second enforced at the chat entry point; 0 disables.
+    transport-per-tenant-qps: ${AGENTIC_TRANSPORT_PER_TENANT_QPS:0}
+    # TTL of the in-process provider/model/client caches; bounds staleness after
+    # out-of-band provider edits in multi-replica deployments.
+    transport-cache-ttl-seconds: ${AGENTIC_TRANSPORT_CACHE_TTL_SECONDS:300}
+    # Upper bound of cached connectivity check results.
+    check-cache-maximum-size: ${AGENTIC_CHECK_CACHE_MAXIMUM_SIZE:256}
+    # Attachment hardening: uploads outside the extension whitelist are rejected
+    # before any byte is written, and per-tenant count/byte quotas are enforced
+    # with the current usage reported on rejection.
+    attachment-allowed-extensions: ${AGENTIC_ATTACHMENT_ALLOWED_EXTENSIONS:png,jpg,jpeg,gif,webp,csv,txt,json,md,pdf}
+    attachment-tenant-max-count: ${AGENTIC_ATTACHMENT_TENANT_MAX_COUNT:2000}
+    attachment-tenant-max-bytes: ${AGENTIC_ATTACHMENT_TENANT_MAX_BYTES:1073741824}
+    attachment-name-max-length: ${AGENTIC_ATTACHMENT_NAME_MAX_LENGTH:128}

@@ -187,7 +187,15 @@ public class ChatClientFactory {
                 && properties.isFallbackToolCallingEnabled();
     }
 
-    /** Drop cached configs, providers and clients owned by the provider. */
+    /**
+     * Drop cached configs, providers and clients owned by the provider. The in-flight
+     * semaphores deliberately survive the eviction: their key space is bounded by the
+     * (tenant, provider) rows the database can hold, so keeping them cannot leak, while
+     * removing one that still has outstanding leases would let a freshly rebuilt
+     * semaphore admit a full extra round of requests (transient over-admission) and
+     * orphan the already-registered permit gauge — the meter registry keeps the old
+     * gauge under the same tags and silently drops the re-registration.
+     */
     public void evict(Long providerId) {
         providerCache.asMap().keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
         clientCache.asMap().entrySet().removeIf(entry -> {
@@ -203,7 +211,6 @@ public class ChatClientFactory {
                 .asMap()
                 .entrySet()
                 .removeIf(entry -> Objects.equals(entry.getValue().getProviderId(), providerId));
-        inFlightSemaphores.keySet().removeIf(key -> Objects.equals(key.providerId(), providerId));
     }
 
     /**
@@ -213,6 +220,12 @@ public class ChatClientFactory {
      * running unthrottled. Waiting longer than
      * {@code dc3.agentic.transport-acquire-timeout-seconds} fails fast with an
      * UNAVAILABLE problem instead of queueing forever.
+     *
+     * <p>Cancellation can land after {@code tryAcquire} granted the permit but before
+     * the lease is emitted downstream; the discarded lease is routed back here and
+     * released so the slot never leaks (verified against reactor-core's
+     * {@code MonoCallable}: a callable value produced into a cancelled subscription
+     * goes through {@code Operators.onDiscard}).
      */
     public Mono<InFlightLease> acquireInFlightSlot(String model, Long tenantId) {
         return Mono.fromCallable(() -> {
@@ -232,6 +245,7 @@ public class ChatClientFactory {
                     }
                     return new InFlightLease(semaphore);
                 })
+                .doOnDiscard(InFlightLease.class, this::releaseInFlightSlot)
                 .subscribeOn(slotScheduler);
     }
 

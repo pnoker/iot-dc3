@@ -17,6 +17,8 @@
 
 import {httpDelete, httpGet, httpPost} from '@/api/common';
 import {API_AGENTIC_BASE} from '@/config/constant/api';
+import {AXIOS_CONFIG} from '@/config/constant/axios';
+import {handleAuthFailure} from '@/config/axios';
 import type {
   AgenticAction,
   AgenticAttachment,
@@ -35,7 +37,7 @@ import type {
   PageQuery,
   PageResult,
 } from '@/config/types';
-import {buildAuthHeaders, resetAuthSession} from '@/utils/authSession';
+import {buildAuthHeaders} from '@/utils/authSession';
 
 interface OpenAIChunk {
   object?: string;
@@ -349,12 +351,10 @@ const buildFetchHeaders = (): HeadersInit => ({
 });
 
 const handleStreamHttpError = async (response: Response): Promise<never> => {
-  if (response.status === 401) {
-    // Drop only the auth keys — never nuke the whole storage. The token cookie
-    // is cleared server-side on 401; here we just remove the frontend flag,
-    // mirroring the axios interceptor's 401 handling.
-    resetAuthSession();
-    window.location.hash = '#/login';
+  if (response.status === AXIOS_CONFIG.UNAUTHORIZED_STATUS) {
+    // Same recovery as the axios interceptor: aggregated warning toast,
+    // auth-session reset and a router redirect — one helper, both transports.
+    handleAuthFailure();
   }
 
   const message = await response.text();

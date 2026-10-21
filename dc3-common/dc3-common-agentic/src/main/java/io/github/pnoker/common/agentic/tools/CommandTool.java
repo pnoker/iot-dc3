@@ -30,7 +30,9 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 /**
- * Command-domain tools exposed to the LLM via Spring AI @Tool.
+ * Command-domain tools exposed to the LLM through the reactive tool registry
+ * ({@code ReactiveAgenticToolRegistry}) — the single registration path both
+ * runtimes (Spring AI chat client and OpenAI-compatible loop) share.
  *
  * @author pnoker
  * @since 2016.10.1

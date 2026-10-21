@@ -52,8 +52,6 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class InsightTool {
 
-    private static final String DOMAIN = "insight";
-
     /** Upper bound of the failure message returned to the model. */
     private static final int FAILURE_MESSAGE_MAX_LENGTH = 200;
 
