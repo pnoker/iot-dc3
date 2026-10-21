@@ -475,6 +475,9 @@ public class ReactiveAgenticToolRegistry {
     /** Immutable traced snapshot, built once at construction. */
     private final Map<String, ReactiveAgenticTool> toolsSnapshot;
 
+    /** Optional meter registry; tool tracing records call counters and durations when present. */
+    private final io.micrometer.core.instrument.MeterRegistry meterRegistry;
+
     /** Create the registry over the full platform tool set. */
     @Autowired
     public ReactiveAgenticToolRegistry(
@@ -490,7 +493,8 @@ public class ReactiveAgenticToolRegistry {
             TenantTool tenantTool,
             UserTool userTool,
             SystemTool systemTool,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            org.springframework.beans.factory.ObjectProvider<io.micrometer.core.instrument.MeterRegistry> meterRegistryProvider) {
         this.pointValueTool = pointValueTool;
         this.pointTool = pointTool;
         this.profileTool = profileTool;
@@ -503,6 +507,8 @@ public class ReactiveAgenticToolRegistry {
         this.tenantTool = tenantTool;
         this.userTool = userTool;
         this.systemTool = systemTool;
+        this.meterRegistry =
+                meterRegistryProvider == null ? null : meterRegistryProvider.getIfAvailable();
         this.toolsSnapshot = buildSnapshot(objectMapper);
     }
 
@@ -527,7 +533,7 @@ public class ReactiveAgenticToolRegistry {
         registerHistoryTools(tools, mapper);
         registerContextTools(tools, mapper);
         Map<String, ReactiveAgenticTool> traced = new LinkedHashMap<>();
-        tools.forEach((name, tool) -> traced.put(name, new ReactiveAgenticToolTracing(name, tool)));
+        tools.forEach((name, tool) -> traced.put(name, new ReactiveAgenticToolTracing(name, tool, meterRegistry)));
         return java.util.Collections.unmodifiableMap(traced);
     }
 

@@ -109,7 +109,7 @@ class ChatClientConfigTest {
                 tenantTool,
                 userTool,
                 systemTool,
-                new ObjectMapper());
+                new ObjectMapper(), null);
         provider = config.agenticToolCallbackProvider(reactiveToolRegistry);
     }
 
@@ -139,7 +139,7 @@ class ChatClientConfigTest {
         ProfileTool profileTool = new ProfileTool(Optional.of(profileFacade));
         ReactiveAgenticToolRegistry registry = new ReactiveAgenticToolRegistry(
                 null, null, profileTool, null, null, null, null, null, null, null, null, null,
-                new ObjectMapper());
+                new ObjectMapper(), null);
         assertThat(registry.tools())
                 .containsOnlyKeys(
                         "lookupProfileById", "lookupProfilesByIds", "searchProfiles", "listProfilesByDeviceId");

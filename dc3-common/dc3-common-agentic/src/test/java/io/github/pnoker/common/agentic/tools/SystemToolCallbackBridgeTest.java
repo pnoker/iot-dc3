@@ -60,7 +60,7 @@ class SystemToolCallbackBridgeTest {
                 mock(TenantTool.class),
                 mock(UserTool.class),
                 systemTool,
-                new ObjectMapper());
+                new ObjectMapper(), null);
     }
 
     @Test

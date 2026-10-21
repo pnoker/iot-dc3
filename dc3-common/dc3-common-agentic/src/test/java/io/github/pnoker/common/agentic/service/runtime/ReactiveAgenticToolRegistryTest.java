@@ -54,7 +54,7 @@ class ReactiveAgenticToolRegistryTest {
                 mock(TenantTool.class),
                 mock(UserTool.class),
                 mock(SystemTool.class),
-                new ObjectMapper());
+                new ObjectMapper(), null);
     }
 
     @Test

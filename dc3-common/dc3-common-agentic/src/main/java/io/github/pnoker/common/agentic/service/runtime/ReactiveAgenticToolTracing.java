@@ -29,10 +29,17 @@ import reactor.core.publisher.Mono;
 final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
     private final ReactiveAgenticTool delegate;
     private final String name;
+    private final io.micrometer.core.instrument.MeterRegistry meterRegistry;
 
     ReactiveAgenticToolTracing(String name, ReactiveAgenticTool delegate) {
+        this(name, delegate, null);
+    }
+
+    ReactiveAgenticToolTracing(String name, ReactiveAgenticTool delegate,
+            io.micrometer.core.instrument.MeterRegistry meterRegistry) {
         this.name = Objects.requireNonNull(name, "name");
         this.delegate = Objects.requireNonNull(delegate, "delegate");
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -52,15 +59,43 @@ final class ReactiveAgenticToolTracing implements ReactiveAgenticTool {
     public Mono<?> call(String arguments, ToolContext context) {
         return Mono.defer(() -> {
             AgenticToolContextUtil.recordToolInvocation(context, name, delegate.domain(), name);
+            long startNanos = System.nanoTime();
             return delegate.call(arguments, context)
                     .cast(Object.class)
-                    .doOnNext(result -> recordResult(context, result))
-                    .doOnError(error -> AgenticToolContextUtil.recordToolError(
-                            context, name, sanitizeErrorMessage(error)))
+                    .doOnNext(result -> {
+                        recordResult(context, result);
+                        recordMetrics(startNanos, outcomeOf(result));
+                    })
+                    .doOnError(error -> {
+                        AgenticToolContextUtil.recordToolError(context, name, sanitizeErrorMessage(error));
+                        recordMetrics(startNanos, "error");
+                    })
                     .onErrorResume(error -> error instanceof CancellationException
                             ? Mono.error(error)
                             : Mono.just((Object) AgenticToolResult.error(sanitizeErrorMessage(error))));
         });
+    }
+
+    /** Map a tool envelope to a compact metric outcome tag. */
+    private static String outcomeOf(Object result) {
+        if (result instanceof AgenticToolResult<?> toolResult) {
+            return toolResult.success() ? "ok" : toolResult.code().toLowerCase();
+        }
+        return "ok";
+    }
+
+    /** Record call counter and duration per tool/domain; absent registry is a no-op. */
+    private void recordMetrics(long startNanos, String outcome) {
+        if (meterRegistry == null) {
+            return;
+        }
+        String domain = delegate.domain();
+        meterRegistry
+                .counter("agentic.tool.calls", "tool", name, "domain", domain, "outcome", outcome)
+                .increment();
+        meterRegistry
+                .timer("agentic.tool.duration", "tool", name, "domain", domain)
+                .record(java.time.Duration.ofNanos(System.nanoTime() - startNanos));
     }
 
     /**

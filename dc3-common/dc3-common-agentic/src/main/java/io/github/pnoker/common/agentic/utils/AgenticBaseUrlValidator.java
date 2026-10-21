@@ -62,6 +62,15 @@ public class AgenticBaseUrlValidator {
     /** DNS resolver seam; the production constructor wires {@code InetAddress::getAllByName}. */
     private final DnsResolver resolver;
 
+    /**
+     * Whether plain http base URLs are rejected on top of the address rules. Defaults
+     * to true in the Spring context: provider API keys must not cross the network in
+     * clear text. Explicitly constructed instances (tests) keep the lenient default
+     * so the address rules stay independently testable.
+     */
+    @org.springframework.beans.factory.annotation.Value("${dc3.agentic.security-base-url-https-only:true}")
+    private boolean httpsOnly;
+
     private final Cache<String, Boolean> resolutionVerdicts = Caffeine.newBuilder()
             .maximumSize(RESOLUTION_CACHE_MAXIMUM_SIZE)
             .expireAfterWrite(RESOLUTION_CACHE_TTL)
@@ -73,9 +82,20 @@ public class AgenticBaseUrlValidator {
         this(InetAddress::getAllByName);
     }
 
-    /** Constructor with an injectable resolver (test seam). */
+    /** Constructor with an injectable resolver (test seam); https-only stays off. */
     public AgenticBaseUrlValidator(DnsResolver resolver) {
         this.resolver = resolver;
+    }
+
+    /**
+     * Constructor with an injectable resolver and an explicit https-only policy.
+     *
+     * @param resolver  injectable resolver (test seam)
+     * @param httpsOnly whether plain http base URLs are rejected
+     */
+    public AgenticBaseUrlValidator(DnsResolver resolver, boolean httpsOnly) {
+        this.resolver = resolver;
+        this.httpsOnly = httpsOnly;
     }
 
     /** Resolver contract allowing the checked {@link UnknownHostException}. */
@@ -143,6 +163,11 @@ public class AgenticBaseUrlValidator {
         if (!"http".equalsIgnoreCase(scheme) && !"https".equalsIgnoreCase(scheme)) {
             throw new RequestException("Provider base URL must use the http or https scheme");
         }
+        if ("http".equalsIgnoreCase(scheme) && httpsOnly) {
+            throw new RequestException(
+                    "Provider base URL must use https; set dc3.agentic.security-base-url-https-only=false only for "
+                            + "trusted plain-http deployments");
+        }
         if (StringUtils.isBlank(uri.getHost())) {
             throw new RequestException("Provider base URL must carry a host name");
         }
@@ -200,7 +225,14 @@ public class AgenticBaseUrlValidator {
     private static boolean isBlockedIpv6(Inet6Address address) {
         byte[] bytes = address.getAddress();
         // Unique-local fc00::/7 (site-local fe80::/10 is covered by isLinkLocalAddress).
-        return (bytes[0] & 0xFE) == 0xFC;
+        if ((bytes[0] & 0xFE) == 0xFC) return true;
+        // NAT64 64:ff9b::/96 maps straight back into IPv4 space (including private).
+        if (bytes[0] == 0x00 && bytes[1] == 0x64 && bytes[2] == (byte) 0xFF && bytes[3] == (byte) 0x9B) return true;
+        // 6to4 2002::/16 embeds an arbitrary IPv4 address.
+        if (bytes[0] == 0x20 && bytes[1] == 0x02) return true;
+        // IPv4-mapped ::ffff:0:0/96 for resolvers that skip JDK normalization.
+        if (bytes[10] == (byte) 0xFF && bytes[11] == (byte) 0xFF) return true;
+        return false;
     }
 
     private static boolean isBlockedIpv4(Inet4Address address) {
