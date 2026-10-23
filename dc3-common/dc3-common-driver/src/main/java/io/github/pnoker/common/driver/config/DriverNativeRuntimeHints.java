@@ -405,6 +405,18 @@ public class DriverNativeRuntimeHints implements RuntimeHintsRegistrar {
                         MemberCategory.INVOKE_PUBLIC_METHODS,
                         MemberCategory.INVOKE_DECLARED_METHODS);
 
+        // LwM2M driver batch (lwm2m): leshan-core's ObjectLoader.loadAllDefault
+        // streams its default OMA model DDFs from models/*.xml inside the
+        // leshan-core jar, and the jar ships no native-image configuration of
+        // its own. Dropped from the image, LeshanServerBuilder.build() dies
+        // with "Unable to load models" before the driver ever registers.
+        // Glob, not regex: Spring Boot 4 serializes resource hints into the
+        // unified reachability-metadata.json, where resource entries are
+        // globs (a "models/.*" regex-style pattern would only match names
+        // starting with a literal dot). String-based patterns keep non-lwm2m
+        // drivers unaffected (leshan-core is not on their classpaths).
+        hints.resources().registerPattern("models/*");
+
         // JDBC driver batch (mysql / postgresql / sqlserver / oracle): the
         // dialect drivers are instantiated reflectively by DriverManager /
         // HikariCP. String-based TypeReferences - the classes only exist on
