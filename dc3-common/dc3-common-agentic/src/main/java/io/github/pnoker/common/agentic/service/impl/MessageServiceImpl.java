@@ -36,7 +36,7 @@ import reactor.core.publisher.Mono;
  * @author pnoker
  * @since 2026.10.21
  */
-@Service
+@Service("agenticMessageService")
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
 
