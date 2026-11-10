@@ -28,6 +28,7 @@ import io.github.pnoker.common.agentic.entity.model.AgenticMessageContent;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.agentic.service.chat.AgenticRunTrace;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.utils.JsonUtil;
@@ -190,7 +191,9 @@ class OpenAiCompatibleAgenticRuntimeConversationTest {
                         null,
                         new tools.jackson.databind.ObjectMapper(),
                         null),
-                new AgenticProperties());
+                new AgenticProperties(),
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
     }
 
     private AgenticRuntimeResult await(reactor.core.publisher.Mono<AgenticRuntimeResult> result) {

@@ -57,6 +57,7 @@ import reactor.core.publisher.Mono;
 public class OpenAiCompatibleConnectivityChecker implements AgenticConnectivityChecker {
 
     private final AgenticProperties properties;
+    private final io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator baseUrlValidator;
 
     @Override
     public boolean supports(AgenticModelProviderTypeEnum providerType) {
@@ -71,6 +72,16 @@ public class OpenAiCompatibleConnectivityChecker implements AgenticConnectivityC
                 return Mono.just(ConnectivityLevelResult.fail(
                         0, ConnectivityErrorTypeEnum.UNREACHABLE, "Base URL is blank", null));
             }
+            // A probe sends the (possibly real) API key to the target: re-validate that the
+            // host still resolves to public space before building the client.
+            return validateTargetUrl(target)
+                    .flatMap(allowed ->
+                            allowed ? Mono.defer(() -> checkL1Probed(target, budget)) : Mono.just(urlRejected()));
+        });
+    }
+
+    private Mono<ConnectivityLevelResult> checkL1Probed(ModelProviderBO target, Duration budget) {
+        return Mono.defer(() -> {
             long startNanos = System.nanoTime();
             OpenAIClient client = createClient(target, budget);
             return Mono.fromFuture(client.async().models().list())
@@ -93,6 +104,15 @@ public class OpenAiCompatibleConnectivityChecker implements AgenticConnectivityC
                 return Mono.just(ConnectivityLevelResult.fail(
                         0, ConnectivityErrorTypeEnum.UNREACHABLE, "Base URL is blank", null));
             }
+            return validateTargetUrl(target)
+                    .flatMap(allowed -> allowed
+                            ? Mono.defer(() -> checkL2Probed(target, model, budget))
+                            : Mono.just(urlRejected()));
+        });
+    }
+
+    private Mono<ConnectivityLevelResult> checkL2Probed(ModelProviderBO target, String model, Duration budget) {
+        return Mono.defer(() -> {
             long startNanos = System.nanoTime();
             OpenAIClient client = createClient(target, budget);
             ChatCompletionCreateParams params = ChatCompletionCreateParams.builder()
@@ -106,6 +126,25 @@ public class OpenAiCompatibleConnectivityChecker implements AgenticConnectivityC
                     .onErrorResume(error -> Mono.just(failure(startNanos, target, error)))
                     .doFinally(signal -> client.close());
         });
+    }
+
+    /** Validate the target URL reactively; a rejection maps to {@code false} with the reason captured. */
+    private Mono<Boolean> validateTargetUrl(ModelProviderBO target) {
+        return baseUrlValidator
+                .validateReactive(target.getBaseUrl())
+                .thenReturn(Boolean.TRUE)
+                .onErrorResume(error -> {
+                    log.info(
+                            "Agentic probe skipped: base URL rejected, host rejected by policy: {}",
+                            error.getMessage());
+                    return Mono.just(Boolean.FALSE);
+                });
+    }
+
+    /** The fixed outcome for a target whose base URL fails public-resolution policy. */
+    private ConnectivityLevelResult urlRejected() {
+        return ConnectivityLevelResult.fail(
+                0, ConnectivityErrorTypeEnum.UNREACHABLE, "Base URL rejected by public-resolution policy", null);
     }
 
     private OpenAIClient createClient(ModelProviderBO target, Duration budget) {

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +28,14 @@ class OpenAiCompatibleAgenticRuntimeTest {
 
     @Test
     void assistantToolCallMessagePreservesReasoningContentForProviderContinuation() {
-        OpenAiCompatibleAgenticRuntime runtime =
-                new OpenAiCompatibleAgenticRuntime(null, null, null, null, new AgenticProperties());
+        OpenAiCompatibleAgenticRuntime runtime = new OpenAiCompatibleAgenticRuntime(
+                null,
+                null,
+                null,
+                null,
+                new AgenticProperties(),
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
 
         ChatCompletionMessageParam message = runtime.assistantToolCallMessage(
                 null,

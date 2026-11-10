@@ -97,6 +97,7 @@ public class ChatClientFactory {
     private final ChatClient.Builder fallbackBuilder;
     private final AgenticProperties properties;
     private final MeterRegistry meterRegistry;
+    private final io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator baseUrlValidator;
 
     @Value("${spring.ai.openai.chat.options.model:gpt-4o}")
     private String fallbackModel;
@@ -107,12 +108,14 @@ public class ChatClientFactory {
             ReactiveModelConfigStore modelConfigStore,
             ChatClient.Builder fallbackBuilder,
             AgenticProperties properties,
-            MeterRegistry meterRegistry) {
+            MeterRegistry meterRegistry,
+            io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator baseUrlValidator) {
         this.modelProviderStore = modelProviderStore;
         this.modelConfigStore = modelConfigStore;
         this.fallbackBuilder = fallbackBuilder;
         this.properties = properties;
         this.meterRegistry = meterRegistry;
+        this.baseUrlValidator = baseUrlValidator;
         Duration ttl = Duration.ofSeconds(properties.getTransportCacheTtlSeconds());
         this.clientCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
         this.providerCache = Caffeine.newBuilder().expireAfterWrite(ttl).build();
@@ -361,17 +364,25 @@ public class ChatClientFactory {
         ChatClient cached = clientCache.getIfPresent(key);
         if (cached != null) return cached;
         ModelProviderBO provider = providerCache.getIfPresent(key);
-        if (provider == null
-                || provider.getEnableFlag() == null
-                || provider.getEnableFlag().getIndex() != 0) {
-            log.warn("Agentic provider cache miss or disabled, tenantId={}, providerId={}", tenantId, providerId);
-            return uncachedFallbackClient(tenantId, String.valueOf(providerId), "provider cache miss or disabled");
+        if (provider == null) {
+            // Routine after the cache TTL expires; only the disabled-provider branch is abnormal.
+            log.debug("Agentic provider cache miss, tenantId={}, providerId={}", tenantId, providerId);
+            return uncachedFallbackClient(tenantId, String.valueOf(providerId), "provider cache miss");
         }
+        if (provider.getEnableFlag() == null || provider.getEnableFlag().getIndex() != 0) {
+            log.warn("Agentic provider disabled, tenantId={}, providerId={}", tenantId, providerId);
+            return uncachedFallbackClient(tenantId, String.valueOf(providerId), "provider disabled");
+        }
+        // Re-validate the base URL at every client build: provider DNS may have moved since
+        // the save-time check, and the stored API key must never reach an internal address.
+        // The only caller path runs on bounded elastic (AgenticPromptBuilder via the Spring AI
+        // runtime), so the blocking DNS check never sits on an event loop.
+        baseUrlValidator.validate(provider.getBaseUrl());
         ChatClient client = AgenticModelProviderTypeEnum.ANTHROPIC.equals(provider.getProviderType())
                 ? buildAnthropicClient(provider)
                 : buildOpenAiClient(provider);
         clientCache.put(key, client);
-        log.info(
+        log.debug(
                 "Agentic ChatClient created, tenantId={}, providerId={}, name={}, type={}, baseUrl={}",
                 tenantId,
                 providerId,

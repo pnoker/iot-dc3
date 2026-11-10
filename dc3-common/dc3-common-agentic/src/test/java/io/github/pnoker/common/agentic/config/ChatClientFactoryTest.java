@@ -22,6 +22,7 @@ import static org.mockito.Mockito.lenient;
 import io.github.pnoker.common.agentic.entity.bo.ModelConfigBO;
 import io.github.pnoker.common.agentic.repository.ReactiveModelConfigStore;
 import io.github.pnoker.common.agentic.repository.ReactiveModelProviderStore;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.DefaultFlagEnum;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -60,8 +61,14 @@ class ChatClientFactoryTest {
     void setUp() throws Exception {
         properties = new AgenticProperties();
         meterRegistry = new SimpleMeterRegistry();
-        factory =
-                new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties, meterRegistry);
+        factory = new ChatClientFactory(
+                modelProviderStore,
+                modelConfigStore,
+                fallbackBuilder,
+                properties,
+                meterRegistry,
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
         injectField("fallbackModel", "gpt-4o");
         header = new RequestHeader.PrincipalHeader();
         header.setTenantId(1L);
@@ -125,8 +132,14 @@ class ChatClientFactoryTest {
     @Test
     void configCacheEntriesExpireAfterTheTtl() throws Exception {
         properties.setTransportCacheTtlSeconds(1);
-        factory =
-                new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties, meterRegistry);
+        factory = new ChatClientFactory(
+                modelProviderStore,
+                modelConfigStore,
+                fallbackBuilder,
+                properties,
+                meterRegistry,
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
         injectField("fallbackModel", "gpt-4o");
         stubTenantModel("tenant-model");
 
@@ -154,8 +167,14 @@ class ChatClientFactoryTest {
         // instead of running unthrottled, and overflow must fail fast.
         properties.setTransportGlobalMaxConcurrentRequests(1);
         properties.setTransportAcquireTimeoutSeconds(1);
-        factory =
-                new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties, meterRegistry);
+        factory = new ChatClientFactory(
+                modelProviderStore,
+                modelConfigStore,
+                fallbackBuilder,
+                properties,
+                meterRegistry,
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
         injectField("fallbackModel", "gpt-4o");
 
         ChatClientFactory.InFlightLease lease =
@@ -197,8 +216,14 @@ class ChatClientFactoryTest {
         // Fresh registry: registering a second global-permits gauge on a shared
         // registry would keep serving the first factory's gauge (16 permits).
         SimpleMeterRegistry raceRegistry = new SimpleMeterRegistry();
-        factory =
-                new ChatClientFactory(modelProviderStore, modelConfigStore, fallbackBuilder, properties, raceRegistry);
+        factory = new ChatClientFactory(
+                modelProviderStore,
+                modelConfigStore,
+                fallbackBuilder,
+                properties,
+                raceRegistry,
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
         injectField("fallbackModel", "gpt-4o");
 
         // Hold the only global slot.

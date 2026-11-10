@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.github.pnoker.common.agentic.config.AgenticProperties;
 import io.github.pnoker.common.agentic.entity.bo.ModelProviderBO;
 import io.github.pnoker.common.agentic.entity.model.ConnectivityLevelResult;
+import io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator;
 import io.github.pnoker.common.enums.AgenticModelProviderTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityErrorTypeEnum;
 import io.github.pnoker.common.enums.ConnectivityStatusEnum;
@@ -54,7 +55,10 @@ class OpenAiCompatibleConnectivityCheckerIT {
         properties = new AgenticProperties();
         properties.setCheckL1TimeoutSeconds(5);
         properties.setCheckL2TimeoutSeconds(5);
-        checker = new OpenAiCompatibleConnectivityChecker(properties);
+        checker = new OpenAiCompatibleConnectivityChecker(
+                properties,
+                new AgenticBaseUrlValidator(
+                        host -> new java.net.InetAddress[] {java.net.InetAddress.getByName("1.1.1.1")}, false));
     }
 
     @AfterEach

@@ -151,11 +151,13 @@ public class AgenticBaseUrlValidator {
 
     /**
      * Resolve and validate the base URL host NOW and return a resolver that always
-     * answers with exactly those validated addresses. Wiring this into the HTTP
-     * client's DNS hook closes the rebinding window: the connection cannot be
-     * re-resolved to a different (private) address between validation and connect.
-     * The functional shape keeps this module free of any HTTP-client dependency;
-     * OkHttp adapters are {@code hostname -> pinnedDns(url).apply(hostname)}.
+     * answers with exactly those validated addresses. This is the pinned-DNS seam
+     * for transports that expose a DNS hook; the currently pinned OpenAI/Anthropic
+     * OkHttp client builders expose none, so the control actually enforced today is
+     * re-validation at every transport build and probe site (see ChatClientFactory,
+     * OpenAiCompatibleAgenticRuntime, OpenAiCompatibleConnectivityChecker). That
+     * bounds the rebinding window to the resolution-verdict cache TTL instead of
+     * leaving it unbounded after the one-time provider save validation.
      *
      * @param baseUrl the base URL to pin
      * @return a resolver fixed to the validated addresses of the base URL host

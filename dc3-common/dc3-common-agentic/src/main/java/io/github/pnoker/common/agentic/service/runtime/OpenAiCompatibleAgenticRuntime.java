@@ -99,6 +99,7 @@ public class OpenAiCompatibleAgenticRuntime {
     private final ReactiveAgenticToolRegistry reactiveToolRegistry;
 
     private final AgenticProperties properties;
+    private final io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator baseUrlValidator;
 
     private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
 
@@ -108,12 +109,14 @@ public class OpenAiCompatibleAgenticRuntime {
             AgenticPromptBuilder promptBuilder,
             @Qualifier("agenticToolCallbackProvider") ToolCallbackProvider toolCallbackProvider,
             ReactiveAgenticToolRegistry reactiveToolRegistry,
-            AgenticProperties properties) {
+            AgenticProperties properties,
+            io.github.pnoker.common.agentic.utils.AgenticBaseUrlValidator baseUrlValidator) {
         this.chatClientFactory = chatClientFactory;
         this.promptBuilder = promptBuilder;
         this.toolCallbackProvider = toolCallbackProvider;
         this.reactiveToolRegistry = reactiveToolRegistry;
         this.properties = properties;
+        this.baseUrlValidator = baseUrlValidator;
     }
 
     /**
@@ -140,27 +143,31 @@ public class OpenAiCompatibleAgenticRuntime {
      * @return a flux of stream frames
      */
     public Flux<AgenticRuntimeStreamFrame> stream(AgenticPreparedChatBO prepared) {
-        return Flux.create(sink -> {
-            AgenticBackpressureGuard guard = AgenticBackpressureGuard.create(
-                    properties.getStreamBackpressureBuffer(),
-                    properties.getStreamIdleTimeoutSeconds() * 1_000_000_000L,
-                    System::nanoTime);
-            sink.onRequest(guard::onDownstreamRequest);
+        return Flux.defer(() -> {
             ModelProviderBO provider = requireProvider(prepared);
-            OpenAIClient client = createClient(provider);
-            OpenAIClientAsync asyncClient = client.async();
-            Disposable execution = streamRound(
-                            asyncClient,
-                            prepared,
-                            initialMessages(prepared),
-                            toolCallbacksByName(),
-                            new java.util.concurrent.ConcurrentHashMap<>(),
-                            sink,
-                            guard,
-                            0)
-                    .doFinally(signal -> client.close())
-                    .subscribe(ignored -> {}, sink::error, sink::complete);
-            sink.onCancel(execution::dispose);
+            // Re-validate the base URL before the stored API key can be sent anywhere:
+            // provider DNS may have moved onto an internal address since the save-time check.
+            return baseUrlValidator.validateReactive(provider.getBaseUrl()).thenMany(Flux.create(sink -> {
+                AgenticBackpressureGuard guard = AgenticBackpressureGuard.create(
+                        properties.getStreamBackpressureBuffer(),
+                        properties.getStreamIdleTimeoutSeconds() * 1_000_000_000L,
+                        System::nanoTime);
+                sink.onRequest(guard::onDownstreamRequest);
+                OpenAIClient client = createClient(provider);
+                OpenAIClientAsync asyncClient = client.async();
+                Disposable execution = streamRound(
+                                asyncClient,
+                                prepared,
+                                initialMessages(prepared),
+                                toolCallbacksByName(),
+                                new java.util.concurrent.ConcurrentHashMap<>(),
+                                sink,
+                                guard,
+                                0)
+                        .doFinally(signal -> client.close())
+                        .subscribe(ignored -> {}, sink::error, sink::complete);
+                sink.onCancel(execution::dispose);
+            }));
         });
     }
 
@@ -176,17 +183,21 @@ public class OpenAiCompatibleAgenticRuntime {
     public Mono<AgenticRuntimeResult> call(AgenticPreparedChatBO prepared) {
         return Mono.defer(() -> {
             ModelProviderBO provider = requireProvider(prepared);
-            OpenAIClient client = createClient(provider);
-            OpenAIClientAsync asyncClient = client.async();
-            List<ChatCompletionMessageParam> messages = initialMessages(prepared);
-            return callRound(
-                            asyncClient,
-                            prepared,
-                            messages,
-                            toolCallbacksByName(),
-                            new java.util.concurrent.ConcurrentHashMap<>(),
-                            0)
-                    .doFinally(signal -> client.close());
+            // Same base-URL re-validation as the stream path: the stored API key must
+            // never be sent to a host whose DNS has moved behind the save-time check.
+            return baseUrlValidator.validateReactive(provider.getBaseUrl()).then(Mono.defer(() -> {
+                OpenAIClient client = createClient(provider);
+                OpenAIClientAsync asyncClient = client.async();
+                List<ChatCompletionMessageParam> messages = initialMessages(prepared);
+                return callRound(
+                                asyncClient,
+                                prepared,
+                                messages,
+                                toolCallbacksByName(),
+                                new java.util.concurrent.ConcurrentHashMap<>(),
+                                0)
+                        .doFinally(signal -> client.close());
+            }));
         });
     }
 
