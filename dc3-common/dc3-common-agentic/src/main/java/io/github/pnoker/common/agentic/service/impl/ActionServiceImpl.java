@@ -120,37 +120,41 @@ public class ActionServiceImpl implements ActionService {
     }
 
     private Mono<ActionBO> execute(ActionBO action, RequestHeader.PrincipalHeader header) {
-        if (!ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
-            return actionStore.updateExecutionResult(
-                    action.getActionId(),
-                    header,
-                    AgenticActionStatusEnum.FAILED,
-                    "Unsupported action type",
-                    Instant.now());
-        }
-        Map<String, Object> payload = action.getPayload();
-        return pointCommandFacade
-                .submitWrite(
-                        header.getTenantId(),
-                        longValue(payload.get("deviceId")),
-                        longValue(payload.get("pointId")),
-                        Objects.toString(payload.get("value"), ""),
-                        PointCommandSourceEnum.AGENTIC)
-                .flatMap(commandId -> actionStore.updateExecutionResult(
-                        action.getActionId(),
-                        header,
-                        AgenticActionStatusEnum.EXECUTED,
-                        "Command accepted: " + commandId,
-                        Instant.now()))
-                .onErrorResume(exception -> {
-                    log.warn("Action execution failed, actionId={}", action.getActionId(), exception);
-                    return actionStore.updateExecutionResult(
-                            action.getActionId(),
-                            header,
-                            AgenticActionStatusEnum.FAILED,
-                            exception.getMessage(),
-                            Instant.now());
-                });
+        return Mono.defer(() -> {
+            if (!ACTION_WRITE_POINT_VALUE.equals(action.getActionType())) {
+                return markFailed(action, header, "Unsupported action type");
+            }
+            Map<String, Object> payload = action.getPayload();
+            try {
+                // Payload parsing happens after claimPending flipped the status to
+                // CONFIRMED, so any parse failure must route into the same FAILED
+                // persistence — otherwise the action would strand in CONFIRMED with
+                // no way to retry it.
+                Long deviceId = longValue(payload.get("deviceId"));
+                Long pointId = longValue(payload.get("pointId"));
+                String value = Objects.toString(payload.get("value"), "");
+                return pointCommandFacade
+                        .submitWrite(header.getTenantId(), deviceId, pointId, value, PointCommandSourceEnum.AGENTIC)
+                        .flatMap(commandId -> actionStore.updateExecutionResult(
+                                action.getActionId(),
+                                header,
+                                AgenticActionStatusEnum.EXECUTED,
+                                "Command accepted: " + commandId,
+                                Instant.now()))
+                        .onErrorResume(exception -> {
+                            log.warn("Action execution failed, actionId={}", action.getActionId(), exception);
+                            return markFailed(action, header, exception.getMessage());
+                        });
+            } catch (Exception payloadError) {
+                log.warn("Action payload rejected, actionId={}", action.getActionId(), payloadError);
+                return markFailed(action, header, payloadError.getMessage());
+            }
+        });
+    }
+
+    private Mono<ActionBO> markFailed(ActionBO action, RequestHeader.PrincipalHeader header, String reason) {
+        return actionStore.updateExecutionResult(
+                action.getActionId(), header, AgenticActionStatusEnum.FAILED, reason, Instant.now());
     }
 
     private void fillCreateAudit(ActionBO entityBO, RequestHeader.PrincipalHeader header) {
