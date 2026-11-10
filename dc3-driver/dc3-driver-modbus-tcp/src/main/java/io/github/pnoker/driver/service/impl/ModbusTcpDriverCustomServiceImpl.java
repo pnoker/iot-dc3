@@ -615,6 +615,13 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
         }
 
         ConsecutiveFailure increment() {
+            long now = System.currentTimeMillis();
+            // Restart the suppression window once it has expired: keeping the original
+            // firstFailureTime would disable backoff forever after the first window
+            // even while failures continue.
+            if (now - firstFailureTime >= FAILURE_BACKOFF_MS) {
+                return new ConsecutiveFailure(1, now);
+            }
             return new ConsecutiveFailure(count + 1, firstFailureTime);
         }
 
