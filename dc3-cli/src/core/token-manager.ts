@@ -177,8 +177,9 @@ async function writeTokenFile(file: TokenFile): Promise<void> {
 /**
  * TokenManager — manages JWT token lifecycle: parse, persist, renew.
  *
- * Proactive renewal: if token expires within 1 hour, trigger renewal before
- * the API call, so the user never sees a 401.
+ * Proactive renewal: if token expires within the configured renewal threshold
+ * (settings.renewal_threshold_hours, default 1), trigger renewal before the API
+ * call, so the user never sees a 401.
  *
  * Reactive fallback: if we get a 401 anyway (clock skew, server restart),
  * retry once after renewal.
