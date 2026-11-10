@@ -62,11 +62,6 @@ jobs:
           mvn -B -DskipTests -Dcoverage.check.skip=true -Dskip.integration.tests=true
           -Dskip.unit.tests=true verify --no-transfer-progress
 
-      - name: Compile
-        run: |
-          set -euo pipefail
-          mvn -U -e -B -DskipTests compile --no-transfer-progress
-
       - name: Validate Javadoc
         run: |
           set -euo pipefail

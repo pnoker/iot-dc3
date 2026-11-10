@@ -53,7 +53,7 @@ jobs:
           set -euo pipefail
           d="$HOME/.m2/repository/org/mockito/mockito-core/${MOCKITO_VERSION}"
           f="$d/mockito-core-${MOCKITO_VERSION}.jar"
-          want=277dd2f725dd344fba6216f0bc611fae7fc4c1d8  # published sha1 of the mockito-core jar for the version resolved above (5.24.0, verified against Central metadata)
+          want=$(mvn -s .mvn/settings.xml -q help:evaluate -Dexpression=mockito.agent.sha1 -DforceStdout)  # pinned beside mockito.version in the root pom
           ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
           if ! ok; then
             echo "mockito jar missing or corrupt; refetching from Central"
@@ -128,7 +128,7 @@ jobs:
           set -euo pipefail
           d="$HOME/.m2/repository/org/mockito/mockito-core/${MOCKITO_VERSION}"
           f="$d/mockito-core-${MOCKITO_VERSION}.jar"
-          want=277dd2f725dd344fba6216f0bc611fae7fc4c1d8  # published sha1 of the mockito-core jar for the version resolved above (5.24.0, verified against Central metadata)
+          want=$(mvn -s .mvn/settings.xml -q help:evaluate -Dexpression=mockito.agent.sha1 -DforceStdout)  # pinned beside mockito.version in the root pom
           ok() { [ -f "$f" ] && echo "$want  $f" | sha1sum -c - >/dev/null 2>&1; }
           if ! ok; then
             echo "mockito jar missing or corrupt; refetching from Central"
@@ -201,7 +201,7 @@ jobs:
       - name: Build aggregate coverage report
         run: |
           set -euo pipefail
-          mvn -U -e -B -pl dc3-coverage -am -Dskip.unit.tests=true -Dskip.integration.tests=true verify --no-transfer-progress
+          mvn -e -B -pl dc3-coverage -am -Dskip.unit.tests=true -Dskip.integration.tests=true verify --no-transfer-progress
 
       - name: Upload aggregate report
         if: always()

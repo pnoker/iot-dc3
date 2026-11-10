@@ -63,7 +63,7 @@ jobs:
         if: matrix.build-mode == 'manual'
         run: |
           set -euo pipefail
-          mvn -U -e -B -DskipTests compile --no-transfer-progress
+          mvn -e -B -DskipTests compile --no-transfer-progress
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@641a925cfafe92d0fdf8b239ba4053e3f8d99d6d

@@ -177,6 +177,9 @@
              behind breaks every fork with "Error opening zip file or JAR
              manifest missing". The dependencyManagement pin keeps them together. -->
         <mockito.version>5.24.0</mockito.version>
+        <!-- Published sha1 of the mockito-core-${mockito.version} jar on Central; CI's
+             agent-integrity gate reads this so the version and its hash move together. -->
+        <mockito.agent.sha1>277dd2f725dd344fba6216f0bc611fae7fc4c1d8</mockito.agent.sha1>
         <mockito.javaagent.argLine>
             -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
         </mockito.javaagent.argLine>
