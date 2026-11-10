@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
 
 /**
- * In-memory denylist of cancelled tokens, keyed by (loginName, tenantCode).
+ * In-memory denylist of cancelled tokens, keyed by principal id.
  *
  * <p>
  * This component is an instance-local, short-lived token revocation cache. We do not store

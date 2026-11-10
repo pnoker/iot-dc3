@@ -62,8 +62,8 @@ public class TokenQuery {
      *
      */
     @Schema(
-            description =
-                    "Random salt string issued by the server during the login handshake; must be echoed back when submitting credentials.",
+            description = "Salt string issued by /token/salt. The server currently does not store or verify it — "
+                    + "clients may echo it back, but authentication does not depend on it.",
             example = "a3f9c2d1")
     private String salt;
 
@@ -72,7 +72,8 @@ public class TokenQuery {
      */
     @Schema(
             description =
-                    "Credential submitted for authentication; the plaintext password, protected in transit by HTTPS. The salt is NOT mixed into the password — it is concatenated with the server-side key to sign the JWT.",
+                    "Credential submitted for authentication; the plaintext password, protected in transit by HTTPS. "
+                            + "The JWT is signed with the server-side security key, independent of the salt.",
             example = "your-plaintext-password")
     private String password;
 
