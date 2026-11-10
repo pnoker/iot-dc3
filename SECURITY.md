@@ -13,9 +13,9 @@ The following table lists the iot-dc3 versions that are currently supported with
 
 | Version  | Supported          |
 |----------|--------------------|
-| 2025.9.x | :white_check_mark: |
-| 2025.6.x | :white_check_mark: |
-| 2025.x.x | :white_check_mark: |
+| 2026.10.x | :white_check_mark: |
+| 2026.9.x | :white_check_mark: |
+| < 2026.9 | :x:                |
 
 ## Reporting a Vulnerability
 
