@@ -223,7 +223,7 @@ defineExpose({refresh});
   .alert-list__date {
     font-size: 12px;
     font-weight: 600;
-    color: #909399;
+    color: var(--dc3-text-muted);
     padding: 4px 0 6px;
     border-bottom: 1px dashed var(--el-border-color-lighter);
     margin-bottom: 8px;
@@ -235,7 +235,7 @@ defineExpose({refresh});
 
   :deep(.el-timeline-item__timestamp) {
     font-size: 12px;
-    color: #909399;
+    color: var(--dc3-text-muted);
     margin-bottom: 2px;
   }
 
@@ -254,12 +254,12 @@ defineExpose({refresh});
 
   .alert-list__name {
     font-size: 13px;
-    color: #606266;
+    color: var(--dc3-text-regular);
   }
 
   .alert-list__message {
     font-size: 12px;
-    color: #909399;
+    color: var(--dc3-text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

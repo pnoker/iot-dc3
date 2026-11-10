@@ -228,7 +228,7 @@ watch(() => props.deviceId, refresh);
 
   .live-feed__sep {
     flex: 0 0 auto;
-    color: #dcdfe6;
+    color: var(--dc3-border-base);
   }
 
   .live-feed__value-line {
@@ -275,7 +275,7 @@ watch(() => props.deviceId, refresh);
     text-overflow: ellipsis;
     white-space: nowrap;
     font-family: 'Menlo', monospace;
-    color: #303133;
+    color: var(--dc3-text-primary);
     font-weight: 500;
     font-size: 12px;
   }

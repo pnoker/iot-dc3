@@ -554,7 +554,7 @@ onBeforeUnmount(() => {
 
   .event-overview__quick-label {
     font-size: 13px;
-    color: #606266;
+    color: var(--dc3-text-regular);
     display: inline-flex;
     align-items: center;
     gap: 4px;

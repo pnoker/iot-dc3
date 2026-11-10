@@ -116,7 +116,7 @@ defineExpose({refresh: load});
 
   :deep(.el-timeline-item__timestamp) {
     font-size: 12px;
-    color: #909399;
+    color: var(--dc3-text-muted);
     margin-bottom: 2px;
   }
 
@@ -142,7 +142,7 @@ defineExpose({refresh: load});
 
   .recent-unconfirmed__name {
     font-size: 13px;
-    color: #303133;
+    color: var(--dc3-text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -150,7 +150,7 @@ defineExpose({refresh: load});
 
   .recent-unconfirmed__message {
     font-size: 12px;
-    color: #909399;
+    color: var(--dc3-text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
