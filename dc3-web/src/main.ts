@@ -28,6 +28,11 @@ import '@/styles/global.scss'; // config app
 
 // config app
 const app = createApp(App);
+// Suppress image/text drag ghosting app-wide. This used to be an inline
+// `ondragstart` attribute on <body>, but the page CSP (no unsafe-inline)
+// blocked every inline handler, so it silently never ran; a real listener
+// both works and keeps the console free of CSP violations.
+document.body.addEventListener('dragstart', (event) => event.preventDefault());
 const pinia = createPinia();
 app.config.errorHandler = (err, _instance, info) => {
   logger.error('Global Vue error', info, err);
