@@ -148,7 +148,7 @@ public class NotifyWorker {
             }
             int nextAttempt = Objects.requireNonNullElse(task.getRetryCount(), 0) + 1;
             if (nextAttempt >= MAX_ATTEMPTS) {
-                return persistTerminal(task, result);
+                return persistTerminal(task, result, nextAttempt);
             }
             return persistRetrying(task, result, nextAttempt).then(Mono.defer(() -> {
                 NotifyTaskDTO retry = NotifyTaskDTO.builder()
@@ -179,6 +179,10 @@ public class NotifyWorker {
      * place — the row id was assigned when the PENDING row was inserted.
      */
     private Mono<Void> persistTerminal(NotifyTaskDTO task, NotifySendResult result) {
+        return persistTerminal(task, result, task.getRetryCount());
+    }
+
+    private Mono<Void> persistTerminal(NotifyTaskDTO task, NotifySendResult result, Integer attempt) {
         return notifyHistoryStore
                 .updateDelivery(
                         task.getTenantId(),
@@ -187,7 +191,7 @@ public class NotifyWorker {
                         Objects.toString(result.getTarget(), ""),
                         toResponseExt(result),
                         Objects.toString(result.getErrorMessage(), ""),
-                        task.getRetryCount())
+                        attempt)
                 .flatMap(updated -> updated
                         ? Mono.<Void>empty()
                         : Mono.error(new IllegalStateException("notify history row not found")));
