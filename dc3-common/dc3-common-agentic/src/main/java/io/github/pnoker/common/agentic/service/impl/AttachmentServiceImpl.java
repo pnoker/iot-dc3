@@ -189,16 +189,11 @@ public class AttachmentServiceImpl implements AttachmentService {
      */
     private Throwable classifyUploadFailure(
             String conversationId, RequestHeader.PrincipalHeader header, Throwable error) {
-        log.warn(
-                "Attachment upload failed, conversationId={}, tenantId={}, userId={}, error={}: {}",
-                conversationId,
-                header.getTenantId(),
-                header.getUserId(),
-                error.getClass().getSimpleName(),
-                error.getMessage());
         if (error instanceof BusinessException businessError) {
             return businessError;
         }
+        // One warn with the stack for infrastructure faults only; client validation
+        // errors above pass through untouched and are already logged by their handlers.
         log.warn(
                 "Attachment upload failed, conversationId={}, tenantId={}, userId={}, error={}: {}",
                 conversationId,

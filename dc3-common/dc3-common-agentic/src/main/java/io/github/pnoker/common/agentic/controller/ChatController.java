@@ -29,7 +29,6 @@ import java.time.Duration;
 import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -61,7 +60,6 @@ import tools.jackson.databind.ObjectMapper;
  * @author pnoker
  * @since 2016.10.1
  */
-@Slf4j
 @Tag(
         name = "chat",
         description =
