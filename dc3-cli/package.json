@@ -36,8 +36,8 @@
     "typecheck": "tsc --noEmit",
     "typecheck:test": "tsc -p tsconfig.test.json --noEmit",
     "prepublishOnly": "pnpm typecheck && pnpm test && pnpm build",
-    "headers": "find src -name '*.ts' | xargs node scripts/add-license-header.mjs",
-    "headers:check": "find src -name '*.ts' | xargs node scripts/add-license-header.mjs --check"
+    "headers": "git ls-files \"src/**/*.ts\" | xargs node scripts/add-license-header.mjs",
+    "headers:check": "git ls-files \"src/**/*.ts\" | xargs node scripts/add-license-header.mjs --check"
   },
   "dependencies": {
     "commander": "^12.1.0",

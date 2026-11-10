@@ -41,7 +41,9 @@ ${body
 
 let missing = 0;
 for (const file of files) {
-  const src = readFileSync(file, 'utf8');
+  // Normalize CRLF checkouts before matching: on Windows a CRLF working copy
+  // would false-positive every file as headerless.
+  const src = readFileSync(file, 'utf8').split('\r\n').join('\n');
   const isVue = file.endsWith('.vue');
   const vueHeader = `<!--\n${header
     .split('\n')

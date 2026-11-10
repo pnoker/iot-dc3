@@ -57,8 +57,8 @@
     "test:all": "pnpm run test && pnpm run test:e2e",
     "prepare": "cd .. && git config core.hooksPath .husky/_",
     "clean": "rimraf dist",
-    "headers": "find src -name '*.ts' -not -path '*ambient/*' -o -name '*.vue' | xargs node scripts/add-license-header.mjs",
-    "headers:check": "find src -name '*.ts' -not -path '*ambient/*' -o -name '*.vue' | xargs node scripts/add-license-header.mjs --check"
+    "headers": "git ls-files \"src/**/*.ts\" \"src/**/*.vue\" | grep -v \"/ambient/\" | xargs node scripts/add-license-header.mjs",
+    "headers:check": "git ls-files \"src/**/*.ts\" \"src/**/*.vue\" | grep -v \"/ambient/\" | xargs node scripts/add-license-header.mjs --check"
   },
   "dependencies": {
     "@antv/g2": "^5.4.8",
@@ -66,46 +66,46 @@
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.20.0",
     "dayjs": "^1.11.23",
-    "dompurify": "^3.4.16",
+    "dompurify": "^3.4.17",
     "element-plus": "^2.14.7",
-    "marked": "^18.0.14",
+    "marked": "^18.1.1",
     "nprogress": "^0.2.0",
-    "pinia": "^4.0.3",
-    "vue": "^3.5.43",
+    "pinia": "^4.1.0",
+    "vue": "^3.5.44",
     "vue-element-plus-x": "^2.0.3",
-    "vue-i18n": "^11.4.13",
-    "vue-router": "^5.3.1"
+    "vue-i18n": "^11.4.16",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.4",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
     "@types/nprogress": "^0.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.71.0",
-    "@typescript-eslint/parser": "^8.71.0",
-    "@vitejs/plugin-vue": "^6.0.9",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitest/coverage-v8": "^5.0.5",
     "@vue/eslint-config-typescript": "^14.9.0",
     "@vue/test-utils": "^2.5.1",
-    "eslint": "^10.12.0",
-    "eslint-plugin-jsdoc": "^65.1.0",
+    "eslint": "^10.13.0",
+    "eslint-plugin-jsdoc": "^65.4.2",
     "eslint-plugin-vue": "^10.11.1",
     "globals": "^17.13.0",
-    "happy-dom": "^20.14.5",
-    "jsdom": "^30.1.1",
+    "happy-dom": "^21.0.4",
+    "jsdom": "^30.1.3",
     "lint-staged": "^17.6.0",
-    "playwright": "^1.63.0",
-    "sass": "^1.105.1",
+    "playwright": "^1.64.1",
+    "sass": "^1.106.1",
     "typescript": "~5.9.3",
     "unplugin-auto-import": "^21.1.0",
     "unplugin-vue-components": "^32.1.0",
-    "vite": "^8.3.2",
-    "vitest": "^5.0.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5",
     "vue-eslint-parser": "^10.4.1",
-    "vue-tsc": "^3.3.12"
+    "vue-tsc": "^3.3.13"
   },
   "lint-staged": {
-    "*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
+    "dc3-web/**/*.{vue,js,mjs,cjs,ts,jsx,tsx}": [
       "eslint --fix --config eslint.config.mjs"
     ]
   }
