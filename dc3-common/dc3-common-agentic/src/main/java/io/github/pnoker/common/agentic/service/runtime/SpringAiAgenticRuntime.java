@@ -20,7 +20,9 @@ import io.github.pnoker.common.agentic.config.ChatClientFactory;
 import io.github.pnoker.common.agentic.service.chat.AgenticPreparedChatBO;
 import io.github.pnoker.common.agentic.service.chat.AgenticPromptBuilder;
 import io.github.pnoker.common.constant.service.AgenticConstant;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
@@ -85,15 +87,25 @@ public class SpringAiAgenticRuntime implements AgenticRuntime {
     private Mono<AgenticRuntimeResult> springAiCall(AgenticPreparedChatBO prepared) {
         return Mono.defer(() -> {
                     ChatClient.ChatClientRequestSpec promptSpec = promptBuilder.build(prepared);
+                    // Spring AI streams incremental deltas and the final chunk usually carries
+                    // only the finish reason/usage with empty text, so the blocking path must
+                    // accumulate every chunk exactly like the streaming path does.
                     return promptSpec.stream().chatResponse().collectList().map(responses -> {
-                        ChatResponse chatResponse = responses.isEmpty() ? null : responses.get(responses.size() - 1);
-                        if (chatResponse == null) {
-                            return new AgenticRuntimeResult("", null);
+                        StringBuilder content = new StringBuilder();
+                        String finishReason = null;
+                        AgenticTokenUsage usage = AgenticTokenUsage.empty();
+                        for (ChatResponse response : responses) {
+                            content.append(responseMapper.streamDelta(response).content());
+                            String chunkFinishReason = responseMapper.finishReasonOrNull(response);
+                            if (StringUtils.isNotBlank(chunkFinishReason)) {
+                                finishReason = chunkFinishReason;
+                            }
+                            AgenticTokenUsage chunkUsage = usageOf(response);
+                            if (!Objects.equals(chunkUsage, AgenticTokenUsage.empty())) {
+                                usage = chunkUsage;
+                            }
                         }
-                        return new AgenticRuntimeResult(
-                                responseMapper.assistantContent(chatResponse),
-                                responseMapper.finishReasonOrNull(chatResponse),
-                                usageOf(chatResponse));
+                        return new AgenticRuntimeResult(content.toString(), finishReason, usage);
                     });
                 })
                 .subscribeOn(Schedulers.boundedElastic());

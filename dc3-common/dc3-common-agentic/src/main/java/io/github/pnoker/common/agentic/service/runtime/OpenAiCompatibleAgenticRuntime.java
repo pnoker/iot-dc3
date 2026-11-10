@@ -803,6 +803,12 @@ public class OpenAiCompatibleAgenticRuntime {
         }
 
         ToolCall build() {
+            if (StringUtils.isBlank(id) || StringUtils.isBlank(name)) {
+                // Some OpenAI-compatible servers stream incomplete tool-call deltas.
+                // Throwing here (inside onComplete) would leave the result sink
+                // unterminated and hang the SSE stream; a half-formed call is skipped.
+                return null;
+            }
             return new ToolCall(id, name, arguments.toString());
         }
 
