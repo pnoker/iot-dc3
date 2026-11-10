@@ -242,10 +242,12 @@ type StructuralPayload = {
 };
 
 const loadStructural = async (tab: Extract<TabKey, 'deviceStatus' | 'protocol' | 'profile'>): Promise<Bucket[]> => {
-  // Fetch both summaries once for parity with the existing endpoint contract,
-  // but derive the result from the tab captured at request start. This keeps a
-  // late response from being interpreted using a newer tab selection.
-  const [driverResult, deviceResult] = (await Promise.all([getDriverStats(), getDeviceStats(10)])) as [StructuralPayload, any];
+  // Fetch only the summary the selected tab renders; the tab is captured at
+  // request start so a late response is never interpreted with a newer selection.
+  const [driverResult, deviceResult] = (await Promise.all([
+    tab === 'protocol' ? getDriverStats() : Promise.resolve(null),
+    tab === 'profile' || tab === 'deviceStatus' ? getDeviceStats(10) : Promise.resolve(null),
+  ])) as [StructuralPayload | null, StructuralPayload | null];
   const driverPayload = driverResult?.driver ?? (driverResult as any)?.data ?? driverResult ?? {};
   const devicePayload = deviceResult?.device ?? (deviceResult as any)?.data ?? deviceResult ?? {};
 

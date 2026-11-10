@@ -260,7 +260,11 @@ const clearPoll = () => {
 const startPoll = (ms: number) => {
   clearPoll();
   if (ms > 0) {
-    timer = setInterval(() => emit('refresh'), ms);
+    timer = setInterval(() => {
+      // A hidden tab keeps firing otherwise — the browser only throttles, never
+      // stops, the interval; pause instead of polling in the background.
+      if (!document.hidden) emit('refresh');
+    }, ms);
   }
 };
 const onIntervalChange = (value: string | number | boolean | undefined) => {
