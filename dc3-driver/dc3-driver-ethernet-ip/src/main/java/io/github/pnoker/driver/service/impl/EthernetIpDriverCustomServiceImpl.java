@@ -583,7 +583,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 try {
                     b = Byte.parseByte(value);
                 } catch (NumberFormatException e) {
-                    b = 0;
+                    // A silent 0 would write wrong data into the physical PLC.
+                    throw new WritePointException("EtherNet/IP write value '{}' is not a valid SINT", value);
                 }
                 buf.put(b);
             }
@@ -593,7 +594,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 try {
                     s = Short.parseShort(value);
                 } catch (NumberFormatException e) {
-                    s = 0;
+                    // A silent 0 would write wrong data into the physical PLC.
+                    throw new WritePointException("EtherNet/IP write value '{}' is not a valid INT", value);
                 }
                 buf.order(ByteOrder.LITTLE_ENDIAN).putShort(s);
             }
@@ -603,7 +605,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 try {
                     i = Integer.parseInt(value);
                 } catch (NumberFormatException e) {
-                    i = 0;
+                    // A silent 0 would write wrong data into the physical PLC.
+                    throw new WritePointException("EtherNet/IP write value '{}' is not a valid DINT", value);
                 }
                 buf.order(ByteOrder.LITTLE_ENDIAN).putInt(i);
             }
@@ -613,7 +616,8 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
                 try {
                     f = Float.parseFloat(value);
                 } catch (NumberFormatException e) {
-                    f = 0f;
+                    // A silent 0 would write wrong data into the physical PLC.
+                    throw new WritePointException("EtherNet/IP write value '{}' is not a valid REAL", value);
                 }
                 buf.order(ByteOrder.LITTLE_ENDIAN).putFloat(f);
             }

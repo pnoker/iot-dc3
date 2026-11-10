@@ -237,7 +237,8 @@ public class BacnetIpDriverCustomServiceImpl implements DriverCustomService {
             try {
                 return new UnsignedInteger(Integer.parseInt(value));
             } catch (NumberFormatException e) {
-                return new UnsignedInteger(0);
+                // A silent 0 would put the device into an unintended multi-state.
+                throw new WritePointException("BACnet write value '{}' is not a valid {} value", value, upperName);
             }
         }
         // Analog types and fallback
