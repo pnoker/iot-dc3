@@ -156,8 +156,13 @@ describe('AgenticAssistant workbench mode', () => {
     store.workbenchExpanded = false;
     await flushPromises();
     expect(wrapper.find('.agentic-panel').exists()).toBe(true);
-    expect(wrapper.find('.agentic-sessions').exists()).toBe(false);
-    expect(wrapper.find('.agentic-context').exists()).toBe(false);
+    // The rail and the context panel are overlay lanes that stay mounted for
+    // the panel's lifetime (their mount/unmount must never re-flow the chat
+    // column); workbench-only VISIBILITY is CSS-driven from the expanded
+    // class, so the docked assertion is on that gate, not on DOM presence.
+    expect(wrapper.find('.agentic-panel--expanded').exists()).toBe(false);
+    expect(wrapper.find('.agentic-sessions').exists()).toBe(true);
+    expect(wrapper.find('.agentic-context').exists()).toBe(true);
   });
 
   it('opens the context panel on demand and reflects the focused message run', async () => {

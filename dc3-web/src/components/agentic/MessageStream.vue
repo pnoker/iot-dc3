@@ -90,7 +90,15 @@ const handlePromptClick = (item: AssistantPromptItem) => {
 </script>
 
 <style lang="scss" scoped>
+// One reading column for every stream state, shared with the composer's
+// --agentic-read-width cap: at workbench width an uncapped message list
+// stretches past 900px (unreadable line lengths) and drifts off the
+// composer's centred column. Docked the panel is narrower than the cap, so
+// this is a no-op there.
 .agentic-loading-state {
+  width: 100%;
+  max-width: var(--agentic-read-width, 760px);
+  margin: 0 auto;
   padding: var(--dc3-space-4);
 }
 
@@ -98,9 +106,8 @@ const handlePromptClick = (item: AssistantPromptItem) => {
   display: flex;
   flex-direction: column;
   gap: var(--dc3-space-5);
-  // The message canvas fills the available width; only the composer below
-  // keeps a centred reading column.
   width: 100%;
+  max-width: var(--agentic-read-width, 760px);
   margin: var(--dc3-space-10) auto 0;
 }
 
@@ -108,6 +115,7 @@ const handlePromptClick = (item: AssistantPromptItem) => {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: var(--agentic-read-width, 760px);
   min-width: 0;
   margin: 0 auto;
 

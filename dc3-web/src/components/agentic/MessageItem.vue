@@ -246,6 +246,13 @@ const historyAttachments = computed(() =>
   align-items: flex-start;
   min-width: 0;
   max-width: 100%;
+  // Bounds the per-frame layout cost of the panel's width morph and of
+  // drag-resize: messages outside the viewport skip layout, so a width
+  // change only re-flows the messages near the viewport instead of the
+  // whole conversation. `auto` keeps the last rendered size so the
+  // scrollbar stays stable across the skip.
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
 }
 
 .agentic-message--user {

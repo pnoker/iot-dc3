@@ -289,7 +289,12 @@ describe('AgenticAssistant', () => {
     await search.setValue('');
     expect(historyTitles()).toEqual(['Reasoning UI', 'Live session']);
 
-    wrapper.findComponent({name: 'ElDropdown'}).vm.$emit('command', 'load-more');
+    // Scope to the docked header: the always-mounted workbench rail carries
+    // its own ElDropdown (per-session actions) earlier in the tree.
+    const historyDropdown = wrapper
+      .find('.agentic-header__primary-actions')
+      .findComponent({name: 'ElDropdown'});
+    historyDropdown.vm.$emit('command', 'load-more');
     await flushPromises();
 
     expect(apiMocks.listAgenticSessions).toHaveBeenLastCalledWith({offset: 3, limit: 50});

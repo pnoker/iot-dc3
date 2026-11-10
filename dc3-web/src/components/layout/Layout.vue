@@ -646,11 +646,15 @@ const handleCommand = async (command: string) => {
     height: var(--dc3-header-height);
     padding-block: 9px;
     padding-inline: var(--dc3-page-padding);
-    // The docked assistant panel now runs the full height: the header yields
-    // its right end through the same dock-width var the body consumes, so the
-    // panel reads as a layout column instead of a layer under the header.
+    // TRUE SIDEBAR contract: the assistant panel is a layout column, so the
+    // header yields its right end through the same dock-width var the body
+    // consumes. The yield animates on the SAME duration+curve as the panel's
+    // motion (--dc3-agentic-morph-duration) so header, page and panel move
+    // as one lockstep push; during a drag the panel collapses the duration
+    // to 0s via --dc3-agentic-body-transition so tracking stays 1:1 with the
+    // pointer.
     padding-right: calc(var(--dc3-page-padding) + var(--dc3-agentic-dock-width, 0px));
-    transition: padding-right var(--dc3-agentic-body-transition, var(--dc3-duration-slow)) var(--dc3-ease-standard);
+    transition: padding-right var(--dc3-agentic-body-transition, var(--dc3-agentic-morph-duration)) var(--dc3-ease-emphasized);
     border-bottom: 1px solid var(--dc3-border-base);
     background:
       radial-gradient(circle at 12% -80%, var(--dc3-ambient-primary), transparent 36%),
@@ -948,14 +952,14 @@ const handleCommand = async (command: string) => {
       flex: 1 1 auto;
       min-width: 0;
       height: 100%;
-      // Slide over when the assistant panel docks: the panel is
-      // position:fixed, so the page reserves its width through this var
-      // (published by AgenticAssistant from panelStyle, including drag-resize).
-      // During a drag the panel collapses this duration to 0s via
-      // --dc3-agentic-body-transition so width tracking stays 1:1 with the
-      // pointer — it must not animate while the user is still dragging.
+      // TRUE SIDEBAR: the page yields its right edge to the docked assistant
+      // column (published by AgenticAssistant from panelStyle, including
+      // drag-resize) and re-flows live while it moves — that per-frame
+      // reflow is the price of a real sidebar, kept affordable by the
+      // chart-fit settle debounce and the panel carrying its own motion on
+      // transform. Same duration+curve as the panel for the lockstep push.
       margin-right: var(--dc3-agentic-dock-width, 0px);
-      transition: margin-right var(--dc3-agentic-body-transition, var(--dc3-duration-slow)) var(--dc3-ease-standard);
+      transition: margin-right var(--dc3-agentic-body-transition, var(--dc3-agentic-morph-duration)) var(--dc3-ease-emphasized);
 
       > .el-scrollbar {
         flex: 1;

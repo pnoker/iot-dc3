@@ -154,12 +154,14 @@
   --dc3-duration-slow: 280ms;
   --dc3-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --dc3-ease-emphasized: cubic-bezier(0.05, 0.7, 0.1, 1);
+  // Assistant panel mode sweep: the panel width, the page's yielding margin
+  // and the header's yielding padding all ride this ONE duration+curve so
+  // the sidebar push reads as a single lockstep motion.
+  --dc3-agentic-morph-duration: 320ms;
 
   // Layout metrics mirror tokens.scss (read at runtime when a component
   // needs a metric in JS or calc()).
   --dc3-header-height: 60px;
-  // Space reserved for the docked assistant panel (0 when closed).
-  --dc3-agentic-dock-width: 0px;
   --dc3-aside-width: 220px;
   --dc3-aside-collapsed-width: 64px;
 
@@ -223,6 +225,7 @@ html.dark {
     --dc3-duration-fast: 0ms;
     --dc3-duration-base: 0ms;
     --dc3-duration-slow: 0ms;
+    --dc3-agentic-morph-duration: 0ms;
   }
 }
 

@@ -438,18 +438,27 @@ describe('agentic store', () => {
     expect(store.messagesByConversation[conversationId][0].createTime).toBe('2026-10-01 09:00:00');
   });
 
-  it('clears the workbench flag when the panel closes or the store resets', () => {
-    const store = useAgenticStore();
+  it('clears the workbench flag when the panel closes or the store resets', async () => {
+    vi.useFakeTimers();
+    try {
+      const store = useAgenticStore();
 
-    store.toggleWorkbench();
-    expect(store.workbenchExpanded).toBe(true);
-    store.close();
-    expect(store.visible).toBe(false);
-    expect(store.workbenchExpanded).toBe(false);
+      store.toggleWorkbench();
+      expect(store.workbenchExpanded).toBe(true);
+      store.close();
+      expect(store.visible).toBe(false);
+      // The flag outlives the panel's leave transition so the closing
+      // sheet stays at workbench width while it slides out.
+      expect(store.workbenchExpanded).toBe(true);
+      await vi.advanceTimersByTimeAsync(360);
+      expect(store.workbenchExpanded).toBe(false);
 
-    store.setWorkbenchExpanded(true);
-    store.reset();
-    expect(store.workbenchExpanded).toBe(false);
+      store.setWorkbenchExpanded(true);
+      store.reset();
+      expect(store.workbenchExpanded).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('coalesces a 2000-delta stream into store writes bounded by the frame count', async () => {

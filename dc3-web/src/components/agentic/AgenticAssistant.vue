@@ -22,7 +22,15 @@
     ref="panelRef"
     :aria-label="t('agentic.title')"
     :aria-modal="isMobile || undefined"
-    :class="['agentic-panel', {'agentic-panel--expanded': expanded, 'is-dragging': isDragging}]"
+    :class="[
+      'agentic-panel',
+      {
+        'agentic-panel--expanded': expanded,
+        'is-dragging': isDragging,
+        'is-context-open': contextPanelOpen,
+        'is-rail-collapsed': agenticRailCollapsed,
+      },
+    ]"
     :role="isMobile ? 'dialog' : 'complementary'"
     :style="expanded ? undefined : panelStyle"
     tabindex="-1"
@@ -46,9 +54,11 @@
     <div class="agentic-workspace">
       <!-- Workbench sessions rail — visible only in expanded (full-screen)
            mode. The same list the history dropdown shows, laid out as a
-           permanent column so switching conversations is one tap. -->
+           permanent column so switching conversations is one tap. It stays
+           MOUNTED for the panel's lifetime and is shown/hidden through CSS
+           visibility: as an overlay lane its mount/unmount must never
+           re-flow the chat column (see the workspace style notes). -->
       <AgenticSessionsRail
-        v-if="expanded"
         :active-id="activeConversationId"
         :collapsed="agenticRailCollapsed"
         :disabled="interactionLocked"
@@ -337,7 +347,6 @@
       />
     </section>
       <AgenticContextPanel
-        v-if="expanded && contextPanelOpen"
         :live-traces="currentTraceEvents"
         :message="focusedMessage"
         :model-label="activeModel.label || selectedModel"
@@ -431,10 +440,16 @@ const panelRef = ref<HTMLElement>();
 const panelWidth = ref<number>();
 const resizeFrame = ref<number>();
 const isDragging = ref(false);
-// Pauses .body-main's margin-right transition during a drag by collapsing
-// its duration to 0s on documentElement — same channel as
+// Pauses .body-main's and the header's yield transitions during a drag by
+// collapsing their duration to 0s on documentElement — same channel as
 // --dc3-agentic-dock-width, instead of reaching into Layout's styles.
 const DRAG_BODY_TRANSITION_PROPERTY = '--dc3-agentic-body-transition';
+// Drag bookkeeping: the container box is read once per drag and the pointer
+// position is buffered, so the width write happens at most once per
+// animation frame with no layout reads inside the move handler.
+let dragContainerBox: {right: number; width: number} | undefined;
+let dragFrame = 0;
+let dragPendingClientX = 0;
 const obscuredElements = ref<Array<{element: HTMLElement; wasInert: boolean}>>([]);
 const lastFocusElement = ref<HTMLElement>();
 const renamePopoverVisible = ref(false);
@@ -469,10 +484,12 @@ const panelStyle = computed(() => {
   return {width: tablet ? 'clamp(320px, 40vw, 420px)' : 'clamp(340px, 30vw, 520px)'};
 });
 
-// Publish the dock width so Layout's .body-main can slide over (the panel is
-// position:fixed, so the page reserves space through this custom property).
-// clamp()/min() expressions must live in the custom property itself — the
-// spacing guardrail forbids them in margin declarations.
+// Publish the dock width so Layout's .body-main and the header yield room
+// for the docked column in lockstep with the panel's own motion (one shared
+// duration+curve = one push, see --dc3-agentic-morph-duration). The panel is
+// a real layout column, not a floating layer, so the page re-flows live as
+// it moves. clamp()/min() expressions must live in the custom property
+// itself — the spacing guardrail forbids them in margin declarations.
 watch(
   [panelStyle, visible, expanded, isMobile],
   () => {
@@ -620,6 +637,9 @@ onBeforeUnmount(() => {
   localeReloadToken += 1;
   if (resizeFrame.value) {
     cancelAnimationFrame(resizeFrame.value);
+  }
+  if (dragFrame) {
+    cancelAnimationFrame(dragFrame);
   }
   window.removeEventListener('mousemove', handleResizeMove);
   window.removeEventListener('mouseup', handleResizeEnd);
@@ -847,6 +867,10 @@ const handleRetryMessages = () => {
 const handleResizeStart = (event: MouseEvent) => {
   if (isMobile.value) return;
   event.preventDefault();
+  // One layout read per drag: re-reading the container box inside the move
+  // handler would force a synchronous reflow between every width write.
+  const rect = panelRef.value?.parentElement?.getBoundingClientRect();
+  dragContainerBox = rect ? {right: rect.right, width: rect.width} : undefined;
   window.addEventListener('mousemove', handleResizeMove);
   window.addEventListener('mouseup', handleResizeEnd);
   isDragging.value = true;
@@ -854,19 +878,24 @@ const handleResizeStart = (event: MouseEvent) => {
   document.documentElement.style.setProperty(DRAG_BODY_TRANSITION_PROPERTY, '0s');
 };
 
-const setPanelWidth = (width: number) => {
-  const containerWidth = panelRef.value?.parentElement?.getBoundingClientRect().width || window.innerWidth;
-  const maxWidth = Math.min(MAX_PANEL_WIDTH, Math.floor(containerWidth * 0.45));
+const setPanelWidth = (width: number, containerWidth?: number) => {
+  const measured = containerWidth ?? panelRef.value?.parentElement?.getBoundingClientRect().width;
+  const base = measured || window.innerWidth;
+  const maxWidth = Math.min(MAX_PANEL_WIDTH, Math.floor(base * 0.45));
   panelWidth.value = clamp(width, MIN_PANEL_WIDTH, Math.max(MIN_PANEL_WIDTH, maxWidth));
 };
 
+const applyDragWidth = () => {
+  dragFrame = 0;
+  if (!dragContainerBox) return;
+  setPanelWidth(Math.round(dragContainerBox.right - dragPendingClientX), dragContainerBox.width);
+};
+
 const handleResizeMove = (event: MouseEvent) => {
-  const container = panelRef.value?.parentElement;
-  const rect = container?.getBoundingClientRect();
-  if (!rect) {
-    return;
+  dragPendingClientX = event.clientX;
+  if (!dragFrame) {
+    dragFrame = requestAnimationFrame(applyDragWidth);
   }
-  setPanelWidth(Math.round(rect.right - event.clientX));
 };
 
 const handleResizeKeydown = (delta: number) => {
@@ -881,6 +910,14 @@ const handleResizeEnd = () => {
   isDragging.value = false;
   document.body.classList.remove('agentic-resizing');
   document.documentElement.style.removeProperty(DRAG_BODY_TRANSITION_PROPERTY);
+  // Flush the buffered pointer position so the persisted width matches
+  // where the drag actually ended.
+  if (dragFrame) {
+    cancelAnimationFrame(dragFrame);
+    dragFrame = 0;
+  }
+  applyDragWidth();
+  dragContainerBox = undefined;
   if (panelWidth.value) {
     localStorage.setItem(ASSISTANT_WIDTH_STORAGE_KEY, String(panelWidth.value));
   }
@@ -993,13 +1030,20 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
 </script>
 
 <style lang="scss" scoped>
-// The panel lives in ONE coordinate system for both modes: fixed at full
-// height, anchored right — it docks over the header's right end (the
-// header yields through the --dc3-agentic-dock-width padding, and the
-// expanded workbench simply covers it). Docked width comes from
-// panelStyle; the workbench just widens to 100% — because both states are
-// fixed, the width transition animates continuously instead of snapping
-// between layout flow and fixed positioning (the old "slide projector" cut).
+// The panel is a TRUE SIDEBAR for both modes: fixed at full height, anchored
+// right, docking over the header's right end while the page yields its right
+// edge through --dc3-agentic-dock-width (margin-right on .body-main,
+// padding-right on the header). Docked it sits transparent on the shared
+// canvas — part of the page, not a slab; the workbench covers the page and
+// carries an opaque backdrop of its own. The yield is a per-frame page
+// reflow by nature; it stays affordable because everything else is cheap:
+// the panel rides its own motion on transform (open/close) with its content
+// already laid out at the final width, the message list skips offscreen
+// layout via content-visibility, chart re-fits settle after the sweep
+// instead of per frame, and the rail/context lanes never re-flow the chat
+// column (see the workspace notes). Every moving part shares
+// --dc3-agentic-morph-duration + the emphasized curve so the push reads as
+// one lockstep motion.
 .agentic-panel {
   // One reading column for messages, the empty state and the composer -
   // docked the panel is narrower so this is a no-op there; the workbench
@@ -1013,21 +1057,22 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   right: 0;
   bottom: 0;
   display: flex;
+  // Clips the overlay lanes while the width sweep passes their mount state;
+  // the panel is a fixed full-height surface, so nothing may bleed past it.
+  overflow: hidden;
   z-index: calc(var(--dc3-z-floating-action) - 1);
   min-width: 320px;
   max-width: 520px;
   min-height: 0;
   border-left: 1px solid var(--dc3-border-base);
-  // Sit on the shared canvas instead of a white slab: the sidebar is part
-  // of the page, and its content follows the platform's card grammar.
   background: transparent;
   box-shadow: none;
-  transition: width var(--dc3-duration-slow) var(--dc3-ease-standard);
+  transition: width var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized);
 
   // No left: 0 here: with right: 0 already anchoring the panel, adding a
-  // left anchor over-constrains the box and made the width transition snap
-  // the left edge to x=0 before growing (the slide-projector cut). The
-  // panel now grows leftward from the right edge in one continuous motion.
+  // left anchor over-constrains the box and made width changes snap the
+  // left edge before growing (the slide-projector cut). The panel grows
+  // leftward from the right edge in one continuous motion.
   &.agentic-panel--expanded {
     min-width: 0;
     max-width: none;
@@ -1037,37 +1082,40 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     // Docked mode sits transparent on the shared canvas; the workbench
     // covers the page and needs an opaque backdrop of its own.
     background: var(--dc3-bg-canvas);
-
-    // The platform header's rule is hidden behind the opaque workbench, so
-    // the header draws its own separator here (docked mode reuses the
-    // platform line showing through the transparent panel).
-    .agentic-header {
-      border-bottom: 1px solid var(--dc3-border-base);
-    }
   }
 }
 // Width tracking must stay 1:1 with the pointer during a drag.
 .agentic-panel.is-dragging {
   transition: none;
 }
-// Open / close: slide in from the right edge with a soft fade.
+// Open / close: the page yields on margin-right in lockstep (same duration
+// and curve); the panel rides the same motion on transform — its content is
+// laid out at the final width, so the slide itself costs nothing per frame.
 .agentic-panel-enter-active {
-  // Plain fade: the panel is a real sidebar column, not a floating layer.
-  transition: opacity 280ms ease-out;
+  transition:
+    transform var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized),
+    opacity var(--dc3-agentic-morph-duration) ease-out;
+  will-change: transform, opacity;
 }
 .agentic-panel-leave-active {
-  transition: opacity 200ms ease-in;
+  transition:
+    transform var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized),
+    opacity var(--dc3-agentic-morph-duration) ease-in;
+  will-change: transform, opacity;
 }
 .agentic-panel-enter-from,
 .agentic-panel-leave-to {
   opacity: 0;
+  // 102% clears the .agentic-resizer, which hangs 5px left of the panel edge.
+  transform: translateX(102%);
 }
 // Sessions rail (expanded mode only) — same list as the history dropdown,
-// laid out as a permanent column.
+// laid out as a permanent column. Geometry (position/width/visibility) is
+// owned by the overlay-lane rules near .agentic-workspace; only the surface
+// and internal layout live here.
 .agentic-sessions {
   display: flex;
   flex-direction: column;
-  flex: 0 0 264px;
   min-width: 0;
   border-right: 1px solid var(--dc3-border-base);
   background: var(--dc3-bg-canvas);
@@ -1157,6 +1205,60 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
+}
+// The sessions rail and the context panel are OVERLAY LANES above the chat
+// shell, shown only in workbench mode. They stay mounted for the panel's
+// lifetime and swap visibility with a fade: as absolutely positioned lanes
+// their mount/unmount/toggle never re-flows the chat column. That re-flow
+// used to land on the sweep's first commit, block the main thread past the
+// whole transition, and snap the width to its end state (measured at two
+// ~243ms long tasks per collapse). The chat lane is moved by the shell's
+// transitioning paddings instead — one bounded reflow per frame, riding
+// the same curve as the width sweep.
+.agentic-sessions,
+.agentic-context {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity var(--dc3-duration-base) var(--dc3-ease-standard),
+    visibility 0s linear var(--dc3-duration-base);
+}
+.agentic-sessions {
+  left: 0;
+  width: 264px;
+  transition:
+    opacity var(--dc3-duration-base) var(--dc3-ease-standard),
+    visibility 0s linear var(--dc3-duration-base),
+    width var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized);
+}
+.agentic-context {
+  right: 0;
+}
+.agentic-panel--expanded .agentic-sessions {
+  visibility: visible;
+  opacity: 1;
+  transition:
+    opacity var(--dc3-duration-base) var(--dc3-ease-standard),
+    width var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized);
+}
+.agentic-panel--expanded.is-context-open .agentic-context {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity var(--dc3-duration-base) var(--dc3-ease-standard);
+}
+.agentic-panel--expanded .agentic-shell {
+  padding-left: 264px;
+  padding-right: var(--agentic-context-width);
+}
+.agentic-panel--expanded.is-rail-collapsed .agentic-shell {
+  padding-left: 64px;
+}
+.agentic-panel--expanded:not(.is-context-open) .agentic-shell {
+  padding-right: 0;
 }
 // Neutral tool chip for the header actions (new / expand / close) — the
 // old success/danger circles fought the theme; this matches the utility
@@ -1261,6 +1363,13 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   min-height: 0;
   min-width: 0;
   background: transparent;
+  // The chat lane rides the width sweep through these paddings (the rail
+  // and context lanes are overlays that never re-flow this column) — same
+  // duration and curve as the panel's width transition so the chat column
+  // and the panel edge move as one continuous motion.
+  transition:
+    padding-left var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized),
+    padding-right var(--dc3-agentic-morph-duration) var(--dc3-ease-emphasized);
 }
 .agentic-header {
   display: flex;
@@ -1270,13 +1379,15 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
   gap: var(--dc3-space-3);
   min-height: 0;
   padding: var(--dc3-space-2) var(--dc3-page-padding) var(--dc3-space-3);
-  // Docked: no border of its own. The panel sits transparent on the canvas,
+  // Docked: no border of its own — the panel sits transparent on the canvas,
   // so the platform header's rule shows through at the exact header height
-  // and reads as this header's separator too — one continuous line instead
-  // of two offset ones, and the session meta rows breathe below it. The
+  // and reads as this header's separator too (one continuous line). The
   // expanded workbench covers the platform header, so it draws its own rule.
   border-bottom: none;
   background: transparent;
+}
+.agentic-panel--expanded .agentic-header {
+  border-bottom: 1px solid var(--dc3-border-base);
 }
 .agentic-session-error,
 .agentic-data-error {
@@ -1699,9 +1810,8 @@ const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
 
 <style lang="scss">
 // Drag interaction feedback only (cursor / selection are genuinely global
-// state during a drag). Layout negotiation no longer rides this class:
-// pausing .body-main's transition goes through --dc3-agentic-body-transition
-// on documentElement, next to --dc3-agentic-dock-width.
+// state during a drag). The panel tracks the pointer through buffered
+// per-frame width writes; no layout negotiation rides this class.
 .agentic-resizing {
   cursor: col-resize;
   user-select: none;

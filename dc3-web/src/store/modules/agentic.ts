@@ -205,9 +205,20 @@ export const useAgenticStore = defineStore('agentic', () => {
     await bootstrap();
   };
 
+  // Closing from the workbench defers the flag flip until the panel's leave
+  // transition is over: the panel must keep its full-width workbench layout
+  // while it slides out, and flipping now would snap it to the docked width
+  // in the leave's first frame. A quick reopen inside the window keeps the
+  // workbench, matching the state before the close.
+  // 340ms: just past --dc3-agentic-morph-duration (320ms) so the flag flips
+  // after the leave animation has fully settled, never mid-flight.
+  const WORKBENCH_LEAVE_MS = 340;
   const close = () => {
     visible.value = false;
-    workbenchExpanded.value = false;
+    if (!workbenchExpanded.value) return;
+    window.setTimeout(() => {
+      if (!visible.value) workbenchExpanded.value = false;
+    }, WORKBENCH_LEAVE_MS);
   };
 
   const setWorkbenchExpanded = (value: boolean) => {

@@ -97,9 +97,13 @@
               <small v-if="session.summary">{{ session.summary }}</small>
             </span>
           </button>
-          <!-- Per-item actions: rename / archive / delete behind a hover-revealed ⋯ -->
+          <!-- Per-item actions: rename / archive / delete behind a hover-revealed ⋯.
+               persistent=false keeps the popper unmounted until first use — with
+               ~50 items each eagerly mounting a teleported dropdown menu, the
+               panel's first frame used to block the main thread for seconds. -->
           <el-dropdown
             :disabled="disabled || Boolean(sessionActionLoading[session.conversationId])"
+            :persistent="false"
             popper-class="agentic-item-menu"
             trigger="click"
             @command="(command) => handleItemCommand(command, session)"
