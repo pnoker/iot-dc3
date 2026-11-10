@@ -227,12 +227,18 @@ class EthernetIpCipFrameTest {
         assertThat(EthernetIpDriverCustomServiceImpl.mrReplyPayload(new byte[] {(byte) 0xCC, 0x00, 0x00, 0x11}))
                 .containsExactly(0x11);
 
-        byte[] dint = {(byte) 0xC4, 0x78, 0x56, 0x34, 0x12};
-        byte[] bool = {(byte) 0xC1, 0x01};
+        // CIP type codes are two bytes: element type + 0x00 flag for atomic types
+        // (the STRING structured type carries its two-byte code as well).
+        byte[] dint = {(byte) 0xC4, 0x00, 0x78, 0x56, 0x34, 0x12};
+        byte[] bool = {(byte) 0xC1, 0x00, 0x01};
+        byte[] int16 = {(byte) 0xC3, 0x00, (byte) 0xD2, 0x04};
+        byte[] real = {(byte) 0xCA, 0x00, 0x00, 0x00, (byte) 0xC8, 0x42};
         byte[] string = {(byte) 0xA0, 0x02, 0x03, 0x00, 0x00, 0x00, 0x41, 0x42, 0x43, 0x00};
 
         assertThat(EthernetIpDriverCustomServiceImpl.parseTagValue(dint)).isEqualTo("305419896");
         assertThat(EthernetIpDriverCustomServiceImpl.parseTagValue(bool)).isEqualTo("true");
+        assertThat(EthernetIpDriverCustomServiceImpl.parseTagValue(int16)).isEqualTo("1234");
+        assertThat(EthernetIpDriverCustomServiceImpl.parseTagValue(real)).isEqualTo("100.0");
         assertThat(EthernetIpDriverCustomServiceImpl.parseTagValue(string)).isEqualTo("ABC");
     }
 
@@ -262,7 +268,7 @@ class EthernetIpCipFrameTest {
                             .isEqualTo(EthernetIpDriverCustomServiceImpl.buildSendRrDataPayload(
                                     EthernetIpDriverCustomServiceImpl.buildMrReadTagRequest(0, "MyTag", 1)));
 
-                    byte[] mrReply = {(byte) 0xCC, 0x00, 0x00, (byte) 0xC4, 0x78, 0x56, 0x34, 0x12};
+                    byte[] mrReply = {(byte) 0xCC, 0x00, 0x00, (byte) 0xC4, 0x00, 0x78, 0x56, 0x34, 0x12};
                     byte[] replyPayload = EthernetIpDriverCustomServiceImpl.buildSendRrDataPayload(mrReply);
                     connection.getOutputStream().write(replyHeader(0x005F, replyPayload.length, 0x11223344, 0));
                     connection.getOutputStream().write(replyPayload);

@@ -105,6 +105,9 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
     private static final class CipSession {
         private final Socket socket;
         private final int sessionHandle;
+        // Serializes request/response exchanges: a scheduled read and a command
+        // write racing on the same socket would interleave encapsulation frames.
+        private final java.util.concurrent.locks.ReentrantLock lock = new java.util.concurrent.locks.ReentrantLock();
 
         private CipSession(Socket socket, int sessionHandle) {
             this.socket = socket;
@@ -416,7 +419,10 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
 
         Socket socket;
         try {
-            socket = new Socket(host, port);
+            socket = new Socket();
+            // Bounded connect: the OS default can hang the shared scheduler for
+            // tens of seconds against an unreachable PLC.
+            socket.connect(new java.net.InetSocketAddress(host, port), timeout);
             socket.setSoTimeout(timeout);
         } catch (IOException e) {
             throw new ConnectorException(
@@ -462,15 +468,20 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
      * return the validated message-router reply.
      */
     private byte[] exchangeUnconnected(CipSession session, byte[] cipRequest, int requestService) throws IOException {
-        byte[] response = sendEncapsulatedCommand(
-                session.socket, session.sessionHandle, COMMAND_SEND_RR_DATA, buildSendRrDataPayload(cipRequest));
-        ByteBuffer header = ByteBuffer.wrap(response).order(ByteOrder.LITTLE_ENDIAN);
-        int payloadLength = header.getShort(2) & 0xFFFF;
-        byte[] rrDataPayload =
-                Arrays.copyOfRange(response, ENCAPSULATION_HEADER_SIZE, ENCAPSULATION_HEADER_SIZE + payloadLength);
-        byte[] mrReply = extractUnconnectedDataItem(rrDataPayload);
-        assertMrReplySuccess(mrReply, requestService);
-        return mrReply;
+        session.lock.lock();
+        try {
+            byte[] response = sendEncapsulatedCommand(
+                    session.socket, session.sessionHandle, COMMAND_SEND_RR_DATA, buildSendRrDataPayload(cipRequest));
+            ByteBuffer header = ByteBuffer.wrap(response).order(ByteOrder.LITTLE_ENDIAN);
+            int payloadLength = header.getShort(2) & 0xFFFF;
+            byte[] rrDataPayload =
+                    Arrays.copyOfRange(response, ENCAPSULATION_HEADER_SIZE, ENCAPSULATION_HEADER_SIZE + payloadLength);
+            byte[] mrReply = extractUnconnectedDataItem(rrDataPayload);
+            assertMrReplySuccess(mrReply, requestService);
+            return mrReply;
+        } finally {
+            session.lock.unlock();
+        }
     }
 
     /**
@@ -542,17 +553,19 @@ public class EthernetIpDriverCustomServiceImpl implements DriverCustomService {
 
     /**
      * Decode a Read Tag reply payload (type bytes followed by data) into a
-     * string. Atomic types are decoded per their CIP type code; a Logix STRING
-     * reply carries the two-byte structured type and a length-prefixed body.
+     * string. The CIP type code is two bytes (element type plus a zero flag
+     * byte for atomic types), so both are consumed before the data; a Logix
+     * STRING reply carries the two-byte structured type and a length-prefixed
+     * body.
      */
     static String parseTagValue(byte[] typedPayload) {
-        if (Objects.isNull(typedPayload) || typedPayload.length < 1) {
+        if (Objects.isNull(typedPayload) || typedPayload.length < 2) {
             return null;
         }
         ByteBuffer buf = ByteBuffer.wrap(typedPayload).order(ByteOrder.LITTLE_ENDIAN);
         int type = buf.get() & 0xFF;
+        buf.get();
         if (type == CIP_TYPE_STRING) {
-            buf.get();
             int length = buf.getInt();
             byte[] chars = new byte[Math.min(length, buf.remaining())];
             buf.get(chars);
