@@ -18,6 +18,7 @@ package io.github.pnoker.driver.service.impl;
 
 import com.github.xingshuangs.iot.protocol.s7.enums.EPlcType;
 import com.github.xingshuangs.iot.protocol.s7.service.S7PLC;
+import io.github.pnoker.common.driver.entity.bean.DeviceHealthState;
 import io.github.pnoker.common.driver.entity.bean.ReadPointValue;
 import io.github.pnoker.common.driver.entity.bean.ValidationReport;
 import io.github.pnoker.common.driver.entity.bean.WritePointValue;
@@ -80,6 +81,31 @@ public class PlcS7DriverCustomServiceImpl implements DriverCustomService {
     @Override
     public void initial() {
         connectMap = new ConcurrentHashMap<>(16);
+    }
+
+    /**
+     * Report device health from the cached PLC connection. Without this override the
+     * SDK default always answers ONLINE, hiding a broken PLC link from the scheduler.
+     */
+    @Override
+    public DeviceHealthState health(Map<String, AttributeBO> driverConfig, DeviceBO device) {
+        if (Objects.isNull(device) || Objects.isNull(device.getId())) {
+            return DeviceHealthState.offline();
+        }
+        MyS7PLC cached = connectMap.get(device.getId());
+        if (Objects.isNull(cached)) {
+            return DeviceHealthState.offline();
+        }
+        try {
+            return cached.getPlc().checkConnected() ? DeviceHealthState.online() : DeviceHealthState.offline();
+        } catch (Exception e) {
+            log.warn(
+                    "Driver health check failed, protocol={}, deviceId={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    e);
+            return DeviceHealthState.offline();
+        }
     }
 
     @Override
