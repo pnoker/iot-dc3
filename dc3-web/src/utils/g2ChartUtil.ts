@@ -49,8 +49,18 @@ const MAX_ZERO_SIZE_FRAMES = 5;
  */
 const isEmptyBox = (el: HTMLElement): boolean => el.clientWidth === 0 || el.clientHeight === 0;
 
+/** Settle window: re-fit only after the container has stopped resizing. */
+const FIT_SETTLE_MS = 120;
+
 /**
  * Keep a self-constructed G2 chart fitted to its container box.
+ *
+ * Resize bursts (a sidebar sweep, a window drag) coalesce into ONE fit after
+ * the size has been stable for {@link FIT_SETTLE_MS}: a forceFit re-renders
+ * the whole chart, so fitting per frame during a width animation is the
+ * single most expensive thing a layout transition can do. While the burst is
+ * running the container clips its stale canvas so nothing bleeds past the
+ * shrinking box.
  *
  * Use this when a component builds the chart itself (custom options or a
  * multi-step render pipeline); otherwise prefer {@link mountG2Chart}.
@@ -61,18 +71,35 @@ const isEmptyBox = (el: HTMLElement): boolean => el.clientWidth === 0 || el.clie
  */
 export const observeChartSize = (container: HTMLElement, chart: ForceFitTarget): (() => void) => {
   let frame = 0;
+  let settle = 0;
+  let clipping = false;
   const fit = () => {
     cancelAnimationFrame(frame);
-    frame = requestAnimationFrame(() => void chart.forceFit());
+    frame = requestAnimationFrame(() => {
+      void chart.forceFit();
+      if (clipping) {
+        container.style.overflow = '';
+        clipping = false;
+      }
+    });
   };
-  const observer = new ResizeObserver(fit);
-  observer.observe(container);
   // The observer's initial notification coalesces with the layout settle,
   // so a chart that mounted on a half-finished box still snaps to size.
   fit();
+  const observer = new ResizeObserver(() => {
+    if (!clipping) {
+      container.style.overflow = 'hidden';
+      clipping = true;
+    }
+    clearTimeout(settle);
+    settle = window.setTimeout(fit, FIT_SETTLE_MS);
+  });
+  observer.observe(container);
   return () => {
     cancelAnimationFrame(frame);
+    clearTimeout(settle);
     observer.disconnect();
+    container.style.overflow = '';
   };
 };
 
@@ -92,6 +119,8 @@ export const mountG2Chart = (
   let chart: Chart | undefined;
   let disposeFit: (() => void) | undefined;
   let frame = 0;
+  let themeFrame = 0;
+  let themeObserver: MutationObserver | undefined;
   let disposed = false;
 
   const mount = (attempt: number) => {
@@ -106,9 +135,30 @@ export const mountG2Chart = (
   };
   mount(0);
 
+  // Chart colors are resolved from CSS variables once at build time, so a theme
+  // switch would leave every mounted chart wearing stale ink. html.dark flips a
+  // class on documentElement — the one signal every theme toggle produces — and
+  // a full re-mount rebuilds the chart with freshly resolved colors.
+  themeObserver = new MutationObserver(() => {
+    if (disposed) return;
+    cancelAnimationFrame(themeFrame);
+    themeFrame = requestAnimationFrame(() => {
+      if (disposed) return;
+      disposeFit?.();
+      disposeFit = undefined;
+      chart?.destroy();
+      chart = undefined;
+      mount(0);
+    });
+  });
+  themeObserver.observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
+
   return () => {
     disposed = true;
     cancelAnimationFrame(frame);
+    cancelAnimationFrame(themeFrame);
+    themeObserver?.disconnect();
+    themeObserver = undefined;
     disposeFit?.();
     disposeFit = undefined;
     chart?.destroy();

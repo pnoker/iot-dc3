@@ -50,6 +50,7 @@ import DashboardCard from '@/components/card/dashboard/DashboardCard.vue';
 import {useAsyncLoader} from '@/utils/asyncLoaderUtil';
 import {useEntityNames} from '@/composables/useEntityNames';
 import {DASHBOARD_PALETTE} from '@/config/constant/palette';
+import { useAppStore } from '@/store/modules/app';
 
 const {t, locale} = useI18n();
 const {loading, run, status} = useAsyncLoader();
@@ -70,6 +71,22 @@ const windowSec = 30;
 const pairs = ref<CorrelationPair[]>([]);
 const graphRef = ref<HTMLElement>();
 let graph: Graph | undefined;
+
+// Canvas can't resolve CSS variables, so ink colors are read from the
+// computed theme at render time and the graph re-renders on theme flips.
+const appStore = useAppStore();
+const themeInk = () =>
+  getComputedStyle(document.documentElement).getPropertyValue('--dc3-text-primary').trim() || '#303133';
+const themeEdge = () =>
+  getComputedStyle(document.documentElement)
+    .getPropertyValue('--dc3-border-base')
+    .trim() || '#c0c4cc';
+watch(
+  () => appStore.isDark,
+  () => {
+    if (pairs.value.length > 0) renderGraph();
+  }
+);
 
 const load = () =>
   run(
@@ -146,13 +163,13 @@ const renderGraph = () => {
         labelText: (d: { data?: { name?: string } }) => d.data?.name ?? '',
         labelPlacement: 'bottom',
         labelFontSize: 11,
-        labelFill: '#303133',
+        labelFill: themeInk(),
         cursor: 'pointer',
       },
     },
     edge: {
       style: {
-        stroke: '#c0c4cc',
+        stroke: themeEdge(),
         // Thicker edge = more co-occurrences. Clamp between 1-6 so a
         // single hot pair doesn't wash out everything else.
         lineWidth: (d: {
@@ -161,7 +178,7 @@ const renderGraph = () => {
         endArrow: false,
         labelText: (d: { data?: { weight?: number } }) => String(d.data?.weight ?? ''),
         labelFontSize: 10,
-        labelFill: '#909399',
+        labelFill: themeEdge(),
       },
     },
     behaviors: ['drag-canvas', 'zoom-canvas', 'drag-element'],
