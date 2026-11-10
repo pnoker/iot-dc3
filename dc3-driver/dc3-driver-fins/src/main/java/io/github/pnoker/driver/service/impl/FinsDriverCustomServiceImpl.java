@@ -31,6 +31,7 @@ import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.WritePointException;
 import java.io.IOException;
@@ -40,30 +41,33 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
  * Omron FINS protocol driver service implementation.
  * <p>
- * Communicates with Omron PLCs via the FINS protocol over TCP sockets.
- * Builds FINS frames manually with proper headers and memory read/write
- * commands. Supports D, W, H, and C memory areas.
+ * Communicates with Omron PLCs over FINS/TCP (Omron W420 "Ethernet" transport).
+ * Every TCP exchange carries the standard FINS/TCP envelope: the ASCII magic
+ * {@code 'FINS'}, a 4-byte big-endian length counting from the command field,
+ * a 4-byte command, and a 4-byte error field. Before the first data exchange
+ * the client performs the mandatory node-address registration handshake
+ * (command 0x00000000); the PLC answers with command 0x00000001 and assigns
+ * the client node address used as the FINS source node (SA1).
  * </p>
  * <p>
- * FINS frame structure (for TCP, a 4-byte length prefix is prepended):
- * </p>
- * <ul>
- *   <li>FINS Header: ICF(0x80) + RSV(0x00) + GCT(0x02) + DNA + DA1 + DA2 + SNA + SA1 + SA2 + SID</li>
- *   <li>FINS Command: MRC + SRC + area/destination code + address + length</li>
- * </ul>
- * <p>
- * Memory area codes: D=0x82, W=0xB1, H=0xB0, C=0x83
+ * FINS frame structure (inside the TCP envelope):
+ * ICF(0x80) + RSV(0x00) + GCT(0x02) + DNA + DA1 + DA2 + SNA + SA1 + SA2 + SID,
+ * followed by the command (MRC + SRC) and its parameters. Memory area codes:
+ * D=0x82, W=0xB1, H(HE)=0xB0, C(CIO)=0x83. FINS multi-byte fields are
+ * big-endian on the wire.
  * </p>
  *
  * @author pnoker
@@ -73,23 +77,33 @@ import org.springframework.stereotype.Service;
 @Service
 public class FinsDriverCustomServiceImpl implements DriverCustomService {
 
+    private static final byte[] FINS_TCP_MAGIC = {'F', 'I', 'N', 'S'};
+    private static final int FINS_TCP_LENGTH_OFFSET = 4;
+    private static final int FINS_TCP_COMMAND_OFFSET = 8;
+    private static final int FINS_TCP_ERROR_OFFSET = 12;
+    private static final int FINS_TCP_HEADER_SIZE = 16;
+    private static final int FINS_TCP_COMMAND_NODE_REGISTRATION = 0x00000000;
+    private static final int FINS_TCP_COMMAND_NODE_ACKNOWLEDGE = 0x00000001;
+    private static final int FINS_TCP_COMMAND_FINS_FRAME = 0x00000002;
+    /** Hard cap on accepted TCP payload sizes; real FINS frames stay below 2012 bytes. */
+    private static final int MAX_TCP_PAYLOAD = 4096;
+
     private static final byte FINS_ICF = (byte) 0x80;
     private static final byte FINS_RSV = (byte) 0x00;
     private static final byte FINS_GCT = (byte) 0x02;
 
-    private static final byte MRC_MEMORY_READ = 0x01;
+    private static final byte MRC_MEMORY = 0x01;
     private static final byte SRC_MEMORY_READ = 0x01;
-    private static final byte MRC_MEMORY_WRITE = 0x01;
     private static final byte SRC_MEMORY_WRITE = 0x02;
 
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final DriverProperties driverProperties;
 
-    private Map<Long, Socket> clientMap = new ConcurrentHashMap<>(16);
+    private Map<Long, FinsConnection> clientMap = new ConcurrentHashMap<>(16);
+    private final AtomicInteger sidSequence = new AtomicInteger(0);
 
-    /** Create the driver custom service. */
-    /** fins driver custom service impl. */
+    /** Create the FINS driver custom service. */
     public FinsDriverCustomServiceImpl(
             DriverMetadata driverMetadata, DriverSenderService driverSenderService, DriverProperties driverProperties) {
         this.driverProperties = driverProperties;
@@ -124,12 +138,14 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         if (Objects.isNull(device) || Objects.isNull(device.getId())) {
             return DeviceHealthState.offline();
         }
-        Socket socket = clientMap.get(device.getId());
-        if (Objects.nonNull(socket) && socket.isConnected() && !socket.isClosed()) {
+        FinsConnection connection = clientMap.get(device.getId());
+        if (Objects.nonNull(connection)
+                && connection.socket().isConnected()
+                && !connection.socket().isClosed()) {
             return DeviceHealthState.online();
         }
         try {
-            socket = getConnector(device.getId(), driverConfig);
+            getConnector(device.getId(), driverConfig);
         } catch (Exception e) {
             log.warn(
                     "Driver health check failed, protocol={}, deviceId={}",
@@ -138,7 +154,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                     e);
             return DeviceHealthState.offline();
         }
-        return Objects.nonNull(socket) ? DeviceHealthState.online() : DeviceHealthState.offline();
+        return DeviceHealthState.online();
     }
 
     @Override
@@ -156,9 +172,9 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
                 if (Objects.nonNull(metadataEvent.getId())) {
-                    Socket removed = clientMap.remove(metadataEvent.getId());
+                    FinsConnection removed = clientMap.remove(metadataEvent.getId());
                     if (Objects.nonNull(removed)) {
-                        closeSocket(removed);
+                        closeSocket(removed.socket());
                         log.info(
                                 "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
                                 driverProperties.getCode(),
@@ -183,15 +199,16 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             Map<String, AttributeBO> pointConfig,
             DeviceBO device,
             PointBO point) {
-        Socket socket = getConnector(device.getId(), driverConfig);
+        FinsConnection connection = getConnector(device.getId(), driverConfig);
         String memoryArea = getConfigValue(pointConfig, "memoryArea", "D");
         int address = getConfigIntValue(pointConfig, "address", 0);
         String dataType = getConfigValue(pointConfig, "dataType", "UINT16");
 
         try {
             byte areaCode = resolveMemoryAreaCode(memoryArea);
-            byte[] finsFrame = buildMemoryReadFrame(driverConfig, areaCode, address, wordCount(dataType));
-            byte[] response = sendFinsCommand(socket, finsFrame);
+            byte[] finsFrame =
+                    buildMemoryReadFrame(driverConfig, connection.clientNode(), areaCode, address, wordCount(dataType));
+            byte[] response = sendFinsCommand(connection, finsFrame);
 
             String value = parseReadResponse(response, dataType);
             return new ReadPointValue(device, point, value);
@@ -199,7 +216,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             throw e;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            closeSocket(socket);
+            closeSocket(connection.socket());
             throw new ReadPointException(
                     "FINS read failed, protocol={}, memoryArea={}, address={}, message={}",
                     driverProperties.getCode(),
@@ -217,7 +234,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             DeviceBO device,
             PointBO point,
             WritePointValue writePointValue) {
-        Socket socket = getConnector(device.getId(), driverConfig);
+        FinsConnection connection = getConnector(device.getId(), driverConfig);
         String memoryArea = getConfigValue(pointConfig, "memoryArea", "D");
         int address = getConfigIntValue(pointConfig, "address", 0);
         String dataType = getConfigValue(pointConfig, "dataType", "UINT16");
@@ -226,12 +243,16 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             String value = writePointValue.getValue(String.class);
             byte areaCode = resolveMemoryAreaCode(memoryArea);
             byte[] writeData = encodeWriteData(value, dataType);
-            byte[] finsFrame = buildMemoryWriteFrame(driverConfig, areaCode, address, writeData);
-            sendFinsCommand(socket, finsFrame);
+            byte[] finsFrame =
+                    buildMemoryWriteFrame(driverConfig, connection.clientNode(), areaCode, address, writeData);
+            byte[] response = sendFinsCommand(connection, finsFrame);
+            checkEndCode(response);
             return true;
+        } catch (WritePointException e) {
+            throw e;
         } catch (Exception e) {
             clientMap.remove(device.getId());
-            closeSocket(socket);
+            closeSocket(connection.socket());
             throw new WritePointException(
                     "FINS write failed, protocol={}, memoryArea={}, address={}, message={}",
                     driverProperties.getCode(),
@@ -243,13 +264,14 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Get or create a socket connection for the given device.
+     * Get or create a FINS/TCP connection for the given device, including the
+     * mandatory node-address registration handshake.
      *
      * @param deviceId     unique device identifier
      * @param driverConfig driver configuration
-     * @return cached or newly created Socket
+     * @return cached or newly created connection
      */
-    private Socket getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
+    private FinsConnection getConnector(Long deviceId, Map<String, AttributeBO> driverConfig) {
         return clientMap.computeIfAbsent(deviceId, id -> {
             String host = getConfigValue(driverConfig, "host", "127.0.0.1");
             int port = getConfigIntValue(driverConfig, "port", 9600);
@@ -258,13 +280,15 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 Socket socket = new Socket();
                 socket.connect(new InetSocketAddress(host, port), timeout);
                 socket.setSoTimeout(timeout);
+                int clientNode = performNodeRegistration(socket);
                 log.info(
-                        "Driver FINS connection established, protocol={}, deviceId={}, host={}:{}",
+                        "Driver FINS connection established, protocol={}, deviceId={}, host={}:{}, clientNode={}",
                         driverProperties.getCode(),
                         deviceId,
                         host,
-                        port);
-                return socket;
+                        port,
+                        clientNode);
+                return new FinsConnection(socket, clientNode);
             } catch (IOException e) {
                 log.error(
                         "Driver FINS connection failed, protocol={}, deviceId={}, host={}, port={}",
@@ -273,175 +297,272 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                         host,
                         port,
                         e);
-                return null;
+                throw new ConnectorException("FINS connect failed, host={}, port={}: {}", host, port, e.getMessage());
             }
         });
     }
 
     /**
-     * Build a FINS memory read frame.
+     * Run the FINS/TCP node-address registration handshake and return the
+     * client node address assigned by the PLC.
      *
-     * @param driverConfig driver configuration
-     * @param areaCode     memory area code
-     * @param address      memory address
-     * @param length       number of items to read
-     * @return FINS frame bytes
+     * @param socket an open, connected socket
+     * @return the node address the PLC assigned to this client
+     * @throws IOException on I/O or protocol error
      */
-    private byte[] buildMemoryReadFrame(Map<String, AttributeBO> driverConfig, byte areaCode, int address, int length) {
-        int srcNode = getConfigIntValue(driverConfig, "sourceNode", 1);
-        int destNode = getConfigIntValue(driverConfig, "destNode", 2);
-        int srcUnit = getConfigIntValue(driverConfig, "sourceUnit", 0);
-        int destUnit = getConfigIntValue(driverConfig, "destUnit", 0);
+    private int performNodeRegistration(Socket socket) throws IOException {
+        byte[] request = buildNodeRegistrationFrame();
+        writeFrame(socket, request);
 
-        // FINS header (10 bytes) + command (2 bytes) + read params (4 bytes) = 16 bytes total
-        ByteBuffer buffer = ByteBuffer.allocate(16);
-        buffer.order(ByteOrder.BIG_ENDIAN);
-
-        buffer.put(FINS_ICF);
-        buffer.put(FINS_RSV);
-        buffer.put(FINS_GCT);
-        buffer.put((byte) destNode);
-        buffer.put((byte) destUnit);
-        buffer.put((byte) 0x00); // DA2 (destination unit number high byte — typically 0)
-        buffer.put((byte) srcNode);
-        buffer.put((byte) srcUnit);
-        buffer.put((byte) 0x00); // SA2
-        buffer.put((byte) 0x01); // SID
-
-        buffer.put(MRC_MEMORY_READ);
-        buffer.put(SRC_MEMORY_READ);
-        buffer.put(areaCode);
-        // Address: 2 bytes big-endian
-        buffer.putShort((short) address);
-        buffer.put((byte) 0x00); // bit position
-        buffer.putShort((short) length);
-
-        return wrapWithTcpHeader(buffer.array());
+        byte[] response = readTcpEnvelope(socket);
+        int command = readInt(response, FINS_TCP_COMMAND_OFFSET);
+        int error = readInt(response, FINS_TCP_ERROR_OFFSET);
+        if (command != FINS_TCP_COMMAND_NODE_ACKNOWLEDGE) {
+            throw new IOException(
+                    "FINS/TCP node registration got unexpected command 0x" + Integer.toHexString(command));
+        }
+        if (error != 0) {
+            throw new IOException("FINS/TCP node registration failed, error=0x" + Integer.toHexString(error));
+        }
+        if (response.length < FINS_TCP_HEADER_SIZE + 4) {
+            throw new IOException("FINS/TCP node registration response missing client node address");
+        }
+        return readInt(response, FINS_TCP_HEADER_SIZE);
     }
 
     /**
-     * Build a FINS memory write frame.
+     * Build the FINS/TCP node-address registration frame (command 0x00000000).
      *
-     * @param driverConfig driver configuration
-     * @param areaCode     memory area code
-     * @param address      memory address
-     * @param data         data bytes to write
-     * @return FINS frame bytes
+     * @return the complete registration frame
      */
-    private byte[] buildMemoryWriteFrame(
-            Map<String, AttributeBO> driverConfig, byte areaCode, int address, byte[] data) {
-        int srcNode = getConfigIntValue(driverConfig, "sourceNode", 1);
-        int destNode = getConfigIntValue(driverConfig, "destNode", 2);
-        int srcUnit = getConfigIntValue(driverConfig, "sourceUnit", 0);
-        int destUnit = getConfigIntValue(driverConfig, "destUnit", 0);
-
-        // FINS header (10) + command (2) + write params (6) + data = variable
-        int frameSize = 10 + 2 + 6 + data.length;
-        ByteBuffer buffer = ByteBuffer.allocate(frameSize);
+    byte[] buildNodeRegistrationFrame() {
+        ByteBuffer buffer = ByteBuffer.allocate(FINS_TCP_HEADER_SIZE);
         buffer.order(ByteOrder.BIG_ENDIAN);
-
-        buffer.put(FINS_ICF);
-        buffer.put(FINS_RSV);
-        buffer.put(FINS_GCT);
-        buffer.put((byte) destNode);
-        buffer.put((byte) destUnit);
-        buffer.put((byte) 0x00); // DA2
-        buffer.put((byte) srcNode);
-        buffer.put((byte) srcUnit);
-        buffer.put((byte) 0x00); // SA2
-        buffer.put((byte) 0x01); // SID
-
-        buffer.put(MRC_MEMORY_WRITE);
-        buffer.put(SRC_MEMORY_WRITE);
-        buffer.put(areaCode);
-        buffer.putShort((short) address);
-        buffer.put((byte) 0x00); // bit position
-        buffer.putShort((short) data.length);
-        buffer.put(data);
-
-        return wrapWithTcpHeader(buffer.array());
+        buffer.put(FINS_TCP_MAGIC);
+        buffer.putInt(FINS_TCP_HEADER_SIZE - FINS_TCP_COMMAND_OFFSET);
+        buffer.putInt(FINS_TCP_COMMAND_NODE_REGISTRATION);
+        buffer.putInt(0);
+        return buffer.array();
     }
 
     /**
-     * Wrap FINS frame with TCP header (4-byte length prefix).
+     * Wrap a raw FINS frame in the FINS/TCP data-send envelope (command 0x00000002).
      *
      * @param finsFrame the raw FINS frame
-     * @return frame with TCP length prefix
+     * @return frame with the TCP envelope
      */
-    private byte[] wrapWithTcpHeader(byte[] finsFrame) {
-        ByteBuffer wrapped = ByteBuffer.allocate(4 + finsFrame.length);
+    byte[] wrapWithTcpHeader(byte[] finsFrame) {
+        ByteBuffer wrapped = ByteBuffer.allocate(FINS_TCP_HEADER_SIZE + finsFrame.length);
         wrapped.order(ByteOrder.BIG_ENDIAN);
-        wrapped.putInt(finsFrame.length);
+        wrapped.put(FINS_TCP_MAGIC);
+        wrapped.putInt(finsFrame.length + (FINS_TCP_HEADER_SIZE - FINS_TCP_COMMAND_OFFSET));
+        wrapped.putInt(FINS_TCP_COMMAND_FINS_FRAME);
+        wrapped.putInt(0);
         wrapped.put(finsFrame);
         return wrapped.array();
     }
 
     /**
-     * Send a FINS command frame and receive the response.
+     * Build a FINS memory area read command (0101).
      *
-     * @param socket    the TCP socket
-     * @param finsFrame the FINS command frame
-     * @return response data bytes
-     * @throws IOException on I/O error
+     * @param driverConfig driver configuration
+     * @param clientNode   node address assigned by the PLC handshake
+     * @param areaCode     memory area code
+     * @param address      memory address
+     * @param length       number of items to read
+     * @return raw FINS frame (without the TCP envelope)
      */
-    private byte[] sendFinsCommand(Socket socket, byte[] finsFrame) throws IOException {
+    private byte[] buildMemoryReadFrame(
+            Map<String, AttributeBO> driverConfig, int clientNode, byte areaCode, int address, int length) {
+        ByteBuffer buffer = ByteBuffer.allocate(10 + 2 + 6);
+        buffer.order(ByteOrder.BIG_ENDIAN);
+        putFinsHeader(buffer, driverConfig, clientNode);
+        buffer.put(MRC_MEMORY);
+        buffer.put(SRC_MEMORY_READ);
+        buffer.put(areaCode);
+        buffer.putShort((short) address);
+        buffer.put((byte) 0x00); // bit position (word access)
+        buffer.putShort((short) length);
+        return buffer.array();
+    }
+
+    /**
+     * Build a FINS memory area write command (0102).
+     *
+     * @param driverConfig driver configuration
+     * @param clientNode   node address assigned by the PLC handshake
+     * @param areaCode     memory area code
+     * @param address      memory address
+     * @param data         data bytes to write
+     * @return raw FINS frame (without the TCP envelope)
+     */
+    private byte[] buildMemoryWriteFrame(
+            Map<String, AttributeBO> driverConfig, int clientNode, byte areaCode, int address, byte[] data) {
+        ByteBuffer buffer = ByteBuffer.allocate(10 + 2 + 6 + data.length);
+        buffer.order(ByteOrder.BIG_ENDIAN);
+        putFinsHeader(buffer, driverConfig, clientNode);
+        buffer.put(MRC_MEMORY);
+        buffer.put(SRC_MEMORY_WRITE);
+        buffer.put(areaCode);
+        buffer.putShort((short) address);
+        buffer.put((byte) 0x00); // bit position (word access)
+        buffer.putShort((short) (data.length / 2));
+        buffer.put(data);
+        return buffer.array();
+    }
+
+    /**
+     * Write the 10-byte FINS header with corrected address semantics:
+     * DNA/DA1/DA2 (destination network/node/unit) then SNA/SA1/SA2 (source).
+     *
+     * @param buffer      target buffer
+     * @param config      driver configuration for node overrides
+     * @param clientNode  node address assigned by the PLC handshake (SA1 default)
+     */
+    private void putFinsHeader(ByteBuffer buffer, Map<String, AttributeBO> config, int clientNode) {
+        int destNode = getConfigIntValue(config, "destNode", 2);
+        int destUnit = getConfigIntValue(config, "destUnit", 0);
+        int srcNode = getConfigIntValue(config, "sourceNode", clientNode);
+        int srcUnit = getConfigIntValue(config, "sourceUnit", 0);
+        int sid = sidSequence.updateAndGet(current -> current >= 0xFE ? 1 : current + 1);
+
+        buffer.put(FINS_ICF);
+        buffer.put(FINS_RSV);
+        buffer.put(FINS_GCT);
+        buffer.put((byte) 0x00); // DNA — local network
+        buffer.put((byte) destNode); // DA1 — destination node address
+        buffer.put((byte) destUnit); // DA2 — destination unit (CPU)
+        buffer.put((byte) 0x00); // SNA — source network, local
+        buffer.put((byte) srcNode); // SA1 — source node address
+        buffer.put((byte) srcUnit); // SA2 — source unit (CPU)
+        buffer.put((byte) sid);
+    }
+
+    /**
+     * Send a raw FINS frame in a FINS/TCP envelope and receive the response
+     * envelope, returning the raw FINS response frame.
+     *
+     * @param connection the device connection holding the socket
+     * @param finsFrame  the raw FINS command frame
+     * @return raw FINS response frame (without the TCP envelope)
+     * @throws IOException on I/O or protocol error
+     */
+    private byte[] sendFinsCommand(FinsConnection connection, byte[] finsFrame) throws IOException {
+        // Serialize request/response exchanges: a scheduled read and a command write
+        // racing on the same socket would interleave FINS/TCP envelopes.
+        connection.lock.lock();
+        try {
+            Socket socket = connection.socket();
+            writeFrame(socket, wrapWithTcpHeader(finsFrame));
+
+            byte[] envelope = readTcpEnvelope(socket);
+            int command = readInt(envelope, FINS_TCP_COMMAND_OFFSET);
+            int error = readInt(envelope, FINS_TCP_ERROR_OFFSET);
+            if (command != FINS_TCP_COMMAND_FINS_FRAME) {
+                throw new IOException(
+                        "FINS/TCP data response has unexpected command 0x" + Integer.toHexString(command));
+            }
+            if (error != 0) {
+                throw new IOException("FINS/TCP transport error 0x" + Integer.toHexString(error));
+            }
+            byte[] finsResponse = new byte[envelope.length - FINS_TCP_HEADER_SIZE];
+            System.arraycopy(envelope, FINS_TCP_HEADER_SIZE, finsResponse, 0, finsResponse.length);
+            return finsResponse;
+        } finally {
+            connection.lock.unlock();
+        }
+    }
+
+    private void writeFrame(Socket socket, byte[] frame) throws IOException {
         OutputStream out = socket.getOutputStream();
-        out.write(finsFrame);
+        out.write(frame);
         out.flush();
+    }
 
+    /**
+     * Read one complete FINS/TCP envelope: 4-byte magic, 4-byte length, then
+     * the length-counted payload. Both header reads loop until full because a
+     * TCP segment may carry only part of a header.
+     *
+     * @param socket the TCP socket
+     * @return the full envelope (magic + length + payload)
+     * @throws IOException on I/O, magic mismatch, or oversized payload
+     */
+    private byte[] readTcpEnvelope(Socket socket) throws IOException {
         InputStream in = socket.getInputStream();
-        // Read TCP length header (4 bytes)
-        byte[] lengthHeader = new byte[4];
-        int read = in.read(lengthHeader);
-        if (read != 4) {
-            throw new ReadPointException("FINS response TCP header incomplete, bytesRead={}", read);
+        byte[] header = new byte[FINS_TCP_LENGTH_OFFSET + 4];
+        readFully(in, header);
+        if (header[0] != FINS_TCP_MAGIC[0]
+                || header[1] != FINS_TCP_MAGIC[1]
+                || header[2] != FINS_TCP_MAGIC[2]
+                || header[3] != FINS_TCP_MAGIC[3]) {
+            throw new IOException("FINS/TCP response is missing the 'FINS' magic");
         }
-        int responseLength =
-                ByteBuffer.wrap(lengthHeader).order(ByteOrder.BIG_ENDIAN).getInt();
-        if (responseLength <= 0 || responseLength > 2048) {
-            throw new ReadPointException("FINS invalid response length: {}", responseLength);
+        int payloadLength = readInt(header, FINS_TCP_LENGTH_OFFSET);
+        if (payloadLength <= 0 || payloadLength > MAX_TCP_PAYLOAD) {
+            throw new IOException("FINS invalid response length: " + payloadLength);
         }
+        byte[] envelope = new byte[header.length + payloadLength];
+        System.arraycopy(header, 0, envelope, 0, header.length);
+        readFully(in, envelope, header.length, payloadLength);
+        return envelope;
+    }
 
-        // Read response payload
-        byte[] response = new byte[responseLength];
+    private void readFully(InputStream in, byte[] buffer) throws IOException {
+        readFully(in, buffer, 0, buffer.length);
+    }
+
+    private void readFully(InputStream in, byte[] buffer, int offset, int length) throws IOException {
         int totalRead = 0;
-        while (totalRead < responseLength) {
-            read = in.read(response, totalRead, responseLength - totalRead);
+        while (totalRead < length) {
+            int read = in.read(buffer, offset + totalRead, length - totalRead);
             if (read < 0) {
-                throw new ReadPointException("FINS response stream ended prematurely");
+                throw new IOException("FINS response stream ended prematurely");
             }
             totalRead += read;
         }
-        return response;
+    }
+
+    private int readInt(byte[] data, int offset) {
+        return ByteBuffer.wrap(data, offset, 4).order(ByteOrder.BIG_ENDIAN).getInt();
     }
 
     /**
      * Parse memory read response.
      *
-     * @param response FINS response bytes
+     * @param response raw FINS response frame
      * @param dataType expected data type
      * @return parsed value as string
      */
     private String parseReadResponse(byte[] response, String dataType) {
         // FINS response: FINS header (10) + command (2) + end code (2) + data
-        // Data starts at byte 14 (index 14) in the raw FINS frame (without TCP header)
         int dataOffset = 14;
         if (response.length <= dataOffset) {
             throw new ReadPointException("FINS response too short, length={}", response.length);
         }
+        checkEndCode(response);
 
-        // Check end code
-        int endCode = ((response[12] & 0xFF) << 8) | (response[13] & 0xFF);
-        if (endCode != 0) {
-            throw new ReadPointException("FINS command failed, endCode=0x{}", Integer.toHexString(endCode));
-        }
-
-        // Extract data bytes
         int dataLen = response.length - dataOffset;
         byte[] data = new byte[dataLen];
         System.arraycopy(response, dataOffset, data, 0, dataLen);
 
         return decodeValue(data, dataType);
+    }
+
+    /**
+     * Verify the end code of a FINS response frame; a non-zero end code means
+     * the PLC rejected the command, and the caller must not treat it as success.
+     *
+     * @param response raw FINS response frame (header + command + end code)
+     */
+    private void checkEndCode(byte[] response) {
+        if (response.length < 14) {
+            throw new ReadPointException("FINS response too short to carry an end code, length={}", response.length);
+        }
+        int endCode = ((response[12] & 0xFF) << 8) | (response[13] & 0xFF);
+        if (endCode != 0) {
+            throw new ReadPointException("FINS command failed, endCode=0x{}", Integer.toHexString(endCode));
+        }
     }
 
     /**
@@ -465,7 +586,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                         ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getInt()));
             case "FLOAT" ->
                 String.valueOf(ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).getFloat());
-            case "STRING" -> new String(data).trim();
+            case "STRING" -> new String(data, StandardCharsets.US_ASCII).trim();
             case "BCD" -> bytesToBcdString(data);
             default -> CodecUtil.bytesToHex(data);
         };
@@ -486,64 +607,60 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
     }
 
     /**
-     * Encode a string value to bytes for FINS write operations.
+     * Encode a string value to bytes for FINS write operations. A value that
+     * cannot be parsed as the configured type is rejected: silently writing 0
+     * would put wrong data into a physical PLC.
      *
      * @param value    string value
      * @param dataType data type identifier
      * @return encoded bytes
      */
     byte[] encodeWriteData(String value, String dataType) {
-        byte[] data;
         switch (dataType.toUpperCase()) {
-            case "INT16":
-            case "UINT16": {
-                data = new byte[2];
-                short s;
+            case "INT16", "UINT16": {
+                short parsed;
                 try {
-                    s = Short.parseShort(value);
+                    parsed = Short.parseShort(value.trim());
                 } catch (NumberFormatException e) {
-                    s = 0;
+                    throw new WritePointException("FINS write value '{}' is not a valid UINT16", value);
                 }
-                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putShort(s);
-                break;
+                byte[] data = new byte[2];
+                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putShort(parsed);
+                return data;
             }
-            case "INT32":
-            case "UINT32": {
-                data = new byte[4];
-                int i;
-
+            case "INT32", "UINT32": {
+                int parsed;
                 try {
-
-                    i = Integer.parseInt(value);
-
+                    parsed = Integer.parseInt(value.trim());
                 } catch (NumberFormatException e) {
-
-                    i = 0;
+                    throw new WritePointException("FINS write value '{}' is not a valid INT32", value);
                 }
-                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putInt(i);
-                break;
+                byte[] data = new byte[4];
+                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putInt(parsed);
+                return data;
             }
             case "FLOAT": {
-                data = new byte[4];
-                float f;
+                float parsed;
                 try {
-                    f = Float.parseFloat(value);
+                    parsed = Float.parseFloat(value.trim());
                 } catch (NumberFormatException e) {
-                    f = 0f;
+                    throw new WritePointException("FINS write value '{}' is not a valid FLOAT", value);
                 }
-                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putFloat(f);
-                break;
+                byte[] data = new byte[4];
+                ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN).putFloat(parsed);
+                return data;
             }
             case "STRING": {
-                data = value.getBytes();
-                break;
+                return value.getBytes(StandardCharsets.US_ASCII);
             }
             default: {
-                data = CodecUtil.hexToBytes(value);
-                break;
+                byte[] data = CodecUtil.hexToBytes(value);
+                if (data.length == 0 && value.length() > 0) {
+                    throw new WritePointException("FINS write value '{}' is not valid hex", value);
+                }
+                return data;
             }
         }
-        return data;
     }
 
     /**
@@ -558,7 +675,7 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
             case "W" -> (byte) 0xB1;
             case "H" -> (byte) 0xB0;
             case "C" -> (byte) 0x83;
-            default -> (byte) 0x82;
+            default -> throw new ReadPointException("FINS unsupported memory area '{}'", memoryArea);
         };
     }
 
@@ -604,7 +721,6 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
         List<ValidationReport.AttributeIssue> issues = new ArrayList<>();
         checkRequired(driverConfig, "host", issues);
         checkRequired(driverConfig, "port", issues);
-        checkRequired(driverConfig, "protocol", issues);
         return ValidationReport.builder()
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues)
@@ -620,5 +736,29 @@ public class FinsDriverCustomServiceImpl implements DriverCustomService {
                 .passed(issues.stream().noneMatch(i -> i.getLevel() == ValidationReport.IssueLevel.ERROR))
                 .issues(issues)
                 .build();
+    }
+
+    /**
+     * Holder pairing a device socket with the node address the PLC assigned
+     * during the FINS/TCP registration handshake.
+     */
+    private static final class FinsConnection {
+
+        private final Socket socket;
+        private final int clientNode;
+        private final java.util.concurrent.locks.ReentrantLock lock = new java.util.concurrent.locks.ReentrantLock();
+
+        private FinsConnection(Socket socket, int clientNode) {
+            this.socket = socket;
+            this.clientNode = clientNode;
+        }
+
+        Socket socket() {
+            return socket;
+        }
+
+        int clientNode() {
+            return clientNode;
+        }
     }
 }
