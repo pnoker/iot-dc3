@@ -18,10 +18,12 @@ package io.github.pnoker.common.utils;
 
 import io.github.pnoker.common.constant.common.ExceptionConstant;
 import io.github.pnoker.common.exception.NotFoundException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -58,7 +60,11 @@ public class ResponseUtil {
             }
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename());
+            headers.setContentDisposition(ContentDisposition.attachment()
+                    .filename(
+                            resource.getFilename() == null ? "download" : resource.getFilename(),
+                            StandardCharsets.UTF_8)
+                    .build());
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
             return ResponseEntity.ok()
