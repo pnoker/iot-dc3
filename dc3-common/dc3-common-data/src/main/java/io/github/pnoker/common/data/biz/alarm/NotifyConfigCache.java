@@ -87,7 +87,12 @@ public class NotifyConfigCache {
         if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
         return notifyCache.get(
                 new NotifyKey(id, tenantId),
-                key -> configStore.getNotify(key.tenantId(), key.id()).cache());
+                // Mono.cache() memoizes error terminals; evicting the entry on failure
+                // keeps a transient store outage from being replayed for the whole TTL.
+                key -> configStore.getNotify(key.tenantId(), key.id()).cache().onErrorResume(error -> {
+                    notifyCache.invalidate(new NotifyKey(key.tenantId(), key.id()));
+                    return Mono.error(error);
+                }));
     }
 
     /**
@@ -100,7 +105,12 @@ public class NotifyConfigCache {
         if (!isValidId(id) || !isValidId(tenantId)) return Mono.empty();
         return messageCache.get(
                 new MessageKey(id, tenantId),
-                key -> configStore.getMessage(key.tenantId(), key.id()).cache());
+                // Mono.cache() memoizes error terminals; evicting the entry on failure
+                // keeps a transient store outage from being replayed for the whole TTL.
+                key -> configStore.getMessage(key.tenantId(), key.id()).cache().onErrorResume(error -> {
+                    messageCache.invalidate(new MessageKey(key.tenantId(), key.id()));
+                    return Mono.error(error);
+                }));
     }
 
     /**
@@ -117,7 +127,11 @@ public class NotifyConfigCache {
                         .getChannel(key.tenantId(), key.id())
                         .filter(channel -> Objects.equals(channel.getTenantId(), key.tenantId())
                                 && channel.getChannelTypeFlag() != null)
-                        .cache());
+                        .cache()
+                        .onErrorResume(error -> {
+                            channelCache.invalidate(new ChannelKey(key.tenantId(), key.id()));
+                            return Mono.error(error);
+                        }));
     }
 
     /**
