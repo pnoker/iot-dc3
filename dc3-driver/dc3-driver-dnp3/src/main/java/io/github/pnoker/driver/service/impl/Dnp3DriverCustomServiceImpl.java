@@ -237,6 +237,7 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
         int port = getConfigIntValue(driverConfig, "port", 20_000);
         int masterAddress = getConfigIntValue(driverConfig, "masterAddress", 1);
         int outstationAddress = getConfigIntValue(driverConfig, "outstationAddress", 1);
+        validateEndpoint(host, port);
         try {
             Runtime runtime = new Runtime(new RuntimeConfig());
             MasterChannelConfig channelConfig = new MasterChannelConfig(UShort.valueOf(masterAddress));
@@ -263,24 +264,50 @@ public class Dnp3DriverCustomServiceImpl implements DriverCustomService {
                                     clientState);
                         }
                     });
+            // A created channel starts DISABLED and never connects on its own; enable()
+            // hands it to the connect strategy, which retries in the background.
             Map<String, Map<Integer, String>> cache = new ConcurrentHashMap<>();
             AssociationConfig associationConfig =
                     new AssociationConfig(EventClasses.all(), EventClasses.none(), Classes.all(), EventClasses.none());
-            AssociationId associationId = channel.addAssociation(
-                    UShort.valueOf(outstationAddress),
-                    associationConfig,
-                    new CacheReadHandler(cache, null),
-                    new CurrentTimeAssociationHandler(),
-                    new NoopAssociationInformation());
-            log.info(
-                    "Driver connection established, protocol={}, deviceId={}, host={}:{}",
-                    driverProperties.getCode(),
-                    deviceId,
-                    host,
-                    port);
-            return new Dnp3Connection(runtime, channel, associationId, cache, state);
+            try {
+                AssociationId associationId = channel.addAssociation(
+                        UShort.valueOf(outstationAddress),
+                        associationConfig,
+                        new CacheReadHandler(cache, null),
+                        new CurrentTimeAssociationHandler(),
+                        new NoopAssociationInformation());
+                channel.enable();
+                log.info(
+                        "Driver connection established, protocol={}, deviceId={}, host={}:{}",
+                        driverProperties.getCode(),
+                        deviceId,
+                        host,
+                        port);
+                return new Dnp3Connection(runtime, channel, associationId, cache, state);
+            } catch (Exception associationError) {
+                // The native runtime owns its threads; leaving it un-shutdown leaks them.
+                runtime.shutdown();
+                throw associationError;
+            }
         } catch (Exception e) {
             throw new ConnectorException("Failed to create DNP3 channel: {}:{}", host, port, e);
+        }
+    }
+
+    /**
+     * Reject junk endpoints before they reach the native channel: handing a 4KB
+     * garbage hostname to the library can block inside its resolver far beyond any
+     * reasonable read timeout, so structurally invalid endpoints fail fast here.
+     *
+     * @param host endpoint host (IP literal or host name)
+     * @param port endpoint port
+     */
+    private static void validateEndpoint(String host, int port) {
+        if (Objects.isNull(host) || host.isBlank() || host.length() > 253 || !host.matches("[A-Za-z0-9.\\-_]+")) {
+            throw new ConnectorException("DNP3 host is not a valid IP address or host name: {}", host);
+        }
+        if (port < 1 || port > 65535) {
+            throw new ConnectorException("DNP3 port {} is outside the valid range 1..65535", port);
         }
     }
 
