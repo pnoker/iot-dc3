@@ -99,27 +99,34 @@ public class MessageSenderImpl implements MessageSender, ReactiveMessageSender {
 
     @Override
     public reactor.core.publisher.Mono<Void> sendConfirmed(MqMessage message) {
-        return reactor.core.publisher.Mono.create(sink -> {
-            AtomicBoolean cancelled = new AtomicBoolean();
-            sink.onCancel(() -> cancelled.set(true));
-            WireMqMessage wire;
-            try {
-                wire = EnvelopeCodec.prepare(message);
-            } catch (Throwable error) {
-                sink.error(error);
-                return;
-            }
-            adapter.publish(wire, (envelope, confirmed, cause) -> {
-                if (cancelled.get()) {
-                    return;
-                }
-                if (confirmed) {
-                    sink.success();
-                } else {
-                    sink.error(cause != null ? cause : new MqPublishException("Broker did not confirm the publish"));
-                }
-            });
-        });
+        return reactor.core.publisher.Mono.<Void>create(sink -> {
+                    AtomicBoolean cancelled = new AtomicBoolean();
+                    sink.onCancel(() -> cancelled.set(true));
+                    WireMqMessage wire;
+                    try {
+                        wire = EnvelopeCodec.prepare(message);
+                    } catch (Throwable error) {
+                        sink.error(error);
+                        return;
+                    }
+                    adapter.publish(wire, (envelope, confirmed, cause) -> {
+                        if (cancelled.get()) {
+                            return;
+                        }
+                        if (confirmed) {
+                            sink.success();
+                        } else {
+                            sink.error(
+                                    cause != null
+                                            ? cause
+                                            : new MqPublishException("Broker did not confirm the publish"));
+                        }
+                    });
+                })
+                // Rabbit publishing blocks on broker I/O; without this hop the adapter call runs
+                // on the subscriber's thread, which for store-then-publish chains is an R2DBC/Netty
+                // event loop, and one slow broker freeze would stall every connection on it.
+                .subscribeOn(reactor.core.scheduler.Schedulers.boundedElastic());
     }
 
     private void publishWithDelayFallback(MqMessage message, WireMqMessage wire) {
