@@ -59,7 +59,10 @@ export function registerDashboardCommand(program: Command): void {
     .command('timeseries')
     .description('Time series data')
     .addOption(
-      new Option('--granularity <g>', 'Time bucket granularity: hour groups by hour-of-day, day by calendar date')
+      new Option(
+        '--granularity <g>',
+        'Time bucket granularity: hour groups by hour-of-day, day by calendar date',
+      )
         .choices(['hour', 'day'])
         .default('hour'),
     )
@@ -88,24 +91,29 @@ export function registerDashboardCommand(program: Command): void {
     .option('--range-hours <n>', 'Hours to look back', parsePositiveInteger, 24)
     .option('--limit <n>', 'Max results', parsePositiveInteger, 10)
     .option('--format <format>', 'Output format')
-    .action(async (opts: { dimension: string; rangeHours: number; limit: number; format?: string }) => {
-      const format = detectFormat(opts.format);
-      const result = await dc3Client.get(
-        withQuery('/api/v3/data/dashboard/top', {
-          dimension: opts.dimension,
-          range_hours: opts.rangeHours,
-          limit: opts.limit,
-        }),
-      );
-      printAndExit(result, format);
-    });
+    .action(
+      async (opts: { dimension: string; rangeHours: number; limit: number; format?: string }) => {
+        const format = detectFormat(opts.format);
+        const result = await dc3Client.get(
+          withQuery('/api/v3/data/dashboard/top', {
+            dimension: opts.dimension,
+            range_hours: opts.rangeHours,
+            limit: opts.limit,
+          }),
+        );
+        printAndExit(result, format);
+      },
+    );
 
   // dc3 dashboard topology
   dash
     .command('topology')
     .description('System topology')
     .addOption(
-      new Option('--mode <mode>', 'Aggregation mode: cardinality counts per edge, volume weights by samples')
+      new Option(
+        '--mode <mode>',
+        'Aggregation mode: cardinality counts per edge, volume weights by samples',
+      )
         .choices(['cardinality', 'volume'])
         .default('cardinality'),
     )

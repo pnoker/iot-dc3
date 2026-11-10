@@ -326,7 +326,7 @@ export class ConfigManager {
   /**
    * Persist the in-memory config as-is (rare; mutations should use the
    * internal locked path instead so concurrent writers are not lost).
- */
+   */
   async save(): Promise<void> {
     if (!this.config) throw new Error('Config not loaded');
     await writeConfig(this.config);

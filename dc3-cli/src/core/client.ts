@@ -18,7 +18,12 @@ import { configManager } from './config-manager.js';
 import { tokenManager, credentialIdentifier } from './token-manager.js';
 import type { TokenState } from './token-manager.js';
 import { resolvePassword, deletePasswordFromStore } from './credential-store.js';
-import { fetchOrNetworkError, normalizeGateway, readBodyText, warnInsecureTransport } from './http.js';
+import {
+  fetchOrNetworkError,
+  normalizeGateway,
+  readBodyText,
+  warnInsecureTransport,
+} from './http.js';
 import { ApiError, AuthError } from './errors.js';
 import { decodeJwt } from '../utils/jwt.js';
 
@@ -305,7 +310,11 @@ export class Dc3Client {
     extraHeaders: Record<string, string> = {},
   ): Promise<T> {
     const res = await this.fetchAuthenticated(method, path, body, retryOn401, extraHeaders);
-    return decodeResponseBody<T>(res.status, res.headers.get('content-type'), await readBodyText(res));
+    return decodeResponseBody<T>(
+      res.status,
+      res.headers.get('content-type'),
+      await readBodyText(res),
+    );
   }
 
   /**
@@ -678,7 +687,12 @@ export function parseTokenResource(value: unknown): string {
     // Response-shape failure on the login endpoint: classify as the dedicated
     // API_BAD_BODY machine code (mirroring decodeResponseBody) instead of a
     // plain Error that the chokepoint would render as code INTERNAL.
-    throw new ApiError('Token endpoint returned an invalid resource', undefined, undefined, 'API_BAD_BODY');
+    throw new ApiError(
+      'Token endpoint returned an invalid resource',
+      undefined,
+      undefined,
+      'API_BAD_BODY',
+    );
   }
   return value;
 }
@@ -699,7 +713,11 @@ export function parseAuthField(body: string, field: string, label: string): stri
   } catch {
     parsed = undefined;
   }
-  if (parsed !== null && typeof parsed === 'object' && typeof (parsed as Record<string, unknown>)[field] === 'string') {
+  if (
+    parsed !== null &&
+    typeof parsed === 'object' &&
+    typeof (parsed as Record<string, unknown>)[field] === 'string'
+  ) {
     const value = (parsed as Record<string, string>)[field];
     if (value.length > 0) return value;
   }

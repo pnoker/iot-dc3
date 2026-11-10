@@ -99,7 +99,9 @@ function clampDeadlineToOperationExpiry(deadline: number, expiresAt: string | nu
     return deadline;
   }
   const expiry = Date.parse(expiresAt);
-  return Number.isFinite(expiry) ? Math.min(deadline, expiry + OPERATION_EXPIRY_GRACE_MS) : deadline;
+  return Number.isFinite(expiry)
+    ? Math.min(deadline, expiry + OPERATION_EXPIRY_GRACE_MS)
+    : deadline;
 }
 
 /**
@@ -114,10 +116,13 @@ function delayUntil(wakeAtMs: number, signal: AbortSignal): Promise<void> {
       clearTimeout(timer);
       resolve();
     };
-    const timer = setTimeout(() => {
-      signal.removeEventListener('abort', onAbort);
-      resolve();
-    }, Math.max(0, wakeAtMs - Date.now()));
+    const timer = setTimeout(
+      () => {
+        signal.removeEventListener('abort', onAbort);
+        resolve();
+      },
+      Math.max(0, wakeAtMs - Date.now()),
+    );
     signal.addEventListener('abort', onAbort, { once: true });
   });
 }
@@ -178,7 +183,10 @@ export async function waitForOperation(
       if (Date.now() >= deadline) {
         throw new OperationWaitTimeout(accepted, operation, Date.now() - startedAt);
       }
-      await delayUntil(Date.now() + Math.min(delayMs, MAX_POLL_INTERVAL_MS, deadline - Date.now()), controller.signal);
+      await delayUntil(
+        Date.now() + Math.min(delayMs, MAX_POLL_INTERVAL_MS, deadline - Date.now()),
+        controller.signal,
+      );
       delayMs = Math.min(delayMs * 2, MAX_POLL_INTERVAL_MS);
     }
   } finally {
@@ -358,9 +366,7 @@ export function registerDeviceCommand(program: Command): void {
       requireResourceId('/api/v3/data/device/status', id);
       // Single-device status is a GET path param (DeviceStatusController L176),
       // not the POST /list query body used for paginated status listings.
-      const result = await dc3Client.get(
-        `/api/v3/data/device/status/${encodeURIComponent(id)}`,
-      );
+      const result = await dc3Client.get(`/api/v3/data/device/status/${encodeURIComponent(id)}`);
       printAndExit(result, format);
     });
 
@@ -468,7 +474,12 @@ export function registerDeviceCommand(program: Command): void {
       );
       const buffer = Buffer.from(await res.arrayBuffer());
       if (buffer.length === 0) {
-        throw new ApiError('Template download returned an empty body', undefined, undefined, 'API_BAD_BODY');
+        throw new ApiError(
+          'Template download returned an empty body',
+          undefined,
+          undefined,
+          'API_BAD_BODY',
+        );
       }
       try {
         await writeFile(outputPath, buffer);

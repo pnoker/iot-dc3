@@ -104,7 +104,9 @@ function formatExtBlob(value: Record<string, unknown>): string {
   const parts: string[] = [];
   for (const [key, member] of Object.entries(value)) {
     if (member === null || member === undefined) continue;
-    parts.push(`${key}=${typeof member === 'object' ? (JSON.stringify(member) ?? String(member)) : String(member)}`);
+    parts.push(
+      `${key}=${typeof member === 'object' ? (JSON.stringify(member) ?? String(member)) : String(member)}`,
+    );
   }
   return parts.length > 0 ? parts.join(' ') : '{}';
 }
@@ -121,7 +123,9 @@ function cellify(value: unknown, key?: string): string {
   if (value === undefined) return '';
   if (value === null) return 'null';
   if (isRecord(value)) {
-    return key !== undefined && EXT_BLOB_KEY.test(key) ? formatExtBlob(value) : JSON.stringify(value) ?? String(value);
+    return key !== undefined && EXT_BLOB_KEY.test(key)
+      ? formatExtBlob(value)
+      : (JSON.stringify(value) ?? String(value));
   }
   if (Array.isArray(value)) return JSON.stringify(value) ?? String(value);
   return String(value);
@@ -208,7 +212,9 @@ function formatRowsAsTable(rows: unknown[], footer?: string): string {
   const headers = recordKeys.length > 0 ? recordKeys : ['value'];
   const cells = rows.map((row) =>
     headers.map((header) =>
-      clampCell(recordKeys.length > 0 && isRecord(row) ? cellify(row[header], header) : cellify(row)),
+      clampCell(
+        recordKeys.length > 0 && isRecord(row) ? cellify(row[header], header) : cellify(row),
+      ),
     ),
   );
   const colWidths = headers.map((header, i) =>
@@ -234,7 +240,10 @@ function formatTable(data: unknown): string {
   if (isRecord(data)) {
     const envelope = extractListEnvelope(data);
     if (envelope) {
-      return formatRowsAsTable(envelope.rows, paginationFooter(envelope.rows.length, envelope.meta));
+      return formatRowsAsTable(
+        envelope.rows,
+        paginationFooter(envelope.rows.length, envelope.meta),
+      );
     }
     const flat = flattenObject(data);
     const maxKeyLen = Math.max(...Object.keys(flat).map((k) => k.length));

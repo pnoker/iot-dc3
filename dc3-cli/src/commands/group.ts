@@ -77,7 +77,11 @@ export function registerGroupCommand(program: Command): void {
   group
     .command('update <id>')
     .description('Update a group')
-    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .requiredOption(
+      '--version <n>',
+      'Current version for optimistic locking',
+      parseNonNegativeInteger,
+    )
     .option('--name <name>', 'New group name')
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
@@ -91,7 +95,11 @@ export function registerGroupCommand(program: Command): void {
   group
     .command('delete <id>')
     .description('Delete a group')
-    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .requiredOption(
+      '--version <n>',
+      'Current version for optimistic locking',
+      parseNonNegativeInteger,
+    )
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);

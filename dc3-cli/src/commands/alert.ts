@@ -18,7 +18,11 @@ import { Command, InvalidArgumentError } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { ValidationError } from '../core/errors.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, parsePositiveInteger, requireResourceId } from '../utils/manager.js';
+import {
+  parseNonNegativeInteger,
+  parsePositiveInteger,
+  requireResourceId,
+} from '../utils/manager.js';
 import { readJsonObjectBody } from './analytics.js';
 
 /** Cohort range windows the point-profile backend accepts (audit G31). */
@@ -212,7 +216,12 @@ export function registerAlertCommand(program: Command): void {
       .description(description)
       .option('--days <n>', 'Look-back window in days', parsePositiveInteger)
       .option('--limit <n>', 'Maximum rows to return', parsePositiveInteger)
-      .option('--query <k=v>', 'Extra server query param (repeatable)', collectQuery, [] as string[])
+      .option(
+        '--query <k=v>',
+        'Extra server query param (repeatable)',
+        collectQuery,
+        [] as string[],
+      )
       .option('--format <format>', 'Output format')
       .action(async (opts) => {
         const format = detectFormat(opts.format);

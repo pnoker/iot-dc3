@@ -79,7 +79,11 @@ export function registerLabelCommand(program: Command): void {
   label
     .command('update <id>')
     .description('Update a label')
-    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .requiredOption(
+      '--version <n>',
+      'Current version for optimistic locking',
+      parseNonNegativeInteger,
+    )
     .option('--name <name>', 'New label name')
     .option('--code <code>', 'New label code')
     .option('--color <color>', 'New label color')
@@ -97,7 +101,11 @@ export function registerLabelCommand(program: Command): void {
   label
     .command('delete <id>')
     .description('Delete a label')
-    .requiredOption('--version <n>', 'Current version for optimistic locking', parseNonNegativeInteger)
+    .requiredOption(
+      '--version <n>',
+      'Current version for optimistic locking',
+      parseNonNegativeInteger,
+    )
     .option('--format <format>', 'Output format')
     .action(async (id, opts) => {
       const format = detectFormat(opts.format);

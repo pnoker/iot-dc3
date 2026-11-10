@@ -165,11 +165,7 @@ export function registerAuthCommand(program: Command): void {
         options.password ??
         (process.env.DC3_PASSWORD && process.env.DC3_PASSWORD.length > 0
           ? process.env.DC3_PASSWORD
-          : await requiredInput(
-              '--password <password>',
-              () => passwordPrompt('Password: '),
-              true,
-            ));
+          : await requiredInput('--password <password>', () => passwordPrompt('Password: '), true));
 
       const token = await dc3Client.login(tenant, username, password, profileName);
 

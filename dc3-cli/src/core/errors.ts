@@ -122,7 +122,7 @@ export class ApiError extends CliError {
   public readonly statusCode?: number;
 
   /** Raw problem payload; only set when provided (keeps `'problem' in error` false otherwise). */
-  public declare readonly problem?: unknown;
+  declare public readonly problem?: unknown;
 
   constructor(message: string, statusCode?: number, problem?: unknown, code?: string) {
     super(message, {
@@ -214,7 +214,11 @@ export function suppressFailureEnvelope(): void {
  * @returns the format the invocation was rendering with
  */
 function resolveFailureFormat(): 'json' | 'table' | 'yaml' {
-  return getGlobalFormatOverride() ?? getSettingsFormatOverride() ?? (process.stdout.isTTY ? 'table' : 'json');
+  return (
+    getGlobalFormatOverride() ??
+    getSettingsFormatOverride() ??
+    (process.stdout.isTTY ? 'table' : 'json')
+  );
 }
 
 /**
@@ -228,7 +232,10 @@ function emitFailureEnvelope(failure: FailureShape): void {
   const format = resolveFailureFormat();
   if (format !== 'json' && format !== 'yaml') return;
   if (process.stdout.destroyed || process.stdout.writable === false) return;
-  const envelope = { ok: false, error: { kind: failure.kind, code: failure.code, message: failure.message } };
+  const envelope = {
+    ok: false,
+    error: { kind: failure.kind, code: failure.code, message: failure.message },
+  };
   try {
     process.stdout.write(`${JSON.stringify(envelope)}\n`);
   } catch {

@@ -87,7 +87,10 @@ function warnDeprecatedAliasInvocation(actionCommand: Command, warned: AliasWarn
  */
 function deprecatedAliasSubcommandTerm(cmd: Command): string {
   const args = cmd.registeredArguments
-    .map((arg) => `${arg.required ? '<' : '['}${arg.name()}${arg.variadic ? '...' : ''}${arg.required ? '>' : ']'}`)
+    .map(
+      (arg) =>
+        `${arg.required ? '<' : '['}${arg.name()}${arg.variadic ? '...' : ''}${arg.required ? '>' : ']'}`,
+    )
     .join(' ');
   const alias = cmd.aliases()[0];
   const name = alias ? `${cmd.name()} (deprecated alias: ${alias})` : cmd.name();
@@ -178,7 +181,10 @@ export function buildProgram(): Command {
     // prints the single human line instead. Help output is unaffected.
     .configureOutput({ outputError: () => undefined })
     .configureHelp({ subcommandTerm: deprecatedAliasSubcommandTerm })
-    .option('--profile <name>', 'Use a specific profile for this invocation (before the subcommand)')
+    .option(
+      '--profile <name>',
+      'Use a specific profile for this invocation (before the subcommand)',
+    )
     .option('--format <format>', 'Global output format: json, table, yaml (before the subcommand)');
 
   // Apply the global options once per invocation, before any command action

@@ -209,7 +209,12 @@ export class McpClient {
     }
 
     if (text.trim() === '') {
-      throw new ApiError('MCP endpoint returned an empty body', undefined, undefined, 'MCP_BAD_BODY');
+      throw new ApiError(
+        'MCP endpoint returned an empty body',
+        undefined,
+        undefined,
+        'MCP_BAD_BODY',
+      );
     }
     let payload: RpcPayload<T>;
     try {

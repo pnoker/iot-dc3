@@ -160,11 +160,7 @@ export class KeychainStore implements CredentialStore {
         const script =
           `$c = Get-StoredCredential -Target ${psQuote(winTarget(identifier))}; ` +
           'if ($c) { [Console]::Out.Write($c.GetNetworkCredential().Password) }';
-        const { stdout } = await execFileAsync(
-          'powershell',
-          psEncodedArgs(script),
-          execOptions(),
-        );
+        const { stdout } = await execFileAsync('powershell', psEncodedArgs(script), execOptions());
         return stdout.trim() || null;
       }
     } catch {

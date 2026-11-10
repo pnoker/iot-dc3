@@ -17,7 +17,11 @@
 import { Command } from 'commander';
 import { dc3Client } from '../core/client.js';
 import { detectFormat, printAndExit } from '../utils/format.js';
-import { parseNonNegativeInteger, parsePositiveInteger, requireResourceId } from '../utils/manager.js';
+import {
+  parseNonNegativeInteger,
+  parsePositiveInteger,
+  requireResourceId,
+} from '../utils/manager.js';
 
 /**
  * Session & action plane of the agentic center: conversation lifecycle plus the
@@ -73,10 +77,11 @@ export function registerSessionCommand(program: Command): void {
     .action(async (id: string, opts) => {
       requireResourceId('session messages <conversation_id>', id);
       const format = detectFormat(opts.format);
-      const result = await dc3Client.post(
-        `/api/v3/agentic/message/list`,
-        {conversationId: id, offset: 0, limit: 200},
-      );
+      const result = await dc3Client.post(`/api/v3/agentic/message/list`, {
+        conversationId: id,
+        offset: 0,
+        limit: 200,
+      });
       printAndExit(result, format);
     });
 

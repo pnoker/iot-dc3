@@ -36,7 +36,9 @@ const DECIMAL_INTEGER_PATTERN = /^\d+$/u;
  */
 export function parseNonNegativeInteger(value: string): number {
   if (!DECIMAL_INTEGER_PATTERN.test(value)) {
-    throw new InvalidArgumentError('must be a non-negative integer in plain decimal digits (e.g. 0, 5, 100)');
+    throw new InvalidArgumentError(
+      'must be a non-negative integer in plain decimal digits (e.g. 0, 5, 100)',
+    );
   }
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 0) {
@@ -54,7 +56,9 @@ export function parseNonNegativeInteger(value: string): number {
  */
 export function parsePositiveInteger(value: string): number {
   if (!DECIMAL_INTEGER_PATTERN.test(value)) {
-    throw new InvalidArgumentError('must be a positive integer in plain decimal digits (e.g. 1, 5, 100)');
+    throw new InvalidArgumentError(
+      'must be a positive integer in plain decimal digits (e.g. 1, 5, 100)',
+    );
   }
   const parsed = Number(value);
   if (!Number.isSafeInteger(parsed) || parsed < 1) {

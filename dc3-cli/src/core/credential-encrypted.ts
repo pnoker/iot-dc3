@@ -140,16 +140,10 @@ async function ensureKeyFileLocked(): Promise<Buffer> {
   return key;
 }
 
-async function encryptAndWriteLocked(
-  key: Buffer,
-  entries: Record<string, string>,
-): Promise<void> {
+async function encryptAndWriteLocked(key: Buffer, entries: Record<string, string>): Promise<void> {
   const iv = randomBytes(16);
   const cipher = createCipheriv(ALGORITHM, key, iv);
-  const encrypted = Buffer.concat([
-    cipher.update(JSON.stringify(entries), 'utf8'),
-    cipher.final(),
-  ]);
+  const encrypted = Buffer.concat([cipher.update(JSON.stringify(entries), 'utf8'), cipher.final()]);
   const file: EncryptedFile = {
     v: 2,
     iv: iv.toString('hex'),

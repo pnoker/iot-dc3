@@ -83,7 +83,9 @@ export function registerChatCommand(program: Command): void {
         );
 
         if (res.status === 401) {
-          throw new AuthError(`Authentication failed (401): ${extractErrorDetail(await readBodyText(res))}`);
+          throw new AuthError(
+            `Authentication failed (401): ${extractErrorDetail(await readBodyText(res))}`,
+          );
         }
         if (!res.ok) {
           const text = await readBodyText(res);
