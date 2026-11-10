@@ -35,6 +35,7 @@ import io.github.pnoker.common.agentic.service.runtime.AgenticRuntime;
 import io.github.pnoker.common.agentic.service.runtime.AgenticRuntimeResult;
 import io.github.pnoker.common.agentic.service.runtime.AgenticStreamDelta;
 import io.github.pnoker.common.agentic.service.runtime.AgenticTokenUsage;
+import io.github.pnoker.common.agentic.utils.AgenticUpstreamErrorSanitizer;
 import io.github.pnoker.common.constant.service.AgenticConstant;
 import io.github.pnoker.common.entity.common.RequestHeader;
 import io.github.pnoker.common.enums.AgenticMessageStatusEnum;
@@ -146,7 +147,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                     sanitize(prepared.model()),
                     error);
             lastFinishReason.set(AgenticConstant.Chat.FINISH_REASON_ERROR);
-            prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+            prepared.runTrace()
+                    .recordPendingEvent(AgenticRunEvent.requestFailed(AgenticUpstreamErrorSanitizer.sanitize(error)));
             return Flux.fromIterable(responseCodec.streamEvents(prepared, chatId, created, AgenticStreamDelta.empty()));
         });
 
@@ -165,7 +167,9 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                         userHeader,
                         startNanos),
                 (ignored, error) -> {
-                    prepared.runTrace().recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                    prepared.runTrace()
+                            .recordPendingEvent(
+                                    AgenticRunEvent.requestFailed(AgenticUpstreamErrorSanitizer.sanitize(error)));
                     return persistStreamTermination(
                             prepared,
                             assistantContent,
@@ -218,7 +222,8 @@ public class AgenticChatServiceImpl implements AgenticChatService {
                                     persistAssistantAndBuildResponse(prepared, result, userHeader, startNanos))
                             .onErrorResume(error -> {
                                 prepared.runTrace()
-                                        .recordPendingEvent(AgenticRunEvent.requestFailed(error.getMessage()));
+                                        .recordPendingEvent(AgenticRunEvent.requestFailed(
+                                                AgenticUpstreamErrorSanitizer.sanitize(error)));
                                 recordLifecycle(
                                         userHeader,
                                         prepared.model(),
