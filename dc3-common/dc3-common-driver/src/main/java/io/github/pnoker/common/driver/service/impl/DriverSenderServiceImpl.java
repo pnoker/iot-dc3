@@ -34,7 +34,6 @@ import io.github.pnoker.common.enums.EntityStatusEnum;
 import io.github.pnoker.common.mq.message.MqMessage;
 import io.github.pnoker.common.mq.sender.MessageSender;
 import io.github.pnoker.common.mq.sender.ReactiveMessageSender;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -342,11 +341,9 @@ public class DriverSenderServiceImpl implements DriverSenderService {
         } else {
             log.warn("Device state publish degraded, reason=driverNotRegistered, deviceId={}", deviceId);
         }
-        log.info("Device state published, deviceId={}, status={}", deviceId, status.getCode());
+        // Debug: every point-event flush lands here; at info level this floods the
+        // log during bulk metadata refreshes while carrying no actionable signal.
+        log.debug("Device state published, deviceId={}, status={}", deviceId, status.getCode());
         deviceStateSender(deviceState);
-    }
-
-    private void sendConfirmed(MqTopic topic, String partitionKey, Object payload) {
-        messageSender.sendConfirmed(MqMessage.of(topic, partitionKey, payload), Duration.ofSeconds(5));
     }
 }
