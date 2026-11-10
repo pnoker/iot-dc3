@@ -16,7 +16,7 @@
  */
 
 // TEMPLATE — copy to `tests/unit/<store-name>-store.test.ts` and fill
-// in the parts marked TODO. Does NOT run as a real test (it's not in
+// in the parts marked <FILL-IN>. Does NOT run as a real test (it's not in
 // the vitest include glob because of the `.template.ts` suffix).
 
 // import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -35,7 +35,7 @@
 //   beforeEach(() => {
 //     setActivePinia(createPinia());
 //     vi.clearAllMocks();
-//     // TODO: default mock return values
+//     // <FILL-IN>: default mock return values
 //     apiMocks.doSomething.mockResolvedValue({ data: undefined });
 //   });
 //
