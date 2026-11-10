@@ -29,9 +29,9 @@ import io.github.pnoker.common.driver.service.DriverCustomService;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -146,15 +146,12 @@ public class Iec104DriverCustomServiceImpl implements DriverCustomService {
             DeviceBO device,
             CommandRuntimeBO command,
             Map<String, String> paramValues) {
-        Map<String, String> result = new LinkedHashMap<>();
-        String sendCommand = getConfigValue(commandConfig, "sendCommand", "${value}");
-        if (Objects.nonNull(paramValues)) {
-            for (Map.Entry<String, String> entry : paramValues.entrySet()) {
-                sendCommand = sendCommand.replace("${" + entry.getKey() + "}", entry.getValue());
-            }
-        }
-        result.put("sendCommand", sendCommand);
-        return result;
+        // Protocol I/O is pending (see class WORK IN PROGRESS note). Failing fast lets the SDK
+        // record a FAILED command instead of echoing the substituted template as fake success.
+        throw new UnSupportException(
+                "IEC 104 execute not implemented: protocol I/O is pending, protocol={}, deviceId={}",
+                driverProperties.getCode(),
+                device.getId());
     }
 
     /**
