@@ -27,6 +27,12 @@ import org.apache.commons.lang3.StringUtils;
  */
 public record AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason, AgenticTokenUsage usage) {
 
+    /**
+     * Legacy two-argument constructor for callers without usage data.
+     *
+     * @param delta        stream delta content
+     * @param finishReason provider finish reason
+     */
     public AgenticRuntimeStreamFrame(AgenticStreamDelta delta, String finishReason) {
         this(delta, finishReason, AgenticTokenUsage.empty());
     }

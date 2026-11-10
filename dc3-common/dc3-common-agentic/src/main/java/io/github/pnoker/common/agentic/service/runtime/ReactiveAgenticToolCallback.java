@@ -47,6 +47,11 @@ public class ReactiveAgenticToolCallback implements ToolCallback {
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
+    /**
+     * Wrap a reactive tool for Spring AI's synchronous callback SPI.
+     *
+     * @param tool the reactive tool to bridge
+     */
     public ReactiveAgenticToolCallback(ReactiveAgenticTool tool) {
         this.tool = tool;
     }

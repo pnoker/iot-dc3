@@ -543,8 +543,9 @@ public class OpenAiCompatibleAgenticRuntime {
         return Flux.fromIterable(toolCalls)
                 .concatMap(toolCall -> Mono.defer(() -> {
                     // The same tool with the same arguments over and over is a stuck
-                    // loop: still execute it, but the answer tells the model to change
-                    // course before the loop budget burns the turn.
+                    // loop: past the threshold the call is no longer executed — an
+                    // error envelope tells the model to change course before the loop
+                    // budget burns the turn.
                     String callKey = toolCall.name() + ":" + StringUtils.defaultString(toolCall.arguments());
                     int seen = repeatedCallCount.merge(callKey, 1, Integer::sum);
                     if (seen >= 3) {
