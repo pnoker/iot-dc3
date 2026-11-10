@@ -18,6 +18,7 @@ package io.github.pnoker.driver.service.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -38,6 +39,8 @@ import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.enums.PointTypeEnum;
+import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.MelsecPointVariable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -162,10 +165,12 @@ class MelsecDriverCustomServiceImplTest {
         primeCachedPLC(12L);
         when(plc.readInt32(anyString())).thenThrow(new RuntimeException("plc offline"));
 
-        ReadPointValue value =
-                service.read(driverConfig(), pointConfig("D100", 0), device(12L), point(PointTypeEnum.INT));
-
-        assertThat(value).isNull();
+        // The failure must surface (so the SDK records it for backoff/health) while the
+        // broken connection is invalidated.
+        assertThatThrownBy(() ->
+                        service.read(driverConfig(), pointConfig("D100", 0), device(12L), point(PointTypeEnum.INT)))
+                .isInstanceOf(ReadPointException.class)
+                .hasMessageContaining("plc offline");
         assertThat(connectionMap()).doesNotContainKey(12L);
         verify(plc).close();
     }
@@ -192,14 +197,19 @@ class MelsecDriverCustomServiceImplTest {
                 .when(plc)
                 .writeInt32(anyString(), org.mockito.ArgumentMatchers.anyInt());
 
-        Boolean ok = service.write(
-                driverConfig(),
-                pointConfig("D100", 0),
-                device(14L),
-                point(PointTypeEnum.INT),
-                WritePointValue.builder().value("7").type(PointTypeEnum.INT).build());
-
-        assertThat(ok).isFalse();
+        // The failure must surface (so the SDK records it instead of a fabricated success)
+        // while the broken connection is invalidated.
+        assertThatThrownBy(() -> service.write(
+                        driverConfig(),
+                        pointConfig("D100", 0),
+                        device(14L),
+                        point(PointTypeEnum.INT),
+                        WritePointValue.builder()
+                                .value("7")
+                                .type(PointTypeEnum.INT)
+                                .build()))
+                .isInstanceOf(WritePointException.class)
+                .hasMessageContaining("plc offline");
         assertThat(connectionMap()).doesNotContainKey(14L);
         verify(plc).close();
     }

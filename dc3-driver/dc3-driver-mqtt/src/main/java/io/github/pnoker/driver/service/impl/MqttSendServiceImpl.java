@@ -16,6 +16,7 @@
  */
 package io.github.pnoker.driver.service.impl;
 
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.mqtt.MqttProperties;
 import io.github.pnoker.driver.service.MqttSendService;
 import jakarta.annotation.PreDestroy;
@@ -79,6 +80,15 @@ public class MqttSendServiceImpl implements MqttSendService {
                     topic,
                     mqttProperties.getBrokerHost(),
                     mqttProperties.getBrokerPort(),
+                    error);
+            // Swallowing here reported a successful write/execute to the platform even when
+            // the broker never received the message; surface the failure to the command path.
+            throw new WritePointException(
+                    "MQTT publish failed, topic={}, broker={}:{}, message={}",
+                    topic,
+                    mqttProperties.getBrokerHost(),
+                    mqttProperties.getBrokerPort(),
+                    error.getMessage(),
                     error);
         }
     }

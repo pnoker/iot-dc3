@@ -402,7 +402,15 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
         }
 
         Object value = attribute.readValue(TimeUnit.SECONDS.toMillis(ATTRIBUTE_TIMEOUT_SECONDS));
-        return Objects.nonNull(value) ? String.valueOf(value) : "0";
+        if (Objects.isNull(value)) {
+            // Publishing a fabricated "0" would report a real measurement on a timed-out
+            // attribute; the platform must see the read failure instead.
+            throw new ReadPointException(
+                    "Driver Zigbee attribute read timed out, protocol={}, attributeId={}",
+                    driverProperties.getCode(),
+                    attributeId);
+        }
+        return String.valueOf(value);
     }
 
     /**

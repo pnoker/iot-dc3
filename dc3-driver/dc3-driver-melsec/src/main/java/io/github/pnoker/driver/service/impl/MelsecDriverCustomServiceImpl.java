@@ -32,7 +32,9 @@ import io.github.pnoker.common.entity.dto.MetadataEventDTO;
 import io.github.pnoker.common.enums.AttributeTypeEnum;
 import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
+import io.github.pnoker.common.exception.ReadPointException;
 import io.github.pnoker.common.exception.ServiceException;
+import io.github.pnoker.common.exception.WritePointException;
 import io.github.pnoker.driver.bean.MelsecPointVariable;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +149,15 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                     device.getId(),
                     point.getId(),
                     e);
-            return null;
+            // Swallowing the error reported a null value to the SDK without recording a
+            // read failure, so backoff and device health never saw the outage.
+            throw new ReadPointException(
+                    "Driver point read failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    point.getId(),
+                    e.getMessage(),
+                    e);
         } finally {
             myMcPLC.lock.unlock();
         }
@@ -186,7 +196,15 @@ public class MelsecDriverCustomServiceImpl implements DriverCustomService {
                     device.getId(),
                     point.getId(),
                     e);
-            return false;
+            // Returning false recorded a success in the SDK write service (only exceptions
+            // feed recordFailure/backoff); rethrow so the failure is tracked honestly.
+            throw new WritePointException(
+                    "Driver point write failed, protocol={}, deviceId={}, pointId={}, message={}",
+                    driverProperties.getCode(),
+                    device.getId(),
+                    point.getId(),
+                    e.getMessage(),
+                    e);
         } finally {
             myMcPLC.lock.unlock();
         }

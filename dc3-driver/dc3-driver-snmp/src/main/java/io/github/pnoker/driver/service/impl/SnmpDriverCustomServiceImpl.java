@@ -99,7 +99,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         try {
             return new org.snmp4j.smi.Integer32(Integer.parseInt(value));
         } catch (NumberFormatException e) {
-            return new org.snmp4j.smi.Integer32(0);
+            // A silent 0 would write a wrong value into the managed device.
+            throw new WritePointException("SNMP write value '{}' is not a valid INTEGER32", value);
         }
     }
 
@@ -107,7 +108,8 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
-            return 0L;
+            // A silent 0 would write a wrong value into the managed device.
+            throw new WritePointException("SNMP write value '{}' is not a valid numeric type", value);
         }
     }
 
@@ -194,6 +196,7 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 throw new ReadPointException(
                         "SNMP response is null, protocol={}, oid={}", driverProperties.getCode(), oid);
             }
+            checkErrorStatus(response.getResponse(), oid);
 
             VariableBinding vb = response.getResponse().get(0);
             Variable variable = vb.getVariable();
@@ -208,6 +211,25 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                     oid,
                     e.getMessage(),
                     e);
+        }
+    }
+
+    /**
+     * Reject a response PDU carrying a non-zero error status so failed GET/SET
+     * operations surface as read/write failures instead of fabricated values.
+     *
+     * @param response the received response PDU
+     * @param oid      the OID of the request, for the error message
+     */
+    private void checkErrorStatus(org.snmp4j.PDU response, String oid) {
+        if (response.getErrorStatus() != 0) {
+            String detail = response.getErrorStatusText();
+            throw new ReadPointException(
+                    "SNMP agent rejected the request, protocol={}, oid={}, status={}, statusText={}",
+                    driverProperties.getCode(),
+                    oid,
+                    response.getErrorStatus(),
+                    detail);
         }
     }
 
@@ -235,6 +257,9 @@ public class SnmpDriverCustomServiceImpl implements DriverCustomService {
                 throw new WritePointException(
                         "SNMP set response is null, protocol={}, oid={}", driverProperties.getCode(), oid);
             }
+            // An error PDU (notWritable, wrongValue, …) still carries a variable binding;
+            // without the errorStatus check the SET would be reported as a fake success.
+            checkErrorStatus(response.getResponse(), oid);
             return true;
         } catch (WritePointException e) {
             throw e;

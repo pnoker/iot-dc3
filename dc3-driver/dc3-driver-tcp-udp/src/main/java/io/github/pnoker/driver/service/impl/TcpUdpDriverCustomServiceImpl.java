@@ -34,6 +34,7 @@ import io.github.pnoker.common.enums.MetadataOperateTypeEnum;
 import io.github.pnoker.common.enums.MetadataTypeEnum;
 import io.github.pnoker.common.exception.ConnectorException;
 import io.github.pnoker.common.exception.ReadPointException;
+import io.github.pnoker.common.exception.UnSupportException;
 import io.github.pnoker.common.exception.WritePointException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,7 +47,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -260,15 +260,12 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
             DeviceBO device,
             CommandRuntimeBO command,
             Map<String, String> paramValues) {
-        Map<String, String> result = new LinkedHashMap<>();
-        String sendCommand = getConfigValue(commandConfig, "sendCommand", "${value}");
-        if (Objects.nonNull(paramValues)) {
-            for (Map.Entry<String, String> entry : paramValues.entrySet()) {
-                sendCommand = sendCommand.replace("${" + entry.getKey() + "}", entry.getValue());
-            }
-        }
-        result.put("sendCommand", sendCommand);
-        return result;
+        // Template substitution without any protocol I/O would report a fake SUCCESS to the
+        // platform; until a real send path exists, fail fast so commands surface as FAILED.
+        throw new UnSupportException(
+                "TCP/UDP execute not implemented: configure read/write points for protocol I/O, protocol={}, deviceId={}",
+                driverProperties.getCode(),
+                device.getId());
     }
 
     private String sendTcp(Long deviceId, Map<String, AttributeBO> driverConfig, String sendCommand)

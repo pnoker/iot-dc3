@@ -269,17 +269,6 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
             DeviceBO device,
             PointBO point,
             WritePointValue values) {
-        /*
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario.
-         *
-         * This method is used to write data to an MQTT topic. First, retrieve the command
-         * topic `commandTopic` and the value to be sent `value` from `pointConfig`. If
-         * the configuration specifies a QoS level `commandQos`, attempt to send the
-         * message with the specified QoS; if not specified or an exception occurs, send
-         * the message with the default QoS. Finally, return `true` to indicate a
-         * successful write operation.
-         */
         AttributeBO commandTopicAttribute = pointConfig.get("commandTopic");
         if (Objects.isNull(commandTopicAttribute)
                 || Objects.isNull(commandTopicAttribute.getValue())
@@ -295,16 +284,26 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
                 point.getId(),
                 commandTopic,
                 Objects.toString(value, "").length());
-        try {
-            int commandQos = pointConfig.get("commandQos").getValue(Integer.class);
+        // An unusable QoS attribute (missing or mistyped) falls back to the default QoS;
+        // a publish failure propagates so the SDK records the write as failed instead of
+        // fabricating success.
+        Integer commandQos = null;
+        AttributeBO commandQosAttribute = pointConfig.get("commandQos");
+        if (Objects.nonNull(commandQosAttribute) && Objects.nonNull(commandQosAttribute.getValue())) {
+            try {
+                commandQos = commandQosAttribute.getValue(Integer.class);
+            } catch (Exception e) {
+                log.debug(
+                        "MQTT command QoS unusable, falling back to default, deviceId={}, pointId={}, topic={}",
+                        device.getId(),
+                        point.getId(),
+                        commandTopic,
+                        e);
+            }
+        }
+        if (Objects.nonNull(commandQos)) {
             mqttSendService.sendToMqtt(commandTopic, commandQos, value);
-        } catch (Exception e) {
-            log.debug(
-                    "MQTT command QoS unavailable, fallback to default, deviceId={}, pointId={}, topic={}",
-                    device.getId(),
-                    point.getId(),
-                    commandTopic,
-                    e);
+        } else {
             mqttSendService.sendToMqtt(commandTopic, value);
         }
         return true;
