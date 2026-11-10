@@ -166,8 +166,8 @@ describe('driver status single-driver endpoint (G25)', () => {
   });
 
   const stubStatus = (body: string, status = 200): void => {
-    vi.stubGlobal('fetch', vi.fn(async (url: string | URL, init?: RequestInit) => {
-      fetchCalls.push({url: String(url), init});
+    vi.stubGlobal('fetch', vi.fn(async (url: string | URL, init?: FetchInit) => {
+      fetchCalls.push({url: String(url), init: init ?? {}});
       return new Response(body, {status});
     }));
   };

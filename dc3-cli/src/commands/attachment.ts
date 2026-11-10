@@ -55,7 +55,7 @@ export function registerAttachmentCommand(program: Command): void {
       // never a JSON-serialized buffer (report F003). postForm lets fetch own
       // the multipart boundary; the file name rides the disposition.
       const form = new FormData();
-      form.append('file', new Blob([content]), basename(file));
+      form.append('file', new Blob([new Uint8Array(content)]), basename(file));
       const result = await dc3Client.postForm(
         `${BASE}/upload?conversation_id=${encodeURIComponent(opts.conversationId)}`,
         form,

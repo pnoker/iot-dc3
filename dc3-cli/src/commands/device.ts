@@ -419,7 +419,7 @@ export function registerDeviceCommand(program: Command): void {
       );
       form.append(
         'file',
-        new Blob([content], {
+        new Blob([new Uint8Array(content)], {
           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         }),
         basename(file),
