@@ -92,13 +92,20 @@ public class FilterServiceImpl implements FilterService {
             return Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST));
         }
         String normalizedCode = code.trim();
+        // Mono.cache() memoizes error terminals too; evicting here lets the
+        // next request inside the TTL retry the lookup instead of replaying a
+        // transient auth-center outage as a wall of 401s.
         Mono<Optional<FacadeTenantBO>> lookup = reactiveTenantCache.get(
                 normalizedCode,
                 key -> Mono.defer(() -> tenantFacade.getByCode(key))
                         .filter(tenant -> tenant.getEnableFlag() == EnableFlagEnum.ENABLE)
                         .map(Optional::of)
                         .defaultIfEmpty(Optional.empty())
-                        .cache(AUTH_LOOKUP_TTL));
+                        .cache(AUTH_LOOKUP_TTL)
+                        .onErrorResume(error -> {
+                            reactiveTenantCache.invalidate(normalizedCode);
+                            return Mono.error(error);
+                        }));
         return lookup.flatMap(this::optionalValue)
                 .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)));
     }
@@ -111,13 +118,20 @@ public class FilterServiceImpl implements FilterService {
         }
         String normalizedName = name.trim().toLowerCase(Locale.ROOT);
         String key = tenantId + ":" + normalizedName;
+        // Mono.cache() memoizes error terminals too; evicting here lets the
+        // next request inside the TTL retry the lookup instead of replaying a
+        // transient auth-center outage as a wall of 401s.
         Mono<Optional<FacadeLocalCredentialBO>> lookup = reactiveCredentialCache.get(
                 key,
                 ignored -> Mono.defer(() -> localCredentialFacade.getByLoginName(tenantId, normalizedName))
                         .filter(credential -> credential.getEnableFlag() == EnableFlagEnum.ENABLE)
                         .map(Optional::of)
                         .defaultIfEmpty(Optional.empty())
-                        .cache(AUTH_LOOKUP_TTL));
+                        .cache(AUTH_LOOKUP_TTL)
+                        .onErrorResume(error -> {
+                            reactiveCredentialCache.invalidate(key);
+                            return Mono.error(error);
+                        }));
         return lookup.flatMap(this::optionalValue)
                 .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)));
     }
@@ -136,7 +150,11 @@ public class FilterServiceImpl implements FilterService {
                         .filter(user -> principalId.equals(user.getPrincipalId()))
                         .map(Optional::of)
                         .defaultIfEmpty(Optional.empty())
-                        .cache(AUTH_LOOKUP_TTL));
+                        .cache(AUTH_LOOKUP_TTL)
+                        .onErrorResume(error -> {
+                            reactiveUserCache.invalidate(key);
+                            return Mono.error(error);
+                        }));
         return lookup.flatMap(this::optionalValue)
                 .switchIfEmpty(Mono.error(new UnAuthorizedException(RequestConstant.Message.INVALID_REQUEST)))
                 .map(user -> {
