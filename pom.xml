@@ -95,8 +95,8 @@
 
         <!-- Serialization and data formats -->
         <tools.jackson.version>3.2.4</tools.jackson.version>
-        <jackson.version>2.22.4</jackson.version>
-        <jackson.annotations.version>2.22</jackson.annotations.version>
+        <jackson.version>2.23.0</jackson.version>
+        <jackson.annotations.version>2.23</jackson.annotations.version>
         <jaxb.version>4.0.9</jaxb.version>
         <!-- Jakarta XML Binding API artifact line, versioned separately from the jaxb-ri impl artifacts in jaxb.version. -->
         <jakarta-jaxb-api.version>4.0.5</jakarta-jaxb-api.version>
@@ -145,7 +145,7 @@
         <!-- Build plugins -->
         <os.maven.plugin.version>1.7.1</os.maven.plugin.version>
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <graalvm.native.version>1.1.17</graalvm.native.version>
+        <graalvm.native.version>1.1.18</graalvm.native.version>
         <maven.gpg.plugin>3.2.8</maven.gpg.plugin>
         <maven.source.plugin>3.4.0</maven.source.plugin>
         <maven.javadoc.plugin>3.12.0</maven.javadoc.plugin>
@@ -158,7 +158,7 @@
         <maven.central.plugin.version>0.12.0</maven.central.plugin.version>
         <maven.antrun.plugin.version>3.2.0</maven.antrun.plugin.version>
         <maven.checkstyle.plugin.version>3.6.0</maven.checkstyle.plugin.version>
-        <checkstyle.version>14.3.0</checkstyle.version>
+        <checkstyle.version>14.4.0</checkstyle.version>
         <spotless.version>3.10.4</spotless.version>
         <palantir.java.format.version>2.97.0</palantir.java.format.version>
 
