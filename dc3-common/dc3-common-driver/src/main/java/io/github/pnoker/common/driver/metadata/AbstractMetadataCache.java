@@ -23,6 +23,7 @@ import com.github.benmanes.caffeine.cache.stats.CacheStats;
 import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.exception.ServiceException;
 import java.time.Duration;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -103,6 +104,16 @@ public abstract class AbstractMetadataCache<V> {
      */
     protected void postLoad(long id, V value) {
         // no-op
+    }
+
+    /**
+     * Snapshot of the ids currently resident in the cache. Asynchronous loads that
+     * have not completed yet are not included.
+     *
+     * @return immutable snapshot of cached ids
+     */
+    public Set<Long> cachedIds() {
+        return Set.copyOf(cache.synchronous().asMap().keySet());
     }
 
     /**
