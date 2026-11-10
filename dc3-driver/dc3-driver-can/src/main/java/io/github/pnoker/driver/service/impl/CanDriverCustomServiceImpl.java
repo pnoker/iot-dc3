@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -76,8 +75,6 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
     private final DriverMetadata driverMetadata;
     private final DriverProperties driverProperties;
 
-    private Map<Long, Boolean> deviceMap = new ConcurrentHashMap<>(16);
-
     /** can driver custom service impl. */
     public CanDriverCustomServiceImpl(DriverMetadata driverMetadata, DriverProperties driverProperties) {
         this.driverProperties = driverProperties;
@@ -98,7 +95,8 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
     @Override
     public void initial() {
-        deviceMap = new ConcurrentHashMap<>(16);
+        // No per-device resources to initialize: CAN access shells out to
+        // candump/cansend per exchange and keeps no persistent connections.
     }
 
     @Override
@@ -145,9 +143,6 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
 
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)
                     || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                if (Objects.nonNull(metadataEvent.getId())) {
-                    deviceMap.remove(metadataEvent.getId());
-                }
                 log.info(
                         "Driver connection destroyed, protocol={}, deviceId={}, operateType={}",
                         driverProperties.getCode(),
@@ -263,6 +258,16 @@ public class CanDriverCustomServiceImpl implements DriverCustomService {
         if (!finished) {
             process.destroyForcibly();
             throw new ReadPointException("CAN command timed out, command={}", command);
+        }
+        // stderr is merged into stdout (redirectErrorStream), so a failed candump/cansend
+        // would otherwise feed its error text into payload parsing and publish garbage.
+        int exitCode = process.exitValue();
+        if (exitCode != 0) {
+            throw new ReadPointException(
+                    "CAN command failed, exitCode={}, command={}, output={}",
+                    exitCode,
+                    command,
+                    output.toString().trim());
         }
         return output.toString().trim();
     }
