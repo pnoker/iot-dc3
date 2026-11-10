@@ -280,21 +280,53 @@ public class ZigbeeDriverCustomServiceImpl implements DriverCustomService {
         int baudRate = requiredInt(driverConfig, "baudRate");
         String dongleType = requiredText(driverConfig, "dongleType");
 
-        networkManager = networkManagerFactory.create(dongleType, serialPort, baudRate);
-        networkManager.addNetworkStateListener(state -> log.info(
+        ZigBeeNetworkManager manager = networkManagerFactory.create(dongleType, serialPort, baudRate);
+        manager.addNetworkStateListener(state -> log.info(
                 "Driver Zigbee network state changed, protocol={}, state={}", driverProperties.getCode(), state));
 
-        ZigBeeStatus initStatus = networkManager.initialize();
+        ZigBeeStatus initStatus = manager.initialize();
         log.info("Driver Zigbee network initialized, protocol={}, status={}", driverProperties.getCode(), initStatus);
+        if (!ZigBeeStatus.SUCCESS.equals(initStatus)) {
+            manager.shutdown();
+            // Leaving the manager assigned would make every later read fail with
+            // "node not found" against a network that never came up.
+            throw new ConnectorException(
+                    "Driver Zigbee network initialize failed, protocol={}, status={}",
+                    driverProperties.getCode(),
+                    initStatus);
+        }
 
-        ZigBeeStatus startupStatus = networkManager.startup(true);
+        ZigBeeStatus startupStatus = manager.startup(true);
         log.info("Driver Zigbee network startup, protocol={}, status={}", driverProperties.getCode(), startupStatus);
+        if (!ZigBeeStatus.SUCCESS.equals(startupStatus)) {
+            manager.shutdown();
+            throw new ConnectorException(
+                    "Driver Zigbee network startup failed, protocol={}, status={}",
+                    driverProperties.getCode(),
+                    startupStatus);
+        }
+
+        networkManager = manager;
         log.info(
                 "Driver Zigbee network started, protocol={}, serialPort={}, baudRate={}, dongleType={}",
                 driverProperties.getCode(),
                 serialPort,
                 baudRate,
                 dongleType);
+    }
+
+    /** Release the serial dongle and network state when the driver process shuts down. */
+    @jakarta.annotation.PreDestroy
+    public void shutdown() {
+        ZigBeeNetworkManager manager = networkManager;
+        if (Objects.nonNull(manager)) {
+            try {
+                manager.shutdown();
+            } catch (Exception e) {
+                log.warn("Driver Zigbee network shutdown failed, protocol={}", driverProperties.getCode(), e);
+            }
+            networkManager = null;
+        }
     }
 
     private String requiredText(Map<String, AttributeBO> config, String code) {
