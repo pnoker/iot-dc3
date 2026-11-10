@@ -112,7 +112,10 @@ export const useMenuStore = defineStore('menu', {
   actions: {
     async fetchTree(force = false) {
       if (this.loaded && !force) return;
-      if (inFlightFetch) return inFlightFetch;
+      // A force refresh must not ride an in-flight request started without force —
+      // bumping the generation orphans the old request and always issues a new one.
+      if (inFlightFetch && !force) return inFlightFetch;
+      if (inFlightFetch && force) fetchGeneration++;
 
       const generation = fetchGeneration;
       this.loading = true;
