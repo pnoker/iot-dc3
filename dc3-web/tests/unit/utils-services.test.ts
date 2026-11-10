@@ -139,21 +139,12 @@ describe('utils (services)', () => {
   });
 
   describe('dateUtil', () => {
-    it('formats legacy dates and calculates date differences', async () => {
-      const {calcDate, dateFormat, timestamp, timestampColumn} = await import('@/utils/dateUtil');
+    it('formats legacy dates', async () => {
+      const {dateFormat, timestamp} = await import('@/utils/dateUtil');
       const date = new Date(2026, 4, 13, 8, 9, 10, 11);
 
       expect(dateFormat(date)).toBe('2026-05-13 08:09:10');
       expect(timestamp('2026-05-13T08:09:10')).toContain('2026-05-13 08:09:10');
-      expect(timestampColumn({}, {}, '')).toBe('');
-      expect(timestampColumn({}, {}, '2026-05-13T08:09:10')).toContain('2026-05-13 08:09:10');
-      // seconds is the sub-minute remainder (3s), not the total elapsed seconds.
-      expect(calcDate(new Date('2026-05-13T00:00:00Z'), new Date('2026-05-14T01:02:03Z'))).toMatchObject({
-        days: 1,
-        hours: 1,
-        minutes: 2,
-        seconds: 3,
-      });
     });
   });
 

@@ -83,29 +83,3 @@ export const removeStorage = (key: string, isSession?: boolean) => {
   else window.localStorage.removeItem(key);
 };
 
-/**
- * Get all storage values
- *
- * @param isSession Whether to use Session Storage (default: Local Storage)
- * @returns Array of storage items
- */
-export const getAllStorage = (isSession?: boolean) => {
-  const list = [] as Array<{ name: string | null; content: unknown }>;
-  if (isSession) {
-    for (let i = 0; i < window.sessionStorage.length; i++) {
-      list.push({
-        name: window.sessionStorage.key(i),
-        content: getStorage(window.sessionStorage.key(i) || ''),
-      });
-    }
-  } else {
-    for (let i = 0; i < window.localStorage.length; i++) {
-      list.push({
-        name: window.localStorage.key(i),
-        content: getStorage(window.localStorage.key(i) || ''),
-      });
-    }
-  }
-  return list;
-};
-

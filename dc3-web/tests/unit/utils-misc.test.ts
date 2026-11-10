@@ -26,7 +26,7 @@ import i18n from '@/config/i18n';
 import {resolveMenuTitle} from '@/utils/menuUtil';
 import {pointTypeKey, rwFlagKey} from '@/utils/pointFormatUtil';
 import {cleanSearchParams, resetSearchForm} from '@/utils/searchParamUtil';
-import {getAllStorage, getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
+import {getStorage, removeStorage, setStorage} from '@/utils/storageUtil';
 import {formatMs, humanDuration, parseDateSafe} from '@/utils/timeUtil';
 
 describe('utils (misc)', () => {
@@ -71,11 +71,6 @@ describe('utils (misc)', () => {
       expect(getStorage('count')).toBe(12);
       expect(getStorage('enabled')).toBe(false);
       expect(getStorage('token')).toEqual({salt: 's', token: 't'});
-      expect(
-        getAllStorage()
-          .map((item) => item.name)
-          .sort()
-      ).toEqual(['count', 'enabled', 'tenant', 'token']);
     });
 
     it('removes values from the selected storage', () => {
