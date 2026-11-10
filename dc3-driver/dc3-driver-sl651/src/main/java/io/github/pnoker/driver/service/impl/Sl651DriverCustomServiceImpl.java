@@ -116,17 +116,29 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
                     operateType,
                     metadataEvent.getId());
 
+            // The SL651 server is a driver-level singleton: a single device DELETE must
+            // not kill telemetry for the remaining stations, and ADD/UPDATE carries no
+            // server-parameter change, so a running server is left untouched.
             if (MetadataOperateTypeEnum.DELETE.equals(operateType)) {
-                stopServer();
-                log.info(
-                        "Driver server stopped due to device delete, protocol={}, deviceId={}",
-                        driverProperties.getCode(),
-                        metadataEvent.getId());
+                boolean devicesRemain = !deviceMetadata.cachedIds().isEmpty();
+                if (devicesRemain) {
+                    log.info(
+                            "Driver device deleted, server kept running, protocol={}, deviceId={}",
+                            driverProperties.getCode(),
+                            metadataEvent.getId());
+                } else {
+                    stopServer();
+                    log.info(
+                            "Driver server stopped, no devices remain, protocol={}, deviceId={}",
+                            driverProperties.getCode(),
+                            metadataEvent.getId());
+                }
             }
-            if (MetadataOperateTypeEnum.ADD.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType)) {
-                restartServer();
+            if ((MetadataOperateTypeEnum.ADD.equals(operateType) || MetadataOperateTypeEnum.UPDATE.equals(operateType))
+                    && Objects.isNull(sl651Server)) {
+                startServer();
                 log.info(
-                        "Driver server restarted due to device change, protocol={}, deviceId={}",
+                        "Driver server started on device arrival, protocol={}, deviceId={}",
                         driverProperties.getCode(),
                         metadataEvent.getId());
             }
@@ -163,14 +175,15 @@ public class Sl651DriverCustomServiceImpl implements DriverCustomService {
         return false;
     }
 
-    private void restartServer() {
-        stopServer();
-        startServer();
-    }
-
     // ------------------------------------------------------------------------
     //  message listener
     // ------------------------------------------------------------------------
+
+    /** Stop the shared SL651 server when the driver process shuts down. */
+    @jakarta.annotation.PreDestroy
+    public void shutdown() {
+        stopServer();
+    }
 
     private void startServer() {
         try {
