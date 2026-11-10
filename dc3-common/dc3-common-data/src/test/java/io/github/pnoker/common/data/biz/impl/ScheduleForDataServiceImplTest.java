@@ -23,7 +23,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
-import io.github.pnoker.common.data.job.HourlyJobForData;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,15 +54,9 @@ class ScheduleForDataServiceImplTest {
     }
 
     @Test
-    void initialRegistersHourlyJobAndStartsScheduler() throws Exception {
+    void initialRegistersIngestReplayJobAndStartsScheduler() throws Exception {
         service.initial();
 
-        verify(quartzService)
-                .createJobWithCron(
-                        eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
-                        eq("hourly-job"),
-                        eq("0 0 0/1 * * ?"),
-                        eq(HourlyJobForData.class));
         verify(quartzService)
                 .createJobWithInterval(
                         eq(ScheduleConstant.DATA_SCHEDULE_GROUP),
@@ -78,7 +71,7 @@ class ScheduleForDataServiceImplTest {
     void initialThrowsServiceExceptionOnSchedulerFailure() throws Exception {
         doThrow(new SchedulerException("scheduler down"))
                 .when(quartzService)
-                .createJobWithCron(any(), any(), any(), any());
+                .createJobWithInterval(any(), any(), org.mockito.ArgumentMatchers.anyInt(), any(), any());
         org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.initial())
                 .isInstanceOf(ServiceException.class)
                 .hasMessageContaining("Failed to initialize data scheduler")

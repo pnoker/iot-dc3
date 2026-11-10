@@ -18,7 +18,6 @@ package io.github.pnoker.common.data.biz.impl;
 
 import io.github.pnoker.common.constant.driver.ScheduleConstant;
 import io.github.pnoker.common.data.biz.ScheduleForDataService;
-import io.github.pnoker.common.data.job.HourlyJobForData;
 import io.github.pnoker.common.data.job.PointValueIngestReplayJob;
 import io.github.pnoker.common.exception.ServiceException;
 import io.github.pnoker.common.quartz.QuartzService;
@@ -47,8 +46,6 @@ public class ScheduleForDataServiceImpl implements ScheduleForDataService {
     @Override
     public void initial() {
         try {
-            quartzService.createJobWithCron(
-                    ScheduleConstant.DATA_SCHEDULE_GROUP, "hourly-job", "0 0 0/1 * * ?", HourlyJobForData.class);
             quartzService.createJobWithInterval(
                     ScheduleConstant.DATA_SCHEDULE_GROUP,
                     "point-value-ingest-replay",

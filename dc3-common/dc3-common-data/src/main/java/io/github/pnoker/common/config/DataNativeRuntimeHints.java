@@ -303,7 +303,6 @@ public class DataNativeRuntimeHints implements RuntimeHintsRegistrar {
 
     private static final String[] DATA_JOBS = {
         "io.github.pnoker.common.data.job.PointValueIngestReplayJob",
-        "io.github.pnoker.common.data.job.HourlyJobForData"
     };
 
     private static final String[] DATA_LISTENERS = {
