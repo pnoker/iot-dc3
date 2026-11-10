@@ -102,11 +102,6 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
     public void initial() {
         /*
          * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario. This method is automatically executed when the
-         * driver starts, and you can perform specific initialization operations here.
-         *
          */
     }
 
@@ -140,11 +135,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
          * deletion.
          *
          * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT) Metadata
-         * operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario.
-         */
+         * operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)         */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
         if (MetadataTypeEnum.DEVICE.equals(metadataType)) {
@@ -189,10 +180,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             DeviceBO device,
             PointBO point) {
         /*
-         * Read device point data logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario. Generate random data based on point type: - If the
+         * Read device point data logic. Generate random data based on point type: - If the
          * point type is STRING, generate a random string of length 8; - If the point type
          * is BOOLEAN, generate a random boolean value; - Otherwise, generate a random
          * float between 0 and 100.
@@ -232,10 +220,7 @@ public class VirtualDriverCustomServiceImpl implements DriverCustomService {
             PointBO point,
             WritePointValue writePointValue) {
         /*
-         * Write device point data logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario. You can implement the point data write logic based
+         * Write device point data logic. You can implement the point data write logic based
          * on specific business requirements. By default, this method returns false,
          * indicating that the write operation was not executed or failed.
          */

@@ -348,7 +348,7 @@ public class TcpUdpDriverCustomServiceImpl implements DriverCustomService {
         }
     }
 
-    // ---- Frame parsing ----
+    // ---- UDP (stateless, connection-per-call) ----
 
     private String sendUdp(Map<String, AttributeBO> driverConfig, String sendCommand) throws IOException {
         String host = getConfigValue(driverConfig, "host", "localhost");

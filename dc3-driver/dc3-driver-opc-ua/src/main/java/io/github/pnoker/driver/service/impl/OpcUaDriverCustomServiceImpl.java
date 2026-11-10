@@ -78,9 +78,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
 
-    /**
-     * Cache of device ID to OPC UA client connections.
-     */
+    /** Connect timeout applied when establishing an OPC UA session. */
     private static final long CONNECT_TIMEOUT_SECONDS = 5;
 
     private static final long REQUEST_TIMEOUT_MS = 5000;

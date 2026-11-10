@@ -104,11 +104,6 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
     public void initial() {
         /*
          * Driver initialization logic
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario. This method is automatically executed when the
-         * driver starts, and you can perform specific initialization operations here.
-         *
          */
     }
 
@@ -191,9 +186,6 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
          *
          * Metadata type: {@link MetadataTypeEnum} (DRIVER, DEVICE, POINT) Metadata
          * operation type: {@link MetadataOperateTypeEnum} (ADD, DELETE, UPDATE)
-         *
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario.
          */
         MetadataTypeEnum metadataType = metadataEvent.getMetadataType();
         MetadataOperateTypeEnum operateType = metadataEvent.getOperateType();
@@ -235,14 +227,6 @@ public class MqttDriverCustomServiceImpl implements DriverCustomService, Applica
             Map<String, AttributeBO> pointConfig,
             DeviceBO device,
             PointBO point) {
-        /*
-         * Hint: The logic here is for reference only; please modify it according to the
-         * actual application scenario.
-         *
-         * Since MQTT data is passively received, there is no need to implement the `read`
-         * method here. The processing logic for receiving data has been implemented in
-         * {@link io.github.pnoker.common.mqtt.handler.MqttReceiveHandler#handlerValue}.
-         */
         return null;
     }
 

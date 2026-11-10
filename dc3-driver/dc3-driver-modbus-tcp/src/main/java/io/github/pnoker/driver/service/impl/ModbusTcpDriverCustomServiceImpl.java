@@ -405,7 +405,7 @@ public class ModbusTcpDriverCustomServiceImpl implements DriverCustomService {
      * @param modbusMaster active Modbus connection
      * @param pointConfig  point configuration (slaveId, functionCode, offset)
      * @param type         point value type for register data interpretation
-     * @return read value as string, or "0" for unsupported function codes
+     * @return read value as string
      */
     private String readValue(ModbusMaster modbusMaster, Map<String, AttributeBO> pointConfig, String type) {
         int slaveId = requiredAttribute(pointConfig, "slaveId").getValue(Integer.class);
