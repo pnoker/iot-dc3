@@ -50,7 +50,7 @@
         <bacnet4j.version>6.1.1</bacnet4j.version>
 
         <!-- DLMS/COSEM -->
-        <gurux.dlms.version>4.0.96</gurux.dlms.version>
+        <gurux.dlms.version>4.0.97</gurux.dlms.version>
 
         <!-- Bluetooth LE -->
         <bluetooth.manager.version>1.5.3</bluetooth.manager.version>
@@ -72,7 +72,7 @@
         <openiec61850.version>1.7.0</openiec61850.version>
 
         <!-- DNP3 -->
-        <dnp3.version>1.6.0</dnp3.version>
+        <dnp3.version>1.7.0</dnp3.version>
     </properties>
 
     <dependencyManagement>
