@@ -180,6 +180,11 @@ export function buildProgram(): Command {
     // commander.error() writes its own "error: ..." line; the chokepoint
     // prints the single human line instead. Help output is unaffected.
     .configureOutput({ outputError: () => undefined })
+    // commander 15 rejects excess operands on action-bearing commands before
+    // the action runs; the root needs them delivered so its own action can
+    // produce the precise unknown-command diagnostic instead of a generic
+    // "too many arguments".
+    .allowExcessArguments(true)
     .configureHelp({ subcommandTerm: deprecatedAliasSubcommandTerm })
     .option(
       '--profile <name>',

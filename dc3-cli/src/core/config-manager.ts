@@ -81,7 +81,7 @@ export const AppSettingsSchema = z.object({
 export const ConfigSchema = z.object({
   version: z.literal(1),
   current_profile: z.string().default('default'),
-  settings: AppSettingsSchema.default({}),
+  settings: AppSettingsSchema.prefault({}),
   profiles: z.record(z.string(), StoredProfileSchema),
 });
 
@@ -134,7 +134,7 @@ function validationMessage(label: string, error: ZodError, value: unknown): stri
   const detail = (() => {
     switch (issue.code) {
       case 'invalid_type':
-        return `expected ${issue.expected}, received ${issue.received}`;
+        return `expected ${issue.expected}, received ${JSON.stringify(issue.input) ?? 'undefined'}`;
       case 'too_small':
         return `must be ${issue.inclusive ? '>=' : '>'} ${String(issue.minimum)}`;
       case 'too_big':

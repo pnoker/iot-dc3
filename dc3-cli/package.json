@@ -40,22 +40,22 @@
     "headers:check": "git ls-files \"src/**/*.ts\" | xargs node scripts/add-license-header.mjs --check"
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "js-yaml": "^4.3.2",
-    "zod": "^3.24.0"
+    "commander": "^15.1.0",
+    "js-yaml": "^5.5.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/node": "^26.6.6",
     "@typescript-eslint/parser": "^8.72.1",
-    "@vitest/coverage-v8": "4.1.11",
-    "eslint": "^9.0.0",
-    "eslint-plugin-jsdoc": "^64.5.2",
+    "@vitest/coverage-v8": "5.1.0",
+    "eslint": "^10.14.0",
+    "eslint-plugin-jsdoc": "^65.4.5",
     "globals": "^17.14.0",
     "prettier": "^3.9.10",
-    "tsup": "^8.4.0",
+    "tsup": "^9.0.0",
     "typescript": "^5.7.0",
-    "vitest": "^4.1.11"
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=22.0.0"
