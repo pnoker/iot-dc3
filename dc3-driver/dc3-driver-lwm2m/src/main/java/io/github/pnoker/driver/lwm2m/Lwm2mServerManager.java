@@ -109,11 +109,12 @@ public class Lwm2mServerManager implements DisposableBean {
             });
 
             server.start();
+            // Only a NOSEC endpoint is created today; the securePort property is
+            // reserved for the pending PSK work and is not active.
             log.info(
-                    "LwM2M server started, host={}, port={}, securePort={}",
+                    "LwM2M server started (NOSEC), host={}, port={}",
                     lwm2mProperties.getServerHost(),
-                    lwm2mProperties.getServerPort(),
-                    lwm2mProperties.getSecurePort());
+                    lwm2mProperties.getServerPort());
         } catch (Exception e) {
             throw new ServiceException("LwM2M server startup failed, message={}", e.getMessage(), e);
         }
