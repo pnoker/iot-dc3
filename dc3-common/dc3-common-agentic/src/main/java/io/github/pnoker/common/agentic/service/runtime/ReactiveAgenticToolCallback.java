@@ -64,7 +64,7 @@ public class ReactiveAgenticToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, ToolContext toolContext) {
         if (Schedulers.isInNonBlockingThread()) {
-            throw new IllegalStateException(
+            throw new NonBlockingThreadException(
                     "Agentic tool callback invoked on a non-blocking thread; the Spring AI chain must be "
                             + "subscribed on bounded elastic (see SpringAiAgenticRuntime)");
         }
@@ -72,12 +72,27 @@ public class ReactiveAgenticToolCallback implements ToolCallback {
             Object result =
                     tool.call(toolInput, toolContext).subscribeOn(scheduler).block(CALL_TIMEOUT);
             return serialize(result);
-        } catch (IllegalStateException error) {
+        } catch (NonBlockingThreadException error) {
             throw error;
         } catch (RuntimeException error) {
             Throwable unwrapped = Exceptions.unwrap(error);
+            if (unwrapped instanceof IllegalStateException
+                    && String.valueOf(unwrapped.getMessage()).contains("Timeout on blocking read")) {
+                // A slow tool must degrade to an error envelope like any other failure;
+                // letting block()'s timeout escape would abort the whole agent turn.
+                return serialize(
+                        AgenticToolResult.error("Tool execution timed out after " + CALL_TIMEOUT.toSeconds() + "s"));
+            }
             return serialize(AgenticToolResult.error(
                     unwrapped.getMessage() == null ? "Tool execution failed" : unwrapped.getMessage()));
+        }
+    }
+
+    /** Thread-guard signal, distinct from {@code block()} timeouts so the catch can tell them apart. */
+    private static final class NonBlockingThreadException extends IllegalStateException {
+
+        private NonBlockingThreadException(String message) {
+            super(message);
         }
     }
 

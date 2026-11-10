@@ -40,6 +40,7 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -576,15 +577,25 @@ public class ReactiveAgenticToolRegistry {
 
             @Override
             public Mono<?> call(String arguments, ToolContext context) {
+                // Tool lambdas wrap blocking service calls and evaluate eagerly at assembly
+                // (Mono.just(systemTool.getSystemHealth(context))), so both the assembly and
+                // the subscription must run off the caller thread — the OpenAI loop invokes
+                // this from the OkHttp dispatcher, which must never block on a tool.
+                return Mono.fromCallable(() -> assemble(arguments, context))
+                        .flatMap(assembled -> assembled)
+                        .subscribeOn(Schedulers.boundedElastic());
+            }
+
+            private Mono<Object> assemble(String arguments, ToolContext context) {
                 Map<String, Object> values;
                 try {
                     values = mapper.readValue(arguments, Map.class);
                 } catch (RuntimeException error) {
-                    return Mono.just(AgenticToolResult.invalid(
+                    return Mono.just((Object) AgenticToolResult.invalid(
                             "Invalid arguments JSON for tool '" + definition.name() + "': " + error.getMessage()));
                 }
                 try {
-                    return call.invoke(values, context);
+                    return (Mono<Object>) call.invoke(values, context);
                 } catch (RuntimeException error) {
                     return Mono.error(error);
                 } catch (Exception error) {
