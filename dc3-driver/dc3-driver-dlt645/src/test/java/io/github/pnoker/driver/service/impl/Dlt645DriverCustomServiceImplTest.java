@@ -86,4 +86,38 @@ class Dlt645DriverCustomServiceImplTest {
         assertThat(frame[frame.length - 1] & 0xFF).isEqualTo(0x16);
         assertThat(Dlt645Frame.verifyChecksum(frame)).isTrue();
     }
+
+    @Test
+    void parseRejectsMalformedFramesWithShortDataField() {
+        // L<4 is malformed (a legit response carries at least the 4-byte data
+        // identifier); the parser used to crash with NegativeArraySizeException.
+        byte[] address = Dlt645Frame.encodeAddress("000000000001");
+        byte[] frame = Dlt645Frame.buildReadRequest(address, new int[] {0x00, 0x01, 0x00, 0x00});
+        frame[9] = 0x02;
+        assertThatThrownBy(() -> Dlt645Frame.parse(frame))
+                .isInstanceOf(io.github.pnoker.common.exception.ConnectorException.class)
+                .hasMessageContaining("data length invalid");
+    }
+
+    @Test
+    void parseReturnsDataWithResponseOffsetReversed() {
+        byte[] address = Dlt645Frame.encodeAddress("000000000001");
+        byte[] response = new byte[12 + 5];
+        response[0] = (byte) 0x68;
+        System.arraycopy(address, 0, response, 1, 6);
+        response[7] = (byte) 0x68;
+        response[8] = (byte) 0x91;
+        response[9] = 0x05; // L = DI(4) + one data byte
+        response[10] = 0x00;
+        response[11] = 0x01;
+        response[12] = 0x00;
+        response[13] = 0x00;
+        response[14] = (byte) (0x42 + 0x33);
+        response[response.length - 2] =
+                (byte) io.github.pnoker.common.driver.support.CodecUtil.sumChecksum(response, 0, response.length - 2);
+        response[response.length - 1] = (byte) 0x16;
+
+        byte[] data = Dlt645Frame.parse(response);
+        assertThat(data).containsExactly(0x42);
+    }
 }

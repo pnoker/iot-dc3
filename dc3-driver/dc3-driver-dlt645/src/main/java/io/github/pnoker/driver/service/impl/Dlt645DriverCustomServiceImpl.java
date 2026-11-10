@@ -283,52 +283,100 @@ public class Dlt645DriverCustomServiceImpl implements DriverCustomService {
         return sb.toString();
     }
 
+    /**
+     * Decode BCD digits. DL/T 645 transmits data least significant byte first,
+     * so the digit pairs are read from the last byte to the first (high nibble
+     * before low nibble within each byte).
+     */
     private String toBcdString(byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
-        for (byte b : data) {
-            sb.append((char) ('0' + ((b >> 4) & 0x0F)));
-            sb.append((char) ('0' + (b & 0x0F)));
+        boolean started = false;
+        for (int i = data.length - 1; i >= 0; i--) {
+            int b = data[i] & 0xFF;
+            int high = (b >> 4) & 0x0F;
+            int low = b & 0x0F;
+            if (!started && high != 0) {
+                started = true;
+            }
+            if (started) {
+                sb.append((char) ('0' + high));
+            }
+            if (!started && low != 0) {
+                started = true;
+            }
+            if (started) {
+                sb.append((char) ('0' + low));
+            }
         }
-        return sb.toString();
+        return sb.length() == 0 ? "0" : sb.toString();
     }
 
+    /**
+     * Decode an integer value. DL/T 645 transmits least significant byte first;
+     * 32- and 64-bit integers are two's complement, shorter widths unsigned.
+     */
     private long toInt(byte[] data) {
-        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
         return switch (data.length) {
-            case 1 -> bb.get() & 0xFF;
-            case 2 -> bb.getShort() & 0xFFFF;
-            case 4 -> bb.getInt();
-            case 8 -> bb.getLong();
-            default -> new BigInteger(data).longValue();
+            case 1 -> data[0] & 0xFF;
+            case 2 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort() & 0xFFFF;
+            case 4 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            case 8 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getLong();
+            default -> {
+                long value = 0;
+                for (int i = data.length - 1; i >= 0; i--) {
+                    value = (value << 8) | (data[i] & 0xFF);
+                }
+                yield value;
+            }
         };
     }
 
+    /** Decode an IEEE-754 value; DL/T 645 floats are least significant byte first. */
     private double toFloat(byte[] data) {
-        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
         return data.length == 4 ? bb.getFloat() : bb.getDouble();
     }
 
+    /**
+     * Encode a decimal string as BCD digit pairs, least significant byte first,
+     * matching the DL/T 645 wire order.
+     */
     private byte[] fromBcdString(String value) {
-        if (value.length() % 2 != 0) {
-            value = "0" + value;
+        String digits = value.trim();
+        if (!digits.matches("\\d+")) {
+            throw new ConnectorException("Invalid BCD value: {}", value);
         }
-        byte[] result = new byte[value.length() / 2];
+        if (digits.length() % 2 != 0) {
+            digits = "0" + digits;
+        }
+        byte[] result = new byte[digits.length() / 2];
         for (int i = 0; i < result.length; i++) {
-            int high = value.charAt(i * 2) - '0';
-            int low = value.charAt(i * 2 + 1) - '0';
+            // digit pairs are stored low-pair-first: the last two digits go into byte 0
+            int high = digits.charAt(digits.length() - 2 - i * 2) - '0';
+            int low = digits.charAt(digits.length() - 1 - i * 2) - '0';
             result[i] = (byte) ((high << 4) | low);
         }
         return result;
     }
 
+    /**
+     * Encode an integer as 4 bytes (8 when the value exceeds 32 bits), least
+     * significant byte first — the dominant DL/T 645 data-item width.
+     */
     private byte[] fromInt(long value) {
-        ByteBuffer bb = ByteBuffer.allocate(8).order(ByteOrder.BIG_ENDIAN);
-        bb.putLong(value);
+        boolean wide = value < Integer.MIN_VALUE || value > 0xFFFFFFFFL;
+        ByteBuffer bb = ByteBuffer.allocate(wide ? 8 : 4).order(ByteOrder.LITTLE_ENDIAN);
+        if (wide) {
+            bb.putLong(value);
+        } else {
+            bb.putInt((int) value);
+        }
         return bb.array();
     }
 
+    /** Encode a float as 4 IEEE-754 bytes, least significant byte first. */
     private byte[] fromFloat(float value) {
-        ByteBuffer bb = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer bb = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
         bb.putFloat(value);
         return bb.array();
     }

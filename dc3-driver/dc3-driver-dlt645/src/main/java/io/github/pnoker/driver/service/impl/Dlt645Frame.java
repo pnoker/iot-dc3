@@ -157,10 +157,18 @@ public final class Dlt645Frame {
         if ((response[0] & 0xFF) != (START & 0xFF) || (response[response.length - 1] & 0xFF) != (END & 0xFF)) {
             throw new ConnectorException("DL/T 645 response has invalid frame delimiters");
         }
+        int length = response[9] & 0xFF;
+        // Data field carries at least the 4-byte data identifier (write responses
+        // carry exactly it); anything shorter is a malformed frame, and the field
+        // must fit inside the received bytes (checksum + end byte excluded).
+        // Structure is validated before the checksum so malformed frames are
+        // rejected with a length diagnostic instead of crashing on the slice.
+        if (length < 4 || response.length < 12 + length) {
+            throw new ConnectorException("DL/T 645 response data length invalid: {}", length);
+        }
         if (!verifyChecksum(response)) {
             throw new ConnectorException("DL/T 645 response checksum mismatch");
         }
-        int length = response[9] & 0xFF;
         byte[] data = new byte[length - 4];
         for (int i = 0; i < data.length; i++) {
             data[i] = (byte) (response[14 + i] - RESPONSE_OFFSET);
