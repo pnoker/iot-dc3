@@ -26,7 +26,6 @@ class AgenticPropertiesTest {
     void defaultsMatchProductionExpectations() {
         AgenticProperties properties = new AgenticProperties();
         assertThat(properties.isEnabled()).isTrue();
-        assertThat(properties.getMemoryMaxMessages()).isEqualTo(50);
         assertThat(properties.isMemoryEnabled()).isTrue();
         assertThat(properties.isToolCallingEnabled()).isTrue();
         assertThat(properties.getAttachmentStoragePath()).isEqualTo("dc3/data/upload/agentic/attachment");
@@ -36,13 +35,11 @@ class AgenticPropertiesTest {
     void settersFlowToGetters() {
         AgenticProperties properties = new AgenticProperties();
         properties.setEnabled(false);
-        properties.setMemoryMaxMessages(100);
         properties.setMemoryEnabled(true);
         properties.setToolCallingEnabled(true);
         properties.setAttachmentStoragePath("/tmp/agentic");
 
         assertThat(properties.isEnabled()).isFalse();
-        assertThat(properties.getMemoryMaxMessages()).isEqualTo(100);
         assertThat(properties.isMemoryEnabled()).isTrue();
         assertThat(properties.isToolCallingEnabled()).isTrue();
         assertThat(properties.getAttachmentStoragePath()).isEqualTo("/tmp/agentic");

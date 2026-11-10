@@ -45,7 +45,6 @@ dc3:
     fallback-tool-calling-enabled: ${AGENTIC_FALLBACK_TOOL_CALLING_ENABLED:true}
     fallback-vision-enabled: ${AGENTIC_FALLBACK_VISION_ENABLED:true}
     fallback-reasoning-enabled: ${AGENTIC_FALLBACK_REASONING_ENABLED:false}
-    memory-max-messages: ${AGENTIC_MEMORY_MAX_MESSAGES:50}
     attachment-storage-path: ${AGENTIC_ATTACHMENT_STORAGE_PATH:dc3/data/upload/agentic/attachment}
     # Provider API keys are AES-GCM encrypted at rest with this base64 256-bit master
     # key. Blank derives a stable key from the platform security key (local/dev only);

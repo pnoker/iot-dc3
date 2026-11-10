@@ -43,13 +43,6 @@ public class AgenticProperties {
     private boolean enabled = true;
 
     /**
-     * Maximum number of messages retained per conversation by the in-memory window
-     * before older turns are evicted.
-     */
-    @Min(value = 1, message = "Memory max messages must be greater than 0")
-    private int memoryMaxMessages = 50;
-
-    /**
      * Whether to replay persisted conversation history back to the model provider on
      * each request. When false the assistant remains fully stateless across turns.
      */
@@ -57,8 +50,9 @@ public class AgenticProperties {
 
     /**
      * Maximum number of historical messages (user + assistant turns combined) loaded
-     * from {@code dc3_message} and replayed to the model per request. Independent of
-     * {@link #memoryMaxMessages}, which controls the in-memory advisor window.
+     * from {@code dc3_message} and replayed to the model per request. This persisted
+     * window is the single control over replayed memory; there is no separate
+     * in-memory advisor window cap.
      */
     @Min(value = 1, message = "History window size must be greater than 0")
     private int historyWindowSize = 30;
