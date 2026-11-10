@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -73,8 +72,22 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
     private final DriverMetadata driverMetadata;
     private final DriverSenderService driverSenderService;
     private final ObjectMapper objectMapper = JsonUtil.getJsonMapper();
-    private final Map<String, String> dataByDevEui = new ConcurrentHashMap<>();
-    private final Map<String, Map<String, String>> objectByDevEui = new ConcurrentHashMap<>();
+    // Per-devEui last-value caches are bounded: long-running deployments would otherwise
+    // grow one entry per device forever, even after devices are removed.
+    private final Map<String, String> dataByDevEui =
+            java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, String> eldest) {
+                    return size() > LRU_CACHE_MAX_ENTRIES;
+                }
+            });
+    private final Map<String, Map<String, String>> objectByDevEui =
+            java.util.Collections.synchronizedMap(new java.util.LinkedHashMap<>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(java.util.Map.Entry<String, Map<String, String>> eldest) {
+                    return size() > LRU_CACHE_MAX_ENTRIES;
+                }
+            });
     private final DriverProperties driverProperties;
 
     private MqttClient mqttClient;
@@ -204,9 +217,22 @@ public class LorawanDriverCustomServiceImpl implements DriverCustomService, Mqtt
         }
     }
 
+    /** Upper bound for the per-devEui last-value caches. */
+    private static final int LRU_CACHE_MAX_ENTRIES = 1000;
+
     private synchronized MqttClient getClient(Map<String, AttributeBO> driverConfig) throws Exception {
         if (Objects.nonNull(mqttClient) && mqttClient.isConnected()) {
             return mqttClient;
+        }
+        // Close the stale client before replacing it — dropping the reference without
+        // close() leaks its Paho threads and the old connection stays open broker-side.
+        if (Objects.nonNull(mqttClient)) {
+            try {
+                mqttClient.close();
+            } catch (Exception ignored) {
+                // best effort; the client is being replaced anyway
+            }
+            mqttClient = null;
         }
         String brokerUri = getConfigValue(driverConfig, "brokerUri", "tcp://dc3-mqtt:1883");
         String clientId = "dc3-driver-lorawan-" + UUID.randomUUID();
