@@ -24,6 +24,7 @@ import io.github.pnoker.common.driver.entity.property.DriverProperties;
 import io.github.pnoker.common.driver.metadata.DriverMetadata;
 import io.github.pnoker.common.driver.service.DriverSenderService;
 import java.util.HashMap;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,5 +78,61 @@ class MbusDriverCustomServiceImplTest {
         byte[] frame = MbusFrame.buildSndNke(0);
         assertThat(frame[0] & 0xFF).isEqualTo(0x10);
         assertThat(frame[frame.length - 1] & 0xFF).isEqualTo(0x16);
+    }
+
+    @Test
+    void decodesLittleEndianIntegersPerEn13757() {
+        // 500 stored LSB-first (F4 01): the old big-endian read returned 62465.
+        MbusRecord twoByte = new MbusRecord(0x02, 0x13, new byte[] {(byte) 0xF4, 0x01});
+        assertThat(MbusFrame.decodeValue(twoByte, "AUTO")).isEqualTo("500");
+
+        // 24-bit values accumulate unsigned across the default branch.
+        MbusRecord threeByte = new MbusRecord(0x03, 0x13, new byte[] {0x20, (byte) 0xA1, 0x07});
+        assertThat(MbusFrame.decodeValue(threeByte, "INT")).isEqualTo("500000");
+
+        // 64-bit integer per EN 13757 data-length code 5.
+        MbusRecord eightByte = new MbusRecord(0x05, 0x13, new byte[] {1, 0, 0, 0, 0, 0, 0, 0});
+        assertThat(MbusFrame.decodeValue(eightByte, "INT")).isEqualTo("1");
+    }
+
+    @Test
+    void decodesBcdLeastSignificantDigitsFirst() {
+        // 1234 kWh stored as digits low-pair-first (34 12).
+        MbusRecord bcd = new MbusRecord(0x0A, 0x14, new byte[] {0x34, 0x12});
+        assertThat(MbusFrame.decodeValue(bcd, "AUTO")).isEqualTo("1234");
+
+        // leading zero nibbles are trimmed
+        MbusRecord padded = new MbusRecord(0x0A, 0x14, new byte[] {0x07, 0x00});
+        assertThat(MbusFrame.decodeValue(padded, "BCD")).isEqualTo("7");
+    }
+
+    @Test
+    void decodesLittleEndianFloats() {
+        // 100.0f stored LSB-first (00 00 C8 42).
+        MbusRecord record = new MbusRecord(0x04, 0x38, new byte[] {0x00, 0x00, (byte) 0xC8, 0x42});
+        assertThat(MbusFrame.decodeValue(record, "FLOAT")).isEqualTo("100.0");
+    }
+
+    @Test
+    void parseRecordsWalksDifeAndVifeExtensionChains() {
+        // DIF 0x84 (32-bit + DIFE), DIFE 0x80 (chain continues), DIFE 0x00,
+        // VIF 0xFB (plant), VIFE 0x23 — the value follows the full chain.
+        byte[] data = {(byte) 0x84, (byte) 0x80, 0x00, (byte) 0xFB, 0x23, 0x40, 0x0D, 0x03, 0x00};
+        List<MbusRecord> records = MbusFrame.parseRecords(data);
+
+        assertThat(records).hasSize(1);
+        assertThat(records.get(0).getDif() & 0x0F).isEqualTo(0x04);
+        // the value starts after DIF + 2 DIFEs + VIF + VIFE
+        assertThat(records.get(0).getValueBytes()).containsExactly(0x40, 0x0D, 0x03, 0x00);
+        assertThat(MbusFrame.decodeValue(records.get(0), "INT")).isEqualTo("200000");
+    }
+
+    @Test
+    void parseRecordsStopsOnSpecialAndFillerDifs() {
+        byte[] data = {0x02, 0x13, 0x39, 0x30, (byte) 0x2F};
+        List<MbusRecord> records = MbusFrame.parseRecords(data);
+
+        assertThat(records).hasSize(1);
+        assertThat(MbusFrame.decodeValue(records.get(0), "INT")).isEqualTo("12345");
     }
 }

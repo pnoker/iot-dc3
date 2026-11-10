@@ -18,7 +18,6 @@ package io.github.pnoker.driver.service.impl;
 
 import io.github.pnoker.common.driver.support.CodecUtil;
 import io.github.pnoker.common.exception.ConnectorException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -195,8 +194,10 @@ public final class MbusFrame {
     /**
      * Decode the user-data field into a list of DIF/VIF data records.
      * <p>
-     * Handles the common single-byte DIF and VIF case plus DIFE/VIFE extension bytes;
-     * manufacturer-specific and variable-length records are skipped conservatively.
+     * Handles the common single-byte DIF and VIF case plus DIFE/VIFE extension
+     * chains (each extension byte flagged by its high bit); special/filler DIFs
+     * (low nibble 0xF, e.g. manufacturer-specific data or "more records follow")
+     * end parsing conservatively.
      * </p>
      *
      * @param data user-data bytes
@@ -210,43 +211,51 @@ public final class MbusFrame {
         int i = 0;
         while (i < data.length) {
             int dif = data[i] & 0xFF;
-            if (dif == 0x2F || dif == 0x1F) {
+            if ((dif & 0x0F) == 0x0F) {
+                // 0x0F manufacturer-specific, 0x1F special with more records,
+                // 0x2F/0x3F fillers — none are generically decodable.
                 break;
             }
+            int lenCode = dif & 0x0F;
             int cursor = i + 1;
-            if ((dif & 0x40) != 0) {
-                cursor++; // skip DIFE extension byte
+            while ((dif & 0x80) != 0 && cursor < data.length) {
+                dif = data[cursor] & 0xFF; // DIFE chain, flagged by the high bit
+                cursor++;
             }
             if (cursor >= data.length) {
                 break;
             }
             int vif = data[cursor] & 0xFF;
             cursor++;
-            if ((vif & 0x80) != 0 && cursor < data.length) {
-                cursor++; // skip VIFE extension byte
+            while ((vif & 0x80) != 0 && cursor < data.length) {
+                vif = data[cursor] & 0xFF; // VIFE chain, flagged by the high bit
+                cursor++;
             }
-            int len = difLength(dif & 0x0F);
+            int len = difLength(lenCode);
             if (cursor + len > data.length) {
                 break;
             }
             byte[] valueBytes = Arrays.copyOfRange(data, cursor, cursor + len);
-            records.add(new MbusRecord(dif, vif, valueBytes));
+            records.add(new MbusRecord(data[i], vif, valueBytes));
             i = cursor + len;
         }
         return records;
     }
 
     /**
-     * Map a DIF low-nibble code to its value byte length.
+     * Map a DIF low-nibble code to its value byte length per EN 13757-3:
+     * codes 1-4 are 8/16/24/32-bit integers, 5 and 7 are 64-bit integers,
+     * 6 is 48-bit, 9-12 are 2/4/6/8-digit BCD, 13 is bit fields,
+     * and 14 is 12-digit BCD (6 bytes).
      */
     private static int difLength(int code) {
         return switch (code) {
-            case 1, 9 -> 1;
+            case 1, 9, 13 -> 1;
             case 2, 10 -> 2;
             case 3, 11 -> 3;
-            case 4, 5, 12 -> 4;
-            case 6 -> 6;
-            case 7, 14 -> 8;
+            case 4, 12 -> 4;
+            case 6, 14 -> 6;
+            case 5, 7 -> 8;
             default -> 0;
         };
     }
@@ -254,8 +263,9 @@ public final class MbusFrame {
     /**
      * Decode a record value according to the requested format.
      * <p>
-     * {@code AUTO} selects BCD for BCD-coded DIFs, IEEE-754 for real, and integer
-     * otherwise.
+     * {@code AUTO} selects BCD for BCD-coded DIFs and integer otherwise;
+     * IEEE-754 floating point is only used when requested explicitly, because
+     * the EN 13757 DIF table has no float length code.
      * </p>
      *
      * @param record decoded record
@@ -269,8 +279,6 @@ public final class MbusFrame {
         if ("AUTO".equals(upper)) {
             if (code == 9 || code == 10 || code == 11 || code == 12 || code == 14) {
                 upper = "BCD";
-            } else if (code == 5) {
-                upper = "FLOAT";
             } else {
                 upper = "INT";
             }
@@ -291,41 +299,61 @@ public final class MbusFrame {
         return sb.toString();
     }
 
+    /**
+     * Decode BCD digits. M-Bus BCD records carry the least significant digit
+     * pair in the first byte, so the digits are read from the last byte to the
+     * first (high nibble before low nibble within each byte), trimming leading
+     * zeros.
+     */
     private static String toBcdString(byte[] data) {
         StringBuilder sb = new StringBuilder(data.length * 2);
         boolean started = false;
-        for (byte b : data) {
+        for (int i = data.length - 1; i >= 0; i--) {
+            int b = data[i] & 0xFF;
             int high = (b >> 4) & 0x0F;
             int low = b & 0x0F;
-            if (high != 0) {
+            if (!started && high != 0) {
                 started = true;
             }
             if (started) {
                 sb.append((char) ('0' + high));
             }
-            if (started || low != 0) {
-                sb.append((char) ('0' + low));
-            }
             if (!started && low != 0) {
                 started = true;
+            }
+            if (started) {
+                sb.append((char) ('0' + low));
             }
         }
         return sb.length() == 0 ? "0" : sb.toString();
     }
 
+    /**
+     * Decode an integer value. M-Bus multi-byte values are least significant
+     * byte first (EN 13757-3); 32- and 64-bit integers are two's complement,
+     * shorter and BCD-backed widths are unsigned.
+     */
     private static long toInt(byte[] data) {
-        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
         return switch (data.length) {
-            case 1 -> bb.get() & 0xFF;
-            case 2 -> bb.getShort() & 0xFFFF;
-            case 4 -> bb.getInt();
-            case 8 -> bb.getLong();
-            default -> new BigInteger(data).longValue();
+            case 1 -> data[0] & 0xFF;
+            case 2 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getShort() & 0xFFFF;
+            case 4 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getInt();
+            case 8 -> ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN).getLong();
+            default -> {
+                long value = 0;
+                for (int i = data.length - 1; i >= 0; i--) {
+                    value = (value << 8) | (data[i] & 0xFF);
+                }
+                yield value;
+            }
         };
     }
 
+    /**
+     * Decode an IEEE-754 value. M-Bus floats are least significant byte first.
+     */
     private static double toFloat(byte[] data) {
-        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.BIG_ENDIAN);
+        ByteBuffer bb = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
         return data.length == 4 ? bb.getFloat() : bb.getDouble();
     }
 }
