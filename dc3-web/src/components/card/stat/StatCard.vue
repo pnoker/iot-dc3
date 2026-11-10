@@ -30,7 +30,7 @@
   >
     <div class="stat-card__row">
       <div class="stat-card__icon">
-        <el-icon :size="28">
+        <el-icon>
           <component :is="icon"/>
         </el-icon>
       </div>
@@ -297,6 +297,9 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
     justify-content: center;
     background: var(--stat-card-bg);
     color: var(--stat-card-accent);
+    // The glyph rides the tile's font-size (the el-icon has no fixed size
+    // prop) so the phone compact variant can shrink both together.
+    font-size: 28px;
     flex-shrink: 0;
   }
 
@@ -395,6 +398,32 @@ const accentColor = computed(() => TONE_ACCENT[props.tone] || TONE_ACCENT.blue);
   @media (max-width: $breakpoint-xs-max), (pointer: coarse) {
     .stat-card__footer {
       opacity: 1;
+    }
+  }
+
+  // Phone compact variant — placed after the base rules it overrides (same
+  // specificity, source order wins). The stat grid drops to two columns on
+  // phones (~170-270px cards), so tile, glyph, value type and paddings step
+  // down together: the desktop proportions read cramped and top-heavy at
+  // that width.
+  @media (max-width: $breakpoint-xs-max) {
+    :deep(.el-card__body) {
+      padding: var(--dc3-space-3);
+    }
+
+    .stat-card__row {
+      gap: var(--dc3-space-2);
+    }
+
+    .stat-card__icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--dc3-radius-md);
+      font-size: 20px;
+    }
+
+    .stat-card__value-text {
+      font-size: 20px;
     }
   }
 

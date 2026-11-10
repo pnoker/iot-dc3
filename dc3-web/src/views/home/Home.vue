@@ -502,9 +502,10 @@ const cards = computed<CardModel[]>(() => [
   }
 
   // Stat indicators: always fit the strip on one line, regardless of how
-  // many cards the cards computed property ends up with. Below the lg
-  // tier (tablet / mobile) fall back to 3 cols, and to a single column on
-  // mobile, so cards don't squeeze below their minimum usable width.
+  // many cards the cards computed property ends up with. Below the lg tier
+  // (tablet / mobile) fall back to 3 cols; on phones 2 cols so the six
+  // cards read as three tidy pairs — a single column stretched each card
+  // into a sparse 500px-wide strip with dead space on its right.
   .home__stats {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -516,7 +517,7 @@ const cards = computed<CardModel[]>(() => [
     }
 
     @media (max-width: $breakpoint-xs-max) {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 }
