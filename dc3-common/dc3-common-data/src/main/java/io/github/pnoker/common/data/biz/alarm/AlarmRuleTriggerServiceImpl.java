@@ -151,8 +151,8 @@ public class AlarmRuleTriggerServiceImpl implements AlarmRuleTriggerService {
     }
 
     /**
-     * Dispatch a single fact into the alarm pipeline, swallowing exceptions so a failed
-     * fact never breaks the message consumer.
+     * Dispatch a single fact into the alarm pipeline. Errors are logged here and left to
+     * propagate: the RabbitMQ consumer's REQUEUE path applies the bounded retry policy.
      *
      * @param fact the rule fact to evaluate
      */
