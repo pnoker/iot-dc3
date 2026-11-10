@@ -56,7 +56,10 @@ test.describe('detail pages', () => {
       await waitForAppSettled(page);
       expectHealthy(health, initialMark);
 
-      await expect(page.locator('.el-tabs__item').filter({hasText: /Device Info|设备信息/})).toBeVisible();
+      // The device identity banner was merged into the stat tile grid
+      // (af508d7ce) — the detail page now opens on the Dashboard tab and
+      // carries no separate "Device Info" tab.
+      await expect(page.locator('.el-tabs__item').filter({hasText: /Dashboard|仪表盘/})).toBeVisible();
       await expect(page.locator('.el-tabs__item').filter({hasText: /Related Points|关联位号/})).toBeVisible();
       await expect(page.locator('.el-tabs__item').filter({hasText: /Related Commands|关联指令/})).toBeVisible();
       await expect(page.locator('.el-tabs__item').filter({hasText: /Related Events|关联事件/})).toBeVisible();
