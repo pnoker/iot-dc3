@@ -169,67 +169,74 @@ public class R2dbcDeviceStore implements ReactiveDeviceStore {
 
     @Override
     public Mono<DeviceBO> insert(DeviceBO device) {
-        DeviceBO value = prepare(device, device.getId() == null ? UuidV7.nextLong() : device.getId(), false);
-        DatabaseClient.GenericExecuteSpec insert = databaseClient
-                .sql("INSERT INTO " + TABLE
-                        + " (id, device_name, device_code, driver_id, profile_id, device_ext, enable_flag, tenant_id,"
-                        + " remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name,"
-                        + " operate_time, deleted) VALUES (:id, :device_name, :device_code, :driver_id, :profile_id,"
-                        + " " + dialect.jsonWriteExpression(":device_ext")
-                        + ", :enable_flag, :tenant_id, :remark, :signature, :version, :creator_id,"
-                        + " :creator_name, :create_time, :operator_id, :operator_name, :operate_time, 0)")
-                .bind("id", value.getId())
-                .bind("device_name", value.getDeviceName())
-                .bind("device_code", value.getDeviceCode())
-                .bind("driver_id", value.getDriverId())
-                .bind("device_ext", serialize(value.getDeviceExt()))
-                .bind("enable_flag", enableFlag(value))
-                .bind("tenant_id", value.getTenantId())
-                .bind("remark", value.getRemark())
-                .bind("signature", value.getSignature())
-                .bind("version", value.getVersion())
-                .bind("creator_name", value.getCreatorName())
-                .bind("create_time", utc(value.getCreateTime()))
-                .bind("operator_name", value.getOperatorName())
-                .bind("operate_time", utc(value.getOperateTime()));
-        insert = bindNull(insert, "profile_id", value.getProfileId(), Long.class);
-        insert = insert.bind("creator_id", value.getCreatorId() == null ? 0L : value.getCreatorId());
-        insert = insert.bind("operator_id", value.getOperatorId() == null ? 0L : value.getOperatorId());
-        Mono<DeviceBO> write = insert.fetch()
-                .rowsUpdated()
-                .flatMap(rows -> rows == 1
-                        ? get(value.getTenantId(), value.getId())
-                        : Mono.error(new IllegalStateException("device insert affected " + rows + " rows")));
-        return transactionalOperator.transactional(validateRelations(value).then(write));
+        // Deferred so a malformed BO surfaces as Mono.error through the unified
+        // exception channel instead of a bare throw before subscription; note
+        // prepare() normalizes the passed BO in place (documented store contract).
+        return Mono.defer(() -> {
+            DeviceBO value = prepare(device, device.getId() == null ? UuidV7.nextLong() : device.getId(), false);
+            DatabaseClient.GenericExecuteSpec insert = databaseClient
+                    .sql("INSERT INTO " + TABLE
+                            + " (id, device_name, device_code, driver_id, profile_id, device_ext, enable_flag, tenant_id,"
+                            + " remark, signature, version, creator_id, creator_name, create_time, operator_id, operator_name,"
+                            + " operate_time, deleted) VALUES (:id, :device_name, :device_code, :driver_id, :profile_id,"
+                            + " " + dialect.jsonWriteExpression(":device_ext")
+                            + ", :enable_flag, :tenant_id, :remark, :signature, :version, :creator_id,"
+                            + " :creator_name, :create_time, :operator_id, :operator_name, :operate_time, 0)")
+                    .bind("id", value.getId())
+                    .bind("device_name", value.getDeviceName())
+                    .bind("device_code", value.getDeviceCode())
+                    .bind("driver_id", value.getDriverId())
+                    .bind("device_ext", serialize(value.getDeviceExt()))
+                    .bind("enable_flag", enableFlag(value))
+                    .bind("tenant_id", value.getTenantId())
+                    .bind("remark", value.getRemark())
+                    .bind("signature", value.getSignature())
+                    .bind("version", value.getVersion())
+                    .bind("creator_name", value.getCreatorName())
+                    .bind("create_time", utc(value.getCreateTime()))
+                    .bind("operator_name", value.getOperatorName())
+                    .bind("operate_time", utc(value.getOperateTime()));
+            insert = bindNull(insert, "profile_id", value.getProfileId(), Long.class);
+            insert = insert.bind("creator_id", value.getCreatorId() == null ? 0L : value.getCreatorId());
+            insert = insert.bind("operator_id", value.getOperatorId() == null ? 0L : value.getOperatorId());
+            Mono<DeviceBO> write = insert.fetch()
+                    .rowsUpdated()
+                    .flatMap(rows -> rows == 1
+                            ? get(value.getTenantId(), value.getId())
+                            : Mono.error(new IllegalStateException("device insert affected " + rows + " rows")));
+            return transactionalOperator.transactional(validateRelations(value).then(write));
+        });
     }
 
     @Override
     public Mono<DeviceBO> update(DeviceBO device, int expectedVersion) {
-        DeviceBO value = prepare(device, device.getId(), true);
-        DatabaseClient.GenericExecuteSpec update = databaseClient
-                .sql("UPDATE " + TABLE + " SET device_name = :device_name, driver_id = :driver_id,"
-                        + " profile_id = :profile_id, device_ext = " + dialect.jsonWriteExpression(":device_ext")
-                        + ", enable_flag = :enable_flag,"
-                        + " remark = :remark, signature = :signature, version = version + 1, operator_id = :operator_id,"
-                        + " operator_name = :operator_name, operate_time = :operate_time WHERE id = :id"
-                        + " AND tenant_id = :tenant_id AND version = :expected_version AND deleted = 0")
-                .bind("device_name", value.getDeviceName())
-                .bind("driver_id", value.getDriverId())
-                .bind("device_ext", serialize(value.getDeviceExt()))
-                .bind("enable_flag", enableFlag(value))
-                .bind("remark", value.getRemark())
-                .bind("signature", value.getSignature())
-                .bind("operator_name", value.getOperatorName())
-                .bind("operate_time", utcNow())
-                .bind("id", value.getId())
-                .bind("tenant_id", value.getTenantId())
-                .bind("expected_version", expectedVersion);
-        update = bindNull(update, "profile_id", value.getProfileId(), Long.class);
-        update = update.bind("operator_id", value.getOperatorId() == null ? 0L : value.getOperatorId());
-        Mono<DeviceBO> write = update.fetch()
-                .rowsUpdated()
-                .flatMap(rows -> rows == 1 ? get(value.getTenantId(), value.getId()) : Mono.empty());
-        return transactionalOperator.transactional(validateRelations(value).then(write));
+        return Mono.defer(() -> {
+            DeviceBO value = prepare(device, device.getId(), true);
+            DatabaseClient.GenericExecuteSpec update = databaseClient
+                    .sql("UPDATE " + TABLE + " SET device_name = :device_name, driver_id = :driver_id,"
+                            + " profile_id = :profile_id, device_ext = " + dialect.jsonWriteExpression(":device_ext")
+                            + ", enable_flag = :enable_flag,"
+                            + " remark = :remark, signature = :signature, version = version + 1, operator_id = :operator_id,"
+                            + " operator_name = :operator_name, operate_time = :operate_time WHERE id = :id"
+                            + " AND tenant_id = :tenant_id AND version = :expected_version AND deleted = 0")
+                    .bind("device_name", value.getDeviceName())
+                    .bind("driver_id", value.getDriverId())
+                    .bind("device_ext", serialize(value.getDeviceExt()))
+                    .bind("enable_flag", enableFlag(value))
+                    .bind("remark", value.getRemark())
+                    .bind("signature", value.getSignature())
+                    .bind("operator_name", value.getOperatorName())
+                    .bind("operate_time", utcNow())
+                    .bind("id", value.getId())
+                    .bind("tenant_id", value.getTenantId())
+                    .bind("expected_version", expectedVersion);
+            update = bindNull(update, "profile_id", value.getProfileId(), Long.class);
+            update = update.bind("operator_id", value.getOperatorId() == null ? 0L : value.getOperatorId());
+            Mono<DeviceBO> write = update.fetch()
+                    .rowsUpdated()
+                    .flatMap(rows -> rows == 1 ? get(value.getTenantId(), value.getId()) : Mono.empty());
+            return transactionalOperator.transactional(validateRelations(value).then(write));
+        });
     }
 
     @Override
