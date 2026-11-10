@@ -38,6 +38,7 @@ import type {
   PageResult,
 } from '@/config/types';
 import {buildAuthHeaders} from '@/utils/authSession';
+import {logger} from '@/utils/log';
 
 interface OpenAIChunk {
   object?: string;
@@ -301,15 +302,22 @@ export const streamAgenticChatCompletion = async (
     let buffer = '';
     let done = false;
 
-    while (!done) {
-      const result = await reader.read();
-      done = result.done;
-      buffer += decoder.decode(result.value || new Uint8Array(), {stream: !done});
-      buffer = parseSseBuffer(buffer, callbacks);
-    }
+    try {
+      while (!done) {
+        const result = await reader.read();
+        done = result.done;
+        buffer += decoder.decode(result.value || new Uint8Array(), {stream: !done});
+        buffer = parseSseBuffer(buffer, callbacks);
+      }
 
-    parseSseBuffer(buffer, callbacks, true);
-    callbacks.onDone?.();
+      parseSseBuffer(buffer, callbacks, true);
+      callbacks.onDone?.();
+    } catch (error) {
+      // Release the underlying connection even when a frame kills the stream —
+      // an unclosed reader keeps the socket until garbage collection.
+      await reader.cancel().catch(() => {});
+      throw error;
+    }
   } catch (error) {
     const normalized = error instanceof Error ? error : new Error(String(error));
     callbacks.onError?.(normalized);
@@ -422,6 +430,8 @@ const parseSseBlock = (block: string, callbacks: AgenticStreamCallbacks) => {
       callbacks.onFinish?.(finishReason);
     }
   } catch (error) {
-    throw error instanceof Error ? error : new Error(String(error));
+    // One malformed frame (proxy-injected heartbeat data, a truncated chunk) must
+    // not terminate the whole answer stream — skip it and keep reading.
+    logger.warn('Agentic stream dropped an unparseable SSE frame', error);
   }
 };

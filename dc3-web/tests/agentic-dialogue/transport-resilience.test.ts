@@ -195,10 +195,11 @@ describe('SSE transport resilience', () => {
     expect(outcome.done).toBe(true);
   });
 
-  it('surfaces a malformed frame as a stream error instead of silently corrupting the conversation', async () => {
+  it('skips a malformed frame without killing the stream or corrupting content', async () => {
     const frames = [
       sse({choices: [{delta: {content: 'good prefix, '}}]}),
       encoder.encode('data: {not valid json}\n\n'),
+      sse({choices: [{delta: {content: 'good suffix'}}]}),
       sse({choices: [{finish_reason: 'stop'}]}),
     ];
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(sseResponse(frames)));
@@ -206,13 +207,16 @@ describe('SSE transport resilience', () => {
     let reported: Error | undefined;
     const outcome = await collectStream({onError: (error) => (reported = error)});
 
-    // Contract: the parser never guesses over broken payloads — the turn
-    // fails loudly so the UI can offer regeneration (L60) rather than
-    // showing a silently truncated answer as complete.
-    expect(outcome.error).toBeDefined();
-    expect(reported).toBe(outcome.error);
-    expect(outcome.done).toBe(false);
-    expect(outcome.content).toBe('good prefix, ');
+    // Contract: one malformed frame (a proxy-injected heartbeat, a truncated
+    // chunk) must not terminate the whole answer — the frame is dropped and
+    // the stream carries on to completion. Nothing from the broken payload is
+    // ever guessed into content, so the conversation stays uncorrupted; a
+    // stream-level failure still surfaces through onError (see the abort test).
+    expect(outcome.error).toBeUndefined();
+    expect(reported).toBeUndefined();
+    expect(outcome.done).toBe(true);
+    expect(outcome.content).toBe('good prefix, good suffix');
+    expect(outcome.finishReason).toBe('stop');
   });
 
   it('delivers partial output and an AbortError when the stream is stopped mid-flight', async () => {
