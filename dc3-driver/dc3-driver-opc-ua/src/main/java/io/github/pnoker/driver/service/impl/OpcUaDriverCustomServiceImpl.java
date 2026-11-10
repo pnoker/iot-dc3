@@ -386,14 +386,15 @@ public class OpcUaDriverCustomServiceImpl implements DriverCustomService {
             if (Objects.isNull(dataValue)
                     || Objects.isNull(dataValue.getStatusCode())
                     || !dataValue.getStatusCode().isGood()) {
-                invalidateConnector(deviceId, client);
+                // Point-level bad status (e.g. an unknown NodeId) is a configuration error:
+                // the transport stays healthy, so only the exception propagates.
                 throw new ReadPointException(
                         "Driver point read failed, protocol=" + driverProperties.getCode() + ", statusCode={}",
                         Objects.nonNull(dataValue) ? dataValue.getStatusCode() : null);
             }
             Variant variant = dataValue.getValue();
             if (Objects.isNull(variant) || Objects.isNull(variant.getValue())) {
-                invalidateConnector(deviceId, client);
+                // Same as bad status: a null Variant is point-level, not a transport fault.
                 throw new ReadPointException(
                         "Driver point read failed, protocol=" + driverProperties.getCode() + ", value is null",
                         new IllegalStateException("OPC UA Variant value is null"));

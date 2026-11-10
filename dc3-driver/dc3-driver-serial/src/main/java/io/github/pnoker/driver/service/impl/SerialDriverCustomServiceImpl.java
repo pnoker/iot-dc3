@@ -161,7 +161,9 @@ public class SerialDriverCustomServiceImpl implements DriverCustomService {
             String value = parseResponse(rawResponse, pointConfig);
             return new ReadPointValue(device, point, value);
         } catch (ReadPointException e) {
-            invalidateConnector(device.getId(), conn);
+            // Frame-level failures (checksum, empty body) mean the device answered with
+            // garbage; the port itself is healthy, so tearing it down would reconnect-
+            // storm a misconfigured device every cycle. Only transport faults close it.
             throw e;
         } catch (Exception e) {
             invalidateConnector(device.getId(), conn);
