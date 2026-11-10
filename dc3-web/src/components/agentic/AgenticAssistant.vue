@@ -590,6 +590,10 @@ watch(
   {flush: 'post'}
 );
 
+// A locale flip mid-stream cannot reload the active session (selectSession refuses
+// while streaming); remember the pending reload and replay it when the stream ends
+// so titles/summaries don't stay in the previous language.
+let pendingLocaleReload = false;
 watch(
   () => locale.value,
   async () => {
@@ -598,7 +602,17 @@ watch(
     const conversationId = activeConversationId.value;
     await agenticStore.loadSessions();
     if (token !== localeReloadToken || conversationId !== activeConversationId.value) return;
-    if (conversationId) await agenticStore.selectSession(conversationId);
+    const selected = conversationId ? await agenticStore.selectSession(conversationId) : true;
+    pendingLocaleReload = !selected && agenticStore.streaming;
+  }
+);
+watch(
+  () => agenticStore.streaming,
+  (streaming) => {
+    if (streaming || !pendingLocaleReload) return;
+    pendingLocaleReload = false;
+    const conversationId = activeConversationId.value;
+    if (conversationId) void agenticStore.selectSession(conversationId);
   }
 );
 

@@ -303,7 +303,16 @@ export const useAgenticStore = defineStore('agentic', () => {
       const response = await listAgenticSessions({offset: 0, limit: AGENTIC_SESSIONS_PAGE_LIMIT});
       if (currentLifecycle !== lifecycleToken || requestToken !== sessionsRequestToken) return true;
       const items = (response?.items || []).map(normalizeSession);
-      sessions.value = items;
+      // Optimistic local sessions (created via newSession, never persisted yet) carry
+      // no server timestamps; a plain replace would make them vanish from the rail on
+      // a language switch or retry before their first message syncs.
+      const localOnly = sessions.value.filter(
+        (session) =>
+          !session.createTime &&
+          !session.operateTime &&
+          !items.some((item) => item.conversationId === session.conversationId)
+      );
+      sessions.value = [...localOnly, ...items];
       sessionsServerCount = items.length;
       sessionsHasMore.value = hasMoreSessionPages(response, items);
       sessionsError.value = null;
