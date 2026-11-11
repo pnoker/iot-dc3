@@ -245,7 +245,7 @@ export function registerAgenticHandlers(): void {
     const i = coll.findIndex((r) => String(r.conversationId) === String(ctx.params.conversation_id));
     if (i >= 0) {
       const current = coll[i]!;
-      coll[i] = {
+      const next: Record<string, unknown> = {
         ...current,
         ...ctx.body,
         sessionExt: ctx.body?.sessionExt
@@ -253,6 +253,11 @@ export function registerAgenticHandlers(): void {
           : current.sessionExt,
         operateTime: stamp(),
       };
+      // An explicit title write is a user rename: drop the seed's localized
+      // titles, otherwise localizeAgenticRow() answers with the stale
+      // titleI18n and silently reverts the rename in the update response.
+      if (typeof ctx.body?.title === 'string') delete next.titleI18n;
+      coll[i] = next;
       return responseOf(ctx.config, ok(localizeAgenticRow(coll[i]!)));
     }
     return responseOf(ctx.config, fail('NOT_FOUND', 'Session not found', 404), 404);
