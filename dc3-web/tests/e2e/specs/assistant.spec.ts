@@ -31,6 +31,58 @@ import {expectHealthy, login, waitForAppSettled, watchPageHealth} from '../fixtu
 
 const composer = (page: Page) => page.locator('.el-textarea__inner').first();
 
+// One assistant morph beat: the panel width, the shell's lane paddings and
+// the rail collapse all ride --dc3-agentic-morph-duration (320ms). Geometry
+// measured mid-sweep captures transitional values, so every measurement
+// waits past the sweep before reading boxes.
+const MORPH_SETTLE_MS = 400;
+
+interface ColumnBox {
+  cx: number;
+  w: number;
+}
+
+interface ReadingColumnGeometry {
+  laneCx: number | null;
+  input: ColumnBox | null;
+  stream: ColumnBox | null;
+}
+
+// The workbench's reading column (messages + composer input) centres on the
+// chat lane: the shell's content box between the OVERLAY lanes (sessions
+// rail left, context panel right). The shell's border box spans the whole
+// workbench, so its raw centre is not the column axis.
+const readingColumnGeometry = (page: Page): Promise<ReadingColumnGeometry> =>
+  page.evaluate<ReadingColumnGeometry>(() => {
+    const box = (sel: string): ColumnBox | null => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return {cx: Math.round(r.x + r.width / 2), w: Math.round(r.width)};
+    };
+    const shell = document.querySelector<HTMLElement>('.agentic-shell');
+    if (!shell) return {laneCx: null, input: null, stream: null};
+    const rect = shell.getBoundingClientRect();
+    const style = getComputedStyle(shell);
+    const padLeft = Number.parseFloat(style.paddingLeft) || 0;
+    const padRight = Number.parseFloat(style.paddingRight) || 0;
+    return {
+      laneCx: Math.round(rect.x + padLeft + (rect.width - padLeft - padRight) / 2),
+      input: box('.agentic-input-shell'),
+      stream: box('.agentic-messages'),
+    };
+  });
+
+// The middle column is the reference axis: input and stream both centre on
+// it and share one width.
+const expectColumnOnChatLane = (geometry: ReadingColumnGeometry) => {
+  expect(Math.abs((geometry.input?.cx ?? -1) - (geometry.laneCx ?? -2))).toBeLessThanOrEqual(2);
+  if (geometry.stream) {
+    expect(geometry.input?.w).toBe(geometry.stream.w);
+    expect(Math.abs(geometry.stream.cx - (geometry.laneCx ?? -2))).toBeLessThanOrEqual(2);
+  }
+};
+
 test.describe('agent assistant', () => {
   test('opens from the header and closes with Escape', async ({page}) => {
     const health = watchPageHealth(page);
@@ -137,27 +189,8 @@ test.describe('agent assistant', () => {
     // workbench: the rail icons share one vertical axis; input aligns with the stream
     await page.getByRole('button', {name: /全屏|full.?screen/i}).first().click();
     await expect(page.locator('.agentic-panel--expanded')).toBeVisible();
-    const geometry = await page.evaluate(() => {
-      // scope to the rail nav: the context panel reuses item-icon class names
-      const rail = document.querySelector('.agentic-sessions');
-      const centers = (sel: string) =>
-        [...(rail?.querySelectorAll(sel) ?? [])].map((el) => {
-          const r = el.getBoundingClientRect();
-          return Math.round(r.x + r.width / 2);
-        });
-      const box = (sel: string) => {
-        const el = document.querySelector(sel);
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        return {cx: Math.round(r.x + r.width / 2), w: Math.round(r.width)};
-      };
-      return {
-        railCenters: centers('.agentic-sessions__top button, .agentic-sessions__item-icon, .agentic-sessions__footer button'),
-        shell: box('.agentic-shell'),
-        input: box('.agentic-input-shell'),
-        stream: box('.agentic-messages'),
-      };
-    });
+    await page.waitForTimeout(MORPH_SETTLE_MS);
+    const geometry = await readingColumnGeometry(page);
     // expanded rail: every conversation icon shares one left axis
     const itemIcons = await page.evaluate(() =>
       [...document.querySelectorAll('.agentic-sessions__view .agentic-sessions__item-icon')]
@@ -170,10 +203,12 @@ test.describe('agent assistant', () => {
     if (itemIcons.length > 1) {
       expect(Math.max(...itemIcons) - Math.min(...itemIcons)).toBeLessThanOrEqual(2);
     }
+    expectColumnOnChatLane(geometry);
 
     // collapsed icon rail: every control shares the vertical centre axis
     await page.locator('.agentic-sessions__collapse').click();
     await expect(page.locator('.agentic-sessions')).toHaveClass(/is-collapsed/);
+    await page.waitForTimeout(MORPH_SETTLE_MS);
     const collapsedCenters = await page.evaluate(() => {
       const rail = document.querySelector('.agentic-sessions');
       return [...(rail?.querySelectorAll('button') ?? [])]
@@ -186,12 +221,10 @@ test.describe('agent assistant', () => {
     expect(collapsedCenters.length).toBeGreaterThanOrEqual(3);
     expect(Math.max(...collapsedCenters) - Math.min(...collapsedCenters)).toBeLessThanOrEqual(2);
     await page.locator('.agentic-sessions__collapse').click();
-    // the middle column is the reference axis: input and stream both centre on it
-    expect(Math.abs((geometry.input?.cx ?? -1) - (geometry.shell?.cx ?? -2))).toBeLessThanOrEqual(2);
-    if (geometry.stream) {
-      expect(geometry.input?.w).toBe(geometry.stream.w);
-      expect(Math.abs(geometry.stream.cx - (geometry.shell?.cx ?? -2))).toBeLessThanOrEqual(2);
-    }
+    await expect(page.locator('.agentic-sessions')).not.toHaveClass(/is-collapsed/);
+    await page.waitForTimeout(MORPH_SETTLE_MS);
+    // the collapse round-trip must land back on the same reading-column axis
+    expectColumnOnChatLane(await readingColumnGeometry(page));
     expectHealthy(health);
   });
 
@@ -202,8 +235,10 @@ test.describe('agent assistant', () => {
     await waitForAppSettled(page);
     await page.locator('.agentic-launcher').click();
     if (isMobile) {
-      // no workbench rail on mobile — the docked header keeps its own actions
-      await expect(page.locator('.agentic-sessions')).toHaveCount(0);
+      // no workbench rail on mobile — the lane stays mounted for the panel's
+      // lifetime (overlay lanes toggle through CSS visibility), so the docked
+      // dialog contract is "never visible", not "absent from the DOM"
+      await expect(page.locator('.agentic-sessions')).toBeHidden();
       expectHealthy(health);
       return;
     }
@@ -213,6 +248,9 @@ test.describe('agent assistant', () => {
     const item = page.locator('.agentic-sessions__item').first();
     await item.hover();
     await item.locator('.agentic-sessions__item-more').click();
+    // the item menus are lazy (persistent=false): the popper only mounts on
+    // first open, so wait for it before driving its items
+    await expect(page.locator('.agentic-item-menu')).toBeVisible();
     await page.getByRole('menuitem', {name: /重命名|Rename/}).first().click();
     const dialog = page.locator('.el-dialog:visible, .el-overlay:visible').last();
     await expect(dialog).toBeVisible();
