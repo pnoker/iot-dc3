@@ -154,13 +154,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- Instancio for fixture object generation -->
-        <dependency>
-            <groupId>org.instancio</groupId>
-            <artifactId>instancio-junit</artifactId>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- WireMock for HTTP stubbing -->
         <dependency>
             <groupId>org.wiremock</groupId>
