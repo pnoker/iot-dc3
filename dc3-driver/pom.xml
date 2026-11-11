@@ -44,7 +44,7 @@
         <californium.version>4.0.0-M6</californium.version>
 
         <!-- LwM2M -->
-        <leshan.version>2.0.0-M14</leshan.version>
+        <leshan.version>2.0.0-M15</leshan.version>
 
         <!-- BACnet -->
         <bacnet4j.version>6.1.1</bacnet4j.version>
