@@ -73,11 +73,9 @@ NODE ?= node
 PYTHON ?= $(shell for c in python3 python py; do if command -v $$c >/dev/null 2>&1 && $$c -c 'print(1)' >/dev/null 2>&1; then echo $$c; exit 0; fi; done; echo python3)
 PNPM ?= corepack pnpm
 PNPM_WEB := cd dc3-web && $(PNPM)
-# dc3-cli pins pnpm@11.24.0 while dc3-web pins 12.6.0; corepack's shim remembers
-# the last-used version process-wide, so after any dc3-web invocation a nested
-# `pnpm` inside a dc3-cli script (build runs `pnpm typecheck`) starts 12.6.0 and
-# dies on the CLI's own version gate. npx pins the version per invocation.
-PNPM_CLI := cd dc3-cli && npx -y pnpm@11.24.0
+# dc3-cli and dc3-web pin the same pnpm (12.6.0), so corepack's process-wide
+# version memory can no longer start the wrong pnpm inside a nested CLI script.
+PNPM_CLI := cd dc3-cli && $(PNPM)
 
 CHANGE_FILE ?= dc3/doc/CHANGE.md
 FROM ?=

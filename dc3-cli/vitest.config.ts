@@ -5,6 +5,11 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['test/**/*.test.ts'],
+    // The credential-store tests derive AES keys and round-trip files through
+    // the real tmpdir filesystem; on Windows (and on slower CI runners) those
+    // sit close to vitest's 5s default under full-suite worker parallelism.
+    // Budget real work, not assertions — the default starves legitimate I/O.
+    testTimeout: 15_000,
     coverage: {
       provider: 'v8',
       include: ['src/**/*.ts'],
